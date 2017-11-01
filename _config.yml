@@ -11,7 +11,7 @@
 
 title:       "∫ntegrabℓε ∂ifferentiαℓs"
 description: "unorganised memo, notes, code, data, and writings of random topics"
-url_pretty:  "http://righthandabacus.github.io"
+url_pretty:  "https://righthandabacus.github.io"
 
 
 #############################
@@ -63,9 +63,6 @@ avatar: "/img/avatar.png"
 
 # List of links in the navigation bar
 navbar:
-  Resources:
-    - OpenCulture: "http://www.openculture.org/"
-    - g0v.hk: "https://g0vhk.io/"
   Collections:
     - Papers: "papers"
     - Books: "books"
