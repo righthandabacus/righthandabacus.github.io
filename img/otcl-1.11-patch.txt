@@ -1,0 +1,40 @@
+--- configure	2005-11-27 07:58:06.000000000 +0800
++++ configure.fixed	2006-02-08 20:54:40.000000000 +0800
+@@ -878,7 +878,7 @@
+   CXXFLAGS    C++ compiler flags
+   CPP         C preprocessor
+ 
+-Use these variables to override the choices made by `configure' or to help
++Use these variables to override the choices made by \`configure' or to help
+ it to find libraries and programs with nonstandard names/locations.
+ 
+ _ACEOF
+@@ -5455,7 +5455,7 @@
+     # results, and the version is kept in special file).
+ 
+     if test -r /etc/.relid -a "X`uname -n`" = "X`uname -s`" ; then
+-        system=MP-RAS-`awk '{print $3}' /etc/.relid'`
++        system=MP-RAS-`awk '{print $3}' /etc/.relid`
+     fi
+     echo "$as_me:$LINENO: result: $system" >&5
+ echo "${ECHO_T}$system" >&6
+@@ -6001,8 +6001,8 @@
+ # config.status only pays attention to the cache file if you give it
+ # the --recheck option to rerun configure.
+ #
+-# `ac_cv_env_foo' variables (set or unset) will be overridden when
+-# loading this file, other *unset* `ac_cv_foo' will be assigned the
++# \`ac_cv_env_foo' variables (set or unset) will be overridden when
++# loading this file, other *unset* \`ac_cv_foo' will be assigned the
+ # following values.
+ 
+ _ACEOF
+@@ -6081,7 +6081,7 @@
+ t quote
+ d
+ : quote
+-s,[	 `~#$^&*(){}\\|;'"<>?],\\&,g
++s,[	 \`~#$^&*(){}\\|;'"<>?],\\&,g
+ s,\[,\\&,g
+ s,\],\\&,g
+ s,\$,$$,g

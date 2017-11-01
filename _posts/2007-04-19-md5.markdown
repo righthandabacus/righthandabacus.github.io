@@ -1,0 +1,28 @@
+---
+layout: post
+title: "MD5 in C++"
+date: 2007-04-19 04:49:52 +0800
+tags: code
+---
+
+MD5 (Message Digest Five) is the algorithm developed by Rivest (of the RSA
+fame). It is also documented in the RFC1321. In order for the completely free
+use, L. Peter Deutsch wrote his own implementation according to the
+specification of the RFC. Currently, his implementation can be found on
+[Sourceforge](http://sourceforge.net/projects/libmd5-rfc/).
+
+I transformed Deutsch's implementation into C++. So that you
+can call the MD5 in the following way:
+
+```c++
+#include "md5.h"
+
+md5* MD5 = new md5();
+cout << "MD5 of string 'hello' is " << MD5->digest('hello') << endl;
+MD5->reset();
+MD5->append('hello ');
+MD5->append('world!');
+cout << "MD5 of string 'hello world!' is " << MD5->getDigest() << endl;
+```
+
+The code is here: [C++ source](/img/md5.cc) and [header file](/img/md5.h)

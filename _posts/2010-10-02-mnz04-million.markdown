@@ -1,0 +1,32 @@
+---
+layout: post
+title: "Myers et al (2004) Rethinking the Service Model: Scaling Ethernet to a Million Nodes (HotNets)"
+date: 2010-10-02 20:44:39 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "Rethinking the Service Model: Scaling Ethernet to a Million Nodes"
+  author: "Andy Myers and T. S. Eugene Ng and Hui Zhang"
+  booktitle: "Proc. HotNets"
+  year: 2004  
+---
+This paper tells why Ethernet cannot scale and propose a solution to solve it.
+
+Properties of Ethernet that makes it not scalable:
+
+  - Flat addressing scheme: A large network will make the forwarding table too large
+      - Not a problem now as bridge that supports 500K entries are available
+  - Need to support broadcast as a first-class service
+  - RSTP (Rapid Spanning Tree Protocol) is not scalable and cannot recover from bridge failure quickly
+
+RSTP computes spanning tree using distance vector advertisements of the cost to root bridge. Converge is fast in general but slow convergence happens when a root bridge fails: When root bridge fails, old BPDU (bridge protocol data unit) can persist in the network until its message age reaches max age. This creates loops. Moreover, RSTP limits the rate of BPDU transmissions. In the worst case of a ring topology, failing a root bridge creates a chained update of port roles, which can exceed the BPDU transmission rate limit.
+
+Often, flooding occurs more than necessary. For example, when a topology changes, bridges clears its cached station location to ensure their correctness. This makes subsequent received packets forwarded in broadcast mode.
+
+If we can eliminate broadcast in Ethernet, we removed the dependency on spanning tree and we introduce an opportunity to make Ethernet control plane scalable.
+
+Two directions can make Ethernet more scalable: The 4D project avocates to introduce decision plane instead of using control plane. A decision plance has a consistent set of forwarding tables, thus it ensures the topology is loop-free and also allows network to forward data over multipaths.
+
+A distributed control plane, which means to have a full topology in each switch, is another solution. Each switch has a directory service. A bridge receive register message from local hosts. It then forwards its local information to other bridges through state messages. The state messages is therefore synchronizing the directory across all the bridges. When a host need to resolve a MAC address, it sends a query message to its local directory, i.e. attached switch.
+
+The remaining problem of scalability would be route convergence. According to the internet draft by C. Aaettinoglu, V. Jacobson and H. Yu (Towards milli-second IGP convergence), link state protocol processing can be fast enough to be used in large scale if we use incremental shortest path algorithms instead of Dijkstra's algorithm.

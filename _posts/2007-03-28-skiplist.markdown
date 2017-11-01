@@ -1,0 +1,34 @@
+---
+layout: post
+title: "Pugh (2000) Skip list (CACM 33(6))"
+date: 2007-03-28 13:50:34 +0800
+category: paper
+bibtex:
+  type: article
+  title: "Skip lists: A probabilistic alternative to balanced trees"
+  author: "William Pugh"
+  journal: "Communications of the ACM"
+  volume: 33
+  number: 6
+  pages: "668--676"
+  year: 2000
+  url: "ftp://ftp.cs.umd.edu/pub/skipLists/skiplists.pdf"
+
+---
+I learnt something interesting today: The skip list.
+
+Skip list is a data structure that happens to do similar work as a tree.
+However, to make a tree optimized for searching, it has to be balanced and
+balancing is a cost. Skip list, however, does not enforce balancing but make the
+"tree" probabilistically balanced.
+
+Actually, it is not a tree, but a list. The nodes in the list has random number
+of connections to decendent nodes. For example, node 1 may has three connections
+and it is pointing to node 2, node 10 and node 15, node 2 has only one
+connection and it is pointing to node 3. In general, node $n$ must point to node
+$n+1$ but there may be some other connections to node $n+k$.
+
+The more *levels of connections* you have, the faster you can search. Details
+are mentioned in the following paper:
+
+The sample code is also available from the author: <ftp://ftp.cs.umd.edu/pub/skipLists/>

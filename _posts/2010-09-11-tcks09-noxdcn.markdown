@@ -1,0 +1,26 @@
+---
+layout: post
+title: "Tavakoli et al (2009) Applying NOX to the Datacenter (HotNets)"
+date: 2010-09-11 20:43:51 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: Applying NOX to the Datacenter
+  author: "Arsalan Tavakoli and Martin Casado and Teemu Koponen and Scott Shenker"
+  booktitle: "Proc. HotNets VIII"
+  year: 2009
+---
+This paper argues whether we are necessary to use specialized solution for data center network.
+
+VL2 and PortLand are specialized solutions for data center networks. In this
+paper, the authors argue that we do not need specialized solution but just need
+to configure the general network management technology. This paper use NOX
+(Network Operating System, by Berkeley) as the example of general network
+management technology. It comprises of a centralized controller(s) and
+manageable switches. The controller can install forwarding rules into those
+switches, which instruct the switch on how to forward a packet and whether any
+fields in the header should be changed upon being forwarded.
+
+The paper demonstrates how we can configure NOX to perform the load balancing
+function exactly like VL2. And argues that, the resources consumed (i.e.
+forwarding table capacity) using NOX is smaller than VL2.

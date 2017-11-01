@@ -1,0 +1,10 @@
+---
+layout: post
+title: "Films and Resolution"
+date: 2008-03-06 09:08:13 -0500
+tags: code
+---
+
+Normal 35mm film is of dimension 24mm x 36mm. The photo-sensitive chemical is distributed on the film in a resolution as high as 200 molecues/mm in the current technology. However, usually the printing from film uses only 40 lines/mm resolution and naked eyes cannot tell the difference.
+
+This turns out, the resolution of a 35mm full-frame CCD that is comparable to the potential of film needs to have 24x36x200x200=34.56 megapixels.

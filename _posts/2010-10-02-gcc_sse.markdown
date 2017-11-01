@@ -1,0 +1,95 @@
+---
+layout: post
+title: "Using SSE (SIMD extension) in GCC"
+date: 2010-10-02 01:21:11 -0400
+tags: code
+---
+
+Simply speaking, SSE is vector processing. The way to do is to declare a vector type in GCC:
+
+```c
+#include <stdio.h>
+typedef float v4sf __attribute__ ((vector_size(16))); // 4 floats * sizeof(float)=4*4=16
+
+typedef union {
+	v4sf v;
+	float f[4];
+}  v4sf_t;
+
+int main()
+{
+	v4sf_t a, b, c;
+
+	a.f[0] = 1; a.f[1] = 2; a.f[2] = 3; a.f[3] = 4;
+	b.f[0] = 5; b.f[1] = 6; b.f[2] = 7; b.f[3] = 8;
+
+	c.v = a.v + b.v;
+
+	printf("%f, %f, %f, %f\n", c.f[0], c.f[1], c.f[2], c.f[3]);
+	return 0;
+}
+```
+
+Then compile with `gcc -ggdb -c test.c`, and run `objdump -dS test.o`, we can see the following:
+
+```
+	c.v = a.v + b.v;
+  48:	0f 28 4d f0          	movaps -0x10(%rbp),%xmm1
+  4c:	0f 28 45 e0          	movaps -0x20(%rbp),%xmm0
+  50:	0f 58 c1             	addps  %xmm1,%xmm0
+  53:	0f 29 45 d0          	movaps %xmm0,-0x30(%rbp)
+```
+
+The instructions `movaps` and `addps` are SSE instructions. Doing a stress test:
+
+```c
+#include <sys/time.h>
+#include <unistd.h> 
+#include <stdio.h>
+
+typedef float v4sf __attribute__ ((vector_size(16))); // 4 floats * sizeof(float)=4*4=16
+
+typedef union {
+	v4sf v;
+	float f[4];
+} v4sf_t;
+
+int main()
+{
+	v4sf_t a, b, c;
+	int i,j;
+	struct timeval tst, tfin;
+	double t;
+
+	a.f[0] = 1; a.f[1] = 2; a.f[2] = 3; a.f[3] = 4;
+	b.f[0] = 5; b.f[1] = 6; b.f[2] = 7; b.f[3] = 8;
+
+	gettimeofday(&tst, NULL);
+	for (i=0; i != 0xFFFFFFF ; ++i)
+		c.v = a.v * b.v;
+	gettimeofday(&tfin, NULL);
+	t = (tfin.tv_sec - tst.tv_sec) + (double)(tfin.tv_usec - tst.tv_usec)/1e6;
+	printf("%f, %f, %f, %f\n", c.f[0], c.f[1], c.f[2], c.f[3]);
+	printf("Time taken for SSE: %fs\n",t);
+
+	gettimeofday(&tst, NULL);
+	for (i=0; i != 0xFFFFFFF ; ++i)
+		for(j = 0; j < 4; ++j)
+			c.f[j] = a.f[j] * b.f[j];
+	gettimeofday(&tfin, NULL);
+	t = (tfin.tv_sec - tst.tv_sec) + (double)(tfin.tv_usec - tst.tv_usec)/1e6;
+	printf("%f, %f, %f, %f\n", c.f[0], c.f[1], c.f[2], c.f[3]);
+	printf("Time taken for SSE: %fs\n",t);
+
+	return 0;
+}
+```
+
+Output in AMD Athlon(tm) 64 X2 Dual Core Processor 5200+:
+
+```
+5.000000, 12.000000, 21.000000, 32.000000
+Time taken for SSE: 0.725793s
+5.000000, 12.000000, 21.000000, 32.000000
+Time taken for array: 6.414677s
+```

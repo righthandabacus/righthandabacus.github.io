@@ -1,0 +1,35 @@
+---
+layout: post
+title: "Filters for photography"
+date: 2007-05-22 05:37:02 +0800
+tags: business
+---
+
+## Colored filters
+For example:
+  * Y: Yellow
+  * YG: Yellowish green
+  * O: Orange
+  * R: Red
+
+This is to strengthen or weaken colors.
+
+## LB
+LB filter can change the color temperature. For example, LB-A4 warming filter can make a bluish image looks white and LB-B12 cooling filter can make a yellowish photo look white.
+
+## ND
+Neutral Density Filter. Actually a grey filter to reduce light but not altering the color. It is numbered, such as ND2, ND4 and ND8. The ND2 filter allows 1/2 of the luminance to pass through, ND4 allows 1/4 and ND8 allows 1/8.
+
+## PL and CPL
+Polarizer. It is has linear and circular versions. It will quarter the amount of light (i.e. EV-2).
+
+## SL
+Sky Light Filter. Pale pink in color, it can eliminate UV.
+
+## UV
+Eliminate UV to increase the image sharpness. But usually used as a protector.
+
+## Softer
+Use small bubbles on the filter to diffract lights, so that a soft focus effect can be obtained. Because it diffracts light, it is better to use in situations that lights are not dim and from various directions, and shot using a large aperture.
+
+Softers are usually numbered --- the larger the number, the stronger the effect. Nikon system numbered it from 1 to 5.

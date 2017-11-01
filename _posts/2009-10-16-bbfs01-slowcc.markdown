@@ -1,0 +1,17 @@
+---
+layout: post
+title: "Bansel et al (2001) Dynamic Behavior of Slowly-Responsive Congestion Control Algorithms (SIGCOMM)"
+date: 2009-10-16 21:44:15 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "Dynamic Behavior of Slowly-Responsive Congestion Control Algorithms"
+  author: "Deepak Bansal and Hari Balakrishnan and Sally Floyd and and Scott Shenker"
+  booktitle: "Proc. SIGCOMM"
+  year: 2001
+---
+This paper evaluates different flow control algorithms and it is the first to propose the term "TCP-Friendliness" or "TCP-Compatible". The motivation is that, a lot of algorithms are proposed to date to avoid the TCP's AIMD, which changes the rate too drastic and thus not suitable for media streaming use. These algorithms react to congestion slowly. This paper study their fairness issues and efficiency.
+
+From the conclusion, the slowly responsive algorithm can be made to avoid persistently overloading the network or causing persistent loss on sudden bandwidth reduction, by incorporating a self-clocking mechanism. The drawback of having a slowly responsive algorithm is that, they lose throughput to faster algorithms like TCP under dynamic network conditions. But as the paper claim that those slowly responsive algorithms are not doing best-effort delivery, it is not a big deal.
+
+To read: [2] Binomial CC, [17] TEAR

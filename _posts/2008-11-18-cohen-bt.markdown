@@ -1,0 +1,33 @@
+---
+layout: post
+title: "Bram Cohen (2003) Incentives Build Robustness in BitTorrent (IPTPS'03)"
+date: 2008-11-18 17:45:16 -0500
+category: paper
+bibtex:
+  type: inproceedings
+  title: "Incentives Build Robustness in BitTorrent"
+  author: "Bram Cohen"
+  booktitle: "Proc IPTPS'03"
+  year: 2003
+---
+Problems of P2P download: Peers usually connects only for a few minutes and the fairness (i.e. upload rate proportional to download rate).
+
+Chapter 2 (Technical framework): Tracker is the only way for peers to find each other. To keep track of what peers have, BT cuts a file into pieces of fixed size of typically 250KB. Peers exchange availability information of pieces. Each piece has an independent SHA1 hash for checking. Pieces are further broken into sub-pieces of typically 16KB each. BT keeps around 5 requests pipelined at once and a sub-pieces is requested/sent each time. Therefore, instead of waiting for a piece to arrive from one source, a BT client can get the piece from 5 different peers.
+
+There are some prioritisation on request of pieces:
+  * random first piece when downloading starts and nothing to upload
+  * sub-pieces of a partially downloaded piece has the strict priority
+  * rarest first to reduce risk of unavailability of certain pieces
+  * endgame mode: if all yet to download sub-pieces of a piece are requested, send the requests for all the remaining sub-pieces to all peers and cancel the request after a sub-piece arrived
+
+Other techniques suggested by other papers: Erasure code for ensuring delivery but checking is simpler. Tree structure topology for distribution but doesn't utilise the upload capacity of leaves. Having the peers announce what they have can better utilise the upload capacity.
+
+Chapter 3 (Choking): BT will choke its peers so that the upload/download is suspended but the connection is remain open. This is for maintaining good performance.
+
+Pareto efficient means no two counterparties can make an exchange for higher utility. Seeking Pareto optimal is an local optimisation. In BT, peers upload to peers which upload to them, so that *both* getting better downloading rate. Unutilised connections are uploaded on trial basis to see if better transfer rates could be found. This is known as 'optimistic unchoking'. The optimistic unchoking is rotated, i.e. the unchoked peer is changed, every 30 sec. The time is enough for the upload to get to full capacity and then the download to reciprocate and also to the full capacity.
+
+BT clients uses a 20-sec moving average for measuring the transfer rate. Then decided to choke/unchoke peers every 10 sec. The time frame of 10 sec is to provide enough time for TCP to ramp up to full capacity.
+
+BT also implements the anti-snubbing to mitigate the problem of simultaneously choked by all peers. A client will stop upload to a peer, unless through optimistic unchoking, if it cannot get anything from that peer over a minute. In case of snubbing, a client can have more than one optimistic unchoking to recover download rates.
+
+When a client finished download, it only upload to other clients. It prefers those with better upload rates so that upload capacity is better utilised.

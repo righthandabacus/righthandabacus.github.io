@@ -1,0 +1,24 @@
+---
+layout: post
+title: "Kandula et al (2009) Flyways To De-Congest Data Center Networks (HotNets)"
+date: 2010-04-12 01:19:52 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "Flyways To De-Congest Data Center Networks"
+  author: "Srikanth Kandula and Jitendra Padhye and Paramvir Bahl"
+  booktitle: "Proc Hot Nets VIII"
+  year: 2009
+---
+This paper says, if we require a network to be not oversubscribed, the cost is high. For example, if we use fat-tree topology, the networking cost is 2-3x of a tree topology. Using VL2 is even 4-5x. However, it is not necessary to prevent oversubscription because in most of the time, the network is not widely congested.
+
+The paper shows some data collected in their lab (Microsoft) using map-reduce machine learning computation. It finds that,
+
+  - largest demand (source-destination pair) contributes around 0.5% of total traffic
+  - demand size is mostly within ±80% of the mean
+  - 55% of traffic by ToR switch is to only 10 other ToR switch
+  - top 10 ToR switches account for 95% of total traffic
+
+therefore, it is reasonable to make by-pass between hot ToR switches to offload traffic from the main network. In this case the performance will be comparable to that of non-oversubscribed network without the high cost.
+
+The paper proposes two methods to make flyways: Use 60 GHz wireless channel, which allows small antenna (1 inch) and high capacity but short range (within 10m); or use wired channel such as a gigabit switch connection some of the ToRs, but this lacks flexibility.

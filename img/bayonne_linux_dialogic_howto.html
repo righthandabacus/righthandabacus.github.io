@@ -1,0 +1,939 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2K.1beta (1.48)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Bayonne + Linux + Dialogic HOWTO</TITLE>
+<META NAME="description" CONTENT="Bayonne + Linux + Dialogic HOWTO">
+<META NAME="keywords" CONTENT="bayonne_linux_dialogic_howto">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2K.1beta">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="bayonne_linux_dialogic_howto.css">
+
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<IMG WIDTH="81" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next_inactive"
+ SRC="/usr/share/latex2html/icons/nx_grp_g.png"> 
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up_g.png"> 
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev_g.png">   
+<BR>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<P>
+
+<P>
+
+<P>
+
+<P>
+<H1 ALIGN="CENTER">Bayonne + Linux + Dialogic HOWTO</H1>
+<P ALIGN="CENTER"><STRONG>Adrian Sai-wah TAM (swtam@school.net.hk)
+<BR>
+Hong Kong School Net, The Chinese University of Hong Kong</STRONG></P>
+<P ALIGN="CENTER"><STRONG>Version 0.2: September 2, 2002</STRONG></P>
+
+<P>
+
+<H1><A NAME="SECTION00010000000000000000">
+1 Document History</A>
+</H1>
+
+<P>
+
+<UL>
+<LI>[v0.2&nbsp;(2002-09-02)]With the help of SR 5.1 for Linux Installation
+HOWTO from Mr. Gerry Gilmore, enhanced the RedHat installation details.
+Some tricks on Debian's installation is also added.
+</LI>
+<LI>[v0.1&nbsp;(2002-08-29)]First version
+</LI>
+</UL>
+<P>
+
+<H1><A NAME="SECTION00020000000000000000">
+2 Overview</A>
+</H1>
+
+<P>
+Dialogic is a subsidiary of Intel Corporation. It produces a series
+of telephony devices for computers. The Dialogic devices are proud
+of its generic software interface - all Dialogic device share the
+same API and device drivers (a.k.a. System Release), as said by Intel.
+However, the Dialogic's API is not a very efficient tool for developing
+telephony applications, especially in terms of the Rapid Application
+Development tilde.
+
+<P>
+Bayonne, a software project of GNU, is aimed to provide a generic
+framework for telephony hardware. It provides a high level abstraction
+so that all different hardware uses the same script to do the same
+thing (of course, provided that the hardware supports such features
+required). The script that Bayonne uses is simple and easy to understand.
+With the use of Bayonne, we can develop a telephony application easily.
+
+<P>
+Bayonne do not support all the telephony devices on the market. But
+lucky, Dialogic series is one of the brand it supports. The following
+describes how you can do with Dialogic and Bayonne on the Linux platform,
+from the hardware set up to application development.
+
+<P>
+
+<H1><A NAME="SECTION00030000000000000000">
+3 Hardware installation</A>
+</H1>
+
+<P>
+The Dialogic devices usually have a board identification switch on
+the board. The switch is something like a dial, with hexadecimal numbers
+0 to F printed on it. This switch is for identifying and distinguishing
+the board from others when you have more than one board installed
+in a system. Every Dialogic board should have a unique identification
+number, but if you don't care about which board and which board, you
+can just make every board the identification number 0, which then,
+automatic assignment is applied base on the PCI bus and slot number.
+If you are not using the automatic assignment, remember to record
+the identification number and the corresponding board models. These
+are needed during the driver installation.
+
+<P>
+
+<H1><A NAME="SECTION00040000000000000000">
+4 Install System Release on Linux system</A>
+</H1>
+
+<P>
+The Linux system can be any distribution. But I would prefer classifying
+the distributions into RedHat-alike and Debian-alike. Their difference
+is somewhat large. But in this document, you only need to know one
+thing: Do you use RPM for installation of new packages. If not, you
+just read the Debian-alike part.
+
+<P>
+
+<H2><A NAME="SECTION00041000000000000000">
+4.1 Installation for RedHat-alike distributions</A>
+</H2>
+
+<P>
+I have tried the RedHat version 7.3 as well as Mandrake 9.0 beta 1
+and beta 3. Installation on RedHat is easy. Just as the Intel says,
+install Linux Stream package first, then do the Dialogic system release
+installation. However, I found that installation on Mandrake is a
+little bit difficult. I don't know it is the problem of Mandrake-modified
+kernel or the instability of beta distributions. However, there is
+still ways to solve it. Anyway, if you found that your RedHat-alike
+distribution has some problem, do the tasks according to the paragraphs
+followed. If you are RedHat, you can probably skip section <A HREF="bayonne_linux_dialogic_howto.html#KernUp">4.1.1</A>
+and go from <A HREF="bayonne_linux_dialogic_howto.html#LiS">4.1.3</A>.
+
+<P>
+
+<H3><A NAME="SECTION00041100000000000000"></A><A NAME="KernUp"></A>
+<BR>
+4.1.1 Kernel upgrade
+</H3>
+
+<P>
+The Dialogic system release version 5.1 is tailored for kernel version
+2.4 series. Therefore, it would be best to keep up with the most current
+2.4 kernel. I have not tried the installation on kernel 2.2 and the
+development kernel 2.5, please tell me the result if you tried this.
+
+<P>
+You should first, go the <TT>ftp://ftp.kernel.org/pub/linux/kernel/v2.4/</TT>
+and get the kernel tar ball. The one I'd tried is version 2.4.19.
+After you get the tar ball (say, linux-2.4.19.tar.bz2), you extract
+it into somewhere like <TT>/usr/src</TT>, like follows:
+
+<P>
+
+<DL COMPACT>
+<DT>
+<DD>cd&nbsp;/var/tmp
+
+<P>
+wget&nbsp;ftp://ftp.kernel.org/pub/linux/kernel/v2.4/linux-2.4.19.tar.bz2
+
+<P>
+cd&nbsp;/usr/src
+
+<P>
+tar&nbsp;jxf&nbsp;/var/tmp/linux-2.4.19.tar.bz2
+</DD>
+</DL>After extracting the tar ball, you should make the new kernel and
+use it. It is quite easy to do even if it is your first time to compile
+kernel. You just <TT>chdir</TT> into the kernel source directory and
+than <TT>make menuconfig</TT>, choose the options you needed, than
+<TT>make bzImage</TT>; <TT>make modules</TT>; <TT>make modules_install</TT>;
+and finally, <TT>make install</TT>. I don't want to describe in too
+detail, but you can consult The Linux Kernel HOWTO (<TT>http://www.tldp.org/HOWTO/Kernel-HOWTO.html</TT>)
+at Linux Documentation Project (<TT>http://www.tldp.org/</TT>) for
+details on kernel compilation. The most important thing here is: enable
+the Linux telephony support during you <TT>make menuconfig</TT>, either
+in compiled-in or module is okay. After the compilation and installation,
+remember to reboot and use the new kernel before proceed.
+
+<P>
+
+<H3><A NAME="SECTION00041200000000000000">
+4.1.2 Afraid of make bzImage?</A>
+</H3>
+
+<P>
+If you don't want to make your kernel from the tar ball, or you are
+novice enough that do not know how to do it, or you have any reason
+don't want to do it, you can also use the RedHat package manager for
+the kernel upgrade purpose.
+
+<P>
+Dialogic System Release requires a clean and pure kernel. That means,
+it would be better if you are using RedHat because RedHat seldom modify
+the kernel. That was my experience that Mandrake 8.2 beta 1 has some
+problem in the kernel that would give tons of harmless but noisy messages
+during the SR's modules load. The System Release 5.1 requires kernel
+version of 2.4.9+, therefore, if you are using RedHat 7.2, your kernel
+must be upgraded. If you are using Red Hat 7.3, that's great! You
+basically needs no upgrade of kernel. However, the make sure you have
+the following packages installed:
+
+<P>
+
+<UL>
+<LI>kernel-2.4.18-3, or kernel-smp-2.4.18-3 if you are using a system
+with parallel processors
+</LI>
+<LI>kernel-source-2.4.18-3
+</LI>
+<LI>kernel-headers-2.4.18-3
+</LI>
+<LI>some version of gcc, gmake, devel libraries like glibc-devel, runtime
+libraries like glibc and libstdc++, ...
+</LI>
+</UL>
+These packages are required because you need to compile something
+with the kernel source code. You just need to ``<TT>rpm -i</TT>''
+or ``<TT>rpm -U</TT>'' them. The Red Hat users of older version
+may also use these RPM packages and upgrade your existing ones. Go
+to http://www.redhat.com/ or http://www.rpmfind.net/ for details on
+where to get these RPM packages. Again, if you have upgraded the kernel,
+don't forget to re-run the lilo or grub and reboot before proceed!
+RPM do not do these for you!
+
+<P>
+
+<H3><A NAME="SECTION00041300000000000000"></A><A NAME="LiS"></A>
+<BR>
+4.1.3 Install Linux Streams
+</H3>
+
+<P>
+Linux Streams (LiS) is important to Dialogic System Release. It uses
+LiS to make the driver for your system. So the first thing you have
+to do is to go to: <TT>ftp://ftp.gcom.com/pub/linux/src/LiS/</TT>
+and get the latest Linux Stream package. The lastest one at the time
+I write this document is version 2.14.6. Same as downloading and installing
+the kernel, you just download the tar ball (say, <TT>LiS-2.14.6.tar.gz</TT>)
+and extract everything into somewhere like <TT>/usr/src</TT> (recommended).
+
+<P>
+After that, you go to <TT>/usr/src/LiS-2.14.6</TT> and run <TT>make</TT>.
+Then you will have an interactive configuration session which is same
+as running <TT>./configure</TT>. Following is the questions you found:
+
+<P>
+
+<OL>
+<LI>How do you want to configure STREAMS?
+<BR>
+It is recommended to run in Linux kernel. Although it is the choice
+for running in user level, but it is recommended and required by the
+Dialogic System Release to make it a kernel mode program.
+</LI>
+<LI>Are you using the native Linux C compiler or are you crossing-compiling
+using a different compiler?
+<BR>
+Well...are you cross-compiling? I haven't tried and don't know whether
+cross compiling works. Hereinafter, I assumed you are using a native
+compiler, just as what I did.
+</LI>
+<LI>Enter directory location of your kernel source
+<BR>
+Usually the configuration program is smart enough to find the source
+directory of the kernel that you are using. If it fails, tell it the
+right one and press the enter key.
+</LI>
+<LI>Which version of the kernel are you building for?
+<BR>
+It is the version number string of your kernel. If you have given
+the right source directory, it can normally find the string. This
+should be exactly correct because if you have given a wrong version
+string, the kernel may refuse to load the LiS modules.
+</LI>
+<LI>Do you intend to run LiS on this machine with the currently running
+kernel?
+<BR>
+Normally you should choose yes.
+</LI>
+<LI>How do you want to build STREAMS for the Linux kernel?
+<BR>
+You can choose to make LiS a part of the kernel (linked with the kernel)
+or a separate module that loads on your demand. However, you should
+have no choice but make it a module. It is required by the Dialogic
+System Release.
+</LI>
+<LI>After building STREAMS, do you want kernel loadable modules installed?
+<BR>
+I have chosen yes to let the make program move the modules into <TT>/lib/modules/2.4.19/misc</TT>,
+just because I don't want to run <TT>make modules_install</TT> once
+again in the kernel source.
+</LI>
+<LI>Enter location of your kernel module directory
+<BR>
+Give the location where the modules installed, usually it gives a
+correct path as default.
+</LI>
+<LI>When you make STREAMS, do you want to use backward compatible constants
+in the file stropts.h?
+<BR>
+I don't know much about this issue. I just used the default, UnixWare/Solaris
+compatible instead of LiS backward compatible constants.
+</LI>
+<LI>When you make STREAMS, do you want to use Solaris style cmn_err?
+<BR>
+As well, I don't know much about this issue. I just used the default,
+SVR4 style.
+</LI>
+<LI>When you make STREAMS, do you want to compile for source level debugging?
+<BR>
+As I don't want tons of messages jamming my screen or the /var/log/message
+file, I disabled it.
+</LI>
+<LI>Do you want to use shared libraries?
+<BR>
+I have tried to make it statically linked. But something mysterious
+happened. I, threfore, recommends use the dynamic linking.
+</LI>
+</OL>
+That's all of the questions. After that, you should see the LiS compiles
+and installs. In summary, if you are lucky enough (usually, in fact),
+you just need to press enter for several times and use all the default
+values would be okay. After LiS compiles, remember to run once again
+the <TT>make install</TT> command to make the LiS helper scripts copied
+into <TT>/usr</TT>.
+
+<P>
+
+<H3><A NAME="SECTION00041400000000000000"></A><A NAME="RedHatSR"></A>
+<BR>
+4.1.4 Obtain and Install System Release
+</H3>
+
+<P>
+First of all, please go to Intel's web (http://resource.intel.com/telecom/support/releases/unix/index.html)
+and download the ``System Release 5.1 for Red Hat Linux 7.1/7.2
+on Intel Architecture'' (SR 5.1). You will find a file named <TT>LINUX_SR5.1.tgz</TT>
+of 140 MB. Extract it into a directory, you will than find 15 RPM
+files and 6 other files. If you are using RPM for package management,
+just run <TT>./install.sh</TT> and you will see a menu of 6 items.
+The first two are for SpringWare boards and the later four are for
+DM3 boards. You just need to follow the instruction of menu and install
+the required package.
+
+<P>
+For example, I am using a D/480JCT-1T1 card and therefore I choose
+<TT>1</TT> to indicate that I am using a card of SpringWare series.
+It will than show you a list of packages to be installed and install
+the RPM packages by using the ``<TT>rpm -i</TT>'' command. After
+the installation is complete without error, you will see the menu
+again and in this case, you can choose <TT>Q</TT> to quit. Further
+details on installation can be obtained from Intel. There is a document
+called ``Installation and Configuration Guide for Linux'' at the
+above URL describing how to do installations of the System Release
+5.1 on RedHat (and alike systems).
+
+<P>
+Some remarks here: Unless you know specifically that you have <I>Antares</I>
+hardware, make sure not to select option 2 in the menu of install.sh.
+That option will create some entries in your config file that will
+clutter your screen with all kinds of mean, nasty, ugly messages during
+initialization. (Thanks Gerry)
+
+<P>
+After the installation of the SR 5.1, configuration is required. The
+configuration process is aimed to identify the model of board you
+are using, the IRQ it should be used, create the kernel modules for
+use as the device driver for the Dialogic devices and so on. Under
+Red Hat-alike system, it is quite easy. You just go to the SR 5.1
+directory where you just extracted the 140 MB tar ball, there is a
+shell script called <TT>config.sh</TT>. Run it and you will see that
+the first question asked is whether you have a DM3 type board. If
+you answer no (that's me!), you will be prompted for whether you have
+other type of Intel Dialogic Board. Answering these few question is
+very important as wrong answer will give (may be) miserable results.
+
+<P>
+After these, you should follow the instructions appeared. It will
+help you copy the required files into <TT>/usr/src/LiS/</TT> and build
+a kernel modules (with installation to <TT>/lib/modules/</TT><I>version</I><TT>/misc/</TT>).
+It will also help creating configuration files in /usr/dialogic/conf/
+by asking what models you have and what parameters (IRQs and board
+IDs, for example) you want to use. Please follow sections 2.4 to 5.9
+of the ``Installation and Configuration Guide for Linux'' for
+better descriptions.
+
+<P>
+
+<H3><A NAME="SECTION00041500000000000000"></A><A NAME="TestSR"></A>
+<BR>
+4.1.5 Testing if it works
+</H3>
+
+<P>
+Rebooting is never a good practice for Linux systems! The real Linux
+user only reboots at two occations: first is doing something with
+the kernel, and the second is dealing with the hardware which means
+you must stop the power. After installing the Dialogic SR, you don't
+need to reboot. Just call the following commands:
+
+<P>
+
+<DL COMPACT>
+<DT>
+<DD>.&nbsp;/etc/profile.d/orbacus.sh
+
+<P>
+.&nbsp;/usr/dialogic/bin/setenv.sh
+
+<P>
+/etc/rc.d/init.d/orbacus&nbsp;start
+
+<P>
+/etc/rc.d/init.d/dialogic&nbsp;start
+</DD>
+</DL>and you will have the same effect as rebooting the system.
+
+<P>
+All the Dialogic files relies in <TT>/usr/dialogic/</TT>, for example,
+the executables are at <TT>/usr/dialogic/bin/</TT>. You can try go
+there and call <TT>dlstart</TT> - a script for starting the Dialogic
+devices. If everything goes fine, it will download something onto
+the Dialogic hardware and started some daemons with some diagnostic
+information shown. After that, you can call the program <TT>detect</TT>
+in the same directory which will than tell you about what's installed
+in your system. You should normally see the model and board ID of
+the telephony boards. If what I say is happened, congradulation! You've
+make it. If not, try to read the Installation Guide or call the vendor
+for help. Probably it is the problem of your kernel version or you
+have chosen a wrong model during the post-install configuration. If
+it still fails, try think your system as some scratch system and follow
+the solution for Debian-alike distributions.
+
+<P>
+
+<H2><A NAME="SECTION00042000000000000000">
+4.2 Installation for Debian-alike (or non-RPM) distributions</A>
+</H2>
+
+<P>
+Seems that Intel belives Linux is equivalent to Red Hat. It looks
+do not understand what Linux really is. However, frankly, I don't
+like RedHat as many Linux gurus. Debian is my favoriate Linux favor,
+but it do not have RPM given in parallel with Debian Package system.
+I have no patience to install the RPM for it as well. Therefore, after
+reading the ``Installing Dialogic Boards in Slackware Linux''
+by Diego Betancor on May 2001 (<TT>http://diego.betancor.com/dialogicinlinux/</TT>),
+I decided to do it by hand.
+
+<P>
+
+<H3><A NAME="SECTION00042100000000000000">
+4.2.1 Prepare the kernel and Linux Streams</A>
+</H3>
+
+<P>
+Just as described in sections <A HREF="bayonne_linux_dialogic_howto.html#KernUp">4.1.1</A> and <A HREF="bayonne_linux_dialogic_howto.html#LiS">4.1.3</A>, you should
+first keep the kernel up to date and with telephony options enabled.
+Then give the Linux Streams installed as modules.
+
+<P>
+
+<H3><A NAME="SECTION00042200000000000000">
+4.2.2 Installing the Dialogic System Releases</A>
+</H3>
+
+<P>
+The first step is the same as the Red Hat-alike installation: please
+get the 140 MB package first. Then extract it into some directory.
+At there, just call the <TT>install.sh</TT> script. It should fail
+definitely because we have no RPM system. But never mind, I just need
+the output. The install script will tell you what packages you should
+install. For example, in my case, I am installing a SpringWare board
+and it told me that I should have <TT>DLGCcom</TT>, <TT>DLGCcsp</TT>,
+<TT>DLGCdev</TT>, <TT>DLGCgc</TT>, <TT>DLGCooc</TT>, <TT>DLGCparms</TT>,
+<TT>DLGCpri</TT> packages. Then, assuming you have the <TT>rpm2cpio</TT>
+and <TT>cpio</TT> utilities, convert all the required RPMs into cpio
+formats. In my case, I did this:
+
+<P>
+
+<DL COMPACT>
+<DT>
+<DD>for&nbsp;pkgs&nbsp;in&nbsp;com&nbsp;csp&nbsp;dev&nbsp;gc&nbsp;ooc&nbsp;parms&nbsp;pri;&nbsp;do
+
+<P>
+&nbsp;&nbsp;&nbsp;&nbsp;rpm2cpio&nbsp;DLGC${pkgs}-*.i386.rpm&nbsp;&gt;&nbsp;DLGC${pkgs}.cpio
+
+<P>
+done
+</DD>
+</DL>Then, you have two choice. If you are safety-oriented, make a directory,
+say, <TT>/tmp/sr51/</TT> and call the following command. If you are
+risk-taking, just go directly to the root directory and take:
+
+<P>
+
+<DL COMPACT>
+<DT>
+<DD>for&nbsp;pkgs&nbsp;in&nbsp;com&nbsp;csp&nbsp;dev&nbsp;gc&nbsp;ooc&nbsp;parms&nbsp;pri;&nbsp;do
+
+<P>
+&nbsp;&nbsp;&nbsp;&nbsp;cpio&nbsp;-id&nbsp;&lt;&nbsp;/path/to/files/DLGC${pkgs}.cpio
+
+<P>
+done
+</DD>
+</DL>Basically, if you call <TT>cpio</TT> in <TT>/tmp/sr51</TT>/, you will
+see that there is a <TT>./usr/dialogic/</TT> directory and a <TT>./etc/</TT>
+directory. Intel did not use the full power of RPM, but just make
+it as an alternative of tar ball. So we just need to copy everything
+into root (<TT>cp -R * /</TT>) is okay.
+
+<P>
+Debian is somewhat differs from Red Hat. Its start up script is at
+<TT>/etc/init.d/</TT> instead of <TT>/etc/rc.d/init.d/</TT>, so you
+have to move the dialogic startup script and other files to correct
+locations. I would suggest to make a symbolic link as there is still
+some scripts in <TT>/usr/dialogic/bin</TT> believes there is a <TT>/etc/rc.d/init.d/orbacus</TT>
+script. Commands are as follows:
+
+<P>
+
+<DL COMPACT>
+<DT>
+<DD>ln&nbsp;-s&nbsp;/etc/rc.d/init.d/orbacus&nbsp;/etc/init.d/orbacus
+
+<P>
+ln&nbsp;-s&nbsp;/etc/rc.d/rc3.d/S85orbacus&nbsp;/etc/rc3.d/S85orbacus
+
+<P>
+ln&nbsp;-s&nbsp;/etc/rc.d/rc5.d/S85orbacus&nbsp;/etc/rc5.d/S85orbacus
+</DD>
+</DL>After that, you have to make the dynamic link libraries available
+for the use of the SR 5.1 binaries and header files available for
+the compilation of drivers. What you have to do is call the following
+commands at anywhere:
+
+<P>
+
+<DL COMPACT>
+<DT>
+<DD>for&nbsp;dyn&nbsp;in&nbsp;/usr/dialogic/lib/*&nbsp;/usr/dialogic/ooc/lib/*;&nbsp;do
+
+<P>
+&nbsp;&nbsp;&nbsp;&nbsp;ln&nbsp;-s&nbsp;${dyn}&nbsp;/usr/lib/`basename&nbsp;${dyn}`
+
+<P>
+done
+
+<P>
+for&nbsp;header&nbsp;in&nbsp;/usr/dialogic/inc/*.h;&nbsp;do
+
+<P>
+&nbsp;&nbsp;&nbsp;&nbsp;ln&nbsp;-s&nbsp;${header}&nbsp;/usr/include/`basename&nbsp;${header}`
+
+<P>
+done
+</DD>
+</DL>Now, you have created 58+105=163 soft links. Then run this list of
+commands accordingly:
+
+<P>
+
+<DL COMPACT>
+<DT>
+<DD>ln&nbsp;-s&nbsp;/bin/pidof&nbsp;/sbin/pidof
+
+<P>
+ln&nbsp;-s&nbsp;/usr/lib/libxerces_c1_5.so&nbsp;/usr/lib/libxerces.so
+
+<P>
+mkdir&nbsp;-p&nbsp;/var/dialogic/log
+
+<P>
+chmod&nbsp;766&nbsp;/var/dialogic&nbsp;/var/dialogic/log
+
+<P>
+ln&nbsp;-s&nbsp;/var/dialogic/log&nbsp;/usr/dialogic/log
+
+<P>
+cp&nbsp;/usr/dialogic/init.d/dialogic&nbsp;/etc/init.d/dialogic
+
+<P>
+ln&nbsp;-s&nbsp;/etc/init.d/dialogic&nbsp;/etc/rc3.d/S90dialogic
+
+<P>
+ln&nbsp;-s&nbsp;/etc/init.d/dialogic&nbsp;/etc/rc5.d/S90dialogic
+
+<P>
+ln&nbsp;-s&nbsp;/etc/init.d/dialogic&nbsp;/etc/rc0.d/K90dialogic
+
+<P>
+ln&nbsp;-s&nbsp;/etc/init.d/dialogic&nbsp;/etc/rc6.d/K90dialogic
+
+<P>
+cp&nbsp;/usr/dialogic/cfg/RtfConfig.xml&nbsp;/usr/dialogic/cfg/DefaultRtfConfig.xml
+
+<P>
+chmod&nbsp;-w&nbsp;/usr/dialogic/cfg/DefaultRtfConfig.xml
+
+<P>
+echo&nbsp;'.&nbsp;/etc/profile.d/orbacus.sh'&nbsp;&gt;&gt;&nbsp;/etc/profile
+
+<P>
+echo&nbsp;'.&nbsp;/usr/dialogic/bin/setenv.sh'&nbsp;&gt;&gt;&nbsp;/etc/profile
+</DD>
+</DL>which creates a symbolic links to make Debian compatible with the
+Red Hat nomenclature and do some post-installation script that RPM
+will do. Follows that, create a file <TT>/usr/dialogic/cfg/.master.cfg</TT>
+with the following content (2 lines):
+
+<P>
+
+<DL COMPACT>
+<DT>
+<DD>00200&nbsp;&nbsp;vox&nbsp;&nbsp;sram&nbsp;&nbsp;1&nbsp;&nbsp;2
+
+<P>
+00201&nbsp;&nbsp;ant&nbsp;&nbsp;an&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;0
+</DD>
+</DL>Now you have already finished most of the jobs. Next, is to go back
+to source directory of the SR 5.1 which your <TT>config.sh</TT> locates,
+and modify the <TT>config.sh</TT> script at line 20 where defines
+variable <TT>TEST_PKG</TT> to ``<TT>rpm -q</TT>''. Because we
+do not use rpm as the package management tool, the command <TT>rpm
+-q packagename</TT> must fail and gives error return value. To make the
+powerful <TT>config.sh</TT> script runs, we need the <TT>$TEST_PKG
+packagename</TT> return successfully. You can, therefore, modify the <TT>$TEST_PKG</TT>
+into anything that gives successful return values. What I did is make
+it into ``<TT>echo</TT>'', which will definitely return 0 whatever
+you give.
+
+<P>
+After your modification, just execute <TT>config.sh</TT> and do the
+configuration as in section <A HREF="bayonne_linux_dialogic_howto.html#RedHatSR">4.1.4</A> et voila!
+
+<P>
+
+<H3><A NAME="SECTION00042300000000000000">
+4.2.3 Problems?</A>
+</H3>
+
+<P>
+One thing very important: If your <TT>/etc/init.d/orbacus</TT> script
+fails and says relocation error and do not understand the symbol <TT>__dynamic_cast_2</TT>,
+it is not Debian's fault! The orbacus stuff are used to run on Red
+Hat and it seems that the Red Hat's dynamic library is required. Two
+possible solutions to this is (any one will work):
+
+<P>
+
+<OL>
+<LI>Use strip to kill the <TT>__dynamic_cast_2</TT> symbol in <TT>/usr/dialogic/ooc/lib/libOB.so</TT>,
+command line is:
+<BR><TT>strip -strip-symbol=__dynamic_cast_2 /usr/dialogic/oob/lib/libOB.so.4.0.5</TT>
+</LI>
+<LI>Backup your original library file and copy the file <TT>/usr/lib/libstdc++-libc6.2-2.so.3</TT>
+from Red Hat (or Mandrake) distribution and overwrite the original
+</LI>
+</OL>
+The less-dirty solution is under investigation. Please give me some
+time (and hints if you have).
+
+<P>
+Alright, back to the basic. After the installation, you should first
+test the system according to section <A HREF="bayonne_linux_dialogic_howto.html#TestSR">4.1.5</A>. If it works, that's
+great and skip to the next section for the works on Bayonne. If not,
+probably you need to change something in <TT>/usr/dialogic/cfg/</TT>.
+The most critical configuration file is <TT>dialogic.cfg</TT> (for
+SpringWare only). In most case, you need to have a ``<TT>Dialog/HD=YES</TT>''
+in the section <TT>[Genload - All Boards]</TT>, which the <TT>config.sh</TT>
+and <TT>mkcfg</TT> scripts always missed. For others parameters usable
+in the <TT>dialogic.cfg</TT> file, you should consult section 3.3
+of the Installation and Configuration Guide. The following is my configuration
+file for the system with one VFX/PCI card for your reference:
+
+<P>
+
+<DL COMPACT>
+<DT>
+<DD>[Genload&nbsp;-&nbsp;All&nbsp;Boards]
+
+<P>
+Dialog/HD=YES
+
+<P>
+BusType=SCBus
+
+<P>
+SCBusClockMaster=AUTOMATIC
+
+<P>
+SCBusClockMasterSource=AUTOMATIC
+
+<P>
+#[Genload&nbsp;-&nbsp;ID&nbsp;0]&nbsp;/*&nbsp;T1/E1&nbsp;voice&nbsp;HD&nbsp;*/
+
+<P>
+#Feature=dpd_in
+
+<P>
+#ParameterFile=spandti.prm
+
+<P>
+#[Genload&nbsp;-&nbsp;ID&nbsp;1]&nbsp;/*&nbsp;T1/E1&nbsp;voice&nbsp;HD&nbsp;*/
+
+<P>
+#ISDNProtocol=ne1
+</DD>
+</DL>Sometimes, (in fact, most of the time) you may not have the file <TT>/etc/rc.d/init.d/functions</TT>
+which the Red Hat-alike systems have. This function is useless but
+give some fancy output on loading the start up scripts in <TT>/etc/rc.d/init.d/*</TT>.
+If it is the case, your orbacus start up script will not run properly.
+The solution is simple: Delete the lines (line 12, 47, 69) which imports
+the <TT>functions</TT> script and call to <TT>echo_success</TT> functions.
+
+<P>
+
+<H1><A NAME="SECTION00050000000000000000">
+5 Bayonne's matter</A>
+</H1>
+
+<P>
+
+<H2><A NAME="SECTION00051000000000000000">
+5.1 Making Bayonne from Scratch</A>
+</H2>
+
+<P>
+The main portal of Bayonne is at the GNU: <TT>http://www.gnu.org/software/bayonne/</TT>.
+As described in the Bayonne User Manual, you needs four more components
+to make Bayonne works, namely the CommonC++, ccAudio, ccRTP, ccScript.
+These four components can be obtained via HTTP and FTP from ftp.gnu.org
+or any other GNU FTP mirrors. At the time I write this document, the
+latest versions available are: CommonC++2 1.0.1 (<TT>commoncpp2-1.0.1.tar.gz</TT>),
+ccAudio 1.0 RC 1 (ccaudio-1.0rc1.tar.gz), ccRTP 0.9.1 (ccrtp-0.9.1.tar.gz),
+ccScript 2.2.1 (<TT>ccscript-2.2.1.tar.gz</TT>). The latest version
+of Bayonne is 1.0.0 (bayonne-1.0.0.tar.gz).
+
+<P>
+After obtaining all the tar balls, extract and install the CommonC++
+first, then the ccAudio, ccRTP and ccScript in any other, and finally
+extract and install the Bayonne package. The following screen dumps
+shows what's being done:
+
+<P>
+
+<DL COMPACT>
+<DT>
+<DD>#&nbsp;ls&nbsp;-l
+
+<P>
+bayonne-1.0.0.tar.gz&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ccrtp-0.9.1.tar.gz&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;commoncpp2-1.0.1.tar.gz
+
+<P>
+ccaudio-1.0rc1.tar.gz&nbsp;&nbsp;&nbsp;&nbsp;ccscript-2.2.1.tar.gz
+
+<P>
+#&nbsp;for&nbsp;x&nbsp;in&nbsp;*;&nbsp;do&nbsp;tar&nbsp;zxf&nbsp;$x;&nbsp;done
+
+<P>
+#&nbsp;ls&nbsp;-l
+
+<P>
+bayonne-1.0.0/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ccrtp-0.9.1/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;commoncpp2-1.0.1/
+
+<P>
+bayonne-1.0.0.tar.gz&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ccrtp-0.9.1.tar.gz&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;commoncpp2-1.0.1.tar.gz
+
+<P>
+ccaudio-1.0rc1/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ccscript-2.2.1/
+
+<P>
+ccaudio-1.0rc1.tar.gz&nbsp;&nbsp;&nbsp;&nbsp;ccscript-2.2.1.tar.gz
+
+<P>
+#&nbsp;cd&nbsp;commoncpp2-1.0.1
+
+<P>
+#&nbsp;./configure&nbsp;-prefix=/usr
+
+<P>
+....
+
+<P>
+#&nbsp;make&nbsp;&amp;&amp;&nbsp;make&nbsp;install
+
+<P>
+....
+
+<P>
+#&nbsp;cd&nbsp;../ccaudio-1.0rc1
+
+<P>
+#&nbsp;./configure&nbsp;-prefix=/usr
+
+<P>
+....
+
+<P>
+#&nbsp;make&nbsp;&amp;&amp;&nbsp;make&nbsp;install
+
+<P>
+....
+
+<P>
+#&nbsp;cd&nbsp;../ccrtp-0.9.1
+
+<P>
+#&nbsp;./configure&nbsp;-prefix=/usr
+
+<P>
+...
+
+<P>
+#&nbsp;make&nbsp;&amp;&amp;&nbsp;make&nbsp;install
+
+<P>
+...
+
+<P>
+#&nbsp;cd&nbsp;../ccscript-2.2.1
+
+<P>
+#&nbsp;./configure&nbsp;-prefix=/usr
+
+<P>
+...
+
+<P>
+#&nbsp;make&nbsp;&amp;&amp;&nbsp;make&nbsp;install
+
+<P>
+...
+
+<P>
+#&nbsp;cd&nbsp;../bayonne-1.0.0
+
+<P>
+#&nbsp;./configure&nbsp;-prefix=/usr
+
+<P>
+...
+
+<P>
+#&nbsp;make&nbsp;&amp;&amp;&nbsp;make&nbsp;install
+
+<P>
+...
+</DD>
+</DL>In some case, just as what I encountered, you may found some library
+is missing and some packages do not compile. Basically it should not
+happen but once it happens, give a symbolic link in <TT>/usr/lib</TT>
+to fix the problem. Some <TT>Makefile</TT> just mix up the filename
+of libraries for the linker. (I've failed to make bayonne 1.0rc1 because
+the <TT>libperl.so</TT> do not exist but I have <TT>libperl.so.5.6.1</TT>,
+make a symbolic link will do.)
+
+<P>
+After the Bayonne and its depending packages are installed, you can
+have a try to see if it works. Just start the Dialogic daemon (/usr/dialogic/init.d/dialogic),
+and the Bayonne daemon (/etc/rc.d/init.d/bayonne). Then you will find
+that a demo program starts. Dial to the telephony card and have a
+try.
+
+<P>
+
+<H2><A NAME="SECTION00052000000000000000">
+5.2 Global Call</A>
+</H2>
+
+<P>
+Bayonne is not the only way to drive Dialogic devices. Intel provides
+another suite of development software called Global Call for such
+a purpose. Global Call is a suite of API, however, it is different
+from the older, low-level C-API. The Global Call can make us share
+the same code base between all different Dialogic devices, no matter
+it is a DM3 or SpringWire board, it is digital or analog. Nevertheless,
+it is not the purpose of discussing Global Call in this document.
+If you are interested, please refer to http://resource.intel.com/telecom/support/releases/protocols/GCProtocols20/index.html
+for details.
+
+<P>
+
+<H1><A NAME="SECTION00060000000000000000">
+6 Creating your own Bayonne Application</A>
+</H1>
+
+<P>
+Pending
+
+<H1><A NAME="SECTION00070000000000000000">
+About this document ...</A>
+</H1>
+ <STRONG>Bayonne + Linux + Dialogic HOWTO</STRONG><P>
+This document was generated using the
+<A HREF="http://www-texdev.mpce.mq.edu.au/l2h/docs/manual/"><STRONG>LaTeX</STRONG>2<tt>HTML</tt></A> translator Version 2K.1beta (1.48)
+<P>
+Copyright &#169; 1993, 1994, 1995, 1996,
+<A HREF="http://cbl.leeds.ac.uk/nikos/personal.html">Nikos Drakos</A>, 
+Computer Based Learning Unit, University of Leeds.
+<BR>
+Copyright &#169; 1997, 1998, 1999,
+<A HREF="http://www.maths.mq.edu.au/~ross/">Ross Moore</A>, 
+Mathematics Department, Macquarie University, Sydney.
+<P>
+The command line arguments were: <BR>
+ <STRONG>latex2html</STRONG> <TT>-no_subdir -split 0 -show_section_numbers /tmp/lyx_tmpdir813Uptblf/lyx_tmpbuf813GY5Rhb/bayonne_linux_dialogic_howto.tex</TT>
+<P>
+The translation was initiated by Debian User on 2002-09-03<HR>
+<!--Navigation Panel-->
+<IMG WIDTH="81" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next_inactive"
+ SRC="/usr/share/latex2html/icons/nx_grp_g.png"> 
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up_g.png"> 
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev_g.png">   
+<BR>
+<!--End of Navigation Panel-->
+<ADDRESS>
+Debian User
+2002-09-03
+</ADDRESS>
+</BODY>
+</HTML>

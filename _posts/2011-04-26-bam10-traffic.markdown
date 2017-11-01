@@ -1,0 +1,24 @@
+---
+layout: post
+title: "Benson et al (2010) Network Traffic Characteristics of Data Centers in the Wild (IMC)"
+date: 2011-04-26 02:25:54 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "Network Traffic Characteristics of Data Centers in the Wild"
+  author: "Theophilus Benson and Aditya Akella and David A. Maltz"
+  booktitle: "Proc IMC"
+  year: 2010
+---
+Extension of a [previous paper](/2011-04-16-baaz09-dctraffic). Brief read.
+Following are the summary from the paper's introduction:
+
+  - In a data center, most flow are in small size (in terms of bytes transferred) and short (within a second)
+  - Number of flows active per second is well under 10K per rack
+  - Traffic is ON/OFF in nature with properties fits some (lognormal/weibull) heavy-tail distribution
+  - In cloud, majority (80%) of traffic stays in a rack; in university/private enterprises, majority (40-90%)
+    traverses network
+  - Link utilization is significant only in cores, but set of heavily utilized links are time-varying
+  - At any time, heavily utilized core links is less than 25% of the total core links
+  - Primary cause of packet loss is due to momentary spikes
+

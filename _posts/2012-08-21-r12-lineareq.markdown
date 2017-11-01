@@ -1,0 +1,33 @@
+---
+layout: post
+title: "Raghavendra (2012) A Randomized Algorithm for Linear Equations over Prime Fields"
+date: 2012-08-21 08:29:29 -0400
+category: paper
+bibtex:
+  type: misc
+  title: "A Randomized Algorithm for Linear Equations over Prime Fields"
+  author: "Prasad Raghavendra"
+  month: Aug
+  year: 2012
+---
+Summary at: [1] <http://rjlipton.wordpress.com/2012/08/09/a-new-way-to-solve-linear-equations/>
+
+Original paper by Prasad Raghavendra at: [2] <http://www.eecs.berkeley.edu/~prasad/linsystems.pdf>
+
+This is to solve a linear equation system $Ax=b$ over a finite field
+$\mathbb{F}_q$. The finite field is has a finite size of $q$ (a prime), we can
+think of it as integers 0 to $q-1$, with the addition and multiplication are
+done in modulus $q$. Matrix $A$ is of order $m\times n$.
+
+The algorithm to solve the problem is as follows: It first takes $N=Cn$ random
+vectors from $\mathbb{F}|n_q$, make it into a set $S_0$. Then filter $S_0$ to
+find those who can satisfy the first row of $Ax=b$. The satisfying random
+vectors are then "recombined": Select $q-1$ of them randomly and sum up to give
+a new vector. Repeat this random select and sum up process to produce $N$
+vectors. These $N$ vectors are make into a set $S_1$, then applied to the
+second row of $Ax=b$. The filtered set at the last row are the solutions for
+the linear equation.
+
+Note that, in the finite field, there could be infinitely many solutions for a
+linear system. Therefore a set of solutions is produced. The original paper [2]
+gives the analysis on the size of $N$ required and the performance bound.

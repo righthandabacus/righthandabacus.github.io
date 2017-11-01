@@ -1,0 +1,61 @@
+---
+layout: post
+title: "My Presentations and Talks"
+date: 2007-03-26 08:42:05 +0800
+lastedit: 2012-01-27 20:14:06 -0500
+tags: business
+---
+
+People asked me to give presentations and talks often. Below are some of my materials.
+
+## Linux related
+  * [Five-Session Intensive Course on Playing with Linux](/img/0209-linux.pdf)
+    Talk gave September 2002, as an event of Playpen Group, Dept. I.E., CUHK.
+  * [Hardcore Networking](/img/0404-network.pdf)
+    Talk gave in April 2004, as an event of Playpen Group, Dept. I.E., CUHK
+  * [Introduction to Linux](/img/0407-form6linux.pdf)
+    Talk gave in July 2004, for the Sixth Former's IT Camp Workshop 2004, organized by Dept. I.E., CUHK
+  * Linux System & Compuer Networks, [part 1](/img/0408-linux-part1.pdf) and [part 2](/img/0408-linux-part2.pdf)
+    Talk gave in August 2004, for the freshmen of Dept. I.E., CUHK
+  * [Networking in UNIX](/img/0502-network.pdf)
+    Seminar gave in February 2005, for I.E. Society, CUHK
+  * [Windows Command Prompt](/img/0504-wincmd.pdf)
+    Seminar gave in April 2005, for I.E. Society, CUHK
+  * [Handout for the Workshop on Apache 2.0 Virtual Hosting](/img/0510-apache.pdf)
+    A workshop held in Ning Po No.2 College on October 29, 2005.
+
+## Tools and techniques
+  * [MetaPost Tutorial](/img/0501-metapost.pdf) and [code](/img/0501-metapost.mp)
+    Study group presentation on using MetaPost for drawing programmable vector
+    picture. Presentation gave on Jan 21, 2005
+  * [Perl Tutorial](/img/0502-perl.pdf)
+    Study group presentation on using Perl as a quick and dirty scripting tool.
+    Aimed as an introduction for those who want to learn Perl. Presentation gave
+    on Feb 5, 2005
+  * [A Mathematical Tutorial on Poisson Counter Driven Stochastic Differential Equation](/img/0506-pcdsde.pdf)
+    Study group presentation. PCDSDE is learnt from a paper of Roger Brockett
+    and the set of course notes from him. Presentation gave on Jun 4 and 28,
+    2005.
+  * [Packet Sniffering Lab](/img/0506-snifferlab.pdf)
+    A lab manual for IE Leadership Camp Workshops from June 14 to June 17, 2005
+    and subsequent school visits to IE. This is for the secondary school
+    students to have a taste on how unsecure a network can be by letting them to
+    uncover a hidden password on the network.
+  * [Network Security Fundamental](/img/0604-netsec.pdf)
+    A handout for the talk invited by the IE Society on April 10, 2006. This is
+    to introduce the origins of network security flaws to the undergraduates.
+
+## Research topics
+  * [Network Fairness of Heterogeneous Application](/img/2005-hetero.pdf)
+    Study group presentation for my research in my Sigcomm Asia Workshop paper. I forget exact date for the presentation.
+  * [A Study of the Coexistence of Heterogeneous Flows in Data Network](/img/0508-hetero.pdf)
+    Seminar gave in School of Computing, The National University of Singapore on August 22, 2005.
+    Thanks Prof Y C Tay to give me a chance to present my work during my visit to Singapore.
+  * [A Study of the Coexistence of Heterogeneous Flows in Data Network](/img/0510-hetero.pdf)
+    Presentation in [AoE-IT](http://aoeit.ie.cuhk.edu.hk/) meeting on October 27, 2005.
+  * [A Study of the Coexistence of Heterogeneous Flows in Data Network](/img/0601-defence.pdf)
+    Thesis defence on January 13, 2006.
+  * [Leveraging Performance of Multiroot Data Center Networks by Reactive Reroute](/img/20100819-hoti.pdf)
+    Paper presentation in HotInterconnects on August 19, 2010.
+  * [Scalability and Resilience in Data Center Networks: Dynamic Flow Reroute as an Example](/img/20111206-globecom.pdf)
+    Paper presentation in GLOBECOM on December 6, 2011.

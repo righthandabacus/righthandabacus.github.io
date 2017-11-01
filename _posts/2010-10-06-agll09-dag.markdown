@@ -1,0 +1,19 @@
+---
+layout: post
+title: "Avin et al (2009) From Trees to DAGs: Improving the Performance of Bridged Ethernet Networks (GlobeCom)"
+date: 2010-10-06 20:12:34 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "From Trees to DAGs: Improving the Performance of Bridged Ethernet Networks"
+  author: "Chen Avin and Ran Giladi and Nissan Lev-Tov and Zvi Lotker"
+  booktitle: "Proc GlobeCom"
+  year: 2009
+---
+This paper avocates an alternative to spanning tree protocol for Ethernet. Instead of building a tree (which is a undirected graph), it builds a directed acyclic graph (DAG) out of the network. The benefit of this is that, (1) have a better utilization of network links; (2) does not use a routing protocol as proposals like SEATTLE; (3) does not use any encapsulation; (3) backward compatible with spanning tree bridges.
+
+The idea is implemented as Orient network. In the network, there is a polaris instead of a root bridge. The polaris would have all its ports with *south* polarity. A non-root bridge in spanning tree has root port (the port toward root bridge), designated port (to port away from root bridge) and alternative port (disabled port). In Orient, the root port is polarized to *north* and designated port is polarized to *south*. The alternative port is also polarized so that a south-north vector forms a DAG.
+
+This paper proves that, this methods forms a DAG (thus strict total order on bridges), which is a larger graph than spanning tree. A packet is entering a bridge through a *north* port will never leave the bridge in another *north* port. And therefore, a packet will never traverse a loop.
+
+The packet forwarding process in Orient still rely on broadcast. However, the broadcast is also controlled by polarity of ports.

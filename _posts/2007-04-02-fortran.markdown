@@ -1,0 +1,470 @@
+---
+title: "FORTRAN Premier"
+date: 2007-04-02 01:52:02 +0800
+tags: code
+---
+FORTRAN (or Fortran) has three major favors currently, Fortran 77, Fortran 90
+and Fortran 95. Fortran 77 is the most popular one and de-facto. Fortran 90
+relaxes some constrains of Fortran 77, most notably is the allowance of
+free-format programming in Fortran 90. Fortran 95 is just a revision of
+Fortran 90. Knowing that it was developed in 1950s in IBM, Fortran is the most
+enduring computer programming language in history.
+
+## ANSI Fortran 77 fundamentals
+
+Note: Fortran 77 ignores all kinds of space!
+
+### Format
+
+Sample code:
+```fortran
+C234567890
+      program myname
+      declarations
+      statements
+      stop
+      end
+```
+
+  * Fortran 77 is not free-format, every line is constrained by the following use:
+     * Col 1: It is blank; or it is a `c` or `*` for comment line
+     * Col 2-5: Statement label (optional), numbered for use with loop or `goto` statements
+     * Col 6: Leave blank; or put any character (usually `+`) here to mean continuation of previous line
+     * Col 7-72 : Statements
+     * Col 73-80: Sequence number (optional, rarely used today)
+  * Similar to Pascal,
+     * Every Fortran program has to be named
+     * Variables being used have to be declared first
+  * Fortran commands are line-delimited, no semi-colon is needed at the end-of-line
+  * Fortran is case-insensitive
+
+### Variables and types
+
+Fortran has the following types of variables: `integer`, `real`, `double precision`, `complex`, `logical`, `character`.
+  * `integer`: 32-bit signed integer
+  * `real`: 32-bit floating point, can be expressed as `1.0`, `-0.5`, or `1.23E-4`
+  * `double precision`: 64-bit floating point, expression is same as `real` and additionally `1.23D-4` to mean $1.23\times 10^{-4}$ in double precision
+  * `complex`: Complex numbers, using an ordered pair of *real* number such as `(1.2,3.4)` to mean $1.2+j3.4$. There is no double precision complex number.
+  * `logical`: Either `.TRUE.` or `.FALSE.`, the two dots are required
+  * `character`: Trival. Strings are expressed as array of characters, e.g. `'asdfgh'`
+
+Note:
+  * Variable names consists of 1 to 6 characters chosen from `[a-z0-9]`
+  * Numbers can be manipulated by the following in precedence order: `**` (exponentiation), `*` and `/`, `+` and `-`. Parenthesis is allowed to denote precedence.
+  * Integer divisions are truncated
+  * Constants are declared as variables first, then use the `parameter` statement to assign values, for example:
+```fortran
+      integer i, j, n
+      real radius, area, pi
+      parameter(pi=3.14159, n=10)
+```
+  * Usually, type conversions are done automatically. But the following function are provided for explicit type conversion:
+     * `int()`, `real()`, and `dble()`: Convert to integer, real, and double precision respectively
+     * `ichar()` and `char()`: Convert character to integer and vice versa.
+
+Arrays are declared by suffixing a pair of parenthesis to denote the dimension, for example:
+```fortran
+      integer i(10), j(-3:3)
+      real matrix(1:5, 3:10)
+```
+Then, we can have `i(1)` to `i(10)` and `j(-3)` to `j(3)`, as well as `matrix(1,3)` to `matrix(5,10)`. Fortran allows multidimensional arrays to be declared up to 7 dimensions.
+
+Boolean expressions:
+  * Comparing numbers can be done by:
+     * `.LT.` / `.LE.` / `.GT.` / `.GE.` / `.EQ.` / `.NE.`
+  * Boolean operations can be done by:
+     * `.AND.` / `.OR.` / `.NOT.`
+  * `.EQV.` is logical equivalence and `.NEQV.` is logical nonequivalence (i.e. XOR)
+  * All Boolean things are surrounded by a pair of dots
+
+In case variables have initial values, they can be initialized by the `data` statements:
+```fortran
+      data list-of-variables /list-of-values/, ...
+```
+For example, the following three pieces are equivalent:
+```fortran
+      integer m, n
+      real x, y
+      data m/10/, n/20/, x/2.5/, y/2.5/
+
+      integer m, n
+      real x, y
+      data m,n/10,20/, x,y/2*2.5/
+
+      integer m, n
+      real x, y
+      m = 10
+      n = 20
+      x = 2.5
+      y = 2.5
+```
+
+Initializing array can be done similarly:
+```fortran
+      real A(10,20)
+      data A/200*0.5/, A(1,1)/0.0/
+```
+
+### Flow control
+Basic if-statements are in two forms:
+```fortran
+      if (logical_expression) statement
+      if (logical_expression) then
+          statements
+      endif
+```
+They are for one-line of executable statement or multiple lines respectively.
+
+The general form of if-statement is as follows:
+```fortran
+      if (logical_expression) then
+          statements
+      elseif (logical_expression) then
+          statements
+      ...
+      else
+          statements
+      endif
+```
+
+In Fortran, there is no for-loop, but use do-continue to mean exactly the same thing:
+```fortran
+      do label var =  begin, end, step
+         statements
+label continue
+```
+The `step` is optional (use 1 if omitted). For example:
+```fortran
+      do 10 i = 1, n
+          fctl = fctl * i
+ 10   continue
+      do 20 i = 9, 1, -2
+          write(i);
+ 20   continue
+```
+
+In ANSI standard, there is no while-loop either, we use if-goto to simulate the same thing:
+```fortran
+label if (logical expr) then
+         statements
+         goto label
+      endif
+```
+Similarly, do-while loop is done by the following:
+```fortran
+label continue
+         statements
+      if (logical expr) goto label
+```
+
+**Note that**: Because Fortran 77 ignores spaces, and do20i is a perfect variable name, and there are implicit variable declaration rules in Fortran 77, hence the following line is not flagged as error in compiler:
+
+    do 20 i = 1.100
+
+Hence great care is expected in coding.
+
+### String operations
+
+A string is declared as character array, such as
+```fortran
+      character metal*10
+      parameter (metal='cadmium')
+```
+declares `metal` as a 10-character long array to hold a string.
+
+String is assigned by `=` and the text string is quoted. Extra spaces in the character array is padded by space. We can obtain substring, for example, `cad` by `metal(1:3)` or `metal(:3)` and obtain `mium` by `metal(4:)`.
+
+Strings can be concatenated by `//` in Fortran, for example:
+
+  metal = 'cad' // 'mium'
+
+String length is measured by `len(s)` and `index(n,h)` returns the position of needle `n` in the haystack `h`. If `n` is at the very beginning of `h`, `index` returns 1. It returns zero if not found.
+
+### Common built-in functions
+
+Fortran's built-in functions are generic, i.e. they accepts any sensible type as input:
+
+| `abs()` | absolute value, or modulus of a complex number |
+| `min(,,...)` | minimum value of all arguments |
+| `max(,,...)` | maximum value of all arguments |
+| `sqrt()` | square root |
+| `sin()` | sine |
+| `cos()` | cosine |
+| `tan()` | tangent |
+| `sinh()` | hyperbolic sine |
+| `cosh()` | hyperbolic cosine |
+| `tanh()` | hyperbolic tangent |
+| `asin()` | arcsine |
+| `acos()` | arc-cosine |
+| `atan()` | arctangent |
+| `atan2(,)` | arctangent of arg1/arg2 |
+| `exp()` | natural exponential |
+| `log()` | natural logarithm |
+| `log10()` | common logarithm |
+| `aint()` | truncates a real number but preserves the data type |
+| `anint()` | round to the nearest integer but preserves the data type |
+| `nint()` | convert to integer by rounding off to the nearest integer |
+| `mod(,)` | the remainder of dividing integers arg1 by arg 2 |
+| `sign(,)` | setting arg1 the same sign as arg2 |
+| `dim(,)` | if arg1 $>$ arg2, return arg1 $-$ arg2, or zero otherwise |
+| `dprod(,)` | return the double precision produce of two reals |
+| `real()` | converts a number into real, of return the real part of a complex number |
+| `aimag()` | returns the imaginary part of a complex number |
+| `conjg()` | returns the complex conjugate of a complex number |
+
+### Functions and subroutines
+Syntax of a Fortran function:
+```fortran
+      type function name (parameter1, parameter2, ...)
+      declarations
+      statements
+      return
+      end
+```
+Note that:
+  * Functions bear a return type
+  * Parameters have to be declared in the declaration statements
+  * The return value is stored in an implicitly-defined variable with the same name as the function
+  * Functions are terminated by `return` instead of `stop`
+  * Functions can be called with corresponding parameters supplied
+  * All parameters are *passed-by-reference* in Fortran 77!
+
+If functions are simple enough, we can use *statement functions*:
+```fortran
+      real g, m1, m2, r
+      ....
+      newton(m1, m2, r) = g * m1 * m2 / r**2
+      ....
+      force = newton(x, y, distnce)
+```
+Statement functions are one-liners and defined inside the program block, before any executable statements. It can also reference to other variables defined in the same program block.
+
+Subroutine is almost identical to function, but it does not return anything:
+```fortran
+      subroutine name (list-of-arguments)
+      declarations
+      statements
+      return
+      end
+```
+Subroutines are called by the syntax `call name(param1,param2,...)`
+
+In case array is passed to function or subroutine, we may avoid to declare the dimension of array explicitly, but use an asterisk or other scalar parameters instead:
+```fortran
+      subroutine matvec (m, n, A, lda, x, y)
+      integer m, n, lda
+      real x(*), y(*), A(lda,*)
+      integer i, j
+      .....
+      return
+      end
+```
+
+Moreover, Fortran does not support global variables. In case global variables are needed, we use *common block* instead. For example:
+```fortran
+      program myprog
+      integer a, b, c
+      common /myname/ a, b
+      ....
+      stop
+      end
+
+      subroutine mysub (param1, param2)
+      real param1, param2
+      integer a, b
+      common /myname/ a, b
+      ....
+      return
+      end
+```
+The `common` statements declare variables `a` and `b` are members of common block named `myname` and than the common blocks of the same name will be mapped to each other, hence the variables `a` and `b`  behaves like global variables. Notes that the variable names are insignificant. Whenever common blocks are declared, the variables are mapped sequentially according to the order of specification.
+
+### I/O and formating
+The simplex form of Fortran I/O is called the *list directed I/O*, syntax are:
+```fortran
+      read(*,*) list-of-variables
+      write(*,*) list-of-variables
+```
+
+The `read` statement reads a whole line from stdin, then assign each space-delimited or comma-delimited value to the list of variables accordingly. Unmatched values are ignored and unmatched variables are unassigned.
+
+The `write` statement concatenates all the variables in the list and output to stdout. A newline is automatically added at the end. There are actually simplier form of the two `read`/`write` statements in case of input and output to stdin and stdout:
+```fortran
+      read *, list-of-variables
+      print *, list-of-variables
+```
+
+The input or output can actually be *formatted*. Take `write` statements as example, the syntax is:
+```fortran
+      write(*, label) list-of-variables
+ label format format-code
+```
+where the `label` in `write` statement refer to the `format` line, which in turn illustrates how should the output be formatted. For example:
+```fortran
+      write(*, 900) i, x
+  900 format (I4,F8.3)
+```
+The format string can be composed of:
+
+|`A*w*` | text string of width `*w*`   |
+|`D*w*.*d*` | double precision numbers, exponent notation with width `*w*` and `*d*` decimal places  |
+|`E*w*.*d*` | real numbers, exponent notation with width `*w*` and `*d*` decimal places  |
+|`F*w*.*d*` | real numbers, fixed point format with width `*w*` and `*d*` decimal places  |
+|`I*w*` | integer with width `*w*`  |
+|`*n*X` | `*n*` horizontal skip (space), `*n*`=1 if omitted   |
+|`/` | vertical skip (newline)   |
+
+In case there are un-exhausted width, numbers will be adjusted to the right. Note that the following two format lines are equivalent (i.e. repetitions can be short-handed):
+```fortran
+ 950  format (2X, I3, 2X, I3, 2X, I3, 2X, I3)
+ 950  format (4(2X, I3))
+```
+
+Format lines can also be specified inside the write statement, such as:
+```fortran
+      write (*,'(A, F8.3)') 'The answer is x = ', x
+```
+
+In case an array is going to be printed, *implicit loop* can be used inside the write statement:
+```fortran
+      do 10 i = 1, 5
+         write(*,1000) (a(i,j), j=1,10)
+   10 continue
+ 1000 format (I6)
+```
+which will print the array `a` in 5x10 matrix form. Furthermore,
+```fortran
+      write(*,1010) (x(i), i=1,50)
+ 1010 format (10I6)
+```
+will print `x(1)` to `x(10)` in the first line, and `x(11)` to `x(20)` in the second line, etc.
+
+Besides I/O to stdin and stdout, we can do I/O to files. In the `read` and `write` statements, the first asterisk can be replaced by a unit number (from 1 to 99, but usually numbers 1-8 are reserved), to identify which file to I/O from or to. To use a file, you have to open it first:
+```
+    open ([UNIT=]u [, IOSTAT=ios] [, ERR=err], FILE=fname, STATUS=sta [, ACCESS=acc] [, FORM=frm] [, RECL=rl])
+```
+where:
+
+| `u`     | the unique unit number in the range 9-99 that denotes this file |
+| `ios`   | an integer variable, it is set to zero if successful upon return, non-zero otherwise |
+| `err`   | a label, the program will `goto` this label if there is an error |
+| `fname` | a character string denoting the filename |
+| `sta`   | any of `NEW`, `OLD` or `SCRATCH` to denote whether to create a new file, open an existing file, or create a new file and delete when the file is closed |
+| `acc`   | either `SEQUENTIAL` (default) or `DIRECT` |
+| `frm`   | either `FORMATTED` or `UNFORMATTED` (default) |
+| `rl`    | specified the length of each record in a direct-access file |
+
+When we finished using a file, we have to close it:
+```
+      close ([UNIT=]u[,IOSTAT=ios,ERR=err,STATUS=sta])
+```
+
+To do I/O with a file, the `read` and `write` statement is in the following syntax:
+```
+      read ([UNIT=]u, [FMT=]fmt [, IOSTAT=ios] [, ERR=err] [, END=s]) list_of_variables
+      write([UNIT=]u, [FMT=]fmt [, IOSTAT=ios] [, ERR=err] [, END=s]) list_of_variables
+```
+where `s` is the label which we will `goto` when end-of-file is encountered.
+
+## Non-ANSI Fortran
+
+Most Fortran 77 compliers will accept the following non-ANSI syntax
+  * The do-continue loop can use `end do` in place of `continue`
+  * Loops:
+```fortran
+      while (logical expr) do
+         statements
+      enddo
+
+      do while (logical expr) 
+         statements
+      enddo
+```
+  * Support of `include` statement to insert another file, just like the `#include` in C
+
+## Fortran 90
+
+Fortran 90 is a superset of Fortran 77. New features include:
+  * Programs are bracketed by `program myname` and `end program`
+  * Fortran 90 introduces the do-end do loop and also the select case statement:
+```fortran
+      do
+         statements
+      end do
+
+      select case (number)
+      case (:less_than_this, this, this, from_this:to_this, greater_than_this:)
+          statements
+      case (only_this)
+          statements
+      case default
+          statements
+      end select
+```
+  * One may use the expression `if (logical expr) exit` to halt the loop.
+  * Supports the matrix addition, subtraction and multiplication
+  * Language features: Supports the recursive function call, definition of structures (C-struct-like), dynamic allocation of memory, pointers, and operator overloading.
+  * Symbolic names are now up to 31 characters, instead of 6.
+  * End-of-line comments are allowed, start with `!`.
+  * Semi-colons can be used to separate multiple statements in the same line.
+  * Strings can be quoted with double quotation marks in addition to apostrophes.
+  * New form of relational operators:
+```fortran
+    .GE. .GT. .LE. .LT. .EQ. .NE.
+    >=   >    <=   <    ==   /=
+```
+  * Implicit variable declaration can be done by specifying `implicit none` at the beginning of declaration block
+  * New way of defining variable and assigning initial values:
+```fortran
+    real :: num1 = 1.0     ! with initial value
+    real :: num2           ! without initial value
+    integer :: num3
+```
+
+In case the file is with extension `.f90` or free-format is specified, the following rules hold:
+  * A statement line can be as long as 132 characters
+  * Comments must start with `!`, even at the first column
+  * To continue a statement, use `&` at the end of each statement. Comment is allowed after `&`
+  * If we break strings into two lines, put `&` at the end of first line and another `&` at the beginning of the second line. No comments allowed.
+  * Spaces are significant. Hence `1 000 000` no longer means a million.
+
+## Reference
+
+```bibtex
+@BOOK{p87,
+    author = {Clive G. Page},
+    year = 1987,
+    publisher = {Messrs Pitman},
+    title = {Professional Programmer's Guide to Fortran 77},
+    note = {Now available as http://www.star.le.ac.uk/~cgp/fortran.html},
+    pdf = {http://www.star.le.ac.uk/~cgp/prof77.pdf},
+    url = {http://www.star.le.ac.uk/~cgp/fortran.html}
+}
+@MISC{s95,
+    author = {Erik Boman and Sarah T. Whitlock and Paul H. Hargrove},
+    title = {Fortran 77 Tutorial },
+    note = {Stanford University},
+    url = {http://www.stanford.edu/class/me200c/tutorial_77/},
+    year = 1995
+}
+```
+
+Further reading for Fortran 90:
+
+```bibtex
+@MISC{
+    author = {Clive G. Page},
+    year = 2001,
+    title = {Fortran 90 for Fortran 77 Programmers},
+    url = {http://www.star.le.ac.uk/~cgp/f90course/f90.html},
+    pdf = {http://www.star.le.ac.uk/~cgp/f90course/f90.pdf},
+}
+@MISC{
+    author = {Michael Metcalf},
+    title = {Fortran 90 Tutorial},
+    year = 1995,
+    url = {http://wwwasdoc.web.cern.ch/wwwasdoc/WWW/f90/f90.html},
+    pdf = {http://grdelin.phy.hr/~ivo/Nastava/Numericke_methode/literatura/Fortran90Tutorial.pdf},
+}
+```
+

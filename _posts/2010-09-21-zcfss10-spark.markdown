@@ -1,0 +1,29 @@
+---
+layout: post
+title: "Zaharia et al (2010) Spark: Cluster Computing with Working Sets (HotCloud)"
+date: 2010-09-21 15:03:59 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "Spark: Cluster Computing with Working Sets"
+  author: Matei Zaharia and Mosharaf Chowdhury and Michael J. Franklin and Scott Shenker and Ion Stoica  
+  booktitle: Proc HotCloud
+  year: 2010
+---
+This paper proposed a new programming model extended from MapReduce. The key
+feature is the resilient distributed dataset (RDD). RDD is an object in the
+cluster that can be cached. By having a cache, the author claims a 10x speedup
+in some use cases (e.g. Logistic Regression) compared to MapReduce, because
+otherwise same data have to be reloaded from hard disk. RDD is resilient
+because it can be rebuilt at run-time as there is a *lineage* associated with
+each RDD. When an object is not located because of cache miss, hardware
+failure, or otherwise, based on the lineage, it can be re-constructed from its
+"parent". An example of lineage is the following: A file, filtered by a
+program, transformed by a procedure, cached at a node, and processed by a
+function. If, say, another function wants the intermediate data transformed by
+that procedure, but that is not available, we can get the filtered file feed
+into the procedure to get the required data again.
+
+Besides RDD, Spark also provides a mechanism to serve broadcast, read-only
+variable (e.g. look-up tables) and write-only accumulators (e.g. partial sum
+adders) that helps programming a cluster computation.

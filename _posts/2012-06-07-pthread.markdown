@@ -1,0 +1,209 @@
+---
+layout: post
+title: "pthread"
+date: 2012-06-07 15:13:15 -0400
+tags: code
+---
+
+pthread is the standard way of multithread programming in C in UNIX. It is a
+fork-join model of parallel processing, and in the library of pthread, the
+following data structure is defined:
+
+| Pthread data types    | Usage |
+|-----------------------|-------|
+| pthread_t             | Thread ID |
+| pthread_mutex_t       | Mutex variable |
+| pthread_cond_t        | Condition variable |
+| pthread_key_t         | Access key |
+| pthread_attr_t        | Thread attributes object |
+| pthread_mutexattr_t   | Mutex attributes object |
+| pthread_condattr_t    | Condition variable attributes object |
+| pthread_once_t        | One-time initialization control context |
+
+To create a thread, we use pthread_create:
+
+```c
+int pthread_create (
+    pthread t *thread,
+    const pthread_attr_t *attr,
+    void *(*start_routine)(void *),
+    void *arg)
+```
+
+where `attr` can be `NULL` for default thread attributes and the function
+pointer `start_routine` shall expect a `void*` argument and returns a `void*`.
+After the call, `thread` stores the ID for the thread created.
+
+Following are some commonly used functions to handle the threading:
+  * A thread to find itself's thread ID: `pthread_t pthread_self()`
+  * Return 0 if two thread IDs are equal: `int pthread_equal (pthread_t t1, pthread_t t2)`
+  * Find the max num of threads the system allows: `maxThreads = sysconf (_SC_THREAD_THREADS_MAX)`
+  * A thread to terminate itself other than function returns: `void pthread_exit (void *valuep)`
+  * Detach a thread from the parent (so don't need pthread_join()): `int pthread_detach (pthread_t thread)`
+  * Reclaim a thread: `int pthread_join (pthread_t thread, void * *valuep)`
+
+## Race condition
+
+Race condition is two agents competing with each other for a resource, such that
+their order of execution affects the outcome. A common race condition is the
+TOCTOU, time of check-time of use race condition, as the variable `counter` in
+the example below
+
+```c
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
+
+/* Shared objects in the global */
+int counter = 0;
+
+/* thread programs */
+void* plusone(void* arg)
+{
+    int i;
+    for (i=1e6; i>0; --i) counter = counter + 1;
+    return 0;
+}
+
+void* minusone(void* arg)
+{
+    int i;
+    for (i=1e6; i>0; --i) counter = counter - 1;
+    return 0;
+}
+
+/* main */
+int main(int argc, char** argv)
+{
+    const int NUM_PAIRS=2;
+    pthread_t th[NUM_PAIRS * 2];    /* Hold the thread structure */
+    int ret[NUM_PAIRS * 2];     /* Hold the error code */
+    int i;
+
+    counter = 0;
+    for (i=0; i<NUM_PAIRS; i++) {
+        ret[2*i]   = pthread_create(&th[2*i],   NULL, plusone, 0);
+        ret[2*i+1] = pthread_create(&th[2*i+1], NULL, minusone, 0);
+    };
+    for (i=0; i<NUM_PAIRS; i++) {
+        ret[2*i]   = pthread_join(th[2*i], NULL);
+        ret[2*i+1] = pthread_join(th[2*i+1], NULL);
+    };
+    printf("Counter value = %d\n", counter);
+    return 0;
+};
+```
+
+The resulting printf should print zero but due to race condition, usually it is
+not. To make the result correct, we use mutex to lock a resource to make sure
+only one thread is updating the value at a time. Mutex-related routines are:
+
+```c
+mutex = PTHREAD_MUTEX_INITIALIZER;
+int pthread_mutex_init (pthread_mutex_t *mutex, const pthread_mutexattr_t *attr);
+int pthread_mutex_destroy (pthread_mutex_t *mutex);
+int pthread_mutex_lock (pthread_mutex_t *mutex);
+int pthread_mutex_unlock (pthread_mutex_t *mutex);
+int pthread_mutex_trylock (pthread_mutex_t *mutex);
+```
+
+Using multiple mutex in a program may result from deadlock. To avoid deadlock,
+we may either fix the locking order of different mutexes, or to use the backoff
+strategy, i.e. first to lock on one mutex, then use trylock on subsequent mutex.
+If the trylock fails on any of the them, unlock all mutex immediately and
+restart the locking process. However, backoff strategy may give rise to a
+livelock.
+
+For more complicated synchronization, we may use condition. The condition
+variable routines are:
+
+```c
+pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+int pthread_cond_destroy (pthread_cond_t *cond);
+int pthread_cond_wait (pthread_cond_t *cond, pthread_mutex_t *mutex);
+int pthread_cond_signal (pthread_cond_t *cond);
+int pthread_cond_broadcast (pthread_cond_t *cond);
+int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex, const struct timespec *time);
+```
+
+An example of using condition is as follows:
+
+```c
+pthread_mutex_lock (&mutex);
+while (!condition())
+    pthread_cond_wait (&cond, &mutex);
+compute_something();
+pthread_mutex_unlock (&mutex);
+```
+
+The condition variable `cond` must asociate with a mutex to avoid TOCTOU on the
+evaluation of the condition (through `condition()` call). When
+`pthread_cond_wait` is called, upon the condition test failed, the mutex will be
+released but the thread is suspended, to wait for some other thread signal on
+the variable `cond` with `pthread_cond_signal()` or `pthread_cond_broadcast()`
+calls. When `cond` is signaled, the thread resumes (as `pthread_cond_wait()`
+returns), the mutex is locked by this thread again, and the condition is checked
+again. The condition variable provides a unlock-and-wait mechanism while mutex
+is wait-until-locked.
+
+Using condition variable can implement counting semaphores, which the read/write
+lock (read only when no one is writing and no write when someone is reading) is
+an example:
+
+```c
+typedef struct rw_lock {
+    int num_r, num_w;
+    pthread_mutex_t mutex;
+    pthread_cond_t cond;
+} rw_lock_t;
+int rw_lock_init (rw_lock_t *rwl) {
+    rwl->num_r = rwl->num_w = 0;
+    pthread_mutex_init (&(rwl->mutex), NULL);
+    pthread_cond_init (&(rwl->cond), NULL);
+    return 0;
+}
+int rw_lock_rlock (rw_lock_t *rwl) {
+    pthread_mutex_lock (&(rwl->mutex));
+    while (rwl->num_w > 0) /* read allowed only when no write */
+        pthread_cond_wait (&(rwl->cond), &(rwl->mutex));
+    rwl->num_r ++;
+    pthread_mutex_unlock (&(rwl->mutex));
+    return 0;
+}
+int rw_lock_wlock (rw_lock_t *rwl) {
+    pthread_mutex_lock (&(rwl->mutex));
+    while ((rwl->num_w > 0) || (rwl->num_r > 0))
+        pthread_cond_wait (&(rwl->cond), &(rwl->mutex));
+    rwl->num_w ++;
+    pthread_mutex_unlock (&(rwl->mutex));
+    return 0;
+}
+int rw_lock_runlock (rw_lock_t *rwl) {
+    pthread_mutex_lock (&(rwl->mutex));
+    rwl->num_r --;
+    if (rwl->num_r == 0) pthread_cond_signal (&(rwl->cond));
+    pthread_mutex_unlock (&(rwl->mutex));
+    return 0;
+}
+int rw_lock_wunlock (rw_lock_t *rwl) {
+    pthread_mutex_lock (&(rwl->mutex));
+    rwl->num_w --;
+    pthread_cond_broadcast (&(rwl->cond));
+    pthread_mutex_unlock (&(rwl->mutex));
+    return 0;
+}
+```
+
+## Once control
+Once is to set a routine that will be run by only one thread for once even the function is called by all threads.
+
+```c
+pthread_once_t once_control = PTHREAD_ONCE_INIT;
+pthread_once (pthread_once_t *once_control, void (*once_routine)(void));
+```
+
+If some other thread is running `pthread_once()`, executing the function
+suspends the thread until the running thread finishes the call. If the current
+thread or another thread already executed the function, this call bears no
+effect.

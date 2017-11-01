@@ -1,0 +1,19 @@
+---
+layout: post
+title: "Nokia 6270"
+date: 2006-05-18 05:55:01 +0800
+tags: system
+---
+I retired my old phone (I've been using it for last 3-4 years) and get Nokia 6270. Color display, built-in media player, radio, and allows a mini-SD card for expansion, which are all good things. However, I found that there are two bugs:
+
+Firstly, whenever it is not English in the id3 "artist" and "title" field of a MP3, it shows a mess on the screen when you play it. It is not a matter on the display algorithm but I think it is just a bug that Nokia needs to fix. The solution for that is to remove *all* the id3 information from the MP3. I did this by using id3v2:
+
+    id3v2 -D myfavorite.mp3
+
+The second thing is about the media player. I do know that it can play 3GP and MPEG-4 files. However, ain't they the same? I can verify that because I don't see it can play the ISO MPEG-4 files (H.263 video+AAC audio, the Apple QuickTime favor of .mp4 files) but it can really decode the AAC audio from it. However, when you encode the movie into 3GP format with QCIF resolution (176x144), you can see it. Didn't the screen is of 320x240 resolution? I have no idea why it cannot play the movie in higher resolution!
+
+If you want to make the 3GP version of your movie, use ffmpeg and issue the command like this:
+
+    ffmpeg -i OriginalMovie.avi -s qcif -r 30 -ac 1 -ar 8000 -b 180 -ab 32 -o Movie.3gp
+
+where `-r 30` means 30 fps, `-ac 1` means mono sound, `-ar 8000` means 8 kHz audio sampling, `-b 180` means the video bitrate is 180 kbps, and `-ab 32` means the audio bitrate is 32 kbps. (The `-i` option is crucial to be put as the first one, otherwise it will complain about the non-standard resolutions).

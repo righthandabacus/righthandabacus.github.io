@@ -1,0 +1,42 @@
+---
+layout: post
+title: "Set membership check in Perl"
+date: 2010-05-06 10:54:52 -0400
+tags: code
+---
+
+Assume we represent a set by an array in Perl (so strictly speaking it is not merely a set but an ordered set). Now given an item, how to check if it is in the set or not?
+
+In Perl, there is a very powerful command, `grep`, that can do this job. Assume a set is represented by `@prime`, to check if item `$num` is in the set, we can use this
+
+    grep {$_ == $num} @prime;
+
+If it returns a non-empty array, then it is; otherwise, no.
+
+Further, if we not only want to know *whether* it is in the set, but also *where* of the set, we can make it a bit more complicated, like this
+
+    grep {$prime[$_] == $num} (0..@#prime);
+
+The following demonstrate this idea:
+
+```perl
+#!/usr/bin/perl
+# Test for set's is-in operation using grep
+# Output:
+#    11 is a prime, at index 4
+#
+
+my @prime = (2, 3, 5, 7, 11, 13, 17, 19, 23, 31);
+my $num = 6;
+
+my @a = grep {$prime[$_] == $num} (0..$#prime);
+foreach (@a) {
+    print "$num is a prime, at index $_\n";
+};
+
+$num = 11;
+@a = grep {$prime[$_] == $num} (0..$#prime);
+foreach (@a) {
+    print "$num is a prime, at index $_\n";
+};
+```

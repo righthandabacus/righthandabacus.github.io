@@ -1,0 +1,29 @@
+---
+layout: post
+title: "Deleting from Perl hashes"
+date: 2010-05-19 15:51:22 -0400
+tags: code
+---
+
+I program in Perl today. With Hashes. This is for an auxiliary program of my
+research simulation.
+
+Ususally, we can use the following to check if something exists:
+
+    if (defined $a) { ..... };
+
+and if it is a scalar, we can release the memory holded by undefining its content:
+
+    undef $a;
+
+however, I found that the following won't work:
+
+    undef $hash{'key1'};
+    @keylist = sort { $hash{$a} <=> $hash{$b} } keys %hash;
+
+the reason for that is `keys %hash` will still report the existence of `key1`
+but we just undefined its value, but the key is still in the hash. Actually, the
+way I did that is not what I mean....the correct one is:
+
+    delete $hash{'key1'};
+    @keylist = sort { $hash{$a} <=> $hash{$b} } keys %hash;

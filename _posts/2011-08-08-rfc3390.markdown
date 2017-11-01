@@ -1,0 +1,28 @@
+---
+layout: post
+title: "Allman et al (2002) Increasing TCP's Initial Window (RFC3390)"
+date: 2011-08-08 15:26:31 -0400
+category: paper
+bibtex:
+  type: misc
+  title: "Increasing TCP's initial Window"
+  author: "M. Allman and S. Floyd and C. Partridge"
+  howpublished: "IETF RFC 3390"
+  url: "http://tools.ietf.org/rfc/rfc3390.txt"
+  month: "Oct"
+  year: "2002"
+---
+Instead of what RFC2581 describes, the initial congestion window is increased to 2-4 MSS:
+
+```
+min (4*MSS, max (2*MSS, 4380 bytes))
+```
+
+For the MTU of 1500 bytes, the MSS is 1460 bytes. Then the initial cwnd is 3 MSS. The initial cwnd setting is actually according to this table:
+
+| MSS                         | max cwnd   |
+|-----------------------------|------------|
+| MSS $\le$ 1095 bytes        | 4 MSS      |
+| 1095 $<$ MSS $<$ 2190 bytes | 4380 bytes |
+| 2190 bytes $\le$ MSS        | 2 MSS      |
+

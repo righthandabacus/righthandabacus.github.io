@@ -1,0 +1,20 @@
+---
+layout: post
+title: "Sathiaseelan and Radzik (2004) Improving the Performance of TCP in the Case of Packet Reordering (HSNMC)"
+date: 2009-10-16 18:50:23 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: Improving the Performance of TCP in the Case of Packet Reordering
+  author: Arjuna Sathiaseelan and Tomasz Radzik  
+  howpublished: "HSNMC'04"
+  booktitle: Proceedings of 7th IEEE International Conference on High Speed Networks and Multimedia Communications
+  series: LNCS 3079
+  editor: Z. Mammeri and P. Lorenz
+  pages: "63--73"
+  year: 2004
+---
+This paper proposed the RN-TCP, for Reorder Notifying.
+
+The authors propose to have the routers to do explicit packet drop notification, so that the TCP sender can know about a packet is dropped. Then, all non-notified dupacks are just reordering. Hence the performance can be improved.
+

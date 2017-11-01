@@ -1,0 +1,32 @@
+---
+layout: post
+title: "Zhang & Ansari (2011) On Mitigating TCP Incast in Data Center Networks (INFOCOM)"
+date: 2011-07-20 01:12:18 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "On Mitigating TCP Incast in Data Center Networks"
+  author: "Yan Zhang and Nirwan Ansari"
+  booktitle: "Proc. INFOCOM"
+  pages: "51--55"
+  month: "Apr"
+  year: "2011"
+  address: "Shanghai, China"
+---
+This is from the mini-conference of INFOCOM. It proposed FQCN as an extension of QCN in IEEE 802.1Qau.
+
+It is found that QCN does not provide fairness to flows. There are great rate
+disparity between flows according to the experiment reported in this paper. The
+author therefore proposed "fair QCN", which sends feedback of $Fb<0$ to not only
+the sampled flow, but all the overrated flows, i.e. those who sent at rate
+higher than the equal share. The congestion parameter to send to each overrated
+sender is given by $Fb(i)=\frac{A_i}{\sum_{k=1}^N A_k}Fb$, which $N$ is the total
+number of overrated senders, and $A_k$ is the number of packets from flow $k$.
+
+According to the simulation, it is found that with QCN, an incast scenario of
+16 servers can give a throughput of 400Mbps on a 1Gbps link, but FQCN can
+maintain 900Mbps utilization even with large number of servers. The poor
+performance of QCN is due to rate unfairness, which no new traffic is sent
+until the slowest flow of previous job is completed. By being fair, we can
+therefore reduce such "wait time"
+

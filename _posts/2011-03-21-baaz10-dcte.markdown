@@ -1,0 +1,27 @@
+---
+layout: post
+title: "Benson et al (2010) The Case for Fine-grained Traffic Engineering in Data-centers (INM/WREN)"
+date: 2011-03-21 19:47:33 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "The Case for Fine-grained Traffic Engineering in Data-centers"
+  author: "Theophilus Benson and Ashok Anand and Aditya Akella and Ming Zhang"
+  booktitle: "Proc INM/WREN"
+  month: Apr
+  year: 2010
+  address: "San Jose, CA"
+---
+In DCN, congestion occurs in only up to a few seconds. This congestion can be alleviated if optimal routing is used. However, existing traffic engineering technique fail to provide any of the following:
+
+  - Utilize multipath diversity
+  - Adapt to instantaneous load
+  - Use a global view to make routing decisions
+
+This paper propose to monitor traffic at NICs and couple with OpenFlow to do MicroTE. The architecture is as follows:
+
+  - Top-of-rack switch or end-hosts monitor traffic and gather statistics.
+  - Controller collect statistics, either by polling switches regularly or end-hosts feed data to controllers
+  - Controller compile the global view of network and send to routing component
+  - Routing component computes route
+  - If new route is different from current one significantly, new route is used, though OpenFlow update.

@@ -1,0 +1,803 @@
+---
+layout: post
+title: "Threads"
+date: 2012-06-12 12:25:00 -0400
+tags: code
+category: blog
+---
+C++11 came out for a while and recently I did some experiment with it. The most interesting feature in C++11 to me is the standardization of threading syntax in the language. Before that, we can only use pthread library for threading.
+
+# pthread
+
+A code for pthread is as follows: (`profile-1.c`)
+
+```c
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
+
+/* Time measurement routines */
+inline int64_t timeval2us(struct timeval* t)
+{
+	return ((t->tv_sec * 1e6) + t->tv_usec);
+}
+
+inline int64_t timevalDiff(struct timeval *t1, struct timeval *t2)
+{
+	return timeval2us(t1) - timeval2us(t2);
+}
+
+/* Shared objects in the global */
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+int counter = 0;
+
+/* thread programs */
+void* plusone(void* arg)
+{
+	int i;
+	for (i=1e6; i>0; --i) {
+		counter = counter + 1;
+	};
+	return 0;
+}
+
+void* minusone(void* arg)
+{
+	int i;
+	for (i=1e6; i>0; --i) {
+		counter = counter - 1;
+	}
+	return 0;
+}
+
+/* main */
+int main(int argc, char** argv)
+{
+	const int NUM_PAIRS=2;
+	const int REPEATS=5;
+	pthread_t th[NUM_PAIRS * 2];	/* Hold the thread structure */
+	int ret[NUM_PAIRS * 2];		/* Hold the error code */
+	int i, j;
+	struct timeval start, end;
+	int64_t timeElapsed;
+
+	for (j=1; j<=REPEATS; ++j) {
+		printf("Round %d: ",j);
+		counter = 0;
+		gettimeofday(&start, NULL);
+		for (i=0; i<NUM_PAIRS; i++) {
+			ret[2*i]   = pthread_create(&th[2*i],   NULL, plusone, 0);
+			if (ret[2*i]) {
+				printf("Error creating thread (errcode %d)\n", ret[2*i]);
+			};
+			ret[2*i+1] = pthread_create(&th[2*i+1], NULL, minusone, 0);
+			if (ret[2*i+1]) {
+				printf("Error creating thread (errcode %d)\n", ret[2*i+1]);
+			};
+		};
+		for (i=0; i<NUM_PAIRS; i++) {
+			ret[2*i]   = pthread_join(th[2*i], NULL);
+			if (ret[2*i]) {
+				printf("Error joining thread (errcode %d)\n", ret[2*i]);
+			};
+			ret[2*i+1] = pthread_join(th[2*i+1], NULL);
+			if (ret[2*i+1]) {
+				printf("Error joining thread (errcode %d)\n", ret[2*i+1]);
+			};
+		};
+		gettimeofday(&end, NULL);
+		timeElapsed = timevalDiff(&end, &start);
+		printf("Counter value = %d (time elapsed %ld us)\n", counter, timeElapsed);
+	};
+	return 0;
+}
+```
+
+This is a simple code to demonstrate the running of 2×2=4 threads, and a race
+condition on the variable `counter`. Its output is
+
+```
+Round 1: Counter value = -544626 (time elapsed 96079 us)
+Round 2: Counter value = -544303 (time elapsed 101830 us)
+Round 3: Counter value = -613122 (time elapsed 97027 us)
+Round 4: Counter value = -565212 (time elapsed 96079 us)
+Round 5: Counter value = -601146 (time elapsed 97830 us)
+```
+
+which, due to the TOCTOU[^rc] race condition, the counter does not give the value 0.
+However, it is fast.
+
+To guarantee correctness of the counter value, the only way to do in pthread is
+to apply a mutex to safeguard the variable, as follows: (`profile-2.c`)
+
+```c
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
+
+/* Time measurement routines */
+inline int64_t timeval2us(struct timeval* t)
+{
+	return ((t->tv_sec * 1e6) + t->tv_usec);
+}
+
+inline int64_t timevalDiff(struct timeval *t1, struct timeval *t2)
+{
+	return timeval2us(t1) - timeval2us(t2);
+}
+
+/* Shared objects in the global */
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+int counter = 0;
+
+/* thread programs */
+void* plusone(void* arg)
+{
+	int i;
+	for (i=1e6; i>0; --i) {
+		pthread_mutex_lock(&mutex);
+		counter = counter + 1;
+		pthread_mutex_unlock(&mutex);
+	};
+	return 0;
+}
+
+void* minusone(void* arg)
+{
+	int i;
+	for (i=1e6; i>0; --i) {
+		pthread_mutex_lock(&mutex);
+		counter = counter - 1;
+		pthread_mutex_unlock(&mutex);
+	}
+	return 0;
+}
+
+/* main */
+int main(int argc, char** argv)
+{
+	const int NUM_PAIRS=2;
+	const int REPEATS=5;
+	pthread_t th[NUM_PAIRS * 2];	/* Hold the thread structure */
+	int ret[NUM_PAIRS * 2];		/* Hold the error code */
+	int i, j;
+	struct timeval start, end;
+	int64_t timeElapsed;
+
+	for (j=1; j<=REPEATS; ++j) {
+		printf("Round %d: ",j);
+		counter = 0;
+		pthread_mutex_init(&mutex, NULL);	/* No need to init by function if mutex init by macro above */
+		gettimeofday(&start, NULL);
+		for (i=0; i<NUM_PAIRS; i++) {
+			ret[2*i]   = pthread_create(&th[2*i],   NULL, plusone, 0);
+			if (ret[2*i]) {
+				printf("Error creating thread (errcode %d)\n", ret[2*i]);
+			};
+			ret[2*i+1] = pthread_create(&th[2*i+1], NULL, minusone, 0);
+			if (ret[2*i+1]) {
+				printf("Error creating thread (errcode %d)\n", ret[2*i+1]);
+			};
+		};
+		for (i=0; i<NUM_PAIRS; i++) {
+			ret[2*i]   = pthread_join(th[2*i], NULL);
+			if (ret[2*i]) {
+				printf("Error joining thread (errcode %d)\n", ret[2*i]);
+			};
+			ret[2*i+1] = pthread_join(th[2*i+1], NULL);
+			if (ret[2*i+1]) {
+				printf("Error joining thread (errcode %d)\n", ret[2*i+1]);
+			};
+		};
+		gettimeofday(&end, NULL);
+		timeElapsed = timevalDiff(&end, &start);
+		printf("Counter value = %d (time elapsed %ld us)\n", counter, timeElapsed);
+	};
+	return 0;
+};
+```
+
+which it has the output:
+
+```
+Round 1: Counter value = 0 (time elapsed 1067662 us)
+Round 2: Counter value = 0 (time elapsed 1209748 us)
+Round 3: Counter value = 0 (time elapsed 1405176 us)
+Round 4: Counter value = 0 (time elapsed 1839935 us)
+Round 5: Counter value = 0 (time elapsed 1956387 us)
+```
+
+Obviously, the cost of the correctness is the expense of time, an order of magnitude longer time. 
+
+# OpenMP
+
+If we do not use pthread, an alternative (depend on compiler support) is OpenMP. OpenMP code is neat, as below: (`profile-3.c`)
+
+```c
+#include <omp.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
+
+/* Time measurement routines */
+inline int64_t timeval2us(struct timeval* t)
+{
+	return ((t->tv_sec * 1e6) + t->tv_usec);
+}
+
+inline int64_t timevalDiff(struct timeval *t1, struct timeval *t2)
+{
+	return timeval2us(t1) - timeval2us(t2);
+}
+
+/* Shared objects in the global */
+int counter = 0;
+
+/* thread programs */
+void* plusone(void* arg)
+{
+	int i;
+	for (i=1e6; i>0; --i) {
+		counter += 1;
+	};
+	return 0;
+}
+
+void* minusone(void* arg)
+{
+	int i;
+	for (i=1e6; i>0; --i) {
+		counter -= 1;
+	}
+	return 0;
+}
+
+/* main */
+int main(int argc, char** argv)
+{
+	const int NUM_PAIRS=2;
+	const int REPEATS=5;
+	int i, j;
+	struct timeval start, end;
+	int64_t timeElapsed;
+
+	for (j=1; j<=REPEATS; ++j) {
+		printf("Round %d: ",j);
+		counter = 0;
+		gettimeofday(&start, NULL);
+		#pragma omp parallel for num_threads(NUM_PAIRS*2) shared(counter) private(i)
+		for (i=0; i<NUM_PAIRS*2; i++) {
+			if (i % 2) {
+				plusone(NULL);
+			} else {
+				minusone(NULL);
+			}
+		};
+		gettimeofday(&end, NULL);
+		timeElapsed = timevalDiff(&end, &start);
+		printf("Counter value = %d (time elapsed %ld us)\n", counter, timeElapsed);
+	};
+	return 0;
+};
+```
+
+and it executes fast too:
+
+```
+Round 1: Counter value = -693965 (time elapsed 96939 us)
+Round 2: Counter value = -945338 (time elapsed 94232 us)
+Round 3: Counter value = -917874 (time elapsed 89464 us)
+Round 4: Counter value = -768656 (time elapsed 91259 us)
+Round 5: Counter value = -990012 (time elapsed 91583 us)
+```
+
+But it also suffers the same race condition problem. To get rid of the
+incorrectness due to race condition, we may also put mutex into OpenMP code, in
+the name of a critical section: (`profile-4.c`)
+
+```c
+#include <omp.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
+
+/* Time measurement routines */
+inline int64_t timeval2us(struct timeval* t)
+{
+	return ((t->tv_sec * 1e6) + t->tv_usec);
+}
+
+inline int64_t timevalDiff(struct timeval *t1, struct timeval *t2)
+{
+	return timeval2us(t1) - timeval2us(t2);
+}
+
+/* Shared objects in the global */
+int counter = 0;
+
+/* thread programs */
+void* plusone(void* arg)
+{
+	int i;
+	for (i=1e6; i>0; --i) {
+		#pragma omp critical (counterupdate)
+		counter += 1;
+	};
+	return 0;
+}
+
+void* minusone(void* arg)
+{
+	int i;
+	for (i=1e6; i>0; --i) {
+		#pragma omp critical (counterupdate)
+		counter -= 1;
+	}
+	return 0;
+}
+
+/* main */
+int main(int argc, char** argv)
+{
+	const int NUM_PAIRS=2;
+	const int REPEATS=5;
+	int i, j;
+	struct timeval start, end;
+	int64_t timeElapsed;
+
+	for (j=1; j<=REPEATS; ++j) {
+		printf("Round %d: ",j);
+		counter = 0;
+		gettimeofday(&start, NULL);
+		#pragma omp parallel for num_threads(NUM_PAIRS*2) shared(counter) private(i)
+		for (i=0; i<NUM_PAIRS*2; i++) {
+			if (i % 2) {
+				plusone(NULL);
+			} else {
+				minusone(NULL);
+			}
+		};
+		gettimeofday(&end, NULL);
+		timeElapsed = timevalDiff(&end, &start);
+		printf("Counter value = %d (time elapsed %ld us)\n", counter, timeElapsed);
+	};
+	return 0;
+};
+```
+
+Now it runs correctly, but slower than pthread:
+
+```
+Round 1: Counter value = 0 (time elapsed 1703412 us)
+Round 2: Counter value = 0 (time elapsed 1713760 us)
+Round 3: Counter value = 0 (time elapsed 1701295 us)
+Round 4: Counter value = 0 (time elapsed 1717288 us)
+Round 5: Counter value = 0 (time elapsed 1710873 us)
+```
+
+However, in OpenMP, there is a very nice feature to allow us to have synchronization without mutex --- the atomic construct: (`profile-5.c`)
+
+```c
+#include <omp.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
+
+/* Time measurement routines */
+inline int64_t timeval2us(struct timeval* t)
+{
+	return ((t->tv_sec * 1e6) + t->tv_usec);
+}
+
+inline int64_t timevalDiff(struct timeval *t1, struct timeval *t2)
+{
+	return timeval2us(t1) - timeval2us(t2);
+}
+
+/* Shared objects in the global */
+int counter = 0;
+
+/* thread programs */
+void* plusone(void* arg)
+{
+	int i;
+	for (i=1e6; i>0; --i) {
+		#pragma omp atomic
+		counter += 1;
+	};
+	return 0;
+}
+
+void* minusone(void* arg)
+{
+	int i;
+	for (i=1e6; i>0; --i) {
+		#pragma omp atomic
+		counter -= 1;
+	}
+	return 0;
+}
+
+/* main */
+int main(int argc, char** argv)
+{
+	const int NUM_PAIRS=2;
+	const int REPEATS=5;
+	int i, j;
+	struct timeval start, end;
+	int64_t timeElapsed;
+
+	for (j=1; j<=REPEATS; ++j) {
+		printf("Round %d: ",j);
+		counter = 0;
+		gettimeofday(&start, NULL);
+		#pragma omp parallel for num_threads(NUM_PAIRS*2) shared(counter) private(i)
+		for (i=0; i<NUM_PAIRS*2; i++) {
+			if (i % 2) {
+				plusone(NULL);
+			} else {
+				minusone(NULL);
+			}
+		};
+		gettimeofday(&end, NULL);
+		timeElapsed = timevalDiff(&end, &start);
+		printf("Counter value = %d (time elapsed %ld us)\n", counter, timeElapsed);
+	};
+	return 0;
+};
+```
+
+Which runs fast and produce correct result:
+
+```
+Round 1: Counter value = 0 (time elapsed 81834 us)
+Round 2: Counter value = 0 (time elapsed 81999 us)
+Round 3: Counter value = 0 (time elapsed 81743 us)
+Round 4: Counter value = 0 (time elapsed 81671 us)
+Round 5: Counter value = 0 (time elapsed 81685 us)
+```
+
+# C++11 thread
+
+Due to this, we may now see the benefit of C++11 thread. Firstly, the syntax is
+very straightforward compared to pthread: (`profile-4.cc`)
+
+```c++
+#include <thread>
+#include <vector>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
+
+/* Time measurement routines */
+inline int64_t timeval2us(struct timeval* t)
+{
+	return ((t->tv_sec * 1e6) + t->tv_usec);
+}
+
+inline int64_t timevalDiff(struct timeval *t1, struct timeval *t2)
+{
+	return timeval2us(t1) - timeval2us(t2);
+}
+
+/* Shared objects in the global */
+int counter = 0;
+
+/* thread programs */
+void plusone(void)
+{
+	int i;
+	for (i=1e6; i>0; --i) {
+		counter = counter + 1;
+	};
+}
+
+void minusone(void)
+{
+	int i;
+	for (i=1e6; i>0; --i) {
+		counter = counter - 1;
+	}
+}
+
+/* main */
+int main(int argc, char** argv)
+{
+	const int NUM_PAIRS=2;
+	const int REPEATS=5;
+	std::vector<std::thread> th;	/* Hold the thread structure */
+	int i, j;
+	struct timeval start, end;
+	int64_t timeElapsed;
+
+	for (j=1; j<=REPEATS; ++j) {
+		printf("Round %d: ",j);
+		counter = 0;
+		th.clear();
+		gettimeofday(&start, NULL);
+		for (i=0; i<NUM_PAIRS; i++) {
+			th.push_back(std::thread(plusone));
+			th.push_back(std::thread(minusone));
+		};
+		for (auto &t : th) {
+			t.join();
+		};
+		gettimeofday(&end, NULL);
+		timeElapsed = timevalDiff(&end, &start);
+		printf("Counter value = %d (time elapsed %ld us)\n", counter, timeElapsed);
+	};
+	return 0;
+};
+```
+
+But it is twice as slow as pthread and similarly incorrect if not using any mutex:
+
+```
+Round 1: Counter value = 711686 (time elapsed 150792 us)
+Round 2: Counter value = 740895 (time elapsed 152943 us)
+Round 3: Counter value = 663928 (time elapsed 158731 us)
+Round 4: Counter value = 735589 (time elapsed 150441 us)
+Round 5: Counter value = 746492 (time elapsed 153229 us)
+```
+
+To use mutex, we write: (`profile-7.cc`)
+
+```c++
+#include <thread>
+#include <mutex>
+#include <vector>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
+
+/* Time measurement routines */
+inline int64_t timeval2us(struct timeval* t)
+{
+	return ((t->tv_sec * 1e6) + t->tv_usec);
+}
+
+inline int64_t timevalDiff(struct timeval *t1, struct timeval *t2)
+{
+	return timeval2us(t1) - timeval2us(t2);
+}
+
+/* Shared objects in the global */
+int counter = 0;
+std::mutex countermutex;
+
+/* thread programs */
+void plusone(void)
+{
+	int i;
+	for (i=1e6; i>0; --i) {
+		countermutex.lock();
+		counter = counter + 1;
+		countermutex.unlock();
+	};
+}
+
+void minusone(void)
+{
+	int i;
+	for (i=1e6; i>0; --i) {
+		countermutex.lock();
+		counter = counter - 1;
+		countermutex.unlock();
+	}
+}
+
+/* main */
+int main(int argc, char** argv)
+{
+	const int NUM_PAIRS=2;
+	const int REPEATS=5;
+	std::vector<std::thread> th;	/* Hold the thread structure */
+	int i, j;
+	struct timeval start, end;
+	int64_t timeElapsed;
+
+	for (j=1; j<=REPEATS; ++j) {
+		printf("Round %d: ",j);
+		counter = 0;
+		th.clear();
+		gettimeofday(&start, NULL);
+		for (i=0; i<NUM_PAIRS; i++) {
+			th.push_back(std::thread(plusone));
+			th.push_back(std::thread(minusone));
+		};
+		for (auto &t : th) {
+			t.join();
+		};
+		gettimeofday(&end, NULL);
+		timeElapsed = timevalDiff(&end, &start);
+		printf("Counter value = %d (time elapsed %ld us)\n", counter, timeElapsed);
+	};
+	return 0;
+};
+```
+
+which is also doubly slow as in pthread:
+
+```
+Round 1: Counter value = 0 (time elapsed 2342210 us)
+Round 2: Counter value = 0 (time elapsed 2281581 us)
+Round 3: Counter value = 0 (time elapsed 2261940 us)
+Round 4: Counter value = 0 (time elapsed 2469114 us)
+Round 5: Counter value = 0 (time elapsed 2583289 us)
+```
+
+using another method to lock and unlock the mutex cannot improve either: (`profile-8.cc`)
+
+```c++
+#include <thread>
+#include <mutex>
+#include <vector>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
+
+/* Time measurement routines */
+inline int64_t timeval2us(struct timeval* t)
+{
+	return ((t->tv_sec * 1e6) + t->tv_usec);
+}
+
+inline int64_t timevalDiff(struct timeval *t1, struct timeval *t2)
+{
+	return timeval2us(t1) - timeval2us(t2);
+}
+
+/* Shared objects in the global */
+int counter = 0;
+std::mutex countermutex;
+
+/* thread programs */
+void plusone(void)
+{
+	int i;
+	for (i=1e6; i>0; --i) {
+		std::lock_guard<std::mutex> mutexlock(countermutex);
+		counter = counter + 1;
+	};
+}
+
+void minusone(void)
+{
+	int i;
+	for (i=1e6; i>0; --i) {
+		std::lock_guard<std::mutex> mutexlock(countermutex);
+		counter = counter - 1;
+	}
+}
+
+/* main */
+int main(int argc, char** argv)
+{
+	const int NUM_PAIRS=2;
+	const int REPEATS=5;
+	std::vector<std::thread> th;	/* Hold the thread structure */
+	int i, j;
+	struct timeval start, end;
+	int64_t timeElapsed;
+
+	for (j=1; j<=REPEATS; ++j) {
+		printf("Round %d: ",j);
+		counter = 0;
+		th.clear();
+		gettimeofday(&start, NULL);
+		for (i=0; i<NUM_PAIRS; i++) {
+			th.push_back(std::thread(plusone));
+			th.push_back(std::thread(minusone));
+		};
+		for (auto &t : th) {
+			t.join();
+		};
+		gettimeofday(&end, NULL);
+		timeElapsed = timevalDiff(&end, &start);
+		printf("Counter value = %d (time elapsed %ld us)\n", counter, timeElapsed);
+	};
+	return 0;
+};
+```
+
+as the result shows:
+
+```
+Round 1: Counter value = 0 (time elapsed 2983324 us)
+Round 2: Counter value = 0 (time elapsed 4077020 us)
+Round 3: Counter value = 0 (time elapsed 2583562 us)
+Round 4: Counter value = 0 (time elapsed 2611018 us)
+Round 5: Counter value = 0 (time elapsed 3994534 us)
+```
+
+But C++11 provides the atomic variable so that its update in certain ways is
+guaranteed to be atomic, then we can avoid the mutex altogether:
+(`profile-9.cc`)
+
+```c++
+#include <thread>
+#include <atomic>
+#include <vector>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
+
+/* Time measurement routines */
+inline int64_t timeval2us(struct timeval* t)
+{
+	return ((t->tv_sec * 1e6) + t->tv_usec);
+}
+
+inline int64_t timevalDiff(struct timeval *t1, struct timeval *t2)
+{
+	return timeval2us(t1) - timeval2us(t2);
+}
+
+/* Shared objects in the global */
+std::atomic<int> counter;
+
+/* thread programs */
+void plusone(void)
+{
+	int i;
+	for (i=1e6; i>0; --i) {
+		counter++;
+	};
+}
+
+void minusone(void)
+{
+	int i;
+	for (i=1e6; i>0; --i) {
+		counter--;
+	}
+}
+
+/* main */
+int main(int argc, char** argv)
+{
+	const int NUM_PAIRS=2;
+	const int REPEATS=5;
+	std::vector<std::thread> th;	/* Hold the thread structure */
+	int i, j;
+	struct timeval start, end;
+	int64_t timeElapsed;
+
+	for (j=1; j<=REPEATS; ++j) {
+		printf("Round %d: ",j);
+		counter = 0;
+		th.clear();
+		gettimeofday(&start, NULL);
+		for (i=0; i<NUM_PAIRS; i++) {
+			th.push_back(std::thread(plusone));
+			th.push_back(std::thread(minusone));
+		};
+		for (auto &t : th) {
+			t.join();
+		};
+		gettimeofday(&end, NULL);
+		timeElapsed = timevalDiff(&end, &start);
+		printf("Counter value = %d (time elapsed %ld us)\n", counter.load(), timeElapsed);
+	};
+	return 0;
+};
+```
+
+Now is much faster:
+
+```
+Round 1: Counter value = 0 (time elapsed 196952 us)
+Round 2: Counter value = 0 (time elapsed 190333 us)
+Round 3: Counter value = 0 (time elapsed 190803 us)
+Round 4: Counter value = 0 (time elapsed 190650 us)
+Round 5: Counter value = 0 (time elapsed 188199 us)
+```
+
+# Summary
+
+Although the pthread or C++11 thread constructs are generic, it seems that
+OpenMP can provide a balance between syntax tidiness and performance.
+
+[^rc]: Time of check to time of use

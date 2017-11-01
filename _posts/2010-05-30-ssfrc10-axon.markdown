@@ -1,0 +1,29 @@
+---
+layout: post
+title: "Shafer et al (2010) Axon: A Flexible Substrate for Source-routed Ethernet (ANCS)"
+date: 2010-05-30 19:57:23 -0400
+category: paper
+bibtex:
+  type: misc
+  title: "Axon: A Flexible Substrate for Source-routed Ethernet"
+  author: "Jeffrey Shafer and Brent Stephens and Michael Foss and Scott Rixner and Alan L. Cox"
+  howpublished: "ANCS (submitted)"
+  year: 2010
+---
+Proposed a new device to transparently use source-routed Ethernet.
+
+Axon is a transparent replacement for Ethernet *switches*. It talks to other Axon with Axon protocol, but talks to Ethernet devices with Ethernet protocol. The protocol is compatible in the sense that the CRC is the same and the preamble is the same. Thus the Ethernet transceivers can be used.
+
+Axon is proposed because the traditional Ethernet relies on spanning tree. Spanning tree is required to support flooding. However, it sacrifices multipath and thus the network is efficient. Axon uses source-routed protocol to avoid the use of spanning tree. The source-route is done by specifying the output port of every hop.
+
+The Axon packet is in the following format:
+
+    0       4       8       12      16      20      24      28      32
+    |  Type |            Header len         |   Forward hop count   |
+    |   Reverse hop count   | Forward hops (4 bits each)            |
+    | Reverse hops (4 bits each)            | Padding (0 or 4 bits) |
+    | Ethernet packet (varying length)                      |  CRC  |
+
+The forward hops are the port numbers to be forwarded. The first one (at the latter nibble of 6th byte) is the next one to be used. When a packet is forwarded, it will move the first forward hop to the first reverse hop and increment/decrement the reverse/forward hop counts respectively.
+
+Axon uses cut-through routing to speed up transfer. When a packet is first entering an Axon network, it is converted into an Axon packet by consulting a central controller for route information. The central controller also responsible for handling ARP and DHCP, which are intercepted by the Axon devices from hosts. Axon devices will cache route information from the controller to improve performance.

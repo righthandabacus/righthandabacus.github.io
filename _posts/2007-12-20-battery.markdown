@@ -1,0 +1,97 @@
+---
+layout: post
+title: "Rechargable Batteries"
+date: 2007-12-20 13:23:01 -0500
+tags: random
+---
+
+I mean those Nickel-Cadmium and Nikel-Metal Hydride rechargable batteries that we use at home, not car.
+
+## Batteries
+
+NiMH cells are more common than NiCd nowadays. One of the example of NiMH is
+composed of nickel oxyhyrodxide, aqueous potassium hydroxide solution, and metal
+hydride. The chemical equations are:
+
+Positive (+0.52V): $\textrm{NiO(OH)} + \textrm{H}_2\textrm{O} + \textrm{e}^- \to \textrm{Ni(OH)}_2 + \textrm{OH}^-$
+
+Negative (-0.83V): $\textrm{MH} + \textrm{OH}^- \to \textrm{M} + \textrm{H}_2\textrm{O} + \textrm{e}^-$
+
+The metal that used on the negative electrode varies (see
+[Wikipedia](http://en.wikipedia.org/wiki/Nickel_metal_hydride_battery)).
+Although the chemistry measured at 1.35V, the charging voltage shall be
+1.4-1.6V.
+
+The rechargable cells are subject to *memory effect* or called *voltage
+depression*. This means the battery carries less charge after a series of
+regular partial discharge-partial recharge process (e.g. satellite using solar
+power for recharging). This result from the active chemical that did not
+discharged before recharging will undergo some physical change and increased the
+cell's internal resistance. NiMH usually does not have this phenonmenon although
+it is well-known for NiCd. A deep discharge and recharge can cure this.
+
+Rechargable batteries will self-discharge. It (NiMH) discharges around 5-10%
+energy on the first day and 0.5-1% per subsequent day at room temperature. Hence
+the shelf life of NiMH batteries is normally a few months. Some cells have
+longer shelf life due to new technology, and named as "ready-to-use" or
+"pre-charged batteries". An example is my GP ReCyko batteries. It claims to have
+80% capacity after one year in shelf at room temperature.
+
+## Chargers
+
+Charging rechargables is not as trivial as it seems to be. There are different
+ways to charge. Also, in order to conserve the battery, it needs to know when to
+stop charging.
+
+To recharge batteries, we can provide a constant DC voltage to the reversed
+polarity. This works for Pb-H<sub>2</sub>SO<sub>4</sub> car batteries. For NiMH
+and NiCd, we apply constant current.
+
+More sophisticated ways of recharging exists. For example, we may use pulsed
+charging which charge for 1 sec and cut off the circuit for 20-30 msec to let
+the cell stablize (i.e. let the recharged active chemical diffuse away from the
+electrode) and then repeat. A variation of pulsed charging is negative pulse
+charging, which draws current (double of the charge current) out of the battery
+for a short time (e.g. 5 msec) instead of using open circuit for stablization.
+This is claimed to be able to eliminate the bubbles at electrodes.
+
+There are several types of chargers for the batteries: slow charger (0.1C, takes
+14-16 hours), quick charger (0.3C, takes 3-6 hours) and fast charger (1C, takes
+1 hour). The capacity measured in ampere-hour (Ah) is called the C. If the
+battery has 2000mAh, then the 0.1C current used in slow charger is 200mA.
+Usually chargers will have only up to 80% efficiency.
+
+The way to know when to terminate depends on the types of battery. Common safety
+measure is the temperature cut-off to prevent overheat during over-charging. For
+NiCd batteries, continuous charging will make the cell voltage drop after the
+peak is attained, due to the polarization and oxygen build-up. Hence the
+*negative delta V* (NDV) is a method for termination, but only works for larger
+charge current.
+
+$dT/dt$ is the way for NiMH which does not have NDV. It measures the temperature
+change per unit time and stop charging when the temperature rises too fast. NiMH
+batteries can also measure the $dV/dt$, which levels off when the batteries are
+full.
+
+## Memory Effect
+
+In NiCd batteries, memory effect can occur. It means that, when a battery is
+discharged to $X$ and fully recharged, the battery refuse to further deliver power
+when it discharged to the previous level $X$ again.
+
+This is due to crystalline formation at anode (cadmium hydroxide). A new battery
+shall have the crystalline of size of 1um, but when memory effect occur, the
+crystalline grows to 100um. This decreases the surface area for reaction.
+Crystalline formation can also occur by overcharging the battery without deep
+discharge for a prolonged time. Therefore periodic discharge is needed (i.e.
+exercising the battery).
+
+A way to break the crystalline is to recondition the battery: Slowly drain the
+current until the cell is in 0.6-0.4V.
+
+## References
+
+  * [Battery Chargers and Charging Methods](http://www.mpoweruk.com/chargers.htm)
+  * [Cell Construction](http://www.mpoweruk.com/cell_construction.htm)
+  * [NiCd Battery Charger](http://www.angelfire.com/electronic/hayles/charge1.html)
+  * [How to Restore Nickel-based Batteries](http://batteryuniversity.com/learn/article/how_to_restore_nickel_based_batteries)

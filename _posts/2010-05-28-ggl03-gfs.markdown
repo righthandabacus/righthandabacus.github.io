@@ -1,0 +1,46 @@
+---
+layout: post
+title: "Ghemawat et al (2003) The Google File System (SOSP)"
+date: 2010-05-28 00:06:11 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "The Google File System"
+  author: "Sanjay Ghemawat and Howard Gobioff and Shun-Tak Leung"
+  booktitle: "ACM SOSP’03"
+  month: "October 19–22"
+  year: 2003
+  address: "Bolton Landing, New York, USA"  
+---
+The Google File System is not as state-of-the-art as you may think. It is not a distributed file system in a strict sense (unlike global file system or GPFS). Its model has three components: The clients who uses the file system, a master server to do housekeeping and holds metadata, a number of chunkserver to hold the real data.
+
+The goals of GFS are:
+
+  - Make use of large number of commodity components for storage
+  - Hold a modest number of large files (multi-GB)
+  - Support large streaming read (in MBs) and small random reads (a few KBs)
+  - Support large sequential appends. Small writes to arbitrary positions supported but not optimized.
+  - Support multiple concurrent appends, for use as producer-consumer queues or multiway merging.
+    Append order is can be decided by the master server.
+  - Optimize for bandwidth, trading off latency
+
+The operations of GFS include the usual create, delete, open, close, read, write. It also support snapshot and record append operations, which are to create a copy of a file/directory and allow concurrent append by multiple clients respectively. The concurrent append guarantees individual atomicity.
+
+Files in GFS is stored in Linux filesystems as chunks. A chunk is typically 64MB. When a client going to access a file, it converts the file/offset into chunk ID and sends request (chunk ID) to the master. The master replies with the chunk handle (lock) and replica locations. Then the client directly contact the chunkservers for the chunk. This prevents the master server to become a bottleneck.
+
+Large chunk size reduces overhead (client-master interaction, metadata size) but creates hotspots for small files as the files cannot distribute into many chunkservers.
+
+The metadata held in master server are: (1) file and chunk namespace, (2) mapping from file to chunk, (3) locations of chunks. Master server also held operation log, which records the change of metadata. This is like a journal in journaled filesystems. Master server holds all metadata in memory for speed. Periodic scanning is done for garbage collection, migration and re-replication. The total metadata size is small, 64 bytes per chunk plus less than 64 bytes per file. Master server does not remember the location of chunks on disk. These data are collected dynamically from the chunkservers to avoid inconsistency. Regularly, master server creates checkpoint with its metadata and start a new operation log. This is to prepare for outage. Master server also handles locking.
+
+In GFS, updating a file is called a mutation and it has the following procedure:
+
+  - Client requests master for the location of "lease" for a chunk and the location of all replicas
+  - The chunkserver with the lease is "primary", others are "secondary"
+  - The client pushes data to all replicas. It does so by sending data to one of them and they forward to
+    each other in a chain of TCP pipeline.
+  - Once all replicas are acknowledged, the client sends the write requests to the primary.
+  - The primary chunkserver determines the order of executing the write requests (if more than one), and
+    send this order to all other replicas
+  - All replicas tell the primary the completion, and primary tells the client
+
+This operation separates data flow from control flow for network efficiency.

@@ -1,0 +1,16 @@
+---
+layout: post
+title: "vim modeline for NS-3 coding style"
+date: 2009-11-06 14:00:45 -0400
+tags: code
+---
+```
+/* vim:set cin cino=>4n-2f0{2^-2 sw=2 syn=cpp ru nu lcs=tab:>- lbr: */
+```
+
+or
+
+```
+/* vim:set cin cino=>4,n-2,{2,^-2,:2,=2,g0,h2,p5,t0,+2,(0,u0,w1,m1 sw=2 ts=8 et */
+```
+

@@ -1,0 +1,23 @@
+---
+layout: post
+title: "Power Architeture"
+date: 2007-08-14 11:13:31 +0800
+tags: system
+---
+
+Power architecture is a RISC architecture with 4-byte instruction set. It was
+developed by the AIM --- Apple, IBM and Motorola. The semiconductor products
+sector of Motorola became Freescale in 2004 and hence the Power architecture
+processor is created by Freescale now.
+
+The Freescale Power Architecture cores is named as "e200", "e300", "e500",
+"e700" and "e800". The one used in Thecus N1200 is using the "e300" core. It is
+a PowerPC core in 32-bit.
+
+The model in Thecus N1200 is MPC8347. The MPC83xx series supports up to 667 MHz
+clock with Gigabit ethernet.
+
+## References
+  * [Power Architecture: A High-Performance Architecture with a History](http://www-03.ibm.com/servers/eserver/pseries/hardware/whitepapers/power/ppc_arch.html) (IBM developerWorks)
+  * [IBM Power Architecture](http://en.wikipedia.org/wiki/IBM_POWER_Architecture) (wikipedia)
+  * [PowerPC](http://en.wikipedia.org/wiki/Powerpc) (wikipedia)

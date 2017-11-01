@@ -1,0 +1,22 @@
+---
+layout: post
+title: "XCode issues"
+date: 2007-06-06 00:21:48 +0800
+tags: system
+---
+
+Points to note on using gcc over Intel Mac:
+
+  * gcc 3.3 is not working for Intel platform (no libraries available)
+  * gcc 4.0 is the only thing that can link Intel code, due to the libraries' availability
+  * packages to install (ref: XCode 2.4.1)
+     * BSDSDK (command line handling stuff)
+     * DevSDK (important: `/usr/lib/crt1.o` resides here)
+     * gcc-4.0 (the working compiler)
+     * gcc-3.3 (the required stuff, but not used by me)
+  * the installed packages will store a receipt over `/Library/Receipts`
+     * e.g. BSDSDK: `/Library/Receipts/BSDSDK.pkg`
+     * a bill-of-materials (BOM) file contains a list of files installed by this package
+     * to read BOM, use `lsbom`
+     * e.g.: `lsbom -l -f -p f /Library/Receipts/BSDSDK.pkg/Contents/Archive.bom`
+

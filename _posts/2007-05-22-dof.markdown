@@ -1,0 +1,26 @@
+---
+layout: post
+title: "Depth of Field"
+date: 2007-05-22 04:59:16 +0800
+tags: business
+---
+
+To make a deeper [DOF](http://en.wikipedia.org/wiki/Depth_of_field), we can use:
+
+- Longer focal length
+- Wider aperture
+- Stay closer to the focus
+
+Actually, the depth-of-field is determined by the three factors:
+
+- the focal length of the lens ($f$)
+- the f-number of the lens opening ($N$), i.e. the aperture
+- the camera-to-subject distance ($s$), i.e. the object distance in optics terminology
+
+The DOF formula is expressed as:
+
+$$
+\mathrm{DOF} \approx \frac{2 N c f^2 s^2}{f^4 - N^2 c^2 s^2}
+$$
+
+where $c$ is the diameter of the [circle of confusion](http://en.wikipedia.org/wiki/Circle_of_confusion), which is 0.018mm for APS-C and 0.029mm for 35mm film.

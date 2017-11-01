@@ -1,0 +1,21 @@
+---
+layout: post
+title: "C++ subtleties"
+date: 2010-01-04 17:45:48 -0500
+tags: code
+---
+
+  * Calling `delete this` may or may not crash, depending on whether the object is created
+    outside or inside heap
+  * The prefix and postfix `operator++` function is differentiated by void argument (prefix)
+    or a dummy `int` argument (postfix)
+  * The compiler constructs a vtable for an object gradually during the constructor of a class
+    called. Hence the full and complete vtable is ready only after all the constructors called.
+    And therefore, calling virtual function in a constructor do not show polymorphism.
+  * Default component of a class: Default constructor, default destructor, copy constructor,
+    assignment operator, address operator
+  * Virtual destructor is useful for the case that a parent-class pointer to a derived-class
+    object is called for `delete`, then the correct destruction can be done correctly.
+  * C++ compiler do name mangling (because name is no longer unique due to overloading, etc.).
+    Hence C++ object code and C object code are different. To make link a C++ code with C code,
+    one can wrap the C-style function with `extern "C" { }` before feeding into C++.

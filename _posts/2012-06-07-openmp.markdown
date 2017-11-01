@@ -1,0 +1,169 @@
+---
+layout: post
+title: "OpenMP"
+date: 2012-06-07 16:17:27 -0400
+tags: code
+---
+
+Cheat sheet: <http://openmp.org/mp-documents/OpenMP3.1-CCard.pdf>
+
+
+To compile:
+
+    gcc -fopenmp -o code code.c
+
+OpenMP is for SPMD model of parallel processing. The way to specify parallelism
+is `#pragma omp` but it also provides several C functions to specialize each
+thread
+
+```c
+// Return the thread id, start from 0 for the master thread to N-1
+int omp_get_thread_num();
+
+// Return the total number of threads in the current team
+int omp_get_num_threads()
+```
+
+The part of code that multiple threads shall spawn is done by
+
+```c
+#pragma omp parallel num_threads(N)
+{ /* block */ }
+```
+
+If there is nothing inside the block, N threads would be spawned, each to run
+the block for once. The threads are joined again at the end of the code block.
+If no `num_threads` provided, it is determined automatically. The variables can
+be defined as private (thread has its own copy) or shared (all thread share the
+same memory spot) by constructs
+
+```c
+#pragma omp parallel shared(x,y) private(i,j,k)
+```
+
+There are several ways to specify parallelism. One is to break a for-loop into
+multiple threads. This is useful if each loop is data-independent. Syntax is
+
+```c
+#pragma omp for
+for (i=lowerbound; i op upperbound; inc_expr)
+{ /* block */ }
+```
+
+The for-loop must with an integer loop counter `i`, and the
+lowerbound/upperbound must be an explicit integer. The increment expression
+`inc_expr` can be any of the following: `++i`, `i++`, `--i`, `i--`, `i += n`, `i
+-= n`, `i = i+n`, `i=n+i`, `i = i-n`. If in any for-loop, a portion of the code
+must not be executed by more than one thread (e.g. initialization), then we can
+surround it by a `single` construct:
+
+```c
+#pragma omp single
+{ /* block */ }
+```
+
+But for non-loop type parallelism, we need to use sections:
+
+```c
+#pragma omp sections
+{
+  #pragma omp section
+  { /* block */ }
+  #pragma omp section
+  { /* block */ }
+}
+```
+
+The `sections` construct contains a set of structured blocks each identified by
+a `section` construct. Each `section` would be executed in one thread in
+parallel.
+
+Note that, if a parallel section contains only one for construct or one sections
+construct, it may be done in a shortcut:
+
+```c
+#pragma omp paralel for
+for (;;) { /* block */ }
+
+#pragma omp parallel sections
+{
+  #pragma omp section
+  { /* block */ }
+  #pragma omp section
+  { /* block */ }
+}
+```
+
+## Critical sections
+A critical section can be done by
+
+```c
+#pragma omp critical (critical_section_name)
+```
+
+But if the critical section is only to ensure atomic read/write of a variable, it can be done instead by
+
+```c
+#pragma omp atomic [read|write|update|capture]
+x = expr;
+
+#pragma omp atomic capture
+{ /* copy and update */ }
+```
+
+For atomic read, it must be in the form of
+
+    v = x;
+
+For atomic write, it must be in the form of
+
+    x = expr;
+
+For atomic update, it can be any of the following form:
+
+    x++; ++x;
+    x--; --x;
+    x op= expr;
+    x = x op expr;
+
+For atomic capture, it can be any of the following form:
+
+    v = x++;
+    v = x--;
+    v = ++x;
+    v = --x;
+    v = (x op= expr);
+    { v = x; x op= expr; }
+    { x op= expr; v = x; }
+    { v = x; x = x op expr; };
+    { x = x op expr; v = x; };
+    { v = x; x++; }
+    { v = x; ++x; }
+    { v = x; x--; }
+    { v = x; --x; }
+    { x++; v = x; }
+    { ++x; v = x; }
+    { x--; v = x; }
+    { --x; v = x; }
+
+## Other tricks
+
+Sometimes, different thread may have inconsistent view due to cache. To flush
+the cache at certain point,
+
+```c
+#pragma omp flush
+```
+
+If a variable in the parallel is manipulated but eventually reduced to a single
+value on the completion of all threads, it is more efficient to do
+
+```c
+#pragma omp parallel reduction(op: var1, var2)
+```
+
+where the list of variables are supposed to be reduced by the operator `op`
+(which can be `+`, `*`, `&`, `|`, `^`, `&&`, `||`, `max`, or `min`). Then the
+variable would be make independent copies with operator-neutral values
+initialized to each thread, and upon their completion, the variables would be
+combined using the specified operation.

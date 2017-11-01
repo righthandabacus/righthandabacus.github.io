@@ -1,0 +1,31 @@
+---
+layout: post
+title: "bwm-ng"
+date: 2012-01-09 13:46:43 -0500
+tags: system code
+---
+
+The tool `bwm-ng` is the bandwidth monitoring tool that I frequently used. From
+time to time, I wondered how the bandwidth is measured. I digged up the code to
+find it out today. It is based on a periodic pooling of network resources for
+the byte count. The following is the pseudocode of its algorithm:
+
+```
+newCount = Pool_NIC_for_byte_count();
+nowTime = Now();
+instantBw = (newCount - oldCount) / (nowTime - lastTime);
+oldCount = newCount;
+lastTime = nowTime;
+append_to_list(instantBw);
+while (list_size() > N) {
+    remove_from_list();
+}
+reportBw = average_of_list();
+```
+
+This algorithm is run periodically, thus the sampling time (i.e. nowTime above) is regularly spaced.
+
+Thus, it resolved my wonder: The reported bandwidth is fluctuating, as no
+filtering (e.g. EWMA) is done and the list length (N) is quite short compared to
+the sampling frequency. But this reported bandwidth data is accurate in the
+sense that it really compute the bytes/time in a sliding window.

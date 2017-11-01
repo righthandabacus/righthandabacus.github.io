@@ -1,0 +1,66 @@
+---
+layout: post
+title: "Divakaran et al (2010) Size-based Flow Scheduling in a CICQ Switch"
+date: 2010-03-06 23:47:12 -0500
+category: paper
+bibtex:
+  type: misc
+  title: "Size-based Flow Scheduling in a CICQ Switch"
+  author: "Dinil Mon Divakaran and Fabienne Anhalt and Eitan Altman and Pascale Vicat-Blanc Primet"
+  howpublished: "HPSR 2010 (submitted)"
+  year: 2010
+---
+CICQ = Combined Input-crosspoint Queued Switch
+
+CICQ has VOQ at the input and each crosspoint has a buffer (buffered crossbar,
+or BX). In the paper, the following are assumed:
+
+  - $N\times N$ switch architecture
+  - $N^2$ crosspoints, and thus $N^2$ buffers
+  - There are 2 priorities (high, low) and they use different VOQ, thus there are $2N$ VOQs per input
+  - Size-based scheduling (SB): First $\theta$ packets of a flow are marked high priority, others are low priority
+
+VOQ to crosspoint queues are in PIFO (push-in first-out) operation
+
+  - Packets are allowed to insert to the middle
+  - Packets of low priority enqueued to the end
+  - Packets of high priority enqueued to in front of the first low priority packet
+
+pCICQ-1: First version of SB scheduling. Output scheduler (the one selects a
+crosspoint buffer to dequeue to the output at each cycle) maintains a 1-bit
+indicator for each crosspoint buffer. The indicator $PI_{i,j}$ is 1 iff the head
+of line packet at crosspoint buffer $i,j$ is high priority. The output scheduler
+always prefer those crosspoint buffer with $PI_{i,j} = 1$, i.e. high priority
+packets are dequeued sooner than low priority and low priority packets are
+outputted only if no high priority packets are there. The output selection can
+be round-robin, longest queue first, oldest HOL packet first or otherwise. The
+input scheduler (the one puts packet from VOQ to crosspoint buffer) simply
+prefer high-priority VOQ over low-priority one. Therefore, in pCICQ-1, the total
+additional requirement is $N^2$ bits for the $PI_{i,j}$. But it does not
+guarantee strict priority: Because an arriving packet need to wait 1 cycle to be
+seen by the output scheduler. Moreover, in case two high priority packets are
+from different input port but destined to the same output port, their arrival
+order may not be preserved at departure.
+
+pCICQ-2: Improvement over pCICQ-1. For each output, there is an $ASH_j$ queue to
+hold the arrival sequence of high-priority packets. The $ASH_j$ queue holds the
+ID of the arrival input ports. Enqueue is done by the input ports upon high
+priority packet arrivals. Dequeue, however, is by the output scheduler. The
+output scheduler for output $j$ works with the $ASH_j$ queue. If the $ASH_j$
+queue is empty, it is sure that there is no high priority packet and a low
+priority packet is dequeued by round robin or otherwise. If it is not empty,
+then $ASH_j$ is dequeued to find the input port of the oldest high priority
+packet $i$, and that packet is retrieved from buffer $i,j$. In this way,
+cross-input FIFO property for high priority packet is maintained.
+
+Solution to strict priority is the following: There is a sequence controller
+that inputs to $ASH_j$. The input port i will assert a 1-bit indicator $R_{i,j}$
+when it sees a high priority packet destined to output $j$. The sequence control
+will work every cycle to scan all $R_{i,j}$ and put the ID $i$ to $ASH_j$.
+Normally the input scheduler should then put the packets to respective
+crosspoint buffer but if the due time computed as
+$\textrm{length}(ASH_j)+\sum_{k=0}^{i-1}(R_{k,j})=0$, then this packet is the one that
+should be immediately sent out. So, instead of enqueued to the crosspoint
+buffer, it is delivered to the output by cut-through switching.
+
+In pCICQ-2, the $ASH_j$ queue should be long enough to prevent overflow.

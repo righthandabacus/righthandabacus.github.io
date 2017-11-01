@@ -1,0 +1,18 @@
+---
+layout: post
+title: "MetaPost to EPS"
+date: 2005-10-07 05:59:37 +0800
+tags: code
+---
+The FAQ for MetaPost drawing is why ghostview cannot preview the picture but you
+can still included in LaTeX. Actually, this is due to the fact that, MP output
+is not a completely valid postscript, but just a partial file. Whenever you
+included some text, it cannot understand where to find the font as the
+font-related header is missing. No way to fix, this is a feature!
+
+However, I know it is annoying and it make some begineers confused. But I found
+two neat tools. First one is the `mptopdf` command, which is bundled in my
+Debian. It can convert the MP file directly into PDF pictures. Suitable for
+those `pdflatex` users. Another is the `mptoeps` Perl script, available at
+<http://www.alcinoe.net/perl/mptoeps>, which do the same thing but for a completely
+*valid* eps file. This probably help to relief some people's pain.

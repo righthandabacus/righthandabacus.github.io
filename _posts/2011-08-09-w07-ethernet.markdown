@@ -1,0 +1,20 @@
+---
+layout: post
+title: "Wadekar (2007) Enhanced Ethernet for Data Center: Reliable, Channelized and Robust (LANMAN)"
+date: 2011-08-09 11:53:01 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "Enhanced Ethernet for Data Center: Reliable, Channelized and Robust"
+  author: "Manoj Wadekar"
+  booktitle: "Proc. 15th IEEE Workshop on Local and Metropolitan Area Networks"
+  pages: "65--71"
+  year: "2007"
+---
+A summary of IEEE efforts to data center ethernet.
+
+It describes the IEEE 802.1Qau and 802.1Qbb for subnet congestion control and link level flow control. Besides, it also describes:
+
+IEEE 802.1Qat Shortest path bridging. It is to replace spanning tree protocol to increase bisection bandwidth. It let each node to set up its own shortest path tree (root at itself), and forward packets according to this tree. Similar to IETF TRILL, but TRILL is using link state protocol to build the path.
+
+IEEE 802.1p for channelization of Ethernet. It classify flows with 3-bit tagging (8 tags). The classification help network devices to queue traffic into different queues. The specification proposes to use strict priority scheduling for these queues.

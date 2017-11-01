@@ -1,0 +1,148 @@
+---
+layout: post
+title: "English Tenses"
+date: 2006-08-26 09:45:57 +0800
+tags: random
+---
+
+## Present continuous
+  * An activity of something happening now:\\
+    They're talking
+  * A temporary situation:\\
+    I am not feeling well today
+  * A future plan:\\
+    They are having a party next week
+  * About change, development and progress:\\
+    Life is getting easier thanks to technology
+  * With always, to criticise or complain:\\
+    You are always interupting me!
+
+## Present simple
+  * About things that are always true
+  * With words like never, sometimes, often, always, every day, etc to talk about regular and repeated actions:\\
+    My parents never eat meat.
+  * About general facts about our lives:\\
+    We live in a small house.
+
+## Present Perfect
+  * For something happened in the past but has an effect in the present:\\
+    He has had a bad accident.\\
+    I have already seen the film.
+  * Refer to the very recent past:\\
+    He has just passed his exams.
+  * For somethign which started in the past and is still going on:\\
+    I have lived there for five years.
+  * About the past up to the present:\\
+    I have been to Canada.
+  * For something which still has not happened but is expected to happen:\\
+    I have not finished the book yet.
+  * Not to be used in a clause with a past time expression:\\
+    I read it __last week__.
+  * After words like when, after, until, as soon as, etc., to talk about something in the future:\\
+    I will write to you as soon as I have heard from Jenny.
+
+Has gone and has been:
+  * Somebody has gone to a place means he is still there:\\
+    He has gone to school
+  * Somebody has been to a place means he went there once but he is not there now:\\
+    He has been to school
+
+## Present Perfect Continuous
+  * Continuous verbs: The action goes on for some time, e.g. drive, live, make, stand, study, travel, watch, wait, walk, work
+  * For emphasising how long something has been going on up to the present:\\
+    We have been travelling for three hours.
+  * To show that something is still going on:\\
+    I have been reading your book.
+  * To show something is temporary:\\
+    I have been working as a ski instructor, but now I am looking for a new job.
+
+## Past simple
+  * To talk about things that happened in the past:\\
+    I stayed in that hotel last week.
+  * To talk about the general past, and about regular actions:\\
+    Our friends often visited us there.
+
+## Past continuous
+  * For an action which was interrupted by anther action:\\
+    I was reading the newspaper when the doorbell rang.
+  * For an action which was still in progress at a particular time:\\
+    At 2:15 we were still waiting for the bus.
+  * To set the scene for a story or for a series of events:\\
+    In was 1975. We were living in a small house in Liverpool.\\
+    One the day I had my accident, I was preparing for my examinations.
+
+## Past Perfect
+  * When you are talking about past time, you use the past perfect for something which happened earlier and has an effect on the time you are talking about.\\
+    I didn't go to the film with my wife because I had already seen it.
+  * Refers to something which had happened very recently:\\
+    I was feeling very tired because I had just finished work.
+  * For something which started earlier and was still going on at the time you are talking about:\\
+    I had lived there for five years.
+  * To talk about the time up to the time you are talking about:\\
+    In 1997, I had never been to America.
+  * For something which had not happened at the time you are talking about:\\
+    I had never met him before.
+
+## Past perfect continuous
+  * To talk about something which had been going on for some time:\\
+    We had been travelling for three hours
+
+
+## Present tenses for the future
+  * Use present simple for fixed date/time in the future:\\
+    The next train arrives at 11:30.
+  * Use present continuous tense for plans or arrangements for the future:\\
+    I am seeing Jill next week.
+  * Use present tense of verbs like hope, expect, intend, want with a to-infinitive clause for future with uncertain arrangements:\\
+    We hope to see you soon.
+  * After the verb "hope", we use present simple to refer to the future:\\
+    I hope you enjoy your holiday.
+  * Present tenses are often used to refer to the future in clauses with "if" and with time words like "when" or "before":\\
+    You will not get lost if you have a good map.
+
+## Will and going to
+  * When you know that something will happen, use present simple:\\
+    The next train arrives at 11:30
+  * When you predict something will happen, use "will" or "going to":\\
+    It will be sunny tomorrow.\\
+    It is going to rain.
+  * Use "going to" for prediction with evidence:\\
+    I missed the bus. I am going to be late.
+  * Use "going to" for a warning:\\
+    Watch out, we are going to crash.
+  * Use "will" for a promise:\\
+    I will call you later.
+  * Use "going to" for a decision you have made:\\
+    I am going to stay at home tonight.
+  * Use "will" for a decision you have just made:\\
+    I will go to see him.
+
+## There
+  * "There is" for the noun is singular after "there":\\
+    There is a book on the table
+  * "There are" for the noun is plural after "there":\\
+    There are two books on the table
+  * "There is" for two nouns joined by "and" after "there" and the first noun is singular:\\
+    There is a man and two women.
+  * For questions: "there" is placed before "be" or after "is/was/were":\\
+    Are there some oranges left?\\
+    Will there be enough time?
+
+## In/on/at time
+  * "at" is for:
+     * Clock times, e.g. at 10:30
+     * Meals, e.g. at breakfast
+     * Festivals, e.g. at Easter
+  * "on" is for:
+     * days, e.g. on Monday
+     * dates, e.g. on 10 May
+     * parts of a specific day, e.g. on Tuesday evening
+     * special days, e.g. on Christmas eve
+     * special occations, e.g. on my birthday
+  * "in" is for:
+     * parts of the day, e.g. in the morning
+     * seasons, e.g. in winter
+     * months, e.g. in January
+     * years, e.g. in 2000
+     * centuries, e.g. in the 20th century
+   * Example: At 10:30 on 10 May in 2000

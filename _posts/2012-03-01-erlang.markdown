@@ -1,0 +1,69 @@
+---
+layout: post
+title: "Erlang & Poisson distribution"
+date: 2012-03-01 10:38:06 -0500
+tags: math
+---
+Poisson distribution (PDF):
+$$
+f(k;x,\lambda) = \frac{(\lambda x)^k e^{-\lambda x}}{k!}\quad\textrm{for }x,\lambda\ge 0
+$$
+
+Erlang distribution (PDF):
+$$
+f(x;k,\lambda) = \frac{\lambda^k x^{k-1} e^{-\lambda x}}{(k-1)!}\quad\textrm{for }x,\lambda\ge 0
+$$
+
+where $\lambda$ is the arrival rate of a Poisson process, and $k$ is the number
+of arrival events. The Poisson distribution tells the probability of the number
+of arrivals over a given amount of time $x$. The Erlang distribution tells the
+probability of the time interval over a given number of arrivals $k$. The
+difference is that, in Erlang distribution, it is assumed to have an arrival at
+time $t=0$ (which is not counted toward $k$) and $t=x$ (which is counted toward
+$k$), respectively, whereas Poisson does not.
+
+## Derivation
+
+Poisson is derived using the law of rare events: Assume $B(n,p)$ denote the
+binomial distribution of $n$ Bernoulli events with "success" probability $p$.
+Assume the rate of occurrence of "success" is $\lambda$, then $\lambda x = np$
+where $x$ is the time to finish $n$ Bernoulli events. Define $X_n$ to be the
+number of "success" events occurred. So
+
+$$
+\begin{aligned}
+\lim_{n\to\infty}\Pr[X_n = k]
+&= \lim_{n\to\infty}\binom{n}{k}p^k(1-p)^{n-k} \\
+&= \lim_{n\to\infty}\frac{n!}{k!(n-k)!}(\frac{\lambda x}{n})^k(1-\frac{\lambda x}{n})^{n-k} \\
+&= \lim_{n\to\infty}(\frac{n!}{n^k(n-k)!})\frac{(\lambda x)^k}{k!}(1-\frac{\lambda x}{n})^n(1-\frac{\lambda x}{n})^{-k} \\
+&= \lim_{n\to\infty}(\frac{n(n-1)\cdots(n-(k-1))}{n^k})\frac{(\lambda x)^k}{k!}(1-\frac{\lambda x}{n})^n(1-\frac{\lambda x}{n})^{-k} \\
+&= 1\cdot\frac{(\lambda x)^k}{k!}\cdot e^{-\lambda x}\cdot 1 \\
+&= \frac{(\lambda x)^k}{k!}e^{-\lambda x}
+\end{aligned}
+$$
+
+The formula for Erlang distribution is derived by induction. The case of
+$f(x;1,\lambda)$ is trivial because this is the exponential distribution, i.e.
+the time for the next arrival is $x$.
+
+$$
+\begin{aligned}
+f(x;1,\lambda) &= \lambda e^{-\lambda x}  \\
+&= \frac{\lambda^1 x^0 e^{-\lambda x}}{0!}
+\end{aligned}
+$$
+
+Consider $f(x;k-1,\lambda)=\frac{\lambda^{k-1} x^{k-2} e^{-\lambda x}}{(k-2)!}$,
+then $f(x;k,\lambda)$ is defined by the convolution:
+
+$$
+\begin{align}
+f(x;k,\lambda)
+&= \int_0^x f(u;k-1,\lambda)\cdot\lambda e^{-\lambda(x-u)} du \\
+&= \int_0^x \frac{\lambda^{k-1} u^{k-2} e^{-\lambda u}}{(k-2)!}\cdot\lambda e^{-\lambda(x-u)} du \\
+&= \frac{\lambda^k}{(k-2)!} \int_0^x u^{k-2} e^{-\lambda u} e^{-\lambda(x-u)} du \\
+&= \frac{\lambda^k e^{-\lambda x}}{(k-2)!} \int_0^x u^{k-2} du \\
+&= \frac{\lambda^k e^{-\lambda x}}{(k-2)!} \frac{x^{k-1}}{k-1} \\
+&= \frac{\lambda^k x^{k-1} e^{-\lambda x}}{(k-1)!}
+\end{align}
+$$

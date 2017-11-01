@@ -1,0 +1,39 @@
+---
+layout: post
+title: "Libraries of Regular Expressions"
+date: 2010-04-09 14:40:34 -0400
+tags: code
+---
+
+As I have to write a simulation program and simulate for a hugh amount of data,
+some sort of automation is required. I store all the simulation result into a
+text file and there are millions (really millions, I am serious!) of files, I
+want to loop around the directory and extract the data to put into a graph.
+
+For the first step, I need an engine to parse the output. Regular Expression is
+the right tool. I have searched for many kinds of regex libraries, some are
+powerful but complicated to use, some are intuitive but not flexible. I've
+include their links at the bottom of this page.
+
+Finally, I deicided to use Perl-Compative Regular Expression
+([PCRE](http://www.pcre.org)) package. This is a C library and use the Perl regex
+syntax. Powerful enough and easy to use (for me). As I am writing a C++
+program, there is a PCRE wrapper called [PME](http://xaxxon.slackworks.com/pme/).
+
+PCRE and PME are recommended. Sample code of PME are as follows, more from the web:
+
+```c++
+PME* regex;
+regex = new PME("^=+$");
+if (regex->match(string)!=0) {
+  // Line found
+};
+```
+
+## Links
+
+  * <http://www.boost.org/libs/regex/doc/basic_regex.html>
+  * <http://www.cs.unr.edu/~stuart/projects/>
+  * <http://xaxxon.slackworks.com/>
+  * <http://xaxxon.slackworks.com/pme/index.html>
+  * <http://regular-expressions.designerz.com/regular-expressions-c-and-c++.php>

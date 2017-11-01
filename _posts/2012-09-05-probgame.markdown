@@ -1,0 +1,106 @@
+---
+layout: post
+title: "Game of Probability"
+date: 2012-09-05 19:49:36 -0400
+tags: math
+category: blog
+---
+In a game, two players, $A$ and $B$, performing Bernoulli trials $t_A$ and
+$t_B$ alternately, with occurance probabilities $p_A$ and $p_B$ respectively.
+Player $A$ make his turn first. The game ends whenever a player succeed in
+his trial but continues if neither wins.
+
+Consider a round as both player completed one trial. Then define:
+
+  - $P_A(n)$ to be the probability that player $A$ wins before the end of $n$-th trial
+  - $P_B(n)$ to be the probability that player $B$ wins before the end of $n$-th trial
+  - $P_d(n)$ to be the probability that the game draws at the end of $n$-th trial
+
+Then the following are established:
+
+$$
+\begin{aligned}
+P_A(1) &= p_A   \\
+P_B(1) &= (1-p_A)p_B   \\
+P_d(1) &= (1-p_A)(1-p_B)   \\
+P_A(n) &= P_A(n-1) + P_d(n-1)p_A   \\
+P_B(n) &= P_B(n-1) + P_d(n-1)(1-p_A)p_B   \\
+P_d(n) &= P_d(n-1)(1-p_A)(1-p_B)
+\end{aligned}
+$$
+
+From them, we can derive
+
+$$
+\begin{aligned}
+P_d(n) &= (1-p_A)^n(1-p_B)^n   \\
+P_A(n) &= P_A(n-1) + (1-p_A)^{n-1}(1-p_B)^{n-1} p_A   \\
+       &= p_A \sum_{k=0}^{n-1} [(1-p_A)(1-p_B)]^k   \\
+P_B(n) &= P_B(n-1) + (1-p_A)^{n-1}(1-p_B)^{n-1}(1-p_A)p_B   \\
+       &= (1-p_A)p_B \sum_{k=0}^{n-1} [(1-p_A)(1-p_B)]^k.
+\end{aligned}
+$$
+
+We know that these probabilities are correct because
+
+$$
+\begin{aligned}
+& P_A(n)+P_B(n)+P_d(n)  \\
+=& [(1-p_A)(1-p_B)]^n + p_A \sum_{k=0}^{n-1} [(1-p_A)(1-p_B)]^k + (1-p_A)p_B \sum_{k=0}^{n-1} [(1-p_A)(1-p_B)]^k   \\
+=& [(1-p_A)(1-p_B)]^n + (p_A+p_B-p_Ap_B) \sum_{k=0}^{n-1} [(1-p_A)(1-p_B)]^k   \\
+=& [(1-p_A)(1-p_B)]^n + [1-(1-p_A)(1-p_B)]\sum_{k=0}^{n-1} [(1-p_A)(1-p_B)]^k   \\
+=& [(1-p_A)(1-p_B)]^n + \sum_{k=0}^{n-1} [(1-p_A)(1-p_B)]^k - (1-p_A)(1-p_B)\sum_{k=0}^{n-1} [(1-p_A)(1-p_B)]^k   \\
+=& \sum_{k=0}^n [(1-p_A)(1-p_B)]^k - (1-p_A)(1-p_B)\sum_{k=0}^{n-1} [(1-p_A)(1-p_B)]^k   \\
+=& \sum_{k=0}^n [(1-p_A)(1-p_B)]^k - \sum_{k=1}^n [(1-p_A)(1-p_B)]^k   \\
+=& [(1-p_A)(1-p_B)]^0   \\
+=& 1.
+\end{aligned}
+$$
+
+Now consider again
+
+$$
+\begin{aligned}
+P_d(n) &= (1-p_A)^n(1-p_B)^n   \\
+P_A(n) &= p_A \sum_{k=0}^{n-1} [(1-p_A)(1-p_B)]^k   \\
+P_B(n) &= (1-p_A)p_B \sum_{k=0}^{n-1} [(1-p_A)(1-p_B)]^k
+\end{aligned}
+$$
+
+At $n\to\infty$,
+
+$$
+\begin{aligned}
+P_d(\infty) &= \lim_{n\to\infty} (1-p_A)^n(1-p_B)^n = 0  \\
+P_A(\infty) &= p_A \sum_{k=0}^{\infty} [(1-p_A)(1-p_B)]^k   \\
+&= p_A \cdot \frac{1}{1-(1-p_A)(1-p_B)}  \\
+&= \frac{p_A}{p_A+p_B-p_Ap_B}  \\
+P_B(\infty) &= (1-p_A)p_B \sum_{k=0}^{\infty} [(1-p_A)(1-p_B)]^k   \\
+&= (1-p_A)p_B \cdot \frac{1}{1-(1-p_A)(1-p_B)}  \\
+&= \frac{p_B-p_Ap_B}{p_A+p_B-p_Ap_B}
+\end{aligned}
+$$
+
+Therefore, this is the probability of winning the game by respective players.
+
+In fact, there is a easier way to solve for $P_A(\infty)$ and $P_B(\infty)$. In one round, the two players win with probabilities $P_A(1)$ and $P_B(1)$ respectively. If none of them wins, the game is reset and play again. So consider a Markov chain with three states, "A wins", "B wins", and "draw", where the former two are terminating states. We can see that, as long as we are at the terminating state, $A$ wins with probability
+
+$$ \frac{P_A(1)}{P_A(1)+P_B(1)} $$
+
+and $B$ wins with probability
+
+$$ \frac{P_B(1)}{P_A(1)+P_B(1)}. $$
+
+This is easier as no infinite series or recurrence relations are involved.
+
+Further, to make the game fair, i.e. $P_A(\infty)=P_B(\infty)$, we have
+
+$$
+\begin{aligned}
+p_A &= p_B - p_Ap_B = p_B(1-p_A)  \\
+p_B &= \frac{p_A}{1-p_A}  \\
+p_A &= \frac{p_B}{1+p_B}.
+\end{aligned}
+$$
+
+In other words, the first player has an advantage of $\frac{1}{1-p_A}$ just because he goes first.

@@ -1,0 +1,129 @@
+---
+layout: post
+title: "Atlas & Zinin (2008) Basic Specification for IP Fast Reroute: Loop-Free Alternates (RFC5286)"
+date: 2011-05-21 15:49:15 -0400
+category: paper
+bibtex:
+  type: misc
+  title: "Basic Specification for IP Fast Reroute: Loop-Free Alternates"
+  author: "A. Atlas and A. Zinin"
+  howpublished: "RFC5286"
+  year: 2008
+---
+This is an RFC on how to select the "next hop" for fast reroute protections. The
+default next hop is called "primary" and therefore the one used for fast reroute
+is called "alternate" next hop. The alternate next hop is not necessary to be in
+the shortest path, but it has to be loop-free. This RFC defines the term,
+loop-free alternate (LFA) to represent these nodes.
+
+Considering a source $S$ and a destination $D$. Let the shortest-path distance
+between two nodes denoted by $d(X,Y)$. The neighbour of $S$, node $N$, is a
+loop-free neighbour for $S$ to $D$ if the following inequality is satisfied:
+$d(N,D) < d(N,S) + d(S,D).$
+
+Moreover, if a node $N$ is a downstream of the path from $S$ to $D$, it must
+satisfy the downstream path criteron: $d(N,D) < d(S,D).$
+
+Now we found the following:
+
+  - An LFA must satisfy the loop-free condition $d(N,D) < d(N,S) + d(S,D)$
+  - An LFA node $N$ that is protecting node $E$ from failure must satisfy the node-protecting
+    criteria $d(N,D) < d(N,E)+d(E,D)$. This is to mean that node $N$ must not traverse node $E$
+  - In order for a LFA to protect the failure of a non-broadcast multi-access link, we model the
+    NBMA link as a pseudonode and do node-protection against it
+
+The RFC drafts the way to find an LFA for a primary next-hop so that it can do
+protection by fast reroute. The selection is done by a router and prefers
+node-protecting over link-protecting LFAs. The algorithm is as follows. Here we
+defines
+
+  - $S$ and $D$ to be the source and destination routers
+  - $N_1$ to $N_j$ to be the neighbours of $S$
+  - A next hop is defined as a 2-tuple: (outgoing-link, neighbour)
+  - $H_1$ to $H_k$ to be the candidate next hops
+  - $P_1$ to $P_p$ to be primary next hops
+
+and the objective is to find an LFA for $P_i$
+
+```
+P_i.alt_next_hops := {}
+P_i.alt_type := NONE
+P_i.alt_link-protect := FALSE
+P_i.alt_node-protect := FALSE
+P_i.alt_srlg-protect := {}
+
+for each H_h in H_1, ..., H_k:
+    cand_type := NONE
+    cand_link_protect := FALSE
+    cand_node_protect := FALSE
+    cand_srlg_protect := {}
+    next if H_h == P_i
+    if (H_h.link is administratively allowed to be used as an alternate
+        AND cost(H_h.link) < maximum
+        AND reverse_cost(H_h) < maximum
+        AND H_h.neighbor is not overloaded (for IS-IS)
+        AND H_h.link is bidirectional)
+    then
+        H_h can be considered as an alternate
+    else
+        next H_h
+    if d(H_h.neighbor, D) >= d(H_h.neighbor, S) + d(S, D) then
+        next H_h as it is not loop-free
+    else
+        cand_type = LOOP-FREE.
+    if H_h is a primary next-hop then
+        card_type = PRIMARY
+    if H_h.link != P_i.link then
+        card_link-protect := TRUE
+    if d(H_h.neighbor, D) < d(H_h.neighbor, P_i.neighbor) + d(P_i.neighbor, D) then
+        cand_node-protect := TRUE.
+    if the router considers SRLGs, then
+        cand_srlg-protect := SRLGs traversed on the path from S via P_i.link to P_i.neighbor
+        Remove from card_srlg-protect the SRLGs to which H_h belongs
+        Remove from cand_srlg-protect the SRLGs traversed on the path from H_h.neighbor to D
+        /* Now cand_srlg-protect holds the SRLGs to which P_i belongs
+        and that are not traversed on the path from S via H_h to D. */
+    if (cand_type == PRIMARY
+        AND the router prefers other primary next-hops for use as the alternate
+        AND P_i.alt_type != PRIMARY)
+    then
+        goto DONE
+    if (cand_type != PRIMARY
+        AND P_i.alt_type == PRIMARY
+        AND the router prefers other primary next-hops for use as the alternate)
+    then
+        next H_h
+    if (cand_node_protect == TRUE
+        AND P_i.alt_node_protect == FALSE)
+    then
+        goto DONE
+    if (cand_link_protect == TRUE AND P_i.alt_link_protect == FALSE) then
+        goto DONE
+    if (cand_srlg_protect contains P_i.alt_srlg_protect) then
+        goto DONE
+    if (cand_srlg_protect != P_i.alt_srlg_protect) then
+        select between H_h and P_i.alt_next_hops based upon distance, IP addresses
+        if H_h is preferred then
+            goto DONE
+        else if P_i.alt_next_hops is preferred then
+            next H_h
+    if ( d(H_h.neighbor, D) < d(S, D)
+        AND d(P_i.alt_next_hops, D) >= d(S, D) )
+    then
+        /* now H_h is a downstream alternate
+        P_i.alt_next_hops is simply an LFA, H_h is preferred */
+        goto DONE
+    if (H_h is preferred to P_i.alt_next_hops based upon alternate types, distances, etc) then
+        goto DONE
+    if (P_i.alt_next_hops is preferred to H_h) then
+        next H_h
+    P_i.alt_next_hops := UNION(P_i.alt_next_hops, H_h)
+    P_i.alt_type := Better of H_h.alt_type and P_i.alt_type
+    next H_h
+DONE:
+    P_i.alt_next_hops := {H_h}
+    P_i.alt_type := cand_type
+    P_i.alt_link_protect := cand_link_protect
+    P_i.alt_node_protect := cand_node_protect
+    P_i.alt_srlg_protect := cand_srlg_protect
+```

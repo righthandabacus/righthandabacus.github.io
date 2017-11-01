@@ -1,0 +1,16 @@
+---
+layout: post
+title: "Kuzmanovic et al (2009) Adding Explicit Congestion Notification (ECN) Capability to TCP's SYN/ACK packets (RFC5562)"
+date: 2011-08-08 20:35:46 -0400
+category: paper
+bibtex:
+  type: misc
+  title: "Adding Explicit Congestion Notification (ECN) Capability to TCP's SYN/ACK packets"
+  author: "A. Kuzmanovic and A. Mondal and S. Floyd and K. Ramakrishnan"
+  url: "http://tools.ietf.org/rfc/rfc5562.txt"
+  month: "Jun"
+  year: "2009"
+---
+This experimental RFC suggest to extend ECN to SYN-ACK packets of TCP three-way handshake as well. The idea is to use initial window of 1 instead of 2, 3, or 4 for congested network. Note, ECN-capable transport (ECT) is not set on SYN packet, but on SYN-ACK packet. This is a precaution that (1) the responder of TCP connection may not be ECN-capable and (2) preventing packet drop in SYN may create a more serious SYN flood attack.
+
+The reason to have ECN in SYN-ACK is to avoid packet drop to SYN-ACK packets. If that happens, by default, the packet is retransmitted after a 3-second timeout (default RTO). If ECN is used, the SYN-ACK packet will have the ECT codepoint if the SYN packet carries the CWR+ECE flag. Such SYN-ACK packet may be marked CE by a congested router. If that happens, the initiator will response with a ECE ACK but *without* proceed to the ESTABLISHED state. This ECN-echo will make the responder send another SYN-ACK with the same sequence numbers, same ECE flag, but with non-ECN codepoint. Only after the initiator received this SYN-ACK and send its ACK, it can proceed to ESTABLISHED state and send data.

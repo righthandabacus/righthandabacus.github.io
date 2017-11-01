@@ -1,0 +1,17 @@
+---
+layout: post
+title: "Downey (2007) TCP Self-Clocking and Bandwidth Sharing (ComNet)"
+date: 2009-10-19 13:27:35 -0400
+category: paper
+bibtex:
+  type: article
+  title: "TCP Self-Clocking and Bandwidth Sharing"
+  author: "Allen B. Downey"
+  journal: "Computer Networks"
+  volume: 51
+  pages: "3844-3863"
+  year: 2007
+---
+This paper describes the case when the congestion window of a TCP is greater than the BDP. The BDP is defined as the bottleneck bandwidth multiplies by the end-to-end propagation delay. It finds that, in such scenario, the TCP is undergoing self-clocking transfer which means the cwnd does not play an important role in the sending speed but the bottleneck bandwidth is.
+
+

@@ -1,0 +1,30 @@
+---
+layout: post
+title: "mlterm 字型"
+date: 2007-08-07 00:45:26 +0800
+tags: system
+---
+
+在我的Debian內，我最喜愛的terminal —— mlterm 是用楷書顯示UTF8編碼的。對於我那個12吋的Notebook來說太不好讀了。
+
+## 非anti-aliased字型
+
+如果沒有選用anti-aliasing，mlterm會讀取`~/.mlterm/font`來設定字型的。以UTF8來說（其他編碼都是一樣），我這樣設定：
+
+```
+ISO8859-1 = -gnu-unifont-medium-r-normal--*-iso10646-1
+ISO10646_UCS4_1 = -arphic-uming-medium-r-normal--12-*-iso10646-1
+ISO10646_UCS4_1_BIWIDTH = -arphic-uming-medium-r-normal--12-*-iso10646-1
+```
+
+那麼它就會用文鼎的細上海宋（Unicode 明體）來顯示，但是這是bitmap版本，而且十二點的字看起來都很大。
+
+## Anti-aliased字型
+
+如果是用Anti-aliased的話，mlterm是用FreeType（還是XFT？）來取得字型的，而且取的是向量字，好看多了。Anti-aliased字的設定檔在`~/.mlterm/aafont`，我的是：
+
+```
+ISO10646_UCS2_1_BIWIDTH=AR PL ShanHeiSun Uni-iso10646-1;
+```
+
+同樣地，是文鼎的Unicode細上海宋。

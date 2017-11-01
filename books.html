@@ -1,0 +1,29 @@
+---
+layout: page
+title: Books I Read
+subtitle: cover-to-cover or not
+show_avatar: true
+css:
+  - https://cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css
+  - "/css/datatables.override.css"
+foot_js:
+  - https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js
+  - "/js/papers.js"
+---
+
+<table id="fordatatable" class="display" cellspacing="0", width="100%">
+  <thead><tr>
+    <th>Author</th>
+    <th>Title</th>
+    <th>Pub Year</th>
+    <th>Date</th>
+  </tr></thead>
+  <tbody>
+   {% for book in site.categories.book %}<tr>
+      <td><a href="{{ book.url | prepend: site.baseurl }}">{{ book.bibtex.author | default: book.bibtex.editor | truncatewords: 6 }}</a></td>
+      <td><a href="{{ book.url | prepend: site.baseurl }}">{{ book.bibtex.title | default: book.title | truncate:60 }}</a></td>
+      <td><a href="{{ book.url | prepend: site.baseurl }}">{{ book.bibtex.year }}</a></td>
+      <td><a href="{{ book.url | prepend: site.baseurl }}">{{ book.date | date: "%Y-%m-%d" }}</a></td>
+    </tr>{% endfor %}
+  </tbody>
+</table>

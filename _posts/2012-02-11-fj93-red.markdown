@@ -1,0 +1,63 @@
+---
+layout: post
+title: "Floyd & Jacobson (1993) RED Gateway for Congestion Avoidance (TON)"
+date: 2012-02-11 01:22:04 -0500
+category: paper
+bibtex:
+  type: article
+  title: "Random Early Detection Gateways for Congestion Avoidance"
+  author: "Sally Floyd and Van Jacobson"
+  journal: "IEEE/ACM Transactions on Networking"
+  volume: "1"
+  number: "4"
+  pages: "397--413"
+  month: "Aug"
+  year: "1993"
+---
+The paper defining RED queues. The property of RED is:
+
+  - Behavior determined by the average queue size
+  - Dropping packet is an option, but not the only action upon congestion
+  - Packet-marking probability is a function of the average queue size
+
+The algorithm of RED is as follows.
+
+Average queue length calculation is done every time upon packet arrival:
+
+    if the queue is non-empty:
+        avg = (1-Wq)*avg + Wq*Q
+    else the queue is empty:
+        m = f(time - qTime)
+        avg = (1-Wq)^m * avg
+
+where `Q` is the current queue size, `qTime` is the time that the queue start to be idle, and `f` is a linear function. So when the queue becomes empty, it set
+
+    qTime = time
+
+The marking decision is also done per packet arrival:
+
+    if min_th ≤ avg < max_th:
+        count++
+        p_b = max_p * (avg - min_th)/(max_th - min_th)
+        p_a = p_b * (1 - count*p_b)
+        do in probability p_a:
+            mark the packet
+            count = 0
+    else if avg ≥ max_th:
+        mark the packet
+        count = 0
+    else avg < min_th:
+        count = -1
+
+The count above counts the number of packets since last marked packet. So that the marking probability increases with time when it stays `min_th` ≤ `avg` < `max_th`. The above code assumes the queue is packet-based. If it is byte-based, we need to take in the packet size into account when computing `p_b`, which the probability computation above becomes:
+
+    p_b = max_p * (avg - min_th)/(max_th - min_th)
+    p_b = p_b * (packet size)/(max packet size)
+    p_a = p_b * (1 - count*p_b)
+
+The numbers used in the paper are as follows:
+
+    min_th = 3 to 50 packets
+    max_th = 3 * min_th
+    Wq = 0.002
+    max_p = 1/50

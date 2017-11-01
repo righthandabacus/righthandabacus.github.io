@@ -1,0 +1,99 @@
+---
+title: "My HKALE Notes"
+date: 2007-03-27 16:07:25
+tags: business
+---
+These are really really old stuff.
+
+I took the HKALE in 1999 and during 1998 to 1999, I created a set of notes for
+my revision. After I get into the univeristy, I re-organized them up and put
+them into an archive. Unfortunately, my hard disk crashed in 2003 (possibly due
+to over-heat) and all my stuff are lost.
+
+Recently, I get them back from a CD-ROM (I really don't remember I have a copy
+on CD! Thanks Ronnie for that) and I put them here, in case somebody needs. The
+files are created using M$ Word 97.
+
+PS: I found that the HKEA sucks.....the current syllabus is trimed so much! No
+wonder I found the current freshmen are so dumb in certain aspects.
+
+## AL Chemistry
+
+- [Classification of questions](/img/chemlist.doc)
+- [Periodic Table](/img/chempt.doc)
+### Physical Chemistry
+- [Atomic Structure](/img/chemphy-01.doc)
+- [Stiochiometry](/img/chemphy-02.doc)
+- [Electronic structure](/img/chemphy-03.doc)
+- [Energetics](/img/chemphy-04.doc)
+- [Bonding](/img/chemphy-05.doc)
+- [Shapes & Hybridization](/img/chemphy-06.doc)
+- [Energetics of Bond](/img/chemphy-07.doc)
+- [Bonding Intermediate](/img/chemphy-08.doc)
+- [Solid Crystal Structures](/img/chemphy-09.doc)
+- [Intermolecular Forces](/img/chemphy-10.doc)
+- [Chemical Kinetics](/img/chemphy-11.doc)
+- [Rate Equations](/img/chemphy-12.doc)
+- [Collision Theory](/img/chemphy-13.doc)
+- [Acid-Base Equilibria](/img/chemphy-14.doc)
+- [Redox Equilibria](/img/chemphy-15.doc)
+- [Phase Equilibria](/img/chemphy-16.doc)
+### Inorganic Chemsitry
+- [Periodic Properties](/img/cheminorg-1.doc)
+- [Hydrolytic Behavior](/img/cheminorg-2.doc)
+- [s-Block Elements](/img/cheminorg-3.doc)
+- [Halogens](/img/cheminorg-4.doc)
+- [Nitrogen](/img/cheminorg-5.doc)
+- [Sulphur](/img/cheminorg-6.doc)
+- [d-Block Elements](/img/cheminorg-7.doc)
+### Organic Chemistry
+- [Organic Compounds](/img/chemorg-01.doc)
+- [Isomerism](/img/chemorg-02.doc)
+- [Organic Reaction](/img/chemorg-03.doc)
+- [Hydrocarbons](/img/chemorg-04.doc)
+- [Halogeno-Compounds](/img/chemorg-05.doc)
+- [Hydroxy Compounds](/img/chemorg-06.doc)
+- [Carbonyl Compounds](/img/chemorg-07.doc)
+- [Carboxylic Acid](/img/chemorg-08.doc)
+- [Nitrogenous Compound](/img/chemorg-09.doc)
+- [Synthesis & Interconversion](/img/chemorg-10.doc)
+### Chemistry and Society
+- [Chemistry and environment](/img/chemsoc-1.doc)
+- [Chemistry and food](/img/chemsoc-2.doc)
+
+## AL Physics
+
+- [Classification of questions](/img/phylist.doc)
+- [The Formula Sheet](/img/phyformulae.pdf)
+- [Data Treatment](/img/phy-data.doc)
+- [Mechanics](/img/phy-mech.doc)
+- [Electricity and Magnetism](/img/phy-em.doc)
+- [Waves](/img/phy-waves.doc)
+- [Matters](/img/phy-matters.doc)
+- [Atomic Physics](/img/phy-atom.doc)
+
+## AL Pure Mathematics
+
+- [Classification of questions](/img/purelist.doc)
+- [Summary of important concepts](/img/pure-precise.doc)
+- [Formulae and equations cheatsheet](/img/pure-f.doc)
+- [Formulae and equations cheatsheet, in B5 size](/img/pure-f-b5.doc)
+- [Logic & Sets](/img/pure-01.doc)
+- [Mathematical Induction](/img/pure-02.doc)
+- [Binomial Theorem](/img/pure-03.doc)
+- [Limits](/img/pure-04.doc)
+- [Differentiation](/img/pure-05.doc)
+- [2D Coordinate Geometry](/img/pure-06.doc)
+- [Polynomials & Equations](/img/pure-07.doc)
+- [Indefinite Integrals](/img/pure-08.doc)
+- [Inequality](/img/pure-09.doc)
+- [Determinants](/img/pure-10.doc)
+- [Definite Integration](/img/pure-11.doc)
+- [Matrix](/img/pure-12.doc)
+- [Sequence & Series](/img/pure-13.doc)
+- [3D Coordinate Geometry](/img/pure-14.doc)
+- [Vector Algebra](/img/pure-15.doc)
+- [Polar Coordinate System](/img/pure-16.doc)
+- [Geometric Applications of Definite Integrals](/img/pure-17.doc)
+- [Complex Numbers](/img/pure-18.doc)
+- [Greek alphabets](/img/greek.doc)

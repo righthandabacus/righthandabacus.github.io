@@ -1,0 +1,229 @@
+---
+layout: post
+title: "FAT32 structure"
+date: 2009-11-15 15:30:55 -0500
+tags: system
+---
+
+This would be useful if we want to do recovery on corrupted memory cards.
+
+## Master Boot Record and Partition Table
+
+MBR is always the first sector of the disk, located at cylinder 0 head 0 sector 1. The structure (total 512 bytes) is:
+
+| Offset | Size | Description |
+|--------|------|-------------|
+| 0x0    | 446  | Executable code to boot |
+| 0x1BE  | 16   | 1st Partition entry |
+| 0x1CE  | 16   | 2nd Partition entry |
+| 0x1DE  | 16   | 2nd Partition entry |
+| 0x1EE  | 16   | 2nd Partition entry |
+| 0x1FE  | 2    | Signature: 0x55 0xAA |
+
+The partition table is, therefore, part of the MBR. The 16-byte record in the partition table has the following structure:
+
+| Offset | Size | Description |
+|--------|------|-------------|
+| 0x0    | 1    | State of partition (0x00=Inactive, 0x80=Active) |
+| 0x1    | 3    | Beginning of partition: head, cylinder, sector numbers |
+| 0x4    | 1    | Partition type, e.g. FAT32=0x0B |
+| 0x5    | 3    | End of partition: head, cylinder, sector numbers |
+| 0x8    | 4    | Number of sectors between the MBR and first sector in partition |
+| 0xC    | 4    | Number of sectors in the partition |
+
+The beginning and the end of partition is encoded as follows:
+
+```
+Bits
+ 23 22 21 20 19 18 17 16 15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0
+| Head number           | Cylinder num, bits 7-0|     |Sector number    |
+                                                  ^
+                          Cylinder num, bits 9-8--+
+```
+
+In this interpretation, the sector number if limited to 6 bits (max 63) and the
+cylinder is 10 bits (max 1024), but the cylinder number is having the two high
+bits in the third byte the the eight low bits in the second byte. In other
+words, the maximum size of disk that supported by this structure is 255 head,
+1023 cylinder, 63 sector, total to 8414461440 bytes or 8.4 GB. Larger disks
+needs LBA mode interpretation. In that case, the recorded in offset 0x8 tells
+where the LBA begins.
+
+When there are "extended partitions", the first sector of each partition is
+MBR-like which the partition table behaves as a linked list: The MBR marks the
+2nd partition as extended, with the size included all "logical drives". The
+first sector of the 2nd partition marks the region for the first logical
+partition as its 1st partition and the 2nd partition is the remaining spaces.
+Until the last logical partition, where only the 1st partition entry is filled
+and there would be no 2nd partition entry.
+
+## FAT32 Boot record
+
+The first sector of every FAT32 partition is a FAT32 boot record. Its structure
+is as follows:
+
+| Offset | Size | Description |
+|--------|------|-------------|
+| 0x0    | 3    | Jump instruction to boot code, usually 0xEB 0x58 0x90 |
+| 0x3    | 8    | OEM name |
+| 0xB    | 2    | Bytes per sector |
+| 0xD    | 1    | Sector per cluster, in powers of 2 |
+| 0xE    | 2    | Number of reserved sectors |
+| 0x10   | 1    | Number of copies of FAT |
+| 0x11   | 2    | was max root directory entries, n/a for FAT32 |
+| 0x13   | 2    | was number of sectors in partition, n/a for FAT32 |
+| 0x15   | 1    | Media descriptor, hard disk = 0xF8 |
+| 0x16   | 2    | was sectors per FAT, must be zero for FAT32 |
+| 0x18   | 2    | Sectors per track |
+| 0x1A   | 2    | Number of heads |
+| 0x1C   | 4    | Number of hidden sectors in partition |
+| 0x20   | 4    | Number of sectors in partition |
+| 0x24   | 4    | Number of sectors per FAT |
+| 0x28   | 2    | Flags |
+| 0x2A   | 2    | Version of FAT32 drive, high/low byte = major/minor |
+| 0x2C   | 4    | Cluster number of the start of the root directory |
+| 0x30   | 2    | Sector number of the filesystem information sector, offset from the start of the partition |
+| 0x32   | 2    | Sector number of the backup boot sector, offset from the start of the partition |
+| 0x34   | 12   | Reserved |
+| 0x40   | 1    | Logical drive number of partition |
+| 0x41   | 1    | Unused |
+| 0x42   | 1    | Signature 0x29 |
+| 0x43   | 4    | Serial number of partition |
+| 0x47   | 11   | Volume name of partition |
+| 0x52   | 8    | Name of FAT, usually "FAT32" |
+| 0x5A   | 420  | Boot code |
+| 0x1FE  | 2    | Signature 0x55 0xAA |
+
+The OEM name tells what system did the partition formatted. Examples include "MSWIN4.1" or "mkdosfs".
+
+In FAT32, the number of reserved sectors (offset 0xE) is usually 32. While this
+is usually 1 in FAT16. The total number of sectors (offset 0x13) is zero
+indicates that the value should be reference by offset 0x20. This is usually the
+case in FAT32.
+
+The flag (offset 0x28) is in the following structure:
+
+  * 1st Byte: must be 0x00
+  * 2nd Byte: MSB set = FAT mirroring is disabled
+  * 2nd Byte: lower 7 bits = The active FAT copy
+
+Usually the filesystem information sector (mentioned by offset 0x30) is at the
+second sector of the partition. It is served as the extended boot record in
+FAT32. Its structure is:
+
+| Offset | Size | Description |
+|--------|------|-------------|
+| 0x0    | 4    | Signature 0x52 0x52 0x61 0x41, i.e. "RRaA" |
+| 0x4    | 480  | All null bytes, reserved |
+| 0x1E4  | 4    | Signature 0x72 0x72 0x41 0x61, i.e. "rrAa" |
+| 0x1E8  | 4    | Number of free clusters, 0xFFFFFFFF if unknown |
+| 0x1EC  | 4    | Most recently allocated cluster number |
+| 0x1F0  | 14   | Reserved, all null |
+| 0x1FE  | 2    | Signature 0x55 0xAA |
+
+Therefore, the structure of a FAT32 partition is as follows:
+
+If the number of reserved sectors (0xE) is $R$, number of FATs (0x10) is $N$ and the
+number of sectors per FAT (0x24 or 0x16) is $S$, then, counting from the beginning
+of the partition, sector 0 is the boot record, sector $R$ is the first FAT, sector
+$R+NS$ is the beginning of data area, and this is the location of the root
+directory.
+
+## File Allocation Tables in FAT32
+
+The data area must start on a cluster boundary. The FAT is a sequence of
+numbers, each in 32-bit for FAT32 and 16-bit for FAT16. The $k$-th number ($k\ge 0$)
+is corresponding to the $k$-th cluster in the data area, which tells which is the
+next cluster of the data block. The first data cluster is cluster number 2. Thus
+in FAT, the value of:
+
+  * 0x0FFFFFF8 to 0x0FFFFFFF marks the end of a cluster chain
+  * 0x0FFFFFF7 marks a bad cluster
+  * 0x0FFFFFF0 to 0x0FFFFFF6, and also 0x00000001 are reserved value, shall not be used in FAT
+  * 0x00000000 marks an unused cluster
+  * Other value (highest 4 bit must be zero) indicates the position of next cluster of a file
+
+And because of first data cluster is cluster 2, the first 2 FAT entries are
+always 0x0FFFFFFF and never allocated to user data.
+
+## Directory table
+
+Files are organized in a directory. A directory is one or more cluster with a
+number of 32-byte entries. In FAT32 that supports long file name, a 8.3 filename
+entry has the following format:
+
+| Offset | Length | Description |
+|--------|--------|-------------|
+| 0x0    | 8      | File name |
+| 0x8    | 3      | Extension |
+| 0xB    | 1      | Attribute |
+| 0xC    | 1      | Null byte |
+| 0xD    | 1      | Creation time, 10 ms portion in 2 sec, value of 0 to 199 |
+| 0xE    | 2      | Creation time |
+| 0x10   | 2      | Creation date |
+| 0x12   | 2      | Last accessed date |
+| 0x14   | 2      | High bits of cluster number |
+| 0x16   | 2      | Time |
+| 0x18   | 2      | Date |
+| 0x1A   | 2      | Lower bits of cluster number |
+| 0x1C   | 4      | File size |
+
+The attribute is in the following format:
+
+```
+7 6 5 4 3 2 1 0
+| | | | | | | |
+| | | | | | | +- Volume label, not actually a file
+| | | | | | +--- Directory, not actually a file
+| | | | | +----- Hidden file
+| | | | +------- System file
+| | | +--------- Read-only file
+| | +----------- Archive
++-+------------- zero bits
+```
+
+The 16-bit time field is encoded as follows:
+
+  * Bit 15-11: Hour (0 to 23)
+  * Bit 10-5: Minutes (0 to 59)
+  * Bit 4-0: Seconds divided by 2 (0 to 29)
+
+And the 16-bit date field is encoded as follows:
+
+  * Bit 15-9: Year, 1980+n, (n from 0 to 127)
+  * Bit 8-5: Month (1 to 12)
+  * Bit 4-0: Day (1 to 31)
+
+The long file name entry is stored right above the 8.3 entry. Each LFN entry is
+for 13 unicode characters and longer file names are stored "backward", i.e. tail
+parts of the LFN is above the head parts and they are all above the 8.3 entry.
+
+A LFN entry has the following format:
+
+| Offset | Size | Description |
+|--------|------|-------------|
+| 0x0    | 1    | Order of LFN entry, >= 1 |
+| 0x1    | 10   | Unicode character 1-5 |
+| 0xB    | 1    | Attribute |
+| 0xC    | 1    | Null byte |
+| 0xD    | 1    | Checksum of the 8.3 filename |
+| 0xE    | 12   | Unicode character 6-11 |
+| 0x1A   | 2    | Null bytes |
+| 0x1C   | 4    | Unicode character 12-13 |
+
+The checksum is computed using the 8.3 filename, total of 11 bytes. The C code is as follows:
+
+```c++
+unsigned char compute_checksum(unsigned char filename[11]) {
+    unsigned char cksum = filename[0];
+    int i;
+    for (i=1; i<=11; i++) {
+        cksum = ((cksum >> 1)|((cksum & 0x01)<<7)) + filename[i];
+    };
+    return cksum;
+};
+```
+
+When the first byte of a 32-byte record in the directory is byte 0x00, it marks
+the end of the directory record. When it is byte 0xE5, however, means this
+record can be skipped (i.e. deleted).

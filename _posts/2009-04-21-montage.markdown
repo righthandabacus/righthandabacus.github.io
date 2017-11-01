@@ -1,0 +1,11 @@
+---
+layout: post
+title: "montage"
+date: 2009-04-21 22:48:32 -0400
+tags: system
+---
+
+近日知悉Imagemagick內有一程序曰montage，甚有趣，茲記於此。
+
+    montage -resize 750x600^ -crop 750x600+0+0 -gravity Center -geometry 729x586+10+5 -shadow -tile 4x4 +polaroid input/* output.png
+

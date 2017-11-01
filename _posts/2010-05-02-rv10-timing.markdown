@@ -1,0 +1,26 @@
+---
+layout: post
+title: "Ridoux and Veitch (2010) Principles of Robust Timing over the Internet (ACM Queue)"
+date: 2010-05-02 22:55:49 -0400
+category: paper
+bibtex:
+  type: article
+  title: "Principles of Robust Timing over the Internet"
+  author: "Julien Ridoux and Darryl Veitch"
+  url: "http://queue.acm.org/detail.cfm?id=1773943"
+  year: 2010
+---
+PC's clock is an oscillator and HPET (high performance event timer) to count oscillator ticks. The time function is therefore
+   $C(t) = C_0 + p(t) \textrm{HPET}(t)$
+where $p(t)$ is the period of clock ticks and HPET is the tick count. Note, $p(t)$ is varying slowly and therefore $C(t)$ is not always accurate.
+
+To synchronize clocks across a network, host A asks host B for the time and it sets its clock to same as that of host B. However, there are delays in every step:
+
+  - Host delay: NIC, OS process scheduling, code to timestamp a packet. These are in order of 10us.
+  - Network delay: Switch and router queueing. These are in 1ms to order of 100ms.
+
+One way to circumvent these delays is to measure the response time in the sync process and assume time of one trip (one-way delay, OWD) is half of the round trip. For example, the response time as measured by A is $t_1$ and the time reported by host B is $t_2$, then A should, at the time received, set its clock to
+   $t = t_2 + 0.5 t_1.$
+But surely, times for forward trip and return trip do not always equal.
+
+Synchronizing clocks can never be done because we can never find the OWD correctly. However, once clocks are synchronized, it will drift away as time goes. Regarding how to reduce the drift, NTP use a feedback approach: gradually tune the oscillator period (by OS kernel) to compensate drift. The author is working on RADclock project, which use a feed-forward approach. That is, not to change the oscillator frequency but estimate the error in a post-processing stage.

@@ -1,0 +1,33 @@
+---
+layout: post
+title: "FireFox File Selection Dialog"
+date: 2006-08-08 00:39:22 +0800
+tags: system
+---
+
+In my Debian box, the GTK-style file selection dialog of FireFox is damn slow. Here is the way to improve it by getting back the old dialog.
+
+  - Edit /usr/lib/firefox/components/nsFilePicker.js
+  - Search on `registerFactoryLocation`, around line 280, you will see\\
+```
+    compMgr.registerFactoryLocation(FILEPICKER_CID,
+                                    "FilePicker JS Component",
+//@line 278 "/root/bind/firefox-1.5.dfsg+1.5.0.4.orig/xpfe/components/filepicker/src/nsFilePicker.js.in"
+                                    "",
+//@line 280 "/root/bind/firefox-1.5.dfsg+1.5.0.4.orig/xpfe/components/filepicker/src/nsFilePicker.js.in"
+                                    fileSpec,
+                                    location,
+                                    type);
+```
+  - Then you change it to\\
+```
+    compMgr.registerFactoryLocation(FILEPICKER_CID,
+                                    "FilePicker JS Component",
+//@line 278 "/root/bind/firefox-1.5.dfsg+1.5.0.4.orig/xpfe/components/filepicker/src/nsFilePicker.js.in"
+                                    FILEPICKER_CONTRACTID,
+//@line 280 "/root/bind/firefox-1.5.dfsg+1.5.0.4.orig/xpfe/components/filepicker/src/nsFilePicker.js.in"
+                                    fileSpec,
+                                    location,
+                                    type);
+```
+   - Then uninstall or install some extensions to make Firefox know about the change

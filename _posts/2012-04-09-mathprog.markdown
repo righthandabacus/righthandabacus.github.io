@@ -1,0 +1,606 @@
+---
+layout: post
+title: "MathProg language by example"
+date: 2012-04-09 21:06:02 -0400
+tags: code math
+---
+
+Resources:
+- [WikiBooks on GLPK](http://en.wikibooks.org/wiki/GLPK)
+- [IBM DeveloperWorks article on GLPK](http://www.ibm.com/developerworks/linux/library/l-glpk1/),
+  and its [part 2](http://www.ibm.com/developerworks/linux/library/l-glpk2/)
+  and [part 3](http://www.ibm.com/developerworks/linux/library/l-glpk3/)
+
+### Giapetto's problem
+
+```perl
+# Giapetto's problem
+# This finds the optimal solution for maximizing Giapetto's profit
+
+/* Set of toys */
+set TOY;
+
+/* Parameters */
+param Finishing_hours {i in TOY};
+param Carpentry_hours {i in TOY};
+param Demand_toys     {i in TOY};
+param Profit_toys     {i in TOY};
+
+/* Decision variables */
+var x {i in TOY} >=0;
+
+/* Objective function */
+maximize z: sum{i in TOY} Profit_toys[i]*x[i];
+
+/* Constraints */
+s.t. Fin_hours : sum{i in TOY} Finishing_hours[i]*x[i] <= 100;
+s.t. Carp_hours : sum{i in TOY} Carpentry_hours[i]*x[i] <= 80;
+s.t. Dem {i in TOY} : x[i] <= Demand_toys[i];
+
+
+data;
+/* data  section */
+
+set TOY := soldier train;
+
+param Finishing_hours:=
+soldier         2
+train           1;
+
+param Carpentry_hours:=
+soldier         1
+train           1;
+
+param Demand_toys:=
+soldier        40
+train    6.02E+23;
+
+param Profit_toys:=
+soldier         3
+train           2;
+
+end;
+```
+
+- Statements are semicolon terminated
+- set and param are to specify static data
+- var is to introduce variables in optimization
+- Objective is preceded with keyword `maximize` or `minimize`
+- Constraints are specified with `subject to`, `subj to`, `s.t.` or even omitted at all
+- Array subscripts are declared with braces, so as iteration variables in summation
+- Objective and constraints must be named, optionally carrying an expression for subscripts
+- Data section starts with the statement `data`, in the above, parameters are 1D numeric with subscripts over the set `TOY`
+
+### Diet problem
+
+```perl
+# Diet problem
+#
+# This finds the optimal solution for minimizing the cost of my diet
+#
+
+/* sets */
+set FOOD;
+set NEED;
+
+/* parameters */
+param NutrTable {i in FOOD, j in NEED};
+param Cost {i in FOOD};
+param Need {j in NEED};
+
+/* decision variables: x1: Brownie, x2: Ice cream, x3: soda, x4: cake*/
+var x {i in FOOD} >= 0;
+
+/* objective function */
+minimize z: sum{i in FOOD} Cost[i]*x[i];
+
+/* Constraints */
+s.t. const{j in NEED} : sum{i in FOOD} NutrTable[i,j]*x[i] >= Need[j];
+
+/* data section */
+data;
+
+set FOOD := Brownie "Ice cream" soda cake;
+set NEED := Calorie Chocolate Sugar Fat;
+
+param NutrTable: Calorie        Chocolate       Sugar   Fat:=
+Brownie          400            3               2       2
+"Ice cream"      200            2               2       4
+soda             150            0               4       1
+cake             500            0               4       5;
+
+param Cost:=
+Brownie         0.5
+"Ice cream"     0.2
+soda            0.3
+cake            0.8;
+
+param Need:=
+Calorie         500
+Chocolate       6
+Sugar           10
+Fat             8;
+
+end;
+```
+
+- Parameter `NutrTable` is a 2D numeric parameter
+- Recalling a value of a 2D array: `NutrTable[i,j]`
+- Strings with space need to be double quoted
+
+### Knapsack problem
+
+```perl
+# Size of knapsack
+param c;
+
+# Items: index, size, profit
+set I, dimen 3;
+
+# Indices
+set J := setof{(i,s,p) in I} i;
+
+# Assignment
+var a{J}, binary;
+
+maximize obj :
+  sum{(i,s,p) in I} p*a[i];
+
+s.t. size :
+  sum{(i,s,p) in I} s*a[i] <= c;
+
+solve;
+
+printf "The knapsack contains:\n";
+printf {(i,s,p) in I: a[i] == 1} " %i", i;
+printf "\n";
+
+data;
+
+# Size of the knapsack
+param c := 100;
+
+# Items: index, size, profit
+set I :=
+  1 10 10
+  2 10 10
+  3 15 15
+  4 20 20
+  5 20 20
+  6 24 24
+  7 24 24
+  8 50 50;
+
+end;
+```
+
+- Set `J` is build by extracting the index part of set `I`, through the `setof` operation
+- The summation is to scan over set `I`, but only use the index part
+- Output is manipulated by the printf statements
+
+### Assignment problem
+
+```perl
+/* ASSIGN, Assignment Problem */
+/* Written in GNU MathProg by Andrew Makhorin <mao@gnu.org> */
+/* The assignment problem is one of the fundamental combinatorial
+   optimization problems.
+
+   In its most general form, the problem is as follows:
+
+   There are a number of agents and a number of tasks. Any agent can be
+   assigned to perform any task, incurring some cost that may vary
+   depending on the agent-task assignment. It is required to perform all
+   tasks by assigning exactly one agent to each task in such a way that
+   the total cost of the assignment is minimized.
+
+   (From Wikipedia, the free encyclopedia.) */
+
+param m, integer, > 0;  /* number of agents */
+param n, integer, > 0;  /* number of tasks */
+set I := 1..m;          /* set of agents */
+set J := 1..n;          /* set of tasks */
+
+param c{i in I, j in J}, >= 0;
+/* cost of allocating task j to agent i */
+
+var x{i in I, j in J}, >= 0;
+/* x[i,j] = 1 means task j is assigned to agent i
+   note that variables x[i,j] are binary, however, there is no need to
+   declare them so due to the totally unimodular constraint matrix */
+
+s.t. phi{i in I}: sum{j in J} x[i,j] <= 1;
+/* each agent can perform at most one task */
+
+s.t. psi{j in J}: sum{i in I} x[i,j] = 1;
+/* each task must be assigned exactly to one agent */
+
+minimize obj: sum{i in I, j in J} c[i,j] * x[i,j];
+/* the objective is to find a cheapest assignment */
+
+solve;
+
+printf "\n";
+printf "Agent  Task       Cost\n";
+printf{i in I} "%5d %5d %10g\n", i, sum{j in J} j * x[i,j],
+   sum{j in J} c[i,j] * x[i,j];
+printf "----------------------\n";
+printf "     Total: %10g\n", sum{i in I, j in J} c[i,j] * x[i,j];
+printf "\n";
+
+data;
+
+/* These data correspond to an example from [Christofides]. */
+
+/* Optimal solution is 76 */
+
+param m := 8;
+
+param n := 8;
+
+param c : 1  2  3  4  5  6  7  8 :=
+      1  13 21 20 12  8 26 22 11
+      2  12 36 25 41 40 11  4  8
+      3  35 32 13 36 26 21 13 37
+      4  34 54  7  8 12 22 11 40
+      5  21  6 45 18 24 34 12 48
+      6  42 19 39 15 14 16 28 46
+      7  16 34 38  3 34 40 22 24
+      8  26 20  5 17 45 31 37 43 ;
+
+end;
+```
+
+- Integer constraint on variables or parameters are specified with keyword `integer`
+
+### Bin packing problem
+
+```perl
+/* BPP, Bin Packing Problem */
+/* Written in GNU MathProg by Andrew Makhorin <mao@gnu.org> */
+/* Given a set of items I = {1,...,m} with weight w[i] > 0, the Bin
+   Packing Problem (BPP) is to pack the items into bins of capacity c
+   in such a way that the number of bins used is minimal. */
+
+param m, integer, > 0;   /* number of items */
+set I := 1..m;           /* set of items */
+param w{i in 1..m}, > 0; /* w[i] is weight of item i */
+param c, > 0;            /* bin capacity */
+
+/* We need to estimate an upper bound of the number of bins sufficient
+   to contain all items. The number of items m can be used, however, it
+   is not a good idea. To obtain a more suitable estimation an easy
+   heuristic is used: we put items into a bin while it is possible, and
+   if the bin is full, we use another bin. The number of bins used in
+   this way gives us a more appropriate estimation. */
+
+param z{i in I, j in 1..m} :=
+/* z[i,j] = 1 if item i is in bin j, otherwise z[i,j] = 0 */
+
+   if i = 1 and j = 1 then 1
+   /* put item 1 into bin 1 */
+
+   else if exists{jj in 1..j-1} z[i,jj] then 0
+   /* if item i is already in some bin, do not put it into bin j */
+
+   else if sum{ii in 1..i-1} w[ii] * z[ii,j] + w[i] > c then 0
+   /* if item i does not fit into bin j, do not put it into bin j */
+
+   else 1;
+   /* otherwise put item i into bin j */
+
+check{i in I}: sum{j in 1..m} z[i,j] = 1;
+/* each item must be exactly in one bin */
+
+check{j in 1..m}: sum{i in I} w[i] * z[i,j] <= c;
+/* no bin must be overflowed */
+
+param n := sum{j in 1..m} if exists{i in I} z[i,j] then 1;
+/* determine the number of bins used by the heuristic; obviously it is
+   an upper bound of the optimal solution */
+
+display n;
+
+set J := 1..n;  /* set of bins */
+
+var x{i in I, j in J}, binary;
+/* x[i,j] = 1 means item i is in bin j */
+
+var used{j in J}, binary;
+/* used[j] = 1 means bin j contains at least one item */
+
+s.t. one{i in I}: sum{j in J} x[i,j] = 1;
+/* each item must be exactly in one bin */
+
+s.t. lim{j in J}: sum{i in I} w[i] * x[i,j] <= c * used[j];
+/* if bin j is used, it must not be overflowed */
+
+minimize obj: sum{j in J} used[j];
+/* objective is to minimize the number of bins used */
+
+data;
+
+/* The optimal solution is 3 bins */
+
+param m := 6;
+
+param w := 1 50, 2 60, 3 30, 4 70, 5 50, 6 40;
+
+param c := 100;
+
+end;
+```
+
+- Check statement is to verify the on-the-fly parameter construction is correct
+- Display statement is a simple way to print data
+- The sum statement in defining parameter `n`: No else part because the if acts as a filter
+
+### Curve fitting by least square
+
+```perl
+/*Curve fitting problem by Least Squares
+  Nigel_Galloway@operamail.com
+  October 1st., 2007
+*/
+set Sample;
+param Sx {z in Sample};
+param Sy {z in Sample};
+
+var X;
+var Y;
+var Ex{z in Sample};
+var Ey{z in Sample};
+
+/* sum of variances is zero for Sx*/
+variencesX{z in Sample}: X + Ex[z] = Sx[z];
+zumVariancesX: sum{z in Sample} Ex[z] = 0;
+/* sum of variances is zero for Sy*/
+variencesY{z in Sample}: Y + Ey[z] = Sy[z];
+zumVariancesY: sum{z in Sample} Ey[z] = 0;
+
+solve;
+
+param b1 := (sum{z in Sample} Ex[z]*Ey[z])/(sum{z in Sample} Ex[z]*Ex[z]);
+printf "\nbest linear fit is:\n\ty = %f %s %fx\n\n", Y-b1*X, if b1 < 0 then "-" else "+", abs(b1);
+
+data;
+
+param:
+Sample:   Sx    Sy :=
+  1         0    1
+  2       0.5  0.9
+  3         1  0.7
+  4       1.5  1.5
+  5       1.9    2
+  6       2.5  2.4
+  7         3  3.2
+  8       3.5    2
+  9         4  2.7
+ 10       4.5  3.5
+ 11         5    1
+ 12       5.5    4
+ 13         6  3.6
+ 14       6.6  2.7
+ 15         7  5.7
+ 16       7.6  4.6
+ 17       8.5    6
+ 18         9  6.8
+ 19        10  7.3
+;
+
+end;
+```
+
+- In the data section, the parameters `Sx`, `Sy` and the set `Sample` are defined in one statement using the tabbing construct. Which `Sample` is a set of numbers 1..19 and `Sx`, `Sy` are corresponding floating point values
+
+### Graph coloring problem
+
+```perl
+/* COLOR, Graph Coloring Problem */
+/* Written in GNU MathProg by Andrew Makhorin <mao@gnu.org> */
+/* Given an undirected loopless graph G = (V, E), where V is a set of
+   nodes, E <= V x V is a set of arcs, the Graph Coloring Problem is to
+   find a mapping (coloring) F: V -> C, where C = {1, 2, ... } is a set
+   of colors whose cardinality is as small as possible, such that
+   F(i) != F(j) for every arc (i,j) in E, that is adjacent nodes must
+   be assigned different colors. */
+
+param n, integer, >= 2;   /* number of nodes */
+set V := {1..n};          /* set of nodes */
+set E, within V cross V;  /* set of arcs */
+
+check{(i,j) in E}: i != j;  /* there must be no loops */
+
+/* We need to estimate an upper bound of the number of colors |C|.
+   The number of nodes |V| can be used, however, for sparse graphs such
+   bound is not very good. To obtain a more suitable estimation we use
+   an easy "greedy" heuristic. Let nodes 1, ..., i-1 are already
+   assigned some colors. To assign a color to node i we see if there is
+   an existing color not used for coloring nodes adjacent to node i. If
+   so, we use this color, otherwise we introduce a new color. */
+
+set EE := setof{(i,j) in E} (i,j) union setof{(i,j) in E} (j,i);
+/* symmetrisized set of arcs */
+
+param z{i in V, case in 0..1} :=
+/* z[i,0] = color index assigned to node i
+   z[i,1] = maximal color index used for nodes 1, 2, ..., i-1 which are
+            adjacent to node i */
+(  if case = 0 then
+   (  /* compute z[i,0] */
+      min{c in 1..z[i,1]}
+      (  if not exists{j in V: j < i and (i,j) in EE} z[j,0] = c then
+            c
+         else
+            z[i,1] + 1
+      )
+   )
+   else
+   (  /* compute z[i,1] */
+      if not exists{j in V: j < i} (i,j) in EE then
+         1
+      else
+         max{j in V: j < i and (i,j) in EE} z[j,0]
+   )
+);
+
+check{(i,j) in E}: z[i,0] != z[j,0];
+/* check that all adjacent nodes are assigned distinct colors */
+
+param nc := max{i in V} z[i,0];
+/* number of colors used by the heuristic; obviously, it is an upper
+   bound of the optimal solution */
+
+display nc;
+
+var x{i in V, c in 1..nc}, binary;
+/* x[i,c] = 1 means that node i is assigned color c */
+
+var u{c in 1..nc}, binary;
+/* u[c] = 1 means that color c is used, i.e. assigned to some node */
+
+s.t. map{i in V}: sum{c in 1..nc} x[i,c] = 1;
+/* each node must be assigned exactly one color */
+
+s.t. arc{(i,j) in E, c in 1..nc}: x[i,c] + x[j,c] <= u[c];
+/* adjacent nodes cannot be assigned the same color */
+
+minimize obj: sum{c in 1..nc} u[c];
+/* objective is to minimize the number of colors used */
+
+solve;
+
+printf "Total color: %d\n", (sum{c in 1..nc} u[c]);
+printf "Node  Color\n";
+printf{i in V, c in 1..nc: x[i,c]=1} "%4d  %5d\n", i, c;
+
+data;
+
+/* These data correspond to the instance myciel3.col from:
+   http://mat.gsia.cmu.edu/COLOR/instances.html */
+
+/* The optimal solution is 4 */
+
+param n := 11;
+
+set E :=
+ 1 2
+ 1 4
+ 1 7
+ 1 9
+ 2 3
+ 2 6
+ 2 8
+ 3 5
+ 3 7
+ 3 10
+ 4 5
+ 4 6
+ 4 10
+ 5 8
+ 5 9
+ 6 11
+ 7 11
+ 8 11
+ 9 11
+ 10 11
+;
+
+end;
+```
+
+- Edges are pair of nodes, thus defined as `within V cross V`
+- `EE` is defined as the directed edge, which counts both way of `E`, defined by a union operation
+- Max color is found by a heuristic on `z`, which is by a nested if statement
+
+### Sudoku
+
+```perl
+/* SUDOKU, Number Placement Puzzle */
+
+/* Written in GNU MathProg by Andrew Makhorin <mao@gnu.org> */
+
+/* Sudoku, also known as Number Place, is a logic-based placement
+   puzzle. The aim of the canonical puzzle is to enter a numerical
+   digit from 1 through 9 in each cell of a 9x9 grid made up of 3x3
+   subgrids (called "regions"), starting with various digits given in
+   some cells (the "givens"). Each row, column, and region must contain
+   only one instance of each numeral.
+
+   Example:
+
+   +-------+-------+-------+
+   | 5 3 . | . 7 . | . . . |
+   | 6 . . | 1 9 5 | . . . |
+   | . 9 8 | . . . | . 6 . |
+   +-------+-------+-------+
+   | 8 . . | . 6 . | . . 3 |
+   | 4 . . | 8 . 3 | . . 1 |
+   | 7 . . | . 2 . | . . 6 |
+   +-------+-------+-------+
+   | . 6 . | . . . | 2 8 . |
+   | . . . | 4 1 9 | . . 5 |
+   | . . . | . 8 . | . 7 9 |
+   +-------+-------+-------+
+
+   (From Wikipedia, the free encyclopedia.) */
+
+param givens{1..9, 1..9}, integer, >= 0, <= 9, default 0;
+/* the "givens" */
+
+var x{i in 1..9, j in 1..9, k in 1..9}, binary;
+/* x[i,j,k] = 1 means cell [i,j] is assigned number k */
+
+s.t. fa{i in 1..9, j in 1..9, k in 1..9: givens[i,j] != 0}:
+     x[i,j,k] = (if givens[i,j] = k then 1 else 0);
+/* assign pre-defined numbers using the "givens" */
+
+s.t. fb{i in 1..9, j in 1..9}: sum{k in 1..9} x[i,j,k] = 1;
+/* each cell must be assigned exactly one number */
+
+s.t. fc{i in 1..9, k in 1..9}: sum{j in 1..9} x[i,j,k] = 1;
+/* cells in the same row must be assigned distinct numbers */
+
+s.t. fd{j in 1..9, k in 1..9}: sum{i in 1..9} x[i,j,k] = 1;
+/* cells in the same column must be assigned distinct numbers */
+
+s.t. fe{I in 1..9 by 3, J in 1..9 by 3, k in 1..9}:
+     sum{i in I..I+2, j in J..J+2} x[i,j,k] = 1;
+/* cells in the same region must be assigned distinct numbers */
+
+/* there is no need for an objective function here */
+
+solve;
+
+for {i in 1..9}
+{  for {0..0: i = 1 or i = 4 or i = 7}
+      printf " +-------+-------+-------+\n";
+   for {j in 1..9}
+   {  for {0..0: j = 1 or j = 4 or j = 7} printf(" |");
+      printf " %d", sum{k in 1..9} x[i,j,k] * k;
+      for {0..0: j = 9} printf(" |\n");
+   }
+   for {0..0: i = 9}
+      printf " +-------+-------+-------+\n";
+}
+
+data;
+
+/* These data correspond to the example above. */
+
+param givens : 1 2 3 4 5 6 7 8 9 :=
+           1   5 3 . . 7 . . . .
+           2   6 . . 1 9 5 . . .
+           3   . 9 8 . . . . 6 .
+           4   8 . . . 6 . . . 3
+           5   4 . . 8 . 3 . . 1
+           6   7 . . . 2 . . . 6
+           7   . 6 . . . . 2 8 .
+           8   . . . 4 1 9 . . 5
+           9   . . . . 8 . . 7 9 ;
+
+end;
+```
+
+- Solving for any feasible solution, without optimizing
+- First constraint: The cell at `(i,j)` with "given": `x[i,j,k]` is fixed for all `k`

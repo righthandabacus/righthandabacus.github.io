@@ -1,0 +1,75 @@
+---
+layout: post
+title: "Allman et al (2009) TCP Congestion Control (RFC5681)"
+date: 2012-02-09 23:20:19 -0500
+category: paper
+bibtex:
+  type: misc
+  title: "TCP Congestion Control"
+  author: "M. Allman and V. Paxson and E. Blanton"
+  howpublished: "IETF RFC 5681"
+  year: "2009"
+---
+RFC5681 obsoletes RFC2581.
+
+Duplicated Acknowledgment is a packet that satisfies all the following criteria:
+
+  - It is a pure ack
+  - Upon receipt, there is some pending data to send
+  - The ack number has seen before
+  - The ack does not change rwnd
+
+# Slow start and congestion avoidance
+
+IW (initial value of cwnd) must satisfy the following rule:
+
+  - If SMSS $>$ 2190 bytes, IW = 2*SMSS bytes but not more than 2 segments
+  - If 1095 $<$ SMSS $\le$ 2190 bytes, IW = 3*SMSS bytes but not more than 3 segments
+  - If SMSS $\le$ 1095 bytes, IW = 4*SMSS bytes but not more than 4 segments
+
+The SYN+ACK and the ack of SYN+ACK must not increase cwnd. If SYN or SYN+ACK is lost, the initial window used by a sender after a correctly transmitted SYN must be one segment (SMSS bytes)
+
+Initial value of ssthresh should be arbitrarily high but must be reduced in response to congestion. Slow start algorithm is used when `cwnd < ssthresh`; congestion avoidance algorithm is used when `cwnd > ssthresh`. During slow start, TCP increments cwnd by at most SMSS bytes for each ACK received, i.e.
+  `cwnd += min (N, SMSS)`
+for `N` to be the number of previously unacknowledged bytes acknowledged in the incoming ACK.
+
+During congestion avoidance, cwnd is incremented by roughly 1 full-sized segment per RTT, and it should be done by the above equation, once per RTT. The recommended way is to count the number of bytes that have been acknowledged. When this counter reaches cwnd, then increase cwnd by up to SMSS bytes. The common formula is
+  `cwnd += SMSS*SMSS/cwnd`
+which is adjusted on every incoming ACK. But if delayed ack, i.e. ack every other packet, this is less aggressive than allowed (increase by one SMSS per two RTT).
+
+When loss is detected by retransmission timer, ssthresh must be set to
+  `ssthresh = max (FlightSize/2, 2*SMSS)`
+But if the loss segment has already been retransmitted by way of retransmission timer at least once, the value of ssthresh is held constant. (i.e. second RTO in a row does not decrease ssthresh again). The FlightSize is the number of bytes in flight, which might be different from cwnd, as FlightSize is also bounded by rwnd.
+
+Upon a timeout, cwnd must be set to no more than the loss window (LW), which the size is 1 full-sized segment.
+
+Slow-start-based loss recovery after timeout can cause spurious retransmissions that trigger duplicated acknowledgement. But the handling of such varies widely in different implementation.
+
+# Fast retransmit and fast recovery
+
+Whenever an out-of-order segment arrives, TCP should send dupack immediately. The out-of-order may be caused by dropped segments, or reordering of segments by the network, or even a replication of ack or data segments by the network.
+
+TCP should also send ack immediately whenever an incoming segment fills a gap in part or in full.
+
+TCP should use fast retransmit algorithm to detect and repair loss: Triggered by arrival of 3 dupack, TCP retransmits of what appears to be the missing segment. Fast recovery algorithm governs the transmission of new data until a non-dupack arrives.
+
+The fast retransmit and fast recovery algorithm is as follows:
+
+  - On 1st and 2nd dupack, TCP should send a segent of previously unsent data
+    per RFC3042 (limited transmit) provided that rwnd allows, but cwnd must not be changed
+  - On 3rd dupack, TCP must set ssthresh as above, and retransmit the segment
+    starting at SND.UNA, and set cwnd to ssthresh+3*SMSS
+  - For each additional dupack received, cwnd must be incremented by SMSS. But TCP may limit
+    the number of such increment during loss recovery to the number of outstanding segments
+  - When previously unsent data is available, and the new cwnd allows, TCP should send SMSS bytes
+  - When a full ack received, TCP must set cwnd to ssthresh
+
+# Issues
+
+Idle connection means no send and no receive. If TCP has not received and not sent a segment for more than a RTO, cwnd is reduced to the restart window (RW) before transmitting again, which RW = min(IW, cwnd)
+
+Delayed ACK (RFC1122) should be used: ack should be sent for at least every second full-sized segment (2*RMSS bytes) and must be sent within 500ms of the arrival. Or better, ack should be sent for every second segment regardless of size
+
+TCP must not generate more than one ACK for every incoming segment, except to update rwnd
+
+Loss recovery: When the first loss in a window of data is detected, ssthresh must be set according to the formula above. Until all lost segments in the window are repaired, the number of segments transmitted in each RTT must be no more than half the number of outstanding segments when the loss was detected. Once all the loss are repaired, cwnd must be set to no more than ssthresh and congestion avoidance must be used to further increase cwnd. Loss in two successive window of data or loss of retransmission are two indications of congestion, thus cwnd must be lowered twice.

@@ -1,0 +1,28 @@
+---
+css:
+  - "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+  - "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+  - "//cdnjs.cloudflare.com/ajax/libs/bootstrap-social/5.1.1/bootstrap-social.min.css"
+  - "/css/main.css"
+googlefonts:
+  - "Cormorant:400,400i,600,600i"
+  - "Open+Sans+Condensed:300,700"
+  - "Cormorant+Upright:300"
+head_js:
+  - "//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"
+  - "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+foot_js:
+  - "/js/main.js"
+# layout: compress
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  {% include head.html %}
+  <body>
+    {% include nav.html %}
+    {{ content }}
+    {% include footer.html %}
+    {% include footer-scripts.html %}
+  </body>
+</html>

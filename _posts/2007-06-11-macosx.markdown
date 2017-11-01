@@ -1,0 +1,60 @@
+---
+layout: post
+title: "Mac OS X Tricks"
+date: 2007-06-11 03:21:00 +0800
+tags: system
+---
+
+## NFS Server
+To create a NFS server on Mac OS X:
+
+  - Create `/etc/exports` (see `man 5 exports`) for detail
+  - Bring up NFS daemons
+     * `/usr/sbin/portmap`: Loaded if being a NFS client
+     * `/usr/sbin/mountd`: Loaded if being a NFS client
+     * `/sbin/nfsd`
+
+But if you created `/etc/exports`, the NFS daemon will probably launched at boot time by `/System/Library/StartupItems/NFS/NFS`
+
+## Hidden users
+
+To hide a user in OS X (as of 10.4.x), call the terminal and execute as root:
+
+    # defaults write /Library/Preferences/com.apple.loginwindow HiddenUsersList -array-add user1 user2 ...
+
+and to unhide all, execute:
+
+    # defaults delete /Library/Preferences/com.apple.loginwindow HiddenUsersList
+
+If you want to hide an account just for the administrative privilege, simply
+create a user named "Administrator" and short name "Admin" (case sensitive)
+which is the *only* administrator account in the system, then it would be hidden
+from the login screen.
+
+## Finder font size
+
+To change font size of your finder window: Edit `$HOME/Library/Preferences/com.apple.finder.plist` and look for the key
+
+    <key>DesktopViewOptions</key>
+
+which in the hierarchy, you can change `FontSize` and `IconSize` to appropriate value.
+
+If your plist file is not ASCII, change it with plutil.
+
+## Changing UID/GID
+
+Go to the terminal and execute with root:
+
+    # niutil -createprop . /users/[username] uid [new uid]
+    # find / -user [old uid] -exec chown [username] \{\} \;
+
+or you can do the same thing as niutil using the NetInfo Manager. Changing GID is similar.
+
+## Prevent .DS_Store creating at network drives
+
+The `.DS_Store` file is remembering the window position, icon size, etc of your
+finder window. It is good if you need it but it is annoying if you don't,
+especially when you use the file between a Mac, a Windows and a Linux. To turn
+off the creation of `.DS_Store` on networked directories, execute:
+
+    $ defaults write com.apple.desktopservices DSDontWriteNetworkStores true

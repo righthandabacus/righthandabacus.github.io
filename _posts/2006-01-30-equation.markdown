@@ -1,0 +1,18 @@
+---
+layout: post
+title: "Five Equations that Changed the World"
+subtitle: "Michael Guillen / 1995"
+date: 2006-01-30 08:43:00 +0800
+category: book
+bibtex:
+  type: book
+  title: Five Equations that Changed the World
+  author: Michael Guillen
+  publisher: Hyperion
+  address: New York
+  year: 1995
+---
+
+This is not a book for serious readers --- this is a book for leisure. It don't talk about the derivation and theories behind the scene in a strict way but talk about the story of a discovery. The equations are, indeed, have a great impact to science. Of course, the equations are of Physics type, namely, the Newton's universial gravitation formula, the law of thermodynamics by Rudolf Clausius, Daniel Bernoulli's equation of hydrodynamic pressure, the electromagnetic formula of Michael Faraday, and Einsteins' mass-energy conversion formula.
+
+The way this book is presenting is unique. It just like a novel. The good thing about this book is that, it can somehow, make you better understand the equation from how the people discovered it.

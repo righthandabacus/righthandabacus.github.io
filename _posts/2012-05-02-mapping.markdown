@@ -1,0 +1,32 @@
+---
+layout: post
+title: "Mapping the real domain into a finite interval"
+date: 2012-05-02 10:56:50 -0400
+tags: math
+---
+How to construct $f: \mathbb{R} \mapsto (a,b)$?
+
+There are three different functions that I can thought of: Firstly is the
+inverse tangent. Since tangent maps $[0,\pi]$ to $\mathbb{R}$, its inverse
+serves the purpose.
+
+Second function is the similar hyperbolic tangent, defined as
+
+$$
+\mathrm{tanh}(x) = \frac{e^x - e^{-x}}{e^x + e^{-x}}.
+$$
+
+This function maps $\mathbb{R}$ into $(-1,1)$.
+
+The third function is the logistic function:
+
+$$
+P(x) = \frac{1}{1+e^{-x}},
+$$
+
+which maps $\mathbb{R}$ into $(0,1)$. By the way, logistic function is named
+because it is the solution to the logistic equation,
+
+$$
+\frac{d}{dx}P(x) = P(x)(1-P(x)).
+$$

@@ -1,0 +1,425 @@
+---
+layout: post
+title: "Samsung Q25 Installation Record"
+date: 2004-11-27 01:44:27 +0800
+tags: system
+---
+
+Today, I got a Samsung Q25 from PolyU's notebook ownership scheme, with the
+help from my darling's cousin, Ada.
+
+It is really amazing: a notebook with only 1.3 kg but with everything you
+needed: 12 inch LCD, Ethernet, Modem, USB, IEEE 1394, Memorystick slot, SD slot,
+PCMCIA, mic, headphone, internal speaker, IR, and most importantly the 802.11g
+Wi-Fi with a button to turn it on and off anytime.
+
+After playing a while with the BIOS, I found that it has built-in Windows XP
+-- but in this planet, only UNIX rules! So I would like to switch to Debian.
+
+----------
+
+## Booting the System
+I didn't buy the DVD Combo nor the docking for the notebook. So I can only try
+with other way of installation. I can see that the only ways to boot it is to
+use to USB devices, or PXE which I think is so tired to use.
+
+At this point, I should probably clarify: because I use my notebook as my main
+workstation, hence I would like it to be not-so-stable. That's why I've chosen
+Sarge/Sid and also the `new` Debian installer.
+
+After reading the file `debian/dists/sid/main/installer-i386/20040801/doc/INSTALLATION-HOWTO`
+from any Debian mirror, I see the following:
+
+''It's also possible to install from removable USB storage devices. For example
+a USB keychain can make a handy Debian install media that you can take with you
+anywhere.
+
+The easiest way to prepare your USB memory stick is to download
+hd-media/boot.img.gz, and use gunzip to extract the 128 MB image from that
+file. Write this image directly to your memory stick, which must be at least
+128 mb in size. Of course this will destroy anything already on the memory
+stick. Then mount the memory stick, which will now have a FAT filesystem on it.
+Next, download a Debian netinst CD image, and copy that file to the memory
+stick; any filename is ok as long as it ends in ".iso".''
+
+It is the way I wanted: because I got a new "USB thumbdisk". Hence, accroding
+to that, I downloaded
+
+  * `[Debian Mirror]/debian/dists/sid/main/installer-i386/20040801/images/hd-media/boot.img.gz`
+  * <http://cdimage.debian.org/pub/cdimage-testing/sarge_d-i/i386/rc1/sarge-i386-netinst.iso> (or [sarge-i386-businesscard.iso](http://cdimage.debian.org/pub/cdimage-testing/sarge_d-i/i386/rc1/sarge-i386-businesscard.iso)
+
+if your disk is less than 128MB, but not recommended)
+After that, I insert my USB disk into my PC, and run:
+
+    # gunzip boot.img.gz
+    # dd if=boot.img of=/dev/sda
+    # mount /dev/sda /mnt/my_usb
+    # cp sarge-i386-netinst.iso /mnt/my_usb
+    # umount /mnt/my_usb
+
+Now, everything's finished. But please be care that the device *must* be
+`/dev/sda`, not `/dev/sda1`. It won't work in Q25 if it is in a partition but in
+my case, I can brute-forcely using the commands above.
+
+The next step is to take out my Q25, insert the "USB thumbdisk" and boot it
+-- but press F2 on boot to enter BIOS setting. Inside the BIOS setting, in
+the boot selection, expand the part about hard disk booting, and press F5/F6
+to make USB disk the first priority over the toshiba 2.5 inch hard disk.
+Then save and reboot.
+
+## Install
+
+After boot, you will get into the new Debian installer. It is quite easy to
+use and I don't describe it here. But a point to note: I've intentionally
+don't give anything to network configuration, not even the IP. Hence my whole
+installation is using the built-in package from sarge-i386-netinst.iso. The
+hard disk partitioning that I've used is:
+
+  * 39GB at front of disk, ext3 format, mount as `/`
+  * 1GB at end of disk, swap
+
+The reason for the large swap is to use as a hibernation partition, which
+supported in kernel 2.6 -- hence you know, the kernel I've chosen during
+install is kernel-image-2.6.7-1-386.
+
+Waited for a while, and keep my finger on the enter key, the system is finished
+installing and rebooted. Any more? No -- because we used the new installer and
+it crafted a fabulous initrd image for us, so that it will probe for everything
+(this piece came from gentoo??) and load the module for you. Once finished the
+installation of Debian, type ifconfig, I can even use my wireless LAN
+immediately! The only thing lacks is the card reader for Sony MemoryStick
+and SD media.
+
+## Card Reader
+Upon spending a whole day on Google and doing experiments, I found that my
+Samsung Q25 is using a "Ricoh Bay2Controller" card reader. It is a strange
+thing and not a good design. Strange because it is a PCMCIA reader. Hence you
+cannot use your memorystick or secure digital cards as USB mass storage devices
+as usual. It is a bad design because, when using some
+[inferior OS](http://www.microsoft.com/windows/), the system will always
+occupy two drive letters for your MS and SD slot and you can never reclaim it.
+
+But the worse thing among -- I can find no driver for it in Linux. Hence I
+gave up, left it behind at this moment and concentrate on other works first.
+
+## Wireless LAN
+
+The Q25 has a centrino-based wireless built-in. It is running the Intel
+Pro/Wireless 2200BG and hence you can follow my instructions on the article
+"[Linux Kernel with IPW2200 driver}]" to create a kernel with suitable driver
+for it. After having the kernel, the things I need to do is to unpack the
+firmware (files: `ipw2200_boot.fw ipw2200_bss.fw ipw2200_ibss.fw ipw2200_ucode.fw`)
+into `/usr/lib/hotplug/firmware/`. In the future, you can simply load the
+module and the Wi-Fi will work.
+
+## Tunning Base System
+Right now, I have a basic system installed. To make it better, I have to
+install some more utilities and customize it to make it suitable for my general
+use.
+
+The first thing I did is to modify the `/etc/fstab`, so that I mounts the
+procfs and sysfs. Further, I added `noatime` option to root mounts to save
+some battery power by reducing the I/O amounts.
+
+Afterward, I tuned the `/etc/network/interfaces` for an appropriate network
+configuration -- because I didn't do that at installation time.
+
+Next, I modified several files:
+  - `/etc/profile` - Customize for shell look-and-feel
+  - `/root/.bashrc` - Console customerization for root login
+  - `/etc/inetd.conf` - Disable those small servers, namely, discard, daytime, time
+  - `/boot/grub/menu.lst` - Added `vga=792` to the boot options to have a framebuffer console
+
+And the base system is fine to use now.
+
+## ACPI (Pending)
+* <http://acpi.sourceforge.net/index.html> - ACPI for Linux
+* <http://www.cpqlinux.com/acpi-howto.html> - ACPI Howto
+* <http://acpi.sourceforge.net/dsdt/tables/Samsung/Q25/> - DSDT for Samsung Q25
+* <http://acpi.sourceforge.net/dsdt/index.php> - DSDT from ACPI for Linux
+* <http://www.geocities.com/q20linux/> - Linux on the Samsung Q20
+* <http://www.behnel.de/acpi/samsung-acpi.html> - ACPI patches for Samsung P10
+
+## Console Workstation
+
+The system is a bare system, So I want to install some software and remove some unwanted. Here are what I did:
+
+    # apt-get --purge remove tasksel nano nvi pcmcia-cs mailx apt-utils aptitude fdutils \
+        ipchains kernel-image-2.6.7-1-386 ppp pppoe pppconfig pppoeconf
+    # apt-get install ssh sudo less syslog-ng hexedit unison ncftp rar unzip zip hdparm \
+        smartmontools ntpdate
+    # apt-get install vim vim-common libgpmg1
+    # apt-get install bzip2 libbz2-1.0
+    # apt-get install wget lynx libgnutls7 libncursesw5 libgcrypt1 libtasn1-0
+    # apt-get install bc libreadline4
+    # dpkg -P klogd sysklogd
+
+Once these are done, we've finished the console part applications
+
+I tried to make a line into `/etc/sudoers`:
+
+    %root ALL=(ALL) ALL
+
+and also for ''/etc/vim/vimrc.local@:
+
+    # cd /etc/vim
+    # cat > vimrc.local
+    syntax on
+    set background=dark
+    set autowrite
+    set showmatch
+    set fileencodings=utf-8,big5,euc-jp,gbk,euc-kr,utf-bom,iso8859-1
+    set encoding=utf8
+    set tenc=utf8
+    ^D
+
+Then we go to add some more network utilities.
+
+## Network Utilities
+
+Here you are:
+
+    # apt-get install pptp ppp
+    # apt-get install tcpdump libpcap0.8
+    # apt-get install dns-utils bind9-host libdns11 libisc7 liblwres1
+    # apt-get install smbc libkrb53 libldap2 libsasl2 libsmbclient
+    # apt-get install iftop traceroute nbtscan rdesktop rsync
+
+Now my system is capable of doing some networking debug jobs
+
+## PPTP VPN for CUHK
+As I am in CUHK, it is quite frequent that I need to use VPN for the access. As
+I have installed pptp, I can configure for that in a few steps:
+
+    # cd /etc/ppp/peers
+    # cat >> cuhkvpn
+    lock
+    noauth
+    nobsdcomp
+    nodeflate
+    defaultroute
+    persist
+    pty "pptp vpn.cuhk.edu.hk --nolaunchpppd"
+    remotename vpn.cuhk.edu.hk
+    ipparam vpn.cuhk.edu.hk
+    name s034554
+    require-pap
+    ^D
+    # chmod 0640 cuhkvpn
+    # chown root.dip cuhkvpn
+    # cd /etc/ppp
+    # echo "* * My_Password" >> pap-secrets
+
+Yes, that's it. You can now connect via PPTP VPN using just this command:
+
+    # ppp call cuhkvpn
+
+## X11
+Enough for console jobs, here we begin for the graphical part. The basic stuff
+are:
+
+    # apt-get install x-window-system wdm fvwm
+
+with the following depended packages: cpp cpp-3.3 defoma file fontconfig hermes1
+libxproxy libdps1 libexpat1 libfontconfig1 libfreetype6 libfribidi0 libglib1.2
+libgtk1.2 libgtk1.2-common libice6 libjpeg62 libmagic1 libpng12-0 librplay3
+libsm6 libstroke0 libtiff4 libungif4g libwraster2 libx11-6 libxaw7 libcursor1
+libxext6 libxft1 libxft2 libxi6 libxmu6 libxmuu1 libxp6 libxpm4 libxradr2
+libxrender1 libxt6 libxtrap6 libxtst6 libxv1 menu perl perl-modules proxymngr
+ttf-bitstream-vera twm ucf x-window-system-core xbase-clients xdm fonts-100dpi
+xfonts-75dpi xfonts-base xfonts-scalable xfree86-common xfs xfwp xlibmesa-dri
+xlibmesa-gl xlibmesa-glu xlibs xlibs-data xnest xprt-common xprt-xprintorg
+xserver-common xserver-xfree86 xterm xutils xvfb.
+
+At the later part of the installation, debconf will try to configure the
+xserver. During so, you need not to modify anything and everything supplied as
+default will work fine. The only thing need to deal with is probably the X
+server's modules. I have chosen only GLcore, bitmap, dbe, ddc, dri, extmod,
+glx, int10, record, type1, vbe, and xtt. Of course, I've chosen to use wdm over
+the default xdm. After that, upon re-initialize your runlevel, the X-Window
+will give you a login.
+
+I did one more configuration on `/etc/X11/XF86Config-4`: in `ServerFlags` section, added the line
+
+    Option "Xinerama" "true"
+
+## X11 Fonts
+
+Now we install the fonts. As well as the font utilities.
+
+    # apt-get install xfonts-75dpi xfonts-base xfonts-cmex-big5p \
+      xfonts-intl-arabic xfonts-intl-asian xfonts-intl-chinese \
+      xfonts-intl-european xfonts-intl-japanese xfonts-intl-phonetic \
+      xfonts-scalable xfonts-efont-unicode xfonts-efont-unicode-ib \
+      unifont
+    # apt-get install ttf-arphic-bkai00mp ttf-arphic-bsmi00lp \
+      ttf-arphic-gbsn00lp ttf-arphic-gkai00mf ttf-freefont ttf-baekmuk \
+      ttf-kochi-mincho-naga10 ttf-opensymbol ttf-thryomanes
+    # apt-get install ttf2pt1 ttf2pt1-chinese fontconfig qt3-qtconfig \
+      x-ttcidfont-conf ttmkfdir
+
+Afterwards, add the following two lines to `/etc/X11/XF86Config-4`, `Files`
+section:
+
+    FontPath  "/var/lib/defoma/x-ttcidfont-conf.d/dirs/CID"
+    FontPath  "/var/lib/defoma/x-ttcidfont-conf.d/dirs/TrueType"
+
+Because I am not going to use XFS, so comment out the font server setting and
+run "`update-rc.d -f xfs remove` to prevent xfs from starting up on boot.
+
+## Printing Support
+
+    # apt-get install enscript bg5ps ttfprint
+    # apt-get install foomatic-filters foomatic-db cupsys
+
+## Postscript and LaTeX
+
+    # apt-get install gs-cjk-resource cmap-adobe-cns1 cmap-adobe-gb1 \   
+      cmap-adobe-japan1 cmap-adobe-japan2 cmap-adobe-korea1 gsfonts \   
+      gsfonts-other gsfonts-x11 xpdf-i xpdf-utils pspresent \   
+      xpdf-chinese-traditional gv
+    # apt-get install psutils epstool dvipdfmx
+    # apt-get install lyx-qt lyx-common tetex-base tetex-bin tetex-extra \   
+      cjk-latex hbf-cns40-b5 latex-xft-fonts tfm-arphic-bsmi00lp \   
+      tfm-arphic-bkai00mp tth aspell-en latex-ucs
+
+## Chinese Tools
+
+    # apt-get install scim scim-tables-zh pydict
+
+Then modify the last line of `/etc/scim/config` to the following:
+
+    /SupportedUnicodeLocales = en_US.UTF-8,zh_TW.UTF-8
+
+## Browser and Java
+
+    # apt-get install mozilla mozilla-chatzilla
+
+Now install flash:
+
+    # wget -nH -nd http://fpdownload.macromedia.com/get/shockwave/flash/english/linux/7.0r25/install_flash_player_7_linux.tar.gz
+    # apt-get install flashplugin-nonfree
+
+Then, in the debconf, supply the path to the flash binary downloaded from
+macromedia and select ok. Based on the Java build script (j2se-package) from
+<http://z42.de/debian/>, and the Linux JDK for Java 5 
+(jdk-1_5_0-rc-linux-i586.bin, 43.91 MB) from <http://java.sun.com/j2se/downloads.html>
+I have created the package sun-j2sdk1.5_1.5.0+rc1_i386.deb, so
+
+    # dpkg -i sun-j2sdk1.5_1.5.0+rc1_i386.deb
+
+And finally:
+
+    # apt-get install licq licq-plugin-qt
+
+## Productivity tools
+
+    # apt-get install dia openoffice.org gimp scribus sodopodi gnuplot xchm \
+      djview djvulibre-bin gocr gocr-gtk pdftk pdfjam pstotext graphviz
+    # apt-get install emelfm bubblefishymon jpilot mlterm mlterm-tools convmv \
+      screen
+
+Specially for mlterm, I would modify `/etc/mlterm/main` to add/modify the
+following:
+
+    fg_color=white
+    bg_color=black
+    logsize=5000
+    fontsize=14
+    mod_meta_mode=esc
+    not_use_unicode_font=true
+    termtype=xterm
+
+## Multimedia
+
+    # apt-get install esound abcde xmms xmms-cdread transcode mplayer-686 \
+      mencoder-686 mplayer-fonts \
+      acidrip gimageview cdrecord mkisofs cdrdao xcdroast cdda2wav video-dvdrip \
+      hwinfo mp3burn vorbis-tools lame dvdrtools dvd+rw-tools \
+      xscreensaver xloadimage
+
+## Development tools
+
+    # apt-get install make gcc g++ subversion subversion-tools stl-manual manpages-dev
+    # apt-get install dpkg-dev
+
+## Fine-tunning
+
+Because the screen is just 1024x768, I would rather use 75 dpi. And I have some
+Chinese fonts in use, I would also like to speed up the start time. Hence I
+changed `/etc/X11/xinit/xserverrc` from:
+
+    exec /usr/bin/X11/X -dpi 100 -nolisten tcp
+
+to:
+
+    exec /usr/bin/X11/X -dpi 75 -deferglyphs 16
+
+and also for `/etc/X11/wdm/Xservers`, change from:
+
+    :0 local /usr/bin/X11/X -nolisten TCP
+
+to:
+
+    :0 local /usr/bin/X11/X -dpi 75 -deferglyphs 16 vt7
+
+which also enabled the use of remote X and set the locale and specified the
+XIM server. If XFS is used, you can also add the line
+
+    deferglyphs = 16
+
+to `/etc/X11/fs/config`.
+
+In order to enable inputing Chinese in terminals, I have to modify `/etc/inputrc`
+to uncomment the line `set convert-meta off`. So instead of sending a byte
+with the high-bit set to represent Alt-something, it sends the escape first and
+then the character. Which is better for 8-bit characters.
+
+Then modify `/etc/X11/xinit/xinitrc` as well as `/etc/X11/wdm/Xsession` to
+add the following lines:
+
+    if [ -f /etc/profile ]; then
+        . /etc/profile
+    fi
+    export LANG=en_US.UTF-8
+    export XMODIFIERS="@im=SCIM"
+    export GTK_IM_MODULE=xim
+    scim -d
+    xscreensaver -no-splash &
+
+Afterwards, modify `/etc/X11/Xsession.d/99xfree86-common_start`, add the
+following lines before everything,
+
+    if [ -f $HOME/.xinitrc -a -x $HOME/.xinitrc ]; then
+        . $HOME/.xinitrc
+    fi
+
+Next we come to fix Mozilla's Chinese printing problems. Modify
+`/etc/mozilla/prefs.js` to the following:
+
+    pref("font.FreeType2.enable", true);       
+    pref("font.FreeType2.unhinted", false);  
+    pref("font.directory.truetype.1", "/var/lib/defoma/x-ttcidfont-conf.d/dirs/TrueType");
+
+and add the following:
+
+    pref("print.postscript.enabled", true);
+    pref("print.postscript.paper_size", "a4");
+
+Finally, add the user-specific init script at `$HOME/.xinitrc` with execute bit
+set. For example, mine is:
+
+    xloadimage -onroot -fullscreen .wallpaper.jpg
+    xmodmap -e "pointer = 3 2 1 4 5"
+
+also, some customerization can be done for `$HOME/.bashrc` and `$HOME/.bash_profile`.
+
+## References
+
+- <http://www.jw-stumpel.nl/stestu.html> - Multi-lingual text on Linux
+- <ftp://cle.linux.org.tw/pub/fonts/ttf/unicode/> - Unicode True Type Fonts
+- <http://dev.gentoo.org/~liquidx/chinese/chinesefonts.php> - Comparing different Chinese fonts
+- <http://fractal.csie.org/~eric/fontconfig/> - Description of Fontconfig and xft mechanics
+- <http://wiki.debian.org.tw/index.php/Unicode> - Using Unicode in Debian
+- <http://sauvy.ined.fr/~brouard/sony/> - How to install GNU/Linux on Sony Z1
+

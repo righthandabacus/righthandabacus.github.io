@@ -1,0 +1,109 @@
+---
+layout: post
+title: "Perl 5.10"
+date: 2009-06-13 17:11:14 -0400
+tags: code
+---
+
+Is Perl dying? I wish not. Although I can see those languages like Ruby, Python and even Haskell is getting more and more popular.
+
+Recently, I need some Perl script to parse a huge amount of data. I found that version 5.10 of Perl has some nice features on the Regex engine: The possessive quantifier and recursion.
+
+# Possessive Quantifier
+
+Quantifiers like `*?` means non-greedy matching, but now we have `*+`
+to mean possessive. That is, no backtracking allowed. As an example in <http://perldoc.perl.org/perlre.html>, the following is not matched:
+
+    'aaaa' =~ /a++a/
+
+Because the possessive quantifier will eat up the whole string without allowing backtrack, so the last `a` in the regex is not matched. As a result, we can capture the double-quoted string like
+
+    str="This is a string quoted by a pair of \" (double quote)"
+
+by the following regex:
+
+    /"(?:[^"\\]++|\\.)*+"/
+
+If the possessive quantifier is not used, we have to use the following:
+
+    /"(?>(?:(?>[^"\\]+)|\\.)*)"/
+
+# Recursion
+
+The recursion is a pattern like
+
+    (?3)
+
+The number after the question mark denotes the parenthesis number of the capture group. And it is to be replaced with the whole regex of the capture group on runtime. The number is absolute in the above example, but it can also be relative such as
+
+    (?-1) (?+1)
+
+which means the most recently declared capture buffer and the next declared capture buffer.
+
+Thus the following matches a balanced parenthesis:
+
+```perl
+  qr/(               # Capture group number 1
+       \(            # Match a opening parenthesis
+          (?:        # A group of regex without capture
+             [^()]++ # Any non-parenthesis character, no backtracking
+            |        # or
+             (?1)    # Any pattern the also match this capture group
+          )*         # End of the group and any number of repetitions
+       \)            # Match a closing parenthesis
+     )               # End of capture group number 1
+  /x
+```
+
+# Code example
+
+The following code is from <http://www.perlmonks.org/?node_id=660316> and it shows how to use the above regex constructs:
+
+```perl
+#!/usr/local/bin/perl5.10.0
+    
+my @queue =<<"HERE";
+I have some <brackets in <nested brackets> > and
+<another group <nested once <nested twice> > >
+and that's it.
+HERE
+
+my $regex = qr/
+        (                   # start of bracket 1
+        <                   # match an opening angle bracket
+            (?:               
+                [^<>]++     # one or more non angle brackets, non backtracking
+                  |                  
+                (?1)        # recurse to bracket 1
+            )*                 
+        >                   # match a closing angle bracket
+        )                   # end of bracket 1
+        /x;
+
+$" = "\n\t";
+
+while( @queue )
+    {
+    my $string = shift @queue;
+    
+    my @groups = $string =~ m/$regex/g;
+    print "Found:\n\t@groups\n\n" if @groups;
+    
+    unshift @queue, map { s/^<*; s/>$*; $_ } @groups;
+    }
+__END__
+
+Output:
+Found:
+    <brackets in <nested brackets> >
+    <another group <nested once <nested twice> > >
+
+Found:
+    <nested brackets>
+
+Found:
+    <nested once <nested twice> >
+
+Found:
+    <nested twice>
+```

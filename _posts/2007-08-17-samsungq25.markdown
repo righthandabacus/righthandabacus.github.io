@@ -1,0 +1,47 @@
+---
+layout: post
+title: "Specification of my Samsung Q25"
+date: 2007-08-17 00:22:05 +0800
+tags: system
+---
+
+| Processor                 | Intel Pentium M (Dothan) 1.40G Stepping 06 ULV                     |
+| Cache Memory              | 2048K L2 Cache                                                     |
+| Core Chipset              | Intel 855GME & ICH4-M                                              |
+| RAM Type                  | PC333 DDR SODIMM onboard 256MB                                     |
+| Memory Expansion Options  | 1-slot SODIMM                                                      |
+| Hard Disk Drive           | TOSHIBA MK4021GAS 40GB ATA (9.5mmH 2.5 inch)                       |
+| IDE Controller            | SMART UltraDMA-33/66/100 support                                   |
+| LCD Panel                 | 12.1 inch XGA                                                      |
+| Resolution                | 1024x768                                                           |
+| Graphic Controller        | Intel 855GM Embeded Graphic cont.                                  |
+| Video Memory              | UMA 8MB, DVMT Max 64MB                                             |
+| Max External CRT          | 2048 x 1536 @75HZ                                                  |
+| Color Depth               | 262,144 color                                                      |
+| Audio Chipset             | AC-97, CS 4202 Codec                                               |
+| Sound Feature             | Built-in high performance 18-bit CODEC                             |
+| Speakers                  | 2 Speakers x 1 Watt each                                           |
+| Wireless LAN              | Intel IPW2200 802.11a/b/g mini-PCI                                 |
+|                           | Integrated Dual Band 2 Antenna                                     |
+| Wired LAN                 | Intel Kinnereth+ 10/100 Ethernet UTP                               |
+| Modem                     | 56Kbps / V.90 / Agere SCORPIO AC'97                                |
+| Keyboard                  | 82key(pitch 18.5mm, stroke 2.0mm                                   |
+| Pointing Device           | Synaptics Touchpad with wheel button                               |
+| PC Card Controller        | Ricoh R5C591                                                       |
+| I/O Ports & Connectors    | IrDA Fast IR (4Mbps)                                               |
+|                           | USB2.0(x 2), VGA, RJ-11, RJ-45                                     |
+|                           | Type I or Type II PCMCIA Slot (x 1)                                |
+|                           | Headphone-out, Mic-in                                              |
+|                           | Memory stick slot / SD Card slot                                   |
+| AC Adapter                | AD-4212 (42W) , 42Watts output                                     |
+|                           | Free Voltange 100 ~ 240VAC                                         |
+|                           | VAC:50/60Hz                                                        |
+| Standard Battery          | 4 Cells/ 28 Wh/ 3.8Ah (Up to 8hours with power management enabled) |
+| Recharge Time             | 3 hours with System off (4 hours with system on - Windows Idle)    |
+| Power Management          | ACPI 1.0b support, Standby(S3), Hibernate(S4)                      |
+| Display Controls          | 6 levels panel brightness                                          |
+|                           | Battery gauge display                                              |
+| Power Button              | On/Off or Suspend/Resume configurable                              |
+| Password                  | Power-on password (2-level password support)                       |
+| Dimension                 | W273xL234.3xH19.3(MIN) H23.9(MAX) mm                               |
+| System Weight             | 1.3kg                                                              |

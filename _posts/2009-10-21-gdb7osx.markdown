@@ -1,0 +1,17 @@
+---
+layout: post
+title: "GDB 7 on OS X"
+date: 2009-10-21 00:25:02 -0400
+tags: system
+---
+
+GDB 7 is released. It is nice to know that it now supports Darwin systems, a.k.a. Mac OS X.
+
+The only pitfall is that, there are somewhere in the source code written wrong
+and need a minor tweak before compile. Precisely, all the `fprintf` call in
+`opcodes/i386-disc.c` and `opcodes/ppc-disc.c` missed the format string `"%s"` after
+the file descriptor. The patch can be obtained from Google searching "gdb 7 os
+x". Afterwards, patch the system, configure with `--enable-64-bit-bfd` option,
+and then make.
+
+Now I can have a TUI-based, modern-time GDB. Nice.

@@ -1,0 +1,15 @@
+---
+layout: post
+title: "Abu-Libdeh et al (2010) RACS: A Case for Cloud Storage Diversity (SoCC)"
+date: 2010-06-22 02:19:08 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "RACS: A Case for Cloud Storage Diversity"
+  author: "Hussam Abu-Libdeh and Lonnie Princehouse and Hakim Weatherspoon"
+  booktitle: "Proc SoCC'10"
+  month: "June 10-11"
+  year: 2010
+  address: "Indianapolis, Indiana, USA"
+---
+This paper proposed to use multiple cloud services for storage in a RAID-like style, so that the user can prevent vendor lock-in, and provide a higher redundancy. Software is created and published. Performance evaluation is presented.

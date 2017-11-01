@@ -1,0 +1,157 @@
+---
+layout: post
+title: "Sarolahti and Kuznetsov (2002) Congestion Control in TCP (Usenix)"
+date: 2010-06-04 17:00:00 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: Congestion Control in TCP
+  author: Pasi Sarolahti and Alexey Kuznetsov  
+  howpublished: Usenix
+  booktitle: "Proceedings of Usenix 2002/Freenix Track"
+  pages: "49--62"
+  month: June
+  year: 2002
+  address: "Monterey, CA, USA"
+---
+A survey paper on how Linux implements the congestion control in TCP.
+
+# TCP basics
+
+The basics of TCP is specified in RFC793 and the dominant variant, NewReno, is specified in RFC2581.
+
+TCP uses cwnd, the sender's estimate of how much data can be outstanding in the
+network, to regulate transmission rate. It is initialized to 1-2. In slow
+start, it is increased by one for each incoming ACK. In congestion avoidance,
+it is increased by one in a round-trip time. The slow start threshold,
+ssthresh, determines whether the TCP is in slow start or congestion avoidance.
+CA iff cwnd ≥ ssthresh.
+
+Lost of packet is detected by duplicate ACKs. After 3 duplicated ACKs, the
+sender retransmits a segment and set ssthresh to half of the currently
+outstanding  data. Then, cwnd is set to ssthresh+3 segments, to account for the
+segments that have already left the network. In effect, the sender halves the
+Tx rate as packet loss is an indication of congestion.
+
+Retransmission due to incoming dup ACKs is *fast retransmit*. After that, TCP
+is in *fast recovery* to wait until all segments in the last window have been
+acknowledged. During fast recovery, TCP sender maintains the number of
+outstanding segments, i.e. send one new segment for each incoming ACK as far as
+cwnd allows. Precisely, during fast recovery, cwnd increase by one per ACK to
+allow transmission of new segment. But once the fast recovery is over, the cwnd
+restored to the value at the beginning of fast recovery. Two ways to end fast
+recovery is suggested: (1) upon the receipt of the first new ACK; (2) after all
+segments in the last window has been ACKed. The latter is suggested in NewReno
+(RFC2582).
+
+Retransmission timeout (RTO) also triggers retransmission. It expires when no
+new ACK received for a while. When RTO occurs, cwnd is reset to one segment.
+RTO value is determined by RTT. Precisely as follows (RFC2988):
+
+```
+RTTVAR = 0.75 * RTTVAR + 0.25 |SRTT - RTT|
+SRTT = 0.875 * SRTT + 0.125 * RTT
+RTO = max(SRTT + 4*RTTVAR, 1 second)
+```
+
+where RTT is the measured round trip time.
+
+If cumulative ACK is used, recovery in TCP allows only one retransmission per
+round-trip time. SACK is proposed in RFC2018 to acknowledge scattered blocks of
+incoming data, so that the sender can retransmit more than one segment in an
+RTT. SACK needs consensus of both ends. There are two ways to interpret SACK:
+(1) all unacknowledged data are outstanding in the network; (2) Forward
+Acknowledgements, i.e. all unacknowledged packets are assumed lost. The latter
+is too aggressive if reordering is common. RFC2883 suggests an extended use of
+SACK, the duplicate SACK or DSACK. It reports also the duplicated segment so
+that sender can know about spurious retransmissions. The sender can therefore
+learn about the reordering behaviour and adapt to the network condition.
+
+TCP timestamp options is proposed in RFC1323. It allows more accurate RTT
+measurements, especially when BDP is high. Timestamps are attached to each TCP
+segment and echoed by the receiver. Another reason for timestamp is to protect
+against old segments from previous incarnations of TCP. Moreover, timestamp can
+help detecting unnecessary retransmissions, by Eifel algorithm. Eifel algorithm
+suggests that if the ACK timestamp is earlier than the corresponding one in
+retransmission buffer, the retransmission is unnecessary. Then, the change to
+cwnd can be reverted.
+
+RFC3168 suggests explicit congestion notification (ECN). It suggests routers to
+mark packets when they arrived a congested point. The TCP sender who received a
+echoed ECN should reduce its transmission rate.
+
+# Linux TCP
+
+RFCs said TCP can send when cwnd is smaller than by `SND.NXT-SND.UNA`, but Linux
+compares cwnd with the number of outstanding packets. That is, Linux is
+operated in packet units while RFC is in byte units.
+
+Linux supports both interpretations of SACK. When SACK is used, Linux keeps track on the number of in-flight packets by
+
+```
+left_out = sacked_out + lost_out
+in_flight = packets_out - left_out + retrans_out
+```
+
+where
+
+  - `packets_out` is the number of originally transmitted segments above `SND.UNA`
+  - `sacked_out` is the number of segments acknowledged by SACK
+  - `lost_out` is the estimated number of segments lost in the network (for FACK)
+  - `retrans_out` is the number of retransmitted segments
+
+If no SACK, sacked_out is increased by one for every duplicated ACK, so that the behaviour of NewReno is conformed.
+
+Linux keeps a scoreboard for segments. Segments can be marked as any combination of outstanding, acknowledged, retransmitted, or lost.
+
+Besides the TCP state machine, Linux sender keeps another state:
+
+  - Open: Normal state in which the sender increases cwnd according to slow start of congestion
+    avoidance upon ACK received.
+  - Disorder: Sender detected dup ACKs or SACKs. cwnd is not adjusted but each incoming ACK triggers
+    transmission of a new segment. It follows the *packet conservation principle* that a new packet
+    is sent only if an old packet has left the network. This behaviour is similar to that of RFC3042
+  - CWR (Congestion Window Reduced): Sender received congestion notifications (ECN or ICMP source quench
+    or otherwise) but with no outstanding retransmissions. The cwnd is reduced by one segment for every
+    second incoming ACK until the window is halved. CWR state is interrupted by Recovery or Loss state.
+  - Recovery: After sender received sufficient amount of successive dup ACKs and retransmitted the first
+    unacknowledged segment. The cwnd is reduced by one segment for every second incoming ACK, until
+    cwnd == ssthresh. The cwnd is not increased. Sender either retransmits segments that marked lost or
+    makes forward transmission of new segment according to the packet conservation principle. Sender
+    transit into Open state when all outstanding segments at the time recovery state was entered are
+    acknowledged.
+  - Loss: When RTO expires. All outstanding segments are marked lost, and cwnd is set of one segment.
+    Slow start is performed. In Loss state, cwnd is increased but Recovery state only allows cwnd
+    decrease. Loss state transmit to Open state only after all segments marked loss are acknowledged.
+
+There are some features in TCP that Linux implemented differently.
+
+Linux RTO is in the granularity of 10ms. Some other implementation has
+granularity as large as 500ms. Linux allows the minimum RTO of 200ms instead of
+1s in the specification. To avoid the problem of sudden decrease of RTT causing
+RTO to be overestimated, the calculation of mean deviation is adaptive:
+
+```c
+if (RTT < SRTT && |SRTT-RTT| > RTTDEV) {
+    MDEV = 31/32 * MDEV + 1/32 * |SRTT-RTT|
+} else {
+    MDEV = 0.75 * MDEV + 0.25 * |SRTT-RTT|
+}
+```
+
+Then `MDEV` is used to calculate `RTTDEV` and RTO. `RTTDEV` and `MDEV` are separate
+variables: `RTTDEV` allows to decrease for once only in a round trip time but
+`MDEV` is a continuous estimate.
+
+TCP specification suggests to avoid the silly window syndrome by delaying the
+ACK for a maximum of 500ms. Linux adjusts the delay timer dynamically to
+estimate the doubled packet inter-arrival time, with maximum limited to 200ms.
+But for the first incoming segments at the beginning of the connection, ACK is
+immediate. This behaviour, known as *quick acknowledgement*, is to speed up the
+transmission in the beginning of slow start. Quick ACK stops when half of the
+receiver's advertised window is occupied.
+
+RFC2861 suggests *congestion window validation*. It is triggered when the cwnd
+is not fully used, in which case may give an invalid estimate of network
+conditions. The TCP sender decreases cwnd to half way between the current cwnd
+and its utilization.

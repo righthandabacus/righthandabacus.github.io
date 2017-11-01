@@ -1,0 +1,72 @@
+---
+layout: post
+title: "natbib in LaTeX"
+date: 2007-06-30 09:40:56 +0800
+tags: system
+---
+
+When writing a sociological paper rather than a science paper, they prefer to
+use the American Psychology Association (APA) format for citations. In order to
+make this format work, you must include the LaTeX module `natbib` so that the
+author names can be handled correctly.
+
+But `natbib` is a re-implementation of `\cite`, so following lists what can be
+done when `natbib` is included:
+
+## Options at \usepackage
+
+Syntax:
+
+    \usepackage[comma-separated-options]{natbib}
+
+Option list:
+  * style of presentation:
+    * `authoryear` (default): author-year type
+    * `numbers`: author and a sequence number
+    * `super`: author and a superscripted sequence number
+    * `nonamebreak`: no line-break within a citation
+  * brackets:
+    * `round` (default): use parenthesis
+    * `square`: use square brackets
+    * `curly`: use braces
+    * `angle`: use angle brackets
+  * style of multiple citation:
+    * `sort`: sort by order of appearance in bibliographic list
+    * `sort&compress`:
+         and additionally, compress numerics like IEEE (if applicable)
+    * `longnamesfirst`:
+         first one in full author list and subsequent in abbreviated list
+    * `colon` (default): use colons for separation
+    * `comma`: use comma for separation
+  * bibliographic list:
+    * `sectionbib`:
+         use `\section*` instead of `\chapter*` for `\thebibliography`
+         (see chapterbib package)
+
+## Commands
+
+Citation commands:
+  * `\citet`  - name et al (year)
+  * `\citep`  - (name et al, year)
+  * `\citet*` - name and name and name (year)
+  * `\citep*` - (name and name and name, year)
+
+Optionally, you can put options to append some text before and after the citation, e.g.
+
+    \citep[see][sec 1]{tag}
+
+gives: (see somebody, year, sec 1)
+
+Alternative citation commands:
+
+  * `\citealt` - same as `\citet`, but without parenthesis
+  * `\citealp` - same as `\citep`, but without parenthesis
+  * `\citealt*` - same as `\citet*`, but without parenthesis
+  * `\citealp*` - same as `\citep*`, but without parenthesis
+  * `\citeauthor` - just the author
+  * `\citeauthor*` - just the author in full list
+  * `\citeyear` - just the year without parenthesis
+  * `\citeyearpar` - just the year in parenthesis
+
+## Related resources:
+  * [natbib reference sheet](http://merkel.zoneo.net/Latex/natbib.php)

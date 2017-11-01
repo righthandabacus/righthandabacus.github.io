@@ -1,0 +1,20 @@
+---
+layout: post
+title: "Öhring et al (1995) On Generalized Fat Trees (IPPS)"
+date: 2011-08-06 22:52:42 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "On Generalized Fat Trees"
+  author: "Sabine R. Öhring and Maximilian Ibel and Sajal K. Das and Mohan J. Kumar"
+  booktitle: "Proc. 9th International Parallel Processing Symposium"
+  Mon: "Apr"
+  pages: "37--44"
+  address: "Santa Barbara, CA"
+  year: "1995"
+---
+This paper gives a generalized description of fat tree topology, and invented the notation:
+
+$$ XGFT(h;m_1,m_2, ..., m_h; w_1, w_2, ..., w_h) $$
+
+This notation means the fat tree has height $h$, and on level $i$ ($0\le i\le h-1$) each node has $w_{i+1}$ parent nodes and $m_i$ children nodes. Level 0 is the bottom-most layer, so assumed $m_0=0$. So for the degree-3 fat-tree that I always use, it can be expressed by $XGFT(3;3,3,6;1,3,3)$.

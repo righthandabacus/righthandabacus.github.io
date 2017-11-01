@@ -1,0 +1,124 @@
+---
+layout: post
+title: "Wu et al (2010) ICTCP: Incast Congestion Control for TCP in Data Center Networks (CoNEXT)"
+date: 2011-07-20 01:24:54 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "ICTCP: Incast Congestion Control for TCP in Data Center Networks"
+  author: "Haitao Wu and Zhenqian Feng and Chuanxiong Guo and Yongguang Zhang"
+  booktitle: "Proc. ACM CoNEXT"
+  month: "Nov"
+  year: "2010"
+  address: "Philadelphia PA"
+---
+A paper to address the incast issue in data center TCP.
+
+Incast occurs if many-to-one traffic pattern of small data volume on
+high-bandwidth, low latency networks. It is a problem when the application is
+barrier synchronized, i.e. all flow completed before an app can move on. So the
+performance is determined by the slowest connection.
+
+The proposal, ICTCP, try to avoid packet losses before incast, by modifying the
+rwnd at TCP receivers. This is done at system level, with coordination between
+multiple TCP flows to fine-tune the rwnd.
+
+# Background
+
+Typical data center network setup: using ToR swithc of 48-port GbE and a few 10
+GbE uplinks, connecting some 44-48 servers beneath. The amount of data
+transmitted by each connection is around 64KB.
+
+It is known in previous papers that: (1) Small rwnd may throttle TCP throughput
+and thus prevent TCP incast congestion collapse. But static buffer cannot
+handle the dynamics of app requirements. (2) The cwnd control needs loss or ECN
+to trigger window decrease. (3) TCP Vegas assumes RTT is stable before it
+reaches the network available bandwidth, but it is not true in high-bandwidth,
+low latency network. [note: Line-speed change as a means to energy-saving is
+another reason for this is not true in modern-day networks.]
+
+This paper reports their findings that, in their testbed, the base RTT is
+100us. But as the rwnd increases, the RTT increases, even when the throughput
+is smaller than the available bandwidth and no cross traffic. [**why??**]
+Therefore, increase on RTT cannot be regarded as a signal for throughput
+reaching available bandwidth. For example, in 1Gbps link, RTT increases from
+100us to 460us at maximal throughput of 906Mbps.
+
+This paper assumes the classical incast scenario: The congestion point is right
+before the receiver, i.e. the last-hop. It makes use of the fact [again, why?]
+that reducing rwnd can throttle TCP throughput, and hence be leveraged to
+handle incast. In order to differentiate the case of data center and wide-area
+Internet, the special treatment of rwnd only happen when RTT is less than 2ms.
+
+# Algorithm
+
+Firstly, it measures the total incoming traffic on the network interface as
+$BW_T$, and compute the available bandwidth as
+$BW_A=\max(0,\alpha C-BW_T)$, where $\alpha\in [0,1]$ is a parameter to absorb
+oversubscription. In the paper, $\alpha=0.9$.
+
+Secondly, there is a global time-keeping to divide the time into slots of $2T$,
+and each slot is divided into two subslots of $T$. The first slot is for
+measurement of $BW_A$, and second slot is for increasing rwnd. The
+increase is per-connection, but the total increase across all connections is
+guided by $BW_A$. Each connection would have its own RTT. The rwnd on
+each connection can be increased only when now it is in the second subslot
+*and* the last increase for this connection is more than 2RTT ago. The size of
+a subslot is determined by $T=\sum_i w_i \textrm{RTT}_i$ where
+$w_i$ is the normalized traffic volume of connection $i$ over all
+traffic.
+
+Then, the window adjustment is as follows: For every RTT on connection $i$, we
+sample its current throughput (bytes received over RTT) as $b_i^s$. Then
+a measured throughput is calculated as EWMA:
+
+$$ b^m_{i,new}=\max(b_i^s, \beta b^m_{i,old}+(1-\beta)b_i^s).$$
+
+The max is to update the measured throughput as soon as rwnd is increased. Then
+the expected throughput for this
+connection is $b_i^e=\max(b_i^m,rwnd_i/RTT_i)$. The max is to
+ensure $b_i^m\le b_i^e$. Now define the throughput difference
+ratio as $d_i^b=(b_i^e-b_i^m)/b_i^e$, which is between 0 and 1. Then the
+rwnd is adjusted according to this difference ratio:
+
+  - If $d_i^b\le\gamma_1$ or smaller than MSS/rwnd, increase the rwnd if it is in the second subslot and there are enough quota.
+  - If $d_i^b>\gamma_2$ for three continuous RTT, decrease rwnd by one MSS
+  - All other cases, keep the rwnd
+
+The paper suggested $\gamma_1 = 0.1$ and $\gamma_2 = 0.5$ in the experiments.
+
+Increase is triggered when the throughput difference is less than one MSS. Decrease is restricted to one MSS per RTT to prevent the sliding window have to shift backward.
+
+# Other issues
+
+Fairness: When $BW_A$ is less than, say, $0.2C$, it starts to decrease
+the rwnd of some connections (those with rwnd larger than average) to prevent
+congestion. Moreover, increase of rwnd is at most one MSS per RTT when in
+congestion avoidance phase, i.e. when rwnd is big enough, or rwnd has ever
+decreased, or $BW_A$ became small enough. Fairness is achieved in this
+way.
+
+Implementation: The RTT measurement is crucial here. A way to obtain
+measurement is to use TCP timestamp options (RFC1323). However, existing TCP
+uses a clock of ms granularity, but us is required for ICTCP.
+
+Incast scenario is generated in the testbed using [ipref](http://en.wikipedia.org/wiki/Iperf).
+
+Findings in experiment:
+
+  - Goodput of TCP before incast is better than ICTCP, because ICTCP increases
+    window slower and the traffic amount is very small in the experiment (i.e. short-lived flows).
+  - ICTCP has >94% change with no RTO ever occurred. DCTCP became TCP, which suffers from
+     incast, when there are 35 concurrent connections.
+   - DCTCP performs like TCP because at those cases, it needs a big buffer to avoid overflow
+     during control latency.
+   - If the min rwnd is 1 MSS instead of 2 MSS, the RTO is avoided totally, with the penalty of lower
+     throughput. (740Mbps becomes 564Mbps for 40 senders of 64KB)
+   - For long-lasting flows, ICTCP can achieve throughput close to link capacity
+
+ICTCP cannot handle the case that the bottleneck is not at the last-hop, as it assumes this for computing $BW_A$
+
+In case the bandwidth scaled up, ICTCP takes longer time to converge to stable
+share of bandwidth, as there is a limitation of 1 MSS reduction on rwnd. One
+way to circumvent this is to use larger MSS, e.g. jumbo frame of 9KB, or use a
+bigger buffer to make it less easy to RTO.

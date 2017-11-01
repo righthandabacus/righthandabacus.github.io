@@ -1,0 +1,66 @@
+---
+layout: post
+title: "GNU Plot Tricks"
+date: 2005-11-08 14:09:35 +0800
+tags: system
+---
+
+## Bar-n
+
+In GNU Plot, if you want the figure has the labelled axis, you can always use
+the `set xlabel` or `set ylabel` command. However, if you want to have the label
+more fancy, you need to consult the
+[ps_guide.ps](http://www.physics.umanitoba.ca/~gillis/gnuplot/ps_guide.ps) and
+then to see which fancy symbols you want to use. So far, `postscript enhanced`
+terminal is the only flexible terminal for plotting.
+
+In the ps_guide, it said `@` means to align the superscripts and subscripts,
+however, it is wrong! The `@` symbol actually means to place the next symbol (or
+block of symbols) without allocating spaces. Hence the forthcoming symbols will
+occupy the same place with this one. Take bar-n (i.e. $\bar{n}$) as an example,
+the "bar" bears the code 305 (octal) in Times font, so this command will put
+bar-n as the y-axis label:
+
+    set ylabel {/Times-Roman @{\305\305}n}
+
+I need two 305 because the bar is rather short, so I need two to cover the whole n.
+
+
+## Polar polt
+
+Easy, issue these commands first:
+
+    set polar
+    set grid polar
+    set angle radians
+
+then use `t` as the radian angle and plot for r(t)
+
+## Argand Diagram
+
+Plotting complex numbers in the form of argant diagram can be done in the
+following way. Firstly, declare parametric plot (`set parametric`). Secondly,
+define a complex function. The imaginary number is written as `{0,1}`. Thirdly,
+plot the complex function by obtaining argument and magnitude via arg() and
+abs() functions. The following is an example for plotting
+$g(\omega)=\frac{k}{j\omega(-\omega^2+j\omega+4)}$ with different values of $k$,
+
+```
+unset border
+set angles radians
+unset key
+set parametric
+set samples 50000, 50000
+set xzeroaxis
+set yzeroaxis
+set xtics axis
+set ytics axis
+g(w,k)=k/(w*{0,1}*(-w**2+w*{0,1}+4))
+paramx(t,k)=abs(g(t,k))*cos(arg(g(t,k)))
+paramy(t,k)=abs(g(t,k))*sin(arg(g(t,k)))
+plot [t=0:1000] [-1.5:0.5] [-1.5:0.5] \
+  paramx(t,1),paramy(t,1) , \
+  paramx(t,3),paramy(t,3) , \
+  paramx(t,3.5),paramy(t,3.5) , \
+  paramx(t,4),paramy(t,4)
+```

@@ -1,0 +1,17 @@
+---
+layout: post
+title: "Greenberg et al (2005) A Clean Slate 4D Approach to Network Control and Management (CCR)"
+date: 2010-09-29 11:33:35 -0400
+category: paper
+bibtex:
+  type: article
+  title: "A Clean Slate 4D Approach to Network Control and Management"
+  author: "Albert Greenberg and Gisli Hjalmtysson and David A. Maltz and Andy Myers and Jennifer Rexford and Geoffrey Xie and Hong Yan and Jibin Zhan and Hui Zhang"
+  journal: "ACM Computer Communication Review"
+  year: 2005  
+---
+This paper sets the research agenda for 4D project --- Decision, Dissemination, Discovery, and Data.
+
+The paper argues that, the current network, which operates in management/control/data planes, is inefficient. It gives two examples to show that, when we need routing and packet filtering in a network, the network is fragile because a change in routing modifies how a packet filter should do. This paper proposes that, to have a decision plane to control everything at a high level. So for a route to change, it is the decision plane to send command to routers to initiate the change, and therefore it can also change the packet filters simultaneously.
+
+The decision plane is the centralized control (as servers in network, multiple servers are allowed but they are synchronized). It controls data plane down to forwarding table level. The dissemination plane provides communication substrate so that it is neutral to data routing, to ensure delivery of control messages. The discovery plane is to figure out the network topology and physical properties. It provides data to decision plane to decide. Data plane is the one handles the forwarding of each individual packet. It does counting, forwarding, filtering, load balancing, etc.

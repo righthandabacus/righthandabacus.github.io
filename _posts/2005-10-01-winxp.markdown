@@ -1,0 +1,289 @@
+---
+layout: post
+title: "Windows Tricks"
+date: 2005-10-01 01:53:20 +0800
+tags: system
+---
+
+## Remote Desktop
+
+In Windows XP SP2, the following can allow multiple users to remote desktop simultaneously:
+
+  - Open REGEDIT, set `HKLM\Software\Microsoft\Windows NT\CurrentVersion\WinLogon\SFCSetting=DWORD:FFFFFF9D` to disable file protection
+  - Go to `C:\Windows\System32` and `C:\Windows\ServicePackFiles\i386` to find `SFC_OS.DLL`
+  - Using a hex editor, search for `44 00 69 00 73 00 61 00 62 00 6c 00 65` and change it to `53 00 65 00 74 00 74 00 69 00 6e 00 67`
+  - Further search for `33 c0` and change it to `eb 01`
+  - Save `SFC_OS.DLL` and replace all the old file (suggest to do in safe mode in other to prevent file protection in action)
+
+You can also download the [modified DLL file](http://unattended.msfn.org/files/sfc_os_for_xp_sp2.zip)
+
+## Removing unnecessary components from Windows XP
+
+Use nLite from http://nuhi.msfn.org/
+
+## RUNDLL32.EXE Hacks
+Calling DLL functions by `RUNDLL32.EXE`:
+
+    RUNDLL32.EXE [DLLfile],[function] [parameters]
+
+Browsing functions in DLL: use QUIKVIEW.EXE
+
+Quick Shutdown: Either one of these
+
+    RUNDLL32 USER.EXE,ExitWindows
+    RUNDLL32 USER.EXE,ExitWindowsExec
+
+Install Screensaver:
+
+    RUNDLL32 Desk.cpl,InstallScreenSaver XXX.scr
+
+Run Control Panel:
+
+    RUNDLL32 Shell32.dll,Control_RunDLL
+
+Run Control Panel (App Wizard-Install/Uninstall)
+
+    RUNDLL32 Shell32.dll,Control_RunDLL appwiz.cpl,,1
+
+Run Control Panel (App Wizard-Windows Component)
+
+    RUNDLL32 Shell32.dll,Control_RunDLL appwiz.cpl,,2
+
+Run Control Panel (App Wizard-Start Floppy)
+
+    RUNDLL32 Shell32.dll,Control_RunDLL appwiz.cpl,,3
+
+Run Control Panel (Add Printer)
+
+    RUNDLL32 Shell32.dll,SHHelpShortcuts_RunDLL AddPrinter
+
+Open a file with OpenAs dialog
+
+    RUNDLL32 shell32.dll,OpenAs_Rundll [filename]
+
+## Registry Hacks
+
+Add shortcut to right-click menu
+  - Create keys `HKCR\*\shell, HKCR\*\shell\[menu name]`
+  - Assign value `HKCR\*\shell\[menu name]\command = "[Command String]`
+    - Command string for `OpenAs` dialog: `RUNDLL32 shell32.dll,OpenAs_Rundll "%1`
+
+Lock desktop:
+
+    HKU\default\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer\No Save Setting=1
+
+Clear unremovable software in Control Panel: Remove the key
+
+    HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\software name
+
+Hide Run, Find, Shutdown functions in Start Menu: In key `HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer\ `
+Set `NoRun`, `NoFind`, `NoClose`, `NoSetFolders` to `DWORD:1`
+
+Clear the program listing in Run dialog: Clear string values in
+
+    HKU\Default\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU
+
+Modify the action of My Computer icon
+
+  - Modify `HKLM\Software\Classes\CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\ `
+  - Add new key `Shell` and in `Shell\ ` add string value `Command=<Command Line>`
+
+Modify owner of system: In `HKLM\Software\Microsoft\Windows\CurrentVersion\ `
+Modify string values `RegisteredOwner` and `RegisteredOrganization`
+
+Modify IME order
+
+  - In `HKU\.DEFAULT\keyboard layout\preload\ ` there are string values named 1, 2, 3, ...
+  - Modify these string values to corresponding IME codes in order.
+  - IME codes are keys in in `HKLM\SYSTEM\CurrentControlSet\Control\keyboard layouts\ `
+
+Disable CD-ROM autorun.  Modify the value
+`HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer\NoDriveTypeAutoRun`
+from `95000000` to `BD000000`
+
+Disable CD-ROM autorun. Modify the value:
+`HKLM\System\CurrentControlSet\Services\CDRom\Autorun`
+to 0
+
+### Disable FIFO in Floppy
+Add a DWORD value `ForceFifo` in:
+`HKLM\System\CurrentControlSet\Services\Class\FDC\0000`
+and set to 0
+
+### Change File Allocation Size
+Add a new DWORD value `ConfigFileAllocsize` to:
+`HKLM\System\CurrentControlSet\Control\FileSystem`
+and modify the value to `00000F14`
+
+### Modify the Cache of CD-ROM drive
+In `HKLM\System\CurrentControlSet\Control\Filesystem\.CDFS`
+modify `CACHESIZE` and `PREFETCH` to:
+
+* `6B020000` and `E4000000` (4x default)
+* `D6040000` and `AC090000` (Max value)
+
+Prefetch value can be modified to `C0010000`, `80030000`, `40050000`, `00070000` correspond
+to 8x, 16x, 24x and 32x respectively
+
+### Hide Control Panel
+Add a new DWORD value `NoSetFolders` in `HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer`
+and set the value to 1
+
+### Hide Log Off in Start menu
+Add a DWORD value `NoLogOff` to:
+`HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer`
+and set the value to `01 00 00 00`
+
+### Hide Favorites in Start menu
+Add a DWORD value `NoFavoritesMenu` to:
+`HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer`
+and set the value to 1
+
+### Hide Recent Document in Start menu
+Add a DWORD value `NoRecentDocsHistory` to:
+`HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer`
+and set the value to 1
+
+### Clear Recent document on Exit in Start menu
+Add a DWORD value `ClearRecentDocsOnEdit` to:
+`HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer`
+and set the value to 1
+
+### Auto Login in Windows 2000
+In `HKCU\Software\Microsoft\WindowsNT\CurrentVersion\Winlogon`
+modify `AutoAdminLogon` to 1, `DefaultDomainName` to the logon domain,
+`DefaultPassword` to password, `DefaultUserName` to user name
+
+### Hide Windows version on desktop
+Modify the DWORD value
+`HKCU\ControlPanel\desktop\PaintDesktopVersion`
+to 0
+
+### Hide last logon name
+In
+`HKCU\Software\Microsoft\WindowsNT\CurrentVersion\Winlogon`
+Add a string value `DontDisplayLastUserName` and set to 1
+
+### Replace the logon background
+In `HKU\DEFAULT\ControlPanel\Desktop`, add a string value `WallPaper` and set it to the path of wallpaper
+
+### Shutdown without logon in Windows NT Server
+Modify the key:
+`HKLM\Software\Microsoft\WindowsNT\CurrentVersion\Winlogon\ShutdownWithoutLogon`
+to 1
+
+### Show popup message during logon
+Modify the string to the message:
+`HKLM\Software\Microsoft\WindowsNT\CurrentVersion\WinLogon\LegalNoticeCaption`
+
+### No save setting
+In the key
+`HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer`
+Add two DWORD value `NoActiveDesktop` and `NoSaveSettings` and set to 1
+
+### Disable Dr. Watson
+In the key
+`HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\WindowsNT\CurrentVersion\AeDebug`
+set `auto` to 0
+
+### Disable swap memory (for big-RAM systems)
+In the key
+`HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\SessionManager\Memory Management`
+set `DissablePagingExecutive` to 1
+
+### Speed up Network Neighborhood
+In the key
+`HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\RemoteComputer\NameSpace`
+Delete the values `{D6277990-4C6A-11CF-8D87-00AA0060F5BF}`
+
+### Optimize the performance of NTFS
+In the key
+`HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\FileSystem`
+Add value `ConfigFileAllocSize` and set it to be `dword:0x000001f4`. Moreover, to cancel the record of access time, in the key
+`HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\FileSystem`
+add value `NtfsDisableLastAccessUpdate` and set it to be `dword:0x00000001`.
+
+### BIOS time is GMT
+In the key
+`HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\TimeZoneInformation`
+Add value
+
+    RealTimeIsUniversal = dword:0x00000001
+
+## Other Tricks
+
+### Win95 Diskless Client using TCP/IP
+
+- Make DHCP server available
+- Open `%SystemRoot%\RPL\BBLOCK\NETBEUI\ADAPTER\DOS-BB.CNF` on WinNT server, uncomment the line:  \\
+```
+; DRV BBLOCK\TCPDRV.DOS /I: C:\LANMAN.DOS
+```
+- Modify the client TCP/IP configuration profile, in `%SystemRoot%\Rpl\RplFiles\Profiles\%UserName%\AUTOEXEC.BAT`, uncomment: \\
+```
+REM UMB.COM
+REM NMSTR
+REM LOAD TCPIP
+```
+- Modify `%SystemRoot%\Rpl\RplFiles\Profiles\%UserName%\CONFIG.SYS`, Uncomment: \\
+```
+REM NEMM.DOS
+```
+- In AUTOEXEC.BAT, add two lines:\\
+```
+SOCKETS
+DNR
+```
+- Modify `TCPUTILS.INI`, in `[TCPGLOBAL]`, add `[DNR]` part, example of `TCPUTILS.INI`:\\
+```
+ [TCPGLOBAL]
+ drivername=GLOBAL$
+ ;netfiles=C:\LANMAN.DOS\ETC
+ hostname=student3
+ username=student
+ [SOCKETS]
+ drivername=SOCKETS$
+ bindings=TCPIP_XIF
+ numsockets=4
+ numthreads=32
+ poolsize=3200
+ maxsendsize=1024
+ [TELNET]
+ drivername=TELNET$
+ bindings=TCPIP_XIF
+ nsessions=0
+ max_out_sends=0
+ [DNR]
+ drivername=DNR$
+ bindings=TCPIP_XIF
+ nameserver0=157 55 128 80
+ nameserver1=
+ domain=ncrms.edu.cn
+```
+- Copy TCPUTILS.INI to `RplFiles\Profiles\DOS622\Wksta.pro`
+- Modify user configuration file `*.fit`
+  * When using `DOS622.FIT`, add one line:  
+     C:\LANMAN.DOS\TCPUTILS.INI MACHINES\%CNAME%\%USERNAME%\WKSTA\TCPUTILS.INI
+  * When using `DOS622P.FIT`, remove one line:  
+     C:\LANMAN.DOS\TCPUTILS.INI %BINFILES%\LANMAN.DOS\TCPUTILS.INI
+  * and add one line for both cases:  
+     C:\LANMAN.DOS\TCPUTILS.IBI MACHINES\%CNAME%\%USERNAME%\WKSTA\TCPUTILS.INI
+- Copy TCP/IP files to `RplFiles\BinFiles\Lanman.dos\NetProg`: VBAPI.386
+  VSOCKETS.386 RPC16C3.DLL WIN_SOCK.DLL WINSOCK.DLL WSOCKETS.DLL ADDNAME.EXE
+  DNR.EXE EMSBFR.EXE IPCONFIG.EXE NMTSR.EXE PING.EXE SOCKETS.EXE TCPTSR.EXE
+  TINYRFC.EXE UNLOADT.EXE WSAHDAPP.EXE
+
+
+### Modifying BIOS EPA Logo
+
+* Software: CBROM.EXE (Award BIOS), BMPTOEPA.EXE (Conversion), AWDFLASH.EXE
+* Logo: BMP file of dimension 136x126x16 color
+* Procedure:
+  1. Use AWDFLASH.EXE backup the BIOS
+  2. Use CBROM.EXE to add the logo to BIOS
+  3. Use AWDFLASH.EXE reflash the BIOS
+
+### Allow removing Windows component
+
+Delete all `HIDE` in `%systemroot%\inf\sysoc.inf`
+

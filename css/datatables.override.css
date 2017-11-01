@@ -1,0 +1,7 @@
+table.dataTable.display thead th,
+table.dataTable.display thead td,
+table.dataTable.display tbody td,
+table.dataTable.display tfoot td {
+    padding: 1px;
+    border: 0px;
+}

@@ -1,0 +1,107 @@
+---
+layout: post
+title: "Revision: Ito calculus"
+date: 2012-08-03 13:04:14 -0400
+tags: math
+---
+
+Stochastic process: $X(t), t\in[0,\infty)$
+
+Brownian motion $B(t)$:
+  * Continuous
+  * Independent increments
+  * Normal distribution of increments, i.e. $Pr[B(s+t)-B(s)\in A]=\int_A \frac{1}{\sqrt{2\pi t}}e^{-x^2/2t} dt$ for $s,t>0$
+
+Symmetric random walk (SRW):
+  * $X_i \in \{-1,1\}$ with probability $p$ and $q$ respectively
+  * SRW is $M_n = \sum_{i=1}^n X_i$ and $M_0 = 0$
+  * Scaled SRW: $B^{(n)}(k/n) = \frac{1}{\sqrt{n}} M_k$
+  * Limit: Let $t=k/n$, then $B(t)=\lim_{n\to\infty} B^{(n)}(k/n)$
+
+Covariance of BM, assumed $s<t$,
+
+$$\begin{aligned}
+E[B_s B_t] &= E[ (B_s)(B_t-B_s+B_s) ] \\
+&= E[B_s(B_t-B_s)] + E[B_s^2] \\
+&= 0 + E[B_s^2] \\
+&= s
+\end{aligned}$$
+
+Therefore, we have
+
+$$\begin{aligned}
+E[B_s B_t] &= \min(s,t) \\
+<B,B>_T &= T  \\
+dB_t dB_t &= dt \\
+dB_t dt &= dt dt = 0
+\end{aligned}$$
+
+Geometric BM:
+
+$$\begin{aligned}
+S_t &= S_0 \exp(\sigma B_t + (\alpha-\sigma^2/2)t) \\
+\log S_{t_{j+1}} - \log S_{t_j} &= \sigma(B_{t_{j+1}}-B_{t_j}) + (\alpha-\sigma^2/2)(t_{j+1}-t_j)
+\end{aligned}$$
+
+First passage time problem:
+  * Let $M_t = \max_{0<s<t} X_s$ be the *running maximum* of stochastic process $X_t$
+  * Let $T_a = \inf\{t>0: X_t = a\}$ be the first passage time
+  * $T_a < t$ is equivalent to $M_t > a$
+
+Reflection principle of Brownian motion $B_t$:
+
+$$\begin{aligned}
+\textrm{Let }B_s&=a\textrm{ for }s < t \\
+\textrm{Then }B_t-B_s &\perp B_s \\
+\textrm{thus }\Pr[B_t-B_s > 0] &= \Pr[B_t-B_s < 0] \\
+\Pr[B_t > a] &= \Pr[B_s=a, B_t-B_s > 0] \\
+&= \Pr[B_s=a, B_t-B_s < 0] \\
+\textrm{so we have }\Pr[B_s = a] = \Pr[T_a < t] &= 2\Pr[B_t > a].
+\end{aligned}$$
+
+To obtain the p.d.f. of $T_a$, we can consider the m.g.f. $E[\exp(uT_a)]$.
+  * Consider the trail of a Brownian motion $B_t$ that $B_0=0$, $B_s=a$, $B_t=b$ for $s<t$, $a>b$,
+    then it has the same probability as $B'_t$ that $B'_0=0$, $B'_s=a$, $B'_t=2a-b$, just as
+    the path of the B.M. reflected about $a$.
+  * $\Pr[T_a < t, u < B_t < v] = \Pr[2a-v < B_t < 2a-u]$
+  * $\Pr[T_a < t, B_t = u] = \Pr[B_t = 2a-u] = \Pr[M_t > a, B_t = u]$
+  * $\Pr[M_t = a, B_t = u] = \frac{d}{da}\Pr[M_t > a, B_t = u]$
+
+Stochastic integral: $\int_s^t f(\tau,w)dX_{\tau}(w)$
+
+Ito integral: $I(f) = \int_0^t f(s,w)dB_s$
+  * $f$ is a $\mathcal{F}_t$-adapted, square-integrable stochastic process
+  * It is a martingale
+  * $E[I^2(f)] = E[\int_0^t f^2(s,w)ds]$
+
+Ito formula:
+
+$$\begin{aligned}
+f(t,B_t) &= f(0,B_0) + \int_0^t f_t(\tau,B_{\tau})d\tau + \int_0^t f_x(\tau,B_{\tau})dB_{\tau} + \frac{1}{2}\int_0^t f_{xx}(\tau,B_{\tau})d\tau  \\
+df(t,B_t) &= f_t(t,B_t)dt + f_x(t,B_t)dB_t + \frac{1}{2}f_{xx}(t,B_t)dt
+\end{aligned}$$
+
+Example: Solving $\int_0^t B_s dB_s$
+
+$$\begin{aligned}
+\textrm{Let }f(t,x) &= \frac{1}{2} x^2 \\
+d(\frac{1}{2}B_t^2) &= 0 + B_tdB_t + \frac{1}{2}dt \\
+\textrm{thus }\int_0^t d(\frac{1}{2}B_s^2) &= \int_0^t B_sdB_s + \int_0^t \frac{1}{2}ds \\
+\frac{1}{2}(B_t^2-B_0^2) &= \int_0^t B_sdB_s + \frac{1}{2}t \\
+\int_0^t B_sdB_s &= \frac{1}{2}B_t^2 + \frac{1}{2}t.
+\end{aligned}$$
+
+Ito formula in general form:
+
+$$
+df(t,X_t) = f_t dt + f_x dX_t + \frac{1}{2}f_{xx}(dX_t)^2
+$$
+
+where $dX_t = \mu dt + \nu dB_t$, and $(dX_t)^2 = \nu^2 dt$
+
+Multidimensional version:
+
+$$\begin{aligned}
+X_t &= (X_t^1, X_t^2, \cdots, X_t^n) \\
+df(t, X_t) &= f_t dt + \sum_{i=0}^n f_{x_i}dX_t^i + \frac{1}{2} \sum_{i,j=1}^n f_{x_ix_j}dX_t^idX_t^j
+\end{aligned}$$

@@ -1,0 +1,17 @@
+---
+layout: post
+title: "Zhang et al (2011) Shrinking MTU to Mitigate TCP Incast Throughput Collapse in Data Center Networks (ICCMC)"
+date: 2011-07-20 01:27:30 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "Shrinking MTU to Mitigate TCP Incast Throughput Collapse in Data Center Networks"
+  author: "Peng Zhang and Hongbo Wang and Shiduan Cheng"
+  booktitle: "Proceedings of Third International Conference on Communications and Mobile Computing"
+  year: 2011
+---
+A short paper that proposes to use a smaller MTU to solve the incast problem.
+As the buffer size is fixed, a smaller packet means the buffer can hold more
+packets, and then it allows the TCP window to be "larger". A larger TCP window
+is easier to catch packet drops by duplicated acknowledgement. Therefore make
+it less possible to have TCP timeout.

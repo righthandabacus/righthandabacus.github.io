@@ -1,0 +1,36 @@
+---
+layout: post
+title: "Xi & Chao (2007) ESCAP: Efficient SCan for Alternate Paths to Achieve IP Fast Rerouting (Globecom)"
+date: 2012-04-03 12:10:31 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "ESCAP: Efficient SCan for Alternate Paths to Achieve IP Fast Rerouting"
+  author: "Kang Xi and H. Jonathan Chao"
+  booktitle: "Proc. GLOBECOM"
+  year: "2007"
+---
+Similar paper:
+
+    @inproceedings{
+        title: "IP Fast Rerouting for Single-Link/Node Failure Recovery"
+        author: "Kang Xi and H. Jonathan Chao"
+        booktitle: "Proc. BroadNet"
+        year: "2007"
+    }
+
+In a network $G(V,E)$, assume a link $(u,v)$ failed. To find an alternative path joining $u$ to $v$ efficiently as a detour.
+
+Upon failure of link $(u,v)$, consider the sink tree rooted at $v$ in the network, which is the result of routing on $G$. Color the subtree under $u$ (i.e. portion of the sink tree rooted at $u$) in black, and the rest of the sink tree in white. In this tree, only the white portion is unaffected by the failure. An algorithm is proposed to find fast reroute paths for the black portion and, gradually, re-color the black portion into white.
+
+Firstly, find the black node $w$ closest to $u$ that has a bridge to a white node, call it the exit node and the bridge the exit link. The following the reversed path on the tree from $u$ to $w$, then follow the exit link to the exit node, is a backup path. Then color those traversed black nodes into white, as they should install the backup port and use it shall the primary port failed. Also color all the nodes under the subtree rooted at $w$ into white, as normal forwarding will be protected from the failure of $(u,v)$ once the traffic reached $w$. Subsequently, repeat this process until all nodes are colored white. The last node re-colored white shall be $u$, only after all its children are re-colored.
+
+After this procedure, each node shall carry a forwarding table in the format of:
+
+    prefix : output_port : backup_port
+
+in which the traffic matching the prefix shall be forwarded to the default output port, but if the default output port failed, or if the traffic are incoming from the default output port, they are forwarded to the backup port. Under this mechanism, the forwarding decision is made distributed, and independent in each router.
+
+The paper also did an extension to apply the same scheme to multipath routing. The only concern is that, a backup port is to be found for each output port in multipath routing, and upon the backup port is found, it must bound to the output port that overlaps with the recovery path. However, using distributed forwarding logic may result in a long reroute path. For example, consider fig.4 in the ESCAP paper, and if node 8 forwards to nodes 4 and 5, and the link (2,1) is failed. Also assume the backup link (8,6) is found and bound to output port (8,5), then backup port (8,5) is found and bound to output port (8,4), then the forwarding path upon failure would be 8,4,2,4,8,5,2,5,8,6,3,1.
+
+The BroadNet version of the paper proposes similar technique to handle node failure as well, and the ILP formulation of the problem is given.

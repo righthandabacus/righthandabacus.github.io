@@ -1,0 +1,80 @@
+{% if page.titlebanner or page.title %}
+  {% if page.titlebanner %}
+    {% assign headerdiv_code = "banner" %}
+  {% else %}
+    {% assign headerdiv_code = "no-img" %}
+  {% endif %}
+  <header class="header-section{% if page.titlebanner %} has-img{% endif %}">
+    <div class="intro-header {{ headerdiv_code }}">
+      {% comment %}
+          Carousel banner via bootstrap.js
+      {% endcomment %}
+      {% if page.titlebanner %}
+        <div id="header-carousel" class="carousel slide" data-ride="carousel" data-pause="null" data-keyboard="false" data-interval="3000">
+          <ol class="carousel-indicators">
+            {% for titlebanner in page.titlebanner %}
+              <li data-target="#header-carousel" data-slide-to="{{ forloop.index0 }}"></li>
+            {% endfor %}
+          </ol>
+          <div class="carousel-inner">
+            {% for titlebanner in page.titlebanner %}
+              <div class="item{% if forloop.first %} active{% endif %}">
+                {% for imginfo in titlebanner %}
+                  {% if imginfo[0] %}
+                    <img src="{% if imginfo[0] contains '//' %}{{ imginfo[0] }}{% else %}{{ imginfo[0] | prepend: site.baseurl }}{% endif %}"
+                         alt="{{ imginfo[1] }}" />
+                    <div class="carousel-caption">{{ imginfo[1] }}</div>
+                  {% else %}
+                    <img src="{% if imginfo contains '//' %}{{ imginfo }}{% else %}{{ imginfo | prepend: site.baseurl }}{% endif %}" />
+                  {% endif %}
+                {% endfor %}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+      {% comment %}
+          text on the header section of a page
+      {% endcomment %}
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="{{ include.type }}-heading">
+              <h1>{% if page.title %}{{ page.title }}{% else %}&nbsp;{% endif %}</h1>
+              {% if page.subtitle %}
+                {% if include.type == "page" %}
+                  <hr class="small">
+                  <span class="{{ include.type }}-subheading">{{ page.subtitle }}</span>
+                {% else %}
+                  <h2 class="{{ include.type }}-subheading">{{ page.subtitle }}</h2>
+                {% endif %}
+              {% endif %}
+              {% if include.type == "post" %}
+                <span class="post-meta"><time>{{ page.date | date: "%-d %B, %Y" }}</time>
+              {% endif %}
+              {% if page.categories %}
+                <span class="post-categories">
+                  {% for cat in page.categories %}
+                    <a href="{{ site.baseurl }}{{ site.cat_page }}#{{ cat }}" class="post-cat">{{ cat }}</a>
+                  {% endfor %}
+                </span>
+              {% endif %}
+              {% if page.tags %}
+                <span class="post-tags">
+                  {% for tag in page.tags %}
+                    <a href="{{ site.baseurl }}{{ site.tag_page }}#{{ tag }}" class="post-tag">{{ tag }}</a>
+                  {% endfor %}
+                </span>
+              {% endif %}
+              {% if include.type == "post" %}
+                </span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+{% else %}
+  <div class="intro-header"></div>
+{% endif %}

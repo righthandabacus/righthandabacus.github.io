@@ -1,0 +1,32 @@
+---
+layout: post
+title: "Oh and Ahn (1999) Dynamic Calendar Queue (Sim Symp)"
+date: 2009-02-12 00:26:48 -0500
+category: paper
+bibtex:
+  type: inproceedings
+  title: "Dynamic Calendar Queue"
+  author: "SeungHyun Oh and JongSuk Ahn"
+  booktitle: "Proceedings of the 32nd Annual Simulation Symposium"
+  pages: "20--25"
+  month: "Apr"
+  year: 1999
+---
+
+[PDF](https://drive.google.com/open?id=0B6DoI_vm0OLfYzZjbE1zSlV3NGs)
+
+This paper proposes two improvement to the Calendar Queue. The improvement is
+targeting at the resizing mechanism.
+
+First improvement is to detect uneven event distribution. The conventional
+resize rule checks the total events in a queue and resize if it outsides a
+bound. This suggested improvement keeps *encountered* event count which sums the
+number of events seen in those buckets with new event enqueued. This may double
+count a bucket but the objective is to calculate the average encountered events
+which can infer uneven event distribution. If that average is above a threshold,
+resize the calendar queue with bucket size changed.
+
+Second improvement is to find the best bucket size. It keeps track on the bucket
+with longest event queue and the event queue length in each bucket. Then the
+buckets around the longest bucket are considered to compute the average
+inter-event gap and this is the new bucket width.

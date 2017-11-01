@@ -1,0 +1,21 @@
+---
+layout: post
+title: "Sun & Wang (2010) Enable Cache Effect on Forwarding Table in Metro-Ethernet (ACN)"
+date: 2010-10-07 00:24:12 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: Enable Cache Effect on Forwarding Table in Metro-Ethernet
+  author: Xiaocui Sun and Zhijun Wang  
+  booktitle: "Proc. ACN 2010, CCIS 77"
+  pages: "81--94"
+  year: 2010
+---
+Imagine a Metro-Ethernet, if ARP is allowed to broadcast, the broadcast storm
+would be tremendous. In this paper, it assumes that the consumer edge (CE) and
+provider edge (PE) switches have a cache for the forwarding table. The cache is
+to remember the IP-MAC address association it ever encountered (e.g. by
+intercepting ARP requests and replies, and by sniffing the packets passing
+through the switch). Later on, whenever an ARP request arrives, instead of
+broadcast it to all other ports of the switch, it sends the reply to the sender
+directly using its local information.

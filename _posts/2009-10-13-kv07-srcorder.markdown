@@ -1,0 +1,22 @@
+---
+layout: post
+title: "Komattireddy and Vokkarane (2007) Source-Ordering for Improved TCP Performance over Load-Balanced Optical Burst-Switched (OBS) Networks (BROADNETS)"
+date: 2009-10-13 00:16:16 -0500
+category: paper
+bibtex:
+  type: inproceedings
+  title: "Source-Ordering for Improved TCP Performance over Load-Balanced Optical Burst-Switched (OBS) Networks"
+  author: "B. Komattireddy and V.M. Vokkarane"
+  howpublished: BROADNETS
+  booktitle: "Proc. IEEE/CreateNet BROADNETS 2007, Optical Networking Symposium"
+  month: Sep
+  year: 2007
+  address: "Raleigh, NC"
+---
+In OBS network, all-optical switching is done. It is possible to have multipath
+in the network but when a TCP flow switched from a path to another, packet out
+of order may occur and that make TCP (Reno) mistook as loss. The solution
+proposed in this paper is that, because the optical switch know precisely the
+delay differential $\delta$, upon switching paths, the optical switch can delay the
+packet (bursts) for $\delta$, i.e. reorder the sending sequence in the old and new
+path, to avoid packet out of order.

@@ -1,0 +1,200 @@
+---
+layout: post
+title: "Rolfe (2002) One-Time Binary Search Tree Balancing (SIGCSE Bulletin)"
+date: Fri, 27 Oct 2017 17:19:20 -0400
+category: paper
+bibtex:
+  type: article
+  title: "One-Time Binary Search Tree Balancing: The Day/Stout/Warren (DSW) Algorithm"
+  author: "Timothy J. Rolfe"
+  journal: "SIGCSE Bulletin"
+  volume: 34
+  number: 4
+  pages: "85--88"
+  month: "December"
+  year: 2002
+---
+
+[PDF](https://drive.google.com/open?id=0B6DoI_vm0OLfeVRST3pSaFRSMlk)
+
+The paper describe about DSW algorithm, a $O(N)$ time and $O(1)$ space
+transformation of binary search tree to rebalance it.
+
+## Day's algorithm
+
+Given an unbalanced search tree, first convert the tree into a linked list
+(tree with only right child on each node), then *compress* the tree in several
+iteration to convert the linked list into a balanced search tree.
+
+Day's original paper is on Fortran with no support to recusion and pointers. It
+uses a *threaded* binary tree to work around that.
+
+`ILB(K)` = pointer to left child to node `K`\\
+`IRB(K)` = pointer to right child to node `K`
+
+Threaded binary tree: back-pointers to control the traversal, so as to workaround Fortran's lack of recursion
+ - `IRB(k)` is positive (array index) to point to the right child
+ - `IRB(k)` is negative to point to the next node to backtrack in traversal
+
+The algorithm.  First phase: transform the binary search tree into a linked
+list (the "backbone", or "vine")
+
+```c++
+/* Create the "degenerated tree"
+ * make node has no left child but only right child, and right child is a linked list
+ * head will hold the beginning node of the linked list,
+ * and size will tell how many nodes in it
+ */
+void DSW::Strip( BasePtr node, BasePtr &head, int &size )
+{
+    if ( node == NULL ) return; // empty, nothing shall be done
+    BasePtr left = node->left;  // remember left child
+    node->left = NULL;          // degenerated tree has all left == NULL
+	// recursively degenerate the right branch first
+	Strip( node->right, head, size );
+	// whatever becomes the head of the right branch will become right child
+	// of this node. If this node has no right child, the head will remain
+	// to be what's passed in
+	node->right = head;
+	head = node;                // this node will become the new linked list head
+	size++;
+	Strip ( left, head, size ); // recursively do the left branch
+}
+
+// Usage:
+int size = 0;
+BasePtr head = NULL;
+Strip(bst_root, head, size);
+```
+
+Second phase: Convert degenerated tree into balanced tree, using repeated
+leftward rotations.  Tree has a single "pseudo-root" node, which only has the
+right child. That child is the root of the actual tree.
+
+```
+%                %
+ \                \
+  B*               D
+ / \              / \
+A   D     -->    B   E
+   / \          / \ 
+  C   E        A   C
+```
+
+```c++
+/* Perform a number of count of leftward rotation on the tree identified by its root node
+ */
+void DSW::compression ( BasePtr root, int count )
+{
+    BasePtr scanner = root;
+    for ( int j = 0; j < count; j++ ) {   // leftward rotations on scanner's right child
+        BasePtr newleft = scanner->right; // newroot = D
+		scanner->right = newleft->right;  // B.right = E
+		scanner = scanner->right;         // scanner = E (shift down scanner)
+		newleft->right = scanner->left;   // D.right = E.left
+		scanner->left = newroot;          // E.left = D
+		/* original scanner node and its left child are not changed:
+		    A[scanner]      A
+		   / \             / \
+		      C               E[scanner]
+		     / \     ->      / \
+		    B   E           C
+		       / \         / \
+		      D           B   D
+		*/
+	}
+	/* The for-loop above make 2*count nodes down on the right from the root into only
+	   count nodes down, with the other count nodes move to left branch of some other
+	   nodes
+	*/
+}
+
+// Loop structure taken directly from Day’s code
+void DSW::vine_to_tree ( BasePtr root, int size )
+{
+	int NBack = size - 1;
+	for ( int M = NBack / 2; M > 0; M = NBack / 2) {
+		compression ( root, M );
+		NBack = NBack - M - 1;
+	}
+	/* From linked list of N nodes to tree with depth N/2 and each node carrying
+	   one left child, then each loop double the depth of each node's left branch
+	   and halfed the depth of the right branch
+	*/
+}
+```
+
+Illustration of each loop in `vine_to_tree()` with `%` as the pseudo-root:
+
+```
+%                %                 %
+ \                \                 \
+  A                B                 D
+   \              / \               / \
+    B      ->    A   D     ->     B     F
+     \              / \          / \   / \
+      C            C   F        A   C E   G
+       \              / \
+        D            E   G
+         \
+          E
+           \
+            F
+             \
+              G
+```
+
+## Stout and Warren's algorithm
+
+Improvement over Day's algorithm. On the first phase, a rightward rotation is
+used instead to get rid of recursion structure.
+
+```c++
+// Tree to Vine algorithm: “pseudo-root” is passed
+// comparable with a dummy header for a linked list.
+void DSW::tree_to_vine ( BasePtr root, int &size )
+{
+    BasePtr vineTail, remainder, tempPtr;
+    vineTail = root;
+    remainder = vineTail->right;
+    size = 0;
+    while ( remainder != NULL )	{
+		if ( remainder->left == NULL ) {
+		    // no left subtree, remainder move to right
+			vineTail = remainder;
+			remainder = remainder->Right;
+			size++;
+		} else {
+		    // elimate left subtree by rightward rotation
+		    // one node moved to parent of remainder and remainder move up one node
+			tempPtr = remainder->left;
+			remainder->left = tempPtr->right;
+			tempPtr->right = remainder;
+			remainder = tempPtr;
+			vineTail->right = tempPtr;
+		}
+	}
+}
+```
+
+On the second phase, not only a balanced tree, but also a complete tree (one
+with the bottom-most level filled from left to right) can be generated.
+
+```c++
+int FullSize ( int size )
+{
+	// Full portion of a complete tree
+	int Rtn = 1;
+	while ( Rtn <= size )     // One step PAST FULL
+		Rtn = Rtn + Rtn + 1;  // next pow(2,k)-1
+	return Rtn/2;
+}
+void DSW::vine_to_tree ( BasePtr root, int size )
+{
+	int full_count = FullSize (size); // find the expected depth of result tree
+	compression(root, size - full_count);
+	for ( size = full_count ; size > 1 ; size /= 2 )
+	    // instead of compress by half of size, compress by a correct depth
+		compression ( root, size / 2 );
+}
+```

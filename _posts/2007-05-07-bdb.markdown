@@ -1,0 +1,226 @@
+---
+layout: post
+title: "Sample code of using Berkeley DB"
+date: 2007-05-07 06:10:26 +0800
+tags: code
+---
+
+Berkeley DB is ubiquitous but a bit complicated. Although there are some
+alternative out there and some wrapper exists, it is good to know about how to
+manipulate it.
+
+## Header and compilation
+
+To use Berkeley DB, of course, you need the header file and the related libraries. If no pre-compiled binary is available, get the source and compile it. For example, I downloaded the `db-4.5.20.tar.gz` and then,
+
+```
+$ tar zxf db-4.5.20.tar.gz
+$ cd db-4.5.20/build_unix
+$ ../dist/configure
+...
+$ make
+...
+$ cd ../..
+```
+
+So the header file is now `db-4.5.20/build_unix/db.h` and the compiled libraries is at `db-4.5.20/build_unix/libdb.a`
+
+Hence, add the following line at the beginning of the code:
+
+```c
+#include <db.h>
+```
+
+and invoke the compiler like this:
+
+    $ gcc -c -o testdb.o testdb.c -Ipath/to/db-4.5.20/build_unix
+    $ gcc -o testdb testdb.o -Lpath/to/db-4.5.20/build_unix -ldb
+
+## Open the database
+
+```c
+DB *dbp;           /* DB structure handle */ 
+u_int32_t flags;   /* database open flags */ 
+int ret;           /* function return value */ 
+
+void openDB()
+{
+	/* Initialize the structure. This 
+	 * database is not opened in an environment, 
+	 * so the environment pointer is NULL. */ 
+	ret = db_create(&dbp, NULL, 0); 
+	if (ret != 0) { 
+		fprintf(stderr, "Error initializing database structure.\n");
+		exit(1);
+	} 
+
+	/* Database open flags */ 
+	flags = DB_CREATE;	/* If the database does not exist, create it.*/ 
+		/* Alternative flags: (join by bitwise OR)
+		 *   DB_EXCL - Exclusive database creation. Fail if the database already exists
+		 *   DB_RDONLY - Open database fo read operations only
+		 *   DB_TRUNCATE - Empty the file before opening, i.e. delete everything inside
+		 */
+
+	/* open the database */ 
+	ret = dbp->open(dbp,		/* DB structure pointer */ 
+			NULL,		/* Transaction pointer */ 
+			"my_db.db",	/* On-disk file that holds the database. */ 
+			NULL,		/* Optional logical database name */ 
+			DB_BTREE,	/* Database access method */ 
+			flags,		/* Open flags */ 
+			0);		/* File mode (using defaults) */ 
+	if (ret != 0) { 
+		fprintf(stderr, "Error opening database my_db.db\n");
+		exit(1);
+	};
+};
+```
+
+## Closing the database
+
+```c
+void closeDB()
+{
+	/* When we're done with the database, close it. */ 
+	if (dbp != NULL) 
+		dbp->close(dbp, 0); 
+};
+```
+
+## Delete the database
+
+This means to unlink the database file from the filesystem.
+
+```c
+void deleteDB()
+{
+	dbp->remove(	dbp,			/* Database pointer */
+			"mydb.db",		/* Database file to remove */
+			NULL,			/* Database to remove. This is
+						 * NULL so the entire file is 
+						 * removed. */
+			0);			/* Flags. None used. */
+};
+```
+
+## Rename the database
+
+Rename the filename of the database.
+```c
+void renameDB()
+{
+	dbp->rename(	dbp,			/* Database pointer */
+			"mydb.db",		/* Database file to rename */
+			NULL,			/* Database to rename. This is 
+						 * NULL so the entire file is 
+						 * renamed. */
+			"newdb.db",		/* New database file name */
+			0);			/* Flags. None used. */
+};
+```
+
+## Write to the database
+
+```c
+void writeDB()
+{
+	DBT key, data; 
+	char *keystr = "One";
+	float value = 1.00; 
+	int ret; 
+
+	/* Zero out the DBTs before using them. */ 
+	memset(&key, 0, sizeof(DBT)); 
+	memset(&data, 0, sizeof(DBT)); 
+	key.data = keystr; 
+	key.size = strlen(keystr)+1;
+	data.data = &value;
+	data.size = sizeof(float);
+	ret = dbp->put(dbp, NULL, &key, &data, DB_NOOVERWRITE); 
+	if (ret == DB_KEYEXIST) { 
+		dbp->err(dbp, ret, "Failed inserting into database as the key already exists");
+	};
+};
+```
+
+## Read from the database
+Below is to retrieve exactly one record for the exact matching of the key:
+```c
+void readDB()
+{
+	DBT key, data; 
+	char *keystr = "One";
+	float value = 5.5; 
+	int ret;
+	
+	/* Zero out the DBTs before using them. */ 
+	memset(&key, 0, sizeof(DBT)); 
+	memset(&data, 0, sizeof(DBT)); 
+	key.data = keystr;
+	key.size = strlen(keystr)+1;
+	data.data = &value;
+	data.ulen = sizeof(float);
+	data.flags = DB_DBT_USERMEM;
+	ret = dbp->get(dbp, NULL, &key, &data, 0); 
+	if (ret == DB_NOTFOUND) {
+		dbp->err(dbp, ret, "Data not found in the database");
+	};
+	printf("%f\n",*(float*)(data.data));
+};
+```
+
+Alternatively, we can also retrieve records using a cursor.
+
+## Delete from the database
+
+```c
+void deleteRecord()
+{
+	DBT key;
+	char *keystr = "One";
+	
+	/* Zero out the DBTs before using them. */ 
+	memset(&key, 0, sizeof(DBT)); 
+	key.data = keystr;
+	key.size = strlen(keystr)+1;
+
+	dbp->del(dbp, NULL, &key, 0); 
+};
+```
+
+## Walking through the database
+
+Use of cursor is required for walking through the database:
+
+```c
+void walkDB()
+{
+	DBC *cursorp; 
+	DBT key, data; 
+	int ret; 
+
+	/* Initialize cursor */ 
+	dbp->cursor(dbp, NULL, &cursorp, 0); 
+
+	/* Initialize our DBTs. */ 
+	memset(&key, 0, sizeof(DBT)); 
+	memset(&data, 0, sizeof(DBT)); 
+
+	/* Iterate over the database, retrieving each record in turn. */
+		/* use DB_NEXT for interating forward
+		 * and DB_PREV for backward */
+	} while (<#condition#>) 
+	while (!(ret=cursorp->c_get(cursorp, &key, &data, DB_NEXT))) {
+		printf("%s - %f\n", key.data, *(float*)(data.data));
+	}; 
+	if (ret != DB_NOTFOUND) { 
+		fprintf(stderr,"Nothing found in the database.\n");
+		exit(1);
+	};
+
+	/* Close cursor before exit */
+	if (cursorp != NULL) 
+		cursorp->c_close(cursorp); 
+};
+```

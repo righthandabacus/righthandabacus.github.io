@@ -1,0 +1,565 @@
+---
+layout: post
+title: "Manual of playing with NS2"
+date: 2006-02-14 14:13:47 +0800
+tags: code
+---
+
+So far, I played with NS2 for so many months. This is the time to write a guide to let my fellow collegues know about how to play with this nifty animal. Things will be added to improve it continuously.
+
+## Beginning: Know the basics first
+
+Things have to have a start. I cannot say any better than [Eitan Altman's tutorial](http://www-sop.inria.fr/maestro/personnel/Eitan.Altman/COURS-NS/n3.pdf) (see also the web of [his NS course](http://www-sop.inria.fr/maestro/personnel/Eitan.Altman/ns.htm)). This is an inevitable beginner's tutorial and if you are green to NS, take his tutorial and do *all* the exercise first. You have to familiar with the ns2's TCL scripting syntax.
+
+If you want some more introductory text, here you are:
+  * Marc Greis' [*Tutorial for the Network Simulator*](http://www.isi.edu/nsnam/ns/tutorial/index.html)
+  * Jae Chung and Mark Claypool's [*NS by Example*](http://nile.wpi.edu/NS), hosted in Worcester Polytec. Inst.
+
+## Enhancement: Scripting stuff
+### TCL Tutorial
+
+  * <http://nsnam.isi.edu/nsnam/index.php/Quick_Introduction_to_Tcl>
+  * <http://k-lug.org/~griswold/NS2/fib.html>
+  * <http://hegel.ittc.ku.edu/topics/tcltk/index.html>
+
+and [this](http://hegel.ittc.ku.edu/topics/tcltk/tutorial-noplugin/tutorial-0.html) is the very recommended "Introduction to Programming with Tcl" by Shyam Pather.
+
+### OTCL Tutorial
+
+Just a few:
+  * <http://netmedia.kjist.ac.kr/~dulee/tclns.html>
+  * <http://bmrc.berkeley.edu/research/cmt/cmtdoc/otcl/tutorial.html>
+
+## OTCL/C++ Duality
+
+The NS2 objects hierarchy is as follows: (crosslinked from [WPI's NS by Example](http://nile.wpi.edu/NS/))
+
+![](http://nile.wpi.edu/NS/Figure/fig6.gif)
+
+There are many objects in NS2, which responsible for different parts of the simulation. For example, I often work with the protocol stacks and hence the things that interest me are those inherit from `Agent`. Take `Agent/UDP` as an example, this is an object class in C++ *and* OTCL. This is a dual in NS2 so that we can reference to the same thing from a C++ code (i.e. you are hacking the protocol) as well as from the TCL script (i.e. you are modeling a scenario).
+
+Look at the following example from `ns/tcp/tfrc.cc`:
+```c++
+static class TfrcClass : public TclClass {
+public:
+        TfrcClass() : TclClass("Agent/TFRC") {}
+        TclObject* create(int, const char*const*) {
+                return (new TfrcAgent());
+        }
+} class_tfrc;
+```
+
+This is an instance of `TfrcClass` named `class_tfrc` but referenced from nowhere. However, this "strange" object bears an important role: It first inherit from the `TclClass` and defined an OTcl object class named `Agent/TFRC`, so that we can use this tag in the TCL script, such as:
+```tcl
+set agent1 [new Agent/TFRC]
+```
+Secondly, it is a static class object (read: factory pattern) to instantiate a `TfrcAgent` object upon the `create(int, const char*)` is invoked, which is the core thing. So this `class_tfrc` object is the "bridge" to connect the C++ object model to the OTcl object model. Somebody call it the *split object model*.
+
+## OTCL/C++ Linkage
+In NS2, there is a mechanism to pass data between TCL and C++, this is done via two ways: variable binding and function call.
+
+### Variable binding
+
+Variable binding is to make the C++ variables (more accurately, the member variables of objects) linked with a OTCL variable. The following is an example from the constructor of `TcpAgent`:
+
+```c++
+        bind("t_seqno_", &t_seqno_);
+        bind("rtt_", &t_rtt_);
+        bind("srtt_", &t_srtt_);
+        bind("rttvar_", &t_rttvar_);
+        bind("backoff_", &t_backoff_);
+        bind("dupacks_", &dupacks_);
+        bind("seqno_", &curseq_);
+        bind("ack_", &highest_ack_);
+        bind("cwnd_", &cwnd_);
+        bind("ssthresh_", &ssthresh_);
+        bind("maxseq_", &maxseq_);
+        bind("ndatapack_", &ndatapack_);
+        bind("ndatabytes_", &ndatabytes_);
+        bind("nackpack_", &nackpack_);
+        bind("nrexmit_", &nrexmit_);
+        bind("nrexmitpack_", &nrexmitpack_);
+        bind("nrexmitbytes_", &nrexmitbytes_);
+        bind("necnresponses_", &necnresponses_);
+        bind("ncwndcuts_", &ncwndcuts_);
+        bind("ncwndcuts1_", &ncwndcuts1_);
+```
+
+The general structure of variable binding is to use the `bind(const char*,void*)` function call. There are a series of similar functions, namely, `bind`, `bind_time`, `bind_bw`, and `bind_bool`. These calls are for numerical type, temporal type, bandwidth type and boolean type of data respectively. They are no different from the points of view of C++ (because we have only integer and double) but different on how you can use it from TCL (example, you can use kbit for bandwidth but not integer).
+
+Another example is from `mac/mac.cc`:
+
+```c++
+Mac::Mac() :
+        BiConnector(), abstract_(0), netif_(0), tap_(0), ll_(0), channel_(0), callback_(0),
+        hRes_(this), hSend_(this), state_(MAC_IDLE), pktRx_(0), pktTx_(0)
+{
+        index_ = MacIndex++;
+        bind_bw("bandwidth_", &bandwidth_);
+        bind_time("delay_", &delay_);
+        bind_bool("abstract_", &abstract_);
+}
+```
+
+However, this way of binding variables requires all variables immediately available to TCL upon NS2 starts, which may not be that good. So there is another version of binding variables called *delay binding*. Examples are ubiquous in the current version of NS, such as `tcp/tcp.cc`:
+
+```c++
+void
+TcpAgent::delay_bind_init_all()
+{
+
+        // Defaults for bound variables should be set in ns-default.tcl.
+        delay_bind_init_one("window_");
+        delay_bind_init_one("windowInit_");
+        delay_bind_init_one("windowInitOption_");
+
+        delay_bind_init_one("syn_");
+        delay_bind_init_one("windowOption_");
+        delay_bind_init_one("windowConstant_");
+        delay_bind_init_one("windowThresh_");
+...
+}
+
+int
+TcpAgent::delay_bind_dispatch(const char *varName, const char *localName, TclObject *tracer)
+{
+        if (delay_bind(varName, localName, "window_", &wnd_, tracer)) return TCL_OK;
+        if (delay_bind(varName, localName, "windowInit_", &wnd_init_, tracer)) return TCL_OK;
+        if (delay_bind(varName, localName, "windowInitOption_", &wnd_init_option_, tracer)) return TCL_OK;
+        if (delay_bind_bool(varName, localName, "syn_", &syn_, tracer)) return TCL_OK;
+        if (delay_bind(varName, localName, "windowOption_", &wnd_option_ , tracer)) return TCL_OK;
+        if (delay_bind(varName, localName, "windowConstant_",  &wnd_const_, tracer)) return TCL_OK;
+        if (delay_bind(varName, localName, "windowThresh_", &wnd_th_ , tracer)) return TCL_OK;
+...
+}
+```
+
+The two methods of binding are generally no different. We also have the `delay_bind`, `delay_bind_time`, `delay_bind_bw`, and `delay_bind_bool` versions. The difference between these two methods of binding are firstly, calling `bind()` is usually done in the constructors so that all stuff is available once the object is created but the `delay_bind()` is wrapped in methods named `delay_bind_dispatch` and the TCL variable name is declared by `delay_bind_init_one()` in the method `delay_bind_init_all`. Secondly, delay binded variables **cannot be traced**.
+
+For any binded variables, we have to set the default value in `tcl/lib/ns-default.tcl`, like this:
+
+```tcl
+Agent/TCP set window_ 20
+# Agent/TCP set windowInit_ 1
+Agent/TCP set windowInit_ 2 ;           # default changed on 2001/5/26.
+Agent/TCP set windowInitOption_ 1
+# Agent/TCP set syn_ false
+Agent/TCP set syn_ true ;               # default changed on 2001/5/17.
+Agent/TCP set windowOption_ 1
+Agent/TCP set windowConstant_ 4
+Agent/TCP set windowThresh_ 0.002
+```
+
+### Function calling between OTCL/C++
+
+We can invoke a C++ function from the TCL script. In all the NS C++ class code that I read, I can always find the `command` method. An example from `tcp/tcp.cc` is show as follows:
+
+```c++
+int TcpAgent::command(int argc, const char*const* argv)
+{
+        if (argc == 3) {
+                if (strcmp(argv[1], "advance") == 0) {
+                        int newseq = atoi(argv[2]);
+                        if (newseq > maxseq_)
+                                advanceby(newseq - curseq_);
+                        else
+                                advanceby(maxseq_ - curseq_);
+                        return (TCL_OK);
+                }
+                if (strcmp(argv[1], "advanceby") == 0) {
+                        advanceby(atoi(argv[2]));
+                        return (TCL_OK);
+                }
+                if (strcmp(argv[1], "eventtrace") == 0) {
+                        et_ = (EventTrace *)TclObject::lookup(argv[2]);
+                        return (TCL_OK);
+                }
+                if (strcmp(argv[1], "persist") == 0) {
+                        TcpAgent *other
+                          = (TcpAgent*)TclObject::lookup(argv[2]);
+                        cwnd_ = other->cwnd_;
+                        awnd_ = other->awnd_;
+                        ssthresh_ = other->ssthresh_;
+                        t_rtt_ = other->t_rtt_;
+                        t_srtt_ = other->t_srtt_;
+                        t_rttvar_ = other->t_rttvar_;
+                        t_backoff_ = other->t_backoff_;
+                        return (TCL_OK);
+                }
+        }
+        return (Agent::command(argc, argv));
+}
+```
+
+The `command` call is invoked whenever we issue some sort of command from the TCL script as a method of an object. For example, this is from http://www.isi.edu/nsnam/dist/ns-workshop00/iec00-internal.ppt and showing where to call the `advancedby` using `command` call
+```tcl
+set tcp [new Agent/TCP]
+$tcp set packetSize_ 1024
+$tcp advanceby 5000
+```
+
+The `command` call is an example on how TCL can invoke C++ functions. The TCL interpreter expects something to return from C++, you can either return `TCL_OK` or `TCL_ERROR` to show whether the call is success.
+
+More complicated calls may need to pass data between the two languages. This is done by the TCLCL.
+
+If you are passing data from C++ to TCL, you can do by `tcl.result()` or `tcl.resultf()`. The `tcl` object is an instance of the `tcl_` class (TCL interpreter). The syntax of the two result functions are:
+```c++
+tcl.result(const char* s)
+tcl.resultf(const char* fmt, ...)
+```
+Simply speaking, the `result()` call is to pass a string (everything in TCL is a string) and `resultf()` is to pass a string using the formating like `printf()`.
+
+No matter you issued `result()` or not, you must return either "TCL_OK" or "TCL_ERROR" on all the TCL-invoked C++ calls.
+
+On the other hand, for C++ to call TCL, it is pretty easy because it is just an interpreter. To issue an command, we can use any of these:
+```c++
+tcl.eval(char* s);               // Execute command string s
+
+tcl.evalc(const char* s);        // Store string s into the command buffer and execute it afterwards
+
+sprintf(tcl.buffer(), fmt, ...); // Store a string to command buffer using sprinf()
+tcl.eval();                      // Execute the command in the command buffer
+
+tcl.evalf(const char* fmt,...);  // Use printf() formating to construct the command, then put it into
+                                 // the command buffer and execute
+```
+For collecting the return values, we always use `tcl.result()`. It is always a string (`char*`). So we have to do some `atoi()` or similar to get back the value we want. Example:
+```
+char* s=tcl.result();
+int num=atoi(s);
+```
+
+## Extending NS
+
+As you can see from the class hierarchy, the NS is a tree of classes inherited from `NsObject` (with some exceptions). For this part, the most current *The NS manual* is always the best reference. Part II of *The NS Manual* is focused on the construction of NS classes.
+
+Because I have experiences on `Agent` class only, the following is solely for that. We can reference to Chapter 10 of *The NS Manual*.
+
+`Agent` is a daughter class of `Connector`. The important member variables of `Agent` class includes:
+  * `addr_` : Node address, i.e. the source address to be put into a packet
+  * `dst_` : Peer address, i.e. the destination address to be put into a packet
+  * `size_` : Packet size, to be put in common header
+  * `type_` : Packet type, to be put in common header
+  * `fid_` : Flow ID
+  * `prio_` : IP prioirty field
+  * `flags_` : Packet flags
+  * `defttl_` : Default IP TTL value
+
+and the following are member functions *not* to be override by daughter classes:
+  * `Packet* allocpkt()` : Allocate new packet with proper fields assigned, namely,
+     * Common header: uid, ptype, size
+     * IP header: src, dst, flowid, prio, ttl
+     * Flags (zeroed): ecn, pri, usr1, usr2
+  * `Packet* allocpkt(int n)`: Allocate new packet with payload of `n` bytes
+
+and the following are member functions stuffed but *to be reimplemented* by the daughter classes:
+  * `void timeout(n)` : Timeout event handler
+  * `void recv(Packet* p, Handler* h)` : Main receive path
+
+However, a usual ns agent is not that simple. Taking the `Agent/TCP` as an example (`tcp/tcp.{h,cc}`), we still have a mechanism for the upper layers (e.g. `Application/FTP`) to send data. The way `FTP` sends data is to issue a TCL command `send` to the `TCP` agent, which is then handled by `command()` function in TCP class.
+
+On the reversed side, when the agent receives something from the lower layers, the `recv()` function will be invoked with the packet as the argument.
+
+## Timers=
+Timers in NS2 are inherited from the `TimerHandler` abstract class and to be used by a specific `Agent`.
+The public member functions of `TimerHandler` are:
+  - `int status()` : Return timer status, it can be any of TIMER_IDLE, TIMER_PENDING, or TIMER_HANDLING
+  - `void sched(double s)` : Schedule the timer to expire in `s` seconds
+  - `void resched(double s)` : Similar to `sched(s)` but the timer can be in pending state
+The protected member funtions are:
+  - `virtual void expire(Event* e)=0` : To be implemented by daughter classes. Describes what to do if the timer expires
+  - `virtual void handler(Event* e)` : Invokes `expire(e)` and set the `status_` to correct value. The implementation is as follows:
+```c++
+void TimerHandler::handle(Event *e)
+{
+        if (status_ != TIMER_PENDING)   // sanity check
+                abort();
+        status_ = TIMER_HANDLING;
+        expire(e);
+        // if it wasn't rescheduled, it's done
+        if (status_ == TIMER_HANDLING)
+                status_ = TIMER_IDLE;
+}
+```
+
+For the usual cases, the timers are implemented as follows:
+```c++
+class NewTimer : public TimerHandler {
+public:
+        NewTimer(SomeAgent* a) : TimerHandler() { a_ = a; };
+        virtual void expire(Event* e);
+protected:
+        SomeAgent* a_;
+}
+
+NewTimer::expire(Event* e)
+{
+        // Call something in a_ upon timer expires
+        a_->send_next_pkt();
+}
+```
+Note that, usually the event object passed to `expire()` is not used.
+
+## Packet Headers
+The convention in NS is to have the header of every protocol implemented as a separate `struct`. For example, the TFRC protocol have the following: (`tcp/tfrc.h`)
+```c++
+struct hdr_tfrc {
+    int seqno;              //data sequence number
+    double timestamp;       //time this message was sent
+    ...
+
+    static int offset_;     // offset for this header
+    inline static int& offset() {
+        return offset_;
+    }
+    inline static hdr_tfrc* access(const Packet* p) {
+        return (hdr_tfrc*) p->access(offset_);
+    }
+};
+```
+and following: (`tcp/tfrc.cc`)
+```c++
+int hdr_tfrc::offset_;
+
+static class TFRCHeaderClass : public PacketHeaderClass {
+public:
+    TFRCHeaderClass() : PacketHeaderClass("PacketHeader/TFRC", sizeof(hdr_tfrc)) {
+        bind_offset(&hdr_tfrc::offset_);
+    }
+} class_tfrchdr;
+```
+
+The `hdr_tfrc` defines the layout of the protocol header so that gcc will find how big the header would be. The special thing here is the static variable `offset_`. It is to indicate the *offset* of this protocol header in a general, arbitrary ns packet. The `offset_` is used by the two inline functions, `offset()` and `access()`.
+
+The correct value setting for `offset_` is done by the other routines of NS. For the users, to access the packet header is simply calling:
+```c++
+// Packet* p
+hdr_tfrc* header = hdr_tfrc::access(p);
+```
+but the `offset()` function, although always defined, is seldom used.
+
+As suggested by *The ns Manual*, the correct way of doing to define new header is as follows:
+  * Create a new `struct` for the fields, define `offset_` and `access` method
+  * Define member functions if needed (`struct` in C++ is equivalent to `class`)
+  * Create a static class for TCL linkage, and perform `bind_offset()` in the constructor
+  * Edit `tcl/lib/ns-packet.tcl` to include a new packet header name in the `foreach prot` loop
+
+## All-in-one example
+This is the example of how to create a new `Agent` and protocol header, modified from `app/ping.h` and `app/ping.cc`
+
+Header file:
+```c++
+// Header file: ping.h
+#include "agent.h"
+#include "tclcl.h"
+#include "packet.h"
+#include "address.h"
+#include "ip.h"
+
+struct hdr_ping {
+    char reply;
+    int seqno;
+
+    static int offset_;        // required
+    inline static int& offset() { return offset_; }
+    inline static hdr_ping* access(const Packet* p) {
+        return (hdr_ping*) p->access(offset_);
+    }
+};
+
+class PingAgent;
+class PingTimer : public TimerHandler {
+public:
+    PingTimer(PingAgent *a) : TimerHandler() { a_ = a; }
+protected:
+    virtual void expire(Event*);
+    PingAgent* a_;
+};
+
+class PingAgent : public Agent {
+public:
+    PingAgent();
+    int seqno;        // a send sequence number like in real ping
+    virtual int command(int argc, const char*const* argv);
+    virtual void recv(Packet*, Handler*);
+    virtual void start();
+protected:
+    PingTimer timer_;
+};
+```
+
+This is the implementation:
+```c++
+// Implementation file: ping.cc
+#include "ping.h"
+
+int hdr_ping::offset_;
+static class PingHeaderClass : public PacketHeaderClass {
+public:
+    PingHeaderClass() : PacketHeaderClass("PacketHeader/Ping", sizeof(hdr_ping)) {
+        bind_offset(&hdr_ping::offset_);    // Let ns tell you your offset
+    }
+} class_pinghdr;
+
+void PingTimer::expire(Event*)
+{
+    a_->start();       // Time out, send a packet
+}
+
+// A static class for ns to use as a "PingClass factory"
+static class PingClass : public TclClass {
+public:
+    PingClass() : TclClass("Agent/Ping") {}
+    TclObject* create(int, const char*const*) {
+        return (new PingAgent());
+    }
+} class_ping;
+
+PingAgent::PingAgent() : Agent(PT_PING), seqno(0), timer_(this)
+{
+    bind("packetSize_", &size_);      // Let Tcl to set the size of ping packet
+}
+
+int PingAgent::command(int argc, const char*const* argv)
+{
+    if (argc == 2) {
+        if (strcmp(argv[1], "send") == 0) {
+            start();            // Let start() start sending
+            return (TCL_OK);    // Tell Tcl that the command finished successfully
+        }
+    }
+    // If not recognised, let my parent class to handle the command
+    return (Agent::command(argc, argv));
+}
+
+void PingAgent::start()
+{
+    Packet* pkt = allocpkt();              // Create a new packet
+    hdr_ping* hdr = hdr_ping::access(pkt); // Go to the Ping header part
+    hdr->reply = 0;                        // This is not a reply packet
+    hdr->seqno = seqno++;                  // and this is the seqno of this packet
+    send(pkt, 0);                          // Send the packet
+    timer_.resched(1);                     // and ask the ping timer to wake me up 1 sec later
+}
+
+void PingAgent::recv(Packet* pkt, Handler*)
+{
+    hdr_ping* hdr = hdr_ping::access(pkt); // Get the Ping header from the received packet
+
+    if (hdr->reply == 0) {                 // Is it a ping request?
+        int rcv_seq = hdr->seqno;          // Remember the sequence number received
+        Packet::free(pkt);                 // Discard the packet
+        Packet* p = allocpkt();            // and create a new one for reply
+
+        hdr_ping* rh = hdr_ping::access(p);// Get the header of the reply packet
+        rh->reply = 1;                     // this is the reply
+        rh->seqno = rcv_seq;               // for this sequence number
+
+        send(p, 0);                        // Finish setting, send the packet out
+
+    } else {                               // Or this is a ping reply
+        char out[100];                     // then print something via Tcl
+        printf("%s received ping number %d\n", name(), hdr->seqno);
+        Packet::free(pkt);                 // Discard the packet
+    }
+}
+```
+and the auxiliary files: `lib/tcl/ns-packet.tcl`
+```tcl
+...
+foreach prot {
+...
+    Ping   # Ping header
+...
+}
+...
+```
+`lib/tcl/ns-default.tcl` (set the default value for binded variable)
+```tcl
+Agent/Ping set packetSize_ 128
+```
+`common/packet.h` (list of packet header names):
+```c++
+...
+enum packet_t{
+...
+    PT_PONG,
+...
+};
+
+class p_info {
+public:
+    p_info() {
+       ....
+       name_[PT_PONG]="pong";
+       ....
+    }
+    ...
+}
+
+```
+`Makefile.in` (for gcc) or `makefile.vc` (for Visual C++):
+```make
+...
+OBJ_CC = \
+    ....
+    apps/ping.o \
+    ....
+```
+and this is the sample script of usage:
+```tcl
+set ns [new Simulator]
+
+# nam trace file
+set namfd [open out.nam w]
+$ns namtrace-all $namfd
+
+# ns trace file
+set nsfd [open out.tr w]
+$ns trace-all $nsfd
+
+# Topology setup (simple)
+# n0 ----- n1
+set n0 [$ns node]
+set n1 [$ns node]
+$ns duplex-link $n0 $n1 1Mb 10ms DropTail
+
+set p0 [new Agent/Pong]
+set p1 [new Agent/Pong]
+$ns attach-agent $n0 $p0
+$ns attach-agent $n1 $p1
+$ns connect $p0 $p1
+
+# Schedule events
+$ns at 0.5 "$p0 send"
+$ns at 10.5 "finish"
+
+proc finish {} {
+        global ns namfd nsfd
+        $ns flush-trace
+        close $namfd
+        close $nsfd
+        exit 0
+}
+
+#Run the simulation
+$ns run
+```
+
+**Note**: The version of ping bundled in ns-2.29 is quite different from the one I've shown. Most notably, the receiver response of the original ping is not implemented in C++ but in Tcl. For example, `apps/ping.cc` has the following in `recv()` before the packet discard:
+```c++
+sprintf(out, "%s recv %d %3.1f", name(),
+    hdrip->src_.addr_ >> Address::instance().NodeShift_[1],
+    (Scheduler::instance().clock()-hdr->send_time) * 1000);
+Tcl& tcl = Tcl::instance();
+tcl.eval(out);
+```
+Simply speaking, these lines call the `recv` command (which is not listed in `command()`) of the ping agent with several parameters. The action of `recv` command is implemented in the Tcl script, for example, see `tcl/test/test-suite-greis.tcl`:
+```tcl
+Agent/Ping instproc recv {from rtt} {
+    $self instvar node_
+    puts "node [$node_ id] received ping answer from \
+        $from with round-trip-time $rtt ms."
+}
+```
+So that the response string is print by Tcl but not the `printf()` function in C++.

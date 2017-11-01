@@ -1,0 +1,41 @@
+---
+layout: post
+title: "The 13 Motifs of Parallel Programming"
+date: 2010-10-01 23:26:44 -0400
+tags: code
+---
+
+List of Dwarfs (7 dwarfs, later expanded into 13 motifs):
+
+  - Dense Linear Algebra
+  - Sparse Linear Algebra
+  - Spectral Methods
+  - N-Body Methods
+  - Structured Grids
+  - Unstructured Grids
+  - MapReduce
+  - Combinational Logic
+  - Graph Traversal
+  - Dynamic Programming
+  - Backtrack and Branch-and-Bound
+  - Graphical Models
+  - Finite State Machines
+
+The above are *the parallel motifs* (Source and more detail: [Dwarf Mine, from Berkeley](http://view.eecs.berkeley.edu/wiki/Dwarfs)), i.e. a collection of algorithm families that are particularly important in parallel programming. The reason for having these motifs is because doing parallel programming well is hard: Hard to code, hard to understand, hard to analyze, hard to debug, and hard to supply input data (because of the parallelism).
+
+[Here](http://blogs.msdn.com/b/visualizeparallel/archive/2009/12/21/overview-of-the-parallel-dwarfs-project-on-codeplex.aspx) gives one example for each of the 13 motifs:
+
+  - Dense Matrix Algebra: Matrix Multiply
+  - Sparse Matrix Algebra: Matrix Vector Multiply
+  - Spectral Methods: 2D FFT
+  - N-Body Methods
+  - Structured Grid: Laplace's equation with Dirichlet's conditions on the square
+  - Unstructured Grid: 2D Iterative Triangular Grid
+  - MapReduce: well, MapReduce
+  - Combinational Logic: Popcount on a binary string
+  - Graph Traversal: Depth First Search
+  - Dynamic Programming: 0/1 Knapsack Problem
+  - Backtrack and Branch-and-Bound: Traveling Salesman problem
+  - Graphical Models: Viterbi Algorithm for Hidden Markov Models
+  - Finite State Machines: Pattern Matching on Strings
+

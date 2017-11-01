@@ -1,0 +1,92 @@
+---
+layout: post
+title: "Makefile"
+date: 2012-08-21 17:49:50 -0400
+tags: code
+---
+
+Short notes about everything that one might needed in writing Makefile
+
+## Command lines
+
+Calling make with makefile other than makefile
+
+    $ make -f NewMakeFile
+
+Dry-run
+
+    $ make -n
+    
+Execute n jobs at once
+
+    $ make -j n
+
+## Targets and actions
+
+Syntax of a rule
+
+    target: dependent1 dependent2
+    	action1
+    	action2
+
+First target is the default target.
+
+Calling nested Makefiles
+
+    subtarget:
+      	cd subdir && $(MAKE)
+
+here, `$(MAKE)` must be used to ensure all command line arguments are passed on to the nested make
+
+Tell make that some targets are not a file
+
+    .PHONY: all clean test install
+
+To ignore errors on an action, prefix with `-`; to suppress echoing the action command to stdout, prefix with `@`
+
+    clean:
+      	-rm file1 file2 file3 file4
+      	@echo Clean finished.
+
+## Variables
+
+By convention, all variables are in uppercase.
+
+    CC = gcc
+    main: main.c
+      ${CC} -o main main.c
+
+There are different way to assign variables:
+
+Simple assignment: Value on RHS is expanded immediately
+
+    CC := ${GCC} ${FLAGS}
+
+Recursive assignment: Value on RHS is expanded only when LHS is encountered in action
+
+    CC = ${GCC} ${FLAGS}
+
+Conditional assignment: Value is assigned only if the variable does not have a value yet
+
+    CC ?= gcc
+
+Appending: Text is appended to an existing variable
+
+    CC = gcc
+    CC += -Wall
+
+## Patterns
+
+| `%`  | Wildcard for pattern matching |
+| `$@` | Full target name of the current target |
+| `$?` | Dependencies that are newer than the current target |
+| `$*` | The text that corresponds to "`%`" in the target |
+| `$<` | Name of the first dependency |
+| `$^` | Name of all dependencies, with space as the delimiter |
+
+    %.o : %.c
+      gcc -c -o $@ $^ | tee $*.log
+
+To obtain command output from shell, use
+
+    LS = $(shell ls)

@@ -1,0 +1,23 @@
+---
+layout: post
+title: "Scott et al (2009) Addressing the Scalability of Ethernet with MOOSE (ITC21)"
+date: 2010-10-04 13:54:29 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: Addressing the Scalability of Ethernet with MOOSE
+  author: Malcolm Scott and Andrew Moore and Jon Crowcroft  
+  howpublished: "ITC21"
+  booktitle: "Proc. First Workshop on Data Center – Converged and Virtual Ethernet Switching (DC CAVES), ITC 21"
+  month: September
+  year: 2009
+  address: Paris
+---
+This is to propose a new Ethernet architecture to make it scale. The paper says, problem of Ethernet is rooted at the flat addressing scheme of Ethernet. Therefore, a new hierarchical MAC address (MOOSE address) is proposed. The hierarchical MAC address is a composition of a switch ID and host ID, thus it contains location information. The switches are knowing each other through some routing protocol (e.g. modified OSPF) and therefore, the MAC frames are forwarded in shortest path rather than over a spanning tree.
+
+When a packet from host is entering the network, the edge switch modifies the source address into MOOSE address. The end host are knowing each other by the MOOSE address only (as the ARP is also
+modified into MOOSE addresses by the switches). This modification is in-place, i.e. when a frame entering MOOSE network, the source MAC address is modified into MOOSE address by the switch; and when a frame is leaving MOOSE network, the destination MOOSE address is modified back to MAC address.
+
+In MOOSE network, there is a directory service to replace broadcast-based ARP and DHCP. The switches intercept ARP and DHCP packets and convert them into anycast ELK (enhanced lookup) queries to the nearest directory server. The directory server answers the query. There can be more than one directory server for resilience reason.
+
+Mobility is supported in MOOSE, by modifying the directory on its ARP entry when a virtual machine is moved. This is done by having a broadcast ARP announcement sent by the new home switch after a virtual machine is moved. This is the technique used by Xen.

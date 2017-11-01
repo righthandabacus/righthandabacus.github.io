@@ -1,0 +1,16 @@
+---
+layout: post
+title: "Al-Fare et al (2008) A Scalable, Commodity Data Center Network Architecture (SIGCOMM)"
+date: 2011-03-21 17:26:06 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "A Scalable, Commodity Data Center Network Architecture"
+  author: "Mohammad Al-Fares and Alexander Loukissas and Amin Vahdat"
+  booktitle: "Proc SIGCOMM"
+  page: "63--74"
+  month: "Aug"
+  year: 2008
+  address: "Seattle WA"
+---
+This paper proposes the use of fat-tree topology in data center network and discuss its benefit. Architecture is described, including the addressing scheme, routing mechanism, flow scheduling for load-balancing.

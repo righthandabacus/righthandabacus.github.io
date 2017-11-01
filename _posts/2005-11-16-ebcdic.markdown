@@ -1,0 +1,40 @@
+---
+layout: post
+title: "Converting EBCDIC to ASCII"
+date: 2005-11-16 04:21:50 +0800
+tags: code
+---
+
+Finally, I found that somebody is still using EBCDIC today!
+
+Anthropos' FYP need to try out the asynchronous I/O. However, this is an
+"advanced" technique and hence not much reference can be found. By searching in
+Google, the following link can give you a piece of sample:
+
+    ftp://ftp.software.ibm.com/s390/zos/tools/aiosample/aiosample.tar.Z
+
+By extracting the compress package, there are some source code and a readme
+file. However, all are in EBCDIC code. The actual variant of EBCDIC is unknown,
+but I have to get the ASCII version anyway. Thanks god that there is GNU iconv!
+
+The following is the way I do the conversion all in once:
+
+```
+for x in * ; do
+    echo $x
+    cat $x |
+      perl -pe 's/\x15/\x25/g; s/\xAD/\x4A/g; s/\xBD/\x5A/g;' |
+      iconv -f EBCDIC-INT -t ASCII >
+      $x.new
+    mv $x.new $x
+done
+```
+
+The file out of the source is EBCDIC but with some strange character encoding.
+The newline character is coded as 0x15, and the pair of square brackets are
+coded as 0xAD and 0xBD. I check the correct EBCDIC code for these three
+characters by using:
+
+    echo "[]" | iconv -f ASCII -t EBCDIC-INT
+
+and put them into the perl one-liner.

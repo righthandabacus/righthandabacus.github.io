@@ -1,0 +1,144 @@
+---
+layout: post
+title: "Using WebDAV in Apache"
+date: 2004-11-02 22:20:19 +0800
+tags: system
+---
+
+Copied from "Mac OS X Panther Hacks" from O'Reilly, hack #69
+
+WebDAV (Web-based Distributed Authoring and Versioning, also called DAV) is a
+set of extensions to HTTP/1.1 that allows you to edit documents on remote web
+server. DAV provides support for:
+
+- **Editing**: Creating, updating, deleting
+- **Properties**: Title, author, publication date, and so on
+- **Collections**: Analogous to a filesystem's directory or Desktop folder
+- **Locking**: Prevents the confusion and data corruption caused by two or more people editing the same content at the same time
+
+WebDAV is platform-independent, in terms of both client and server. This means
+that Macintosh, Unix, and Windows users can collaborate on web content without
+all the usual conversion problems. Furthermore, it doesn't matter whether your
+documents are hosted on an Apache or Microsoft IIS server.
+
+WebDAV is software agnostic. As long as your web-authoring tools are
+DAV-compliant, the particular product you're using makes little difference. It
+is (at least should be) seamless. Decause DAV is simply a set of extensions to
+HTTP, it's easy for companies to build support into any product that already
+understands the Web. And, since DAV rides on top of HTTP, firewalls tend not to
+get in the way of accessing your web content remotely.
+
+WebDAV makes use of the standard authorization and authentication methods built
+right into every web server. In the same manner as one restricts access to a
+portion (a file, folder, or entire site) of one's web site to a particular set
+of usrs or machines, so too can one finely tune WebDAV access to resources.
+
+Best of all, WebDAV is built into the Apache web server that is part of Mac OS
+X.
+
+## Configuring WebDAV in Apache
+
+Open the Apcache server's main configuration file, `/etc/httpd/httpd.conf`, for
+editing. You'll neecd to authenticate yourself as an administrator by using
+sudo:
+
+    $ sudo pico /etc/httpd/httpd.conf
+
+You'll need to hunt down two lines in your Apache configuration and uncomment
+them. These are the two lines to look for in `/etc/httpd/httpd.conf`:
+
+    # LoadModule dav_module libexec/httpd/libdav.so
+    ...
+    # AddModule mod_dav.c
+
+Since these lines are commented out by default, we'll have to uncomment them in
+order to make WebDAV functional. Do so, and the lines should now look like this:
+
+    LoadModule dav_module libexec/httpd/libdav.so
+    ...
+    AddModule mod_dav.c
+
+Once the WebDAV module is activated, you'll need to add a configuration
+directive to enable a DAV share. Zoom down to the end of the file and add the
+following lines:
+
+```
+  DAVLockDB /etc/httpd/dav/DAVLock
+  DAVMinTimeout 600
+  <Location /dav/>
+     DAV On
+     AuthType Basic
+     AuthName "WebDAV Restricted"
+     AuthUserFile /etc/httpd/dav/.passwd
+     <LimitExcept GET HEAD OPTIONS>
+         Require valid-user
+     </LimitExcept>
+  </Location>
+```
+
+The first line sets up a database file that WebDAV uses to track who's editing
+which file. It locks a file to prevent something dangerous from happening, such
+as two people trying to update it at once. The second line tells the web server
+not to wait forever if the remote computer loses the connection with it. The
+`<Location>` tags set the context of the WebDAV settings to the `/dav`
+directory, which we will set up under document root.
+
+We're using `AuthTypeBasic` security, which requires a username and password to
+make modifications. We'll store the password in a file called
+`/Library/WebServer/.passwd`, and the required username is `webdav`.
+
+The `<LimitExcept>` directive gives us some protection from malicious intent.
+First, it locks down all the actions that can be performed on WebDAV files,
+except those actions that are read-only. Second, it limits the write privileges
+to one user, named `webdav`. The only ability this user has on the system is to
+write files in this directioy.
+
+## Setting up directories
+
+First, you need to set up the realm of WebDAV documents. Based on what we put in
+the configuration file, this will be in a subdirectory of the document root
+called `/dav` (that's `/Library/WebServer/Documents/dav`). You'll need to create
+that directory yourself and change the permissions and ownership to that the web
+server can write to it:
+
+    $ sudo mkdir /Library/WebServer/Documents/dav
+    $ sudo chgrp www /Library/WebServer/Documents/dav
+    $ sudo chmod 775 /Library/WebServer/Documents/dav
+
+Next, you need to find a place for the WebDAV lock database file. For lack of a
+better place, I created a directory alongside the `httpd.conf` configuration
+file, `/etc/httpd/dav`. Again, set the permissions so that the server can write
+files here:
+
+    $ sudo mkdir /etc/httpd/dav
+    $ sudo chgrp www /etc/httpd/dav
+    $ sudo chmod 775 /etc/httpd/dav
+
+## Creating users
+
+While our configuration specifies that only valid users are allowed to alter the
+contents of the `/dav` directory via WebDAV, we haven't yet created said users.
+Will'll do so now.
+
+Don't use an existing username and password. A malicious hacker sniffing your
+communications can grab that username and use it to sneak inside your system.
+The username we will create will be limited to WebDAV files only, which will be
+useless to a would-be intruder.
+
+First, create a password file by using the `htpasswd` utility. (Again, to keep
+everything related to DAV together, I used `/etc/httpd/dav/`.) You'll
+simultaneously create a user account and a password for `webdav`. You'll be
+prompted for a password unique (don't use one that you use elsewhere), because
+of the basic authentication risk I mentioned earlier:
+
+```
+$ sudo htpasswd -c /etc/httpd/dav.passwd webdav
+New password:
+Re-type new password:
+Adding password for user webdav
+```
+
+## See also
+
+WebDAV Resources (http://www.webdav.org)
+

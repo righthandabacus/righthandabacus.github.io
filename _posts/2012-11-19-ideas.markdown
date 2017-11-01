@@ -1,0 +1,27 @@
+---
+layout: post
+title: "Start-up ideas"
+date: 2012-11-19 11:48:35 -0500
+tags: business
+category: blog
+---
+Ways to think of ideas for a start-up: From Wesley Tansey's [blog post](http://wesleytansey.com/how-to-find-startup-ideas/)
+
+  - Repurpose
+    Take a service or approach applied to one market, and apply it to another.
+  - Digitize
+    Take content or functionality that exists only in a legacy form and put it online or in an app.
+  - Automate
+    Take a task that seems tedious and currently requires humans and automate it away.
+  - Unify
+    Create a common platform that ties together proprietary solutions or providers.
+  - Componentize
+    Take a piece of functionality that people currently implement themselves and make it
+    a reusable component.
+  - Connect
+    Transform a situation where people are isolated or lonely by connecting them in a novel way.
+  - Catalyze
+    Encourage people in a community to generate data that would otherwise be less
+    structured or available.
+
+Probably this is also the way towards creativity.

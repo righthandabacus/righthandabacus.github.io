@@ -1,0 +1,172 @@
+---
+layout: post
+title: "Configuration of INN"
+date: 2004-12-04 02:01:24 +0800
+tags: system
+---
+
+I set up an news server today. Jotted some notes.
+
+### Configuration files
+
+#### inn.conf(5) parameters
+
+  * `domain`: domain name suffic without period
+  * `pathhost`: things to put in "`Path:`" field of posted message. Usually the FQDN of the system. If it is unset, innd won't start.
+  * `artcutoff`: Drop postings older than this number of days. Default is 10, valid for feeding.
+  * `maxartsize`: Max article size in bytes, 0 allows any size
+  * `maxconnections`: Default is 50 simultaneous users
+  * `allownewnews`: Allow new news? Default is yes
+  * `clienttimeout`: Amount of idle times in secionds before the connection dropped. Default 600 sec.
+  * `complaints`: value for "`X-Complaints-To:`" header field
+  * `localmaxartsize`: max article size in bytes for locally posted articles (c.f. `maxartsize` for feeded articles)
+
+#### readers.conf(5) parameters
+
+There are two type of config groups: "`auth`" and "`access`"
+  * `auth`: establish the identity of the user
+  * `access`: given the identity, what they can do
+
+The format for the `auth` group is:
+
+```
+auth [name] {
+  hosts: 192.168.0.0/24, 10.0.0.0/8
+  auth: /usr/local/bin/...
+  res: /usr/local/bin/....
+  default: anonymous
+  default-domain: example.com
+}
+```
+
+If `hosts` part is matched with the user's, the program pointed by `res` is run
+and it should return `user@doamin` as the reported user identity. If `res` is
+not set or failed to return, the user identity is constructed by `default` and
+`default-domain`, in the above example, it is `anonymous@example.com`. If the
+user is passsed with `USER/AUTH` commands, the info will pass to the program
+pointed by `auth`, which will return another identity of the form `user@domain`.
+The name of the group is for documentation only.
+
+The format for the `access` group is:
+
+    access [name] {
+      users: alice@domain.com,bob@example.com,...
+      newsgroups: gp1,gp2,gp3,gp4,...
+      read: gp1,gp3,...
+      post: gp2,gp4,...
+    }
+
+The `users` list out all the users that this access group is applicable to, and
+`newsgroups` list out all the groups that the user can both `read` or `post`.
+The lines of `read` and `post` are respectively meant to allow the users to read
+or posts only.
+
+Both `auth` and `access` group will have the behavior determined by
+"last-match-counts". But the two groups are linked together to make effect by
+`key` options only. For example, the following allows all ccess for users from
+example.com:
+
+    auth example {
+      key: special
+      hosts: *.example.com
+      default: specialuser
+    }
+    access example {
+      key: special
+      users: specialuser
+      newsgroups: *
+    }
+
+and the following is a typical example for password-protected sites:
+
+    auth all {
+      auth: "ckpasswd -d /var/lib/.../news_users"
+    }
+    access full {
+      users: *
+      nesgroups: *
+    }
+
+Please note that the `auth` group do not provide `default` or `res`, so the
+users would not have any valid identity until authentication. We rely on this
+feature for mandatory login and hence, a password protection.
+
+#### active(5)
+
+This file describes all the newsgroups on this server.
+
+* Path: `[pathdb]/activ`
+* Each line of active file is:\\
+```
+[name] [himark] [lomark] [flag]
+```
+  * `name` = the name of the newsgroup
+  * `himark` = highest article sequence number in the group
+  * `lomark` = lowest article sequence number in the group
+  * `flag` can be:
+    * `y` : Allow local posting
+    * `n` : No local posting is allowed
+    * `m` : Moderated
+    * `j` : Do not keep posting, just pass on
+    * `x` : No post at all
+    * `=foo.bar` : Locally filed to `foo.bar` group
+
+### Commands
+
+#### ckpasswd(1)
+Options available:
+
+    -s            # check against system password
+    -f file       # check against passwd-like file
+    -d database   # check against dbm database
+
+Creation of passwd-like file for authentication: Using the following Perl script.
+
+    #/usr/bin/perl
+    open FILE,"file";
+    print "Username: ";
+    my $user=<STDIN>; chomp $user;
+    print "Password: ";
+    my $pass=<STDIN>; chomp $pass;
+    my @alphabet = ('.', '/', 0..9, 'A'..'Z', 'a'..'z');
+    my $salt = join ", @alphabet[rand 64,rand 64];
+    my $crypted = crypt($pass,$salt);
+    print FILE "$user=$crypted\n"
+
+#### ctlinnd(8)
+Usage:
+
+    ctlinnd command [option]
+
+Getting help:
+
+    ctlinnd -h          # Get a list of commands
+    ctlinnd -h command  # Usage of the command
+
+For example, to create a group, we are running:
+
+    ctlinnd newgroup group flag creator
+
+like:
+
+    # ctlinnd newgroup new_project y adrian
+
+Setup session:
+
+    # apt-get install inn2
+    # cd /etc/news
+    # mv readers.conf readers.conf.old
+    # cat > readers.conf
+    auth all {
+      auth: "ckpasswd -s"
+    }
+    access full {
+      users: *
+      nesgroups: *
+    }
+    ^D
+    # chgrp shadow /usr/lib/news/bin/auth/passwd/ckpasswd
+    # chmod g+s /usr/lib/news/bin/auth/passwd/ckpasswd
+    # ctlinnd newgroup mygroup y adrian
+    # /etc/init.d/inn2 restart
+

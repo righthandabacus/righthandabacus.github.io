@@ -1,0 +1,130 @@
+---
+layout: post
+title: "Various SSH usage tips"
+date: 2004-11-02 22:20:19 +0800
+lastedit: 2011-06-02 19:16:33 -0400
+tags: system
+---
+
+About keys, tunneling, and more
+
+# Generating a key
+
+- Install SSH
+- Create key pairs:
+```
+$ ssh-keygen -t dsa -b 4096 -C "" -N ""
+```
+- By default, the files named `id_dsa.pub` and `id_dsa` are created, the later one is the private key
+- Copy the public key to the remote server as `~/.ssh/authorized_keys2` (for SSHv2, if for SSHv1, it is `authorized_keys`)
+- Please make sure that the directory `~/.ssh` and your home directory is in mode 0755 (i.e. only writable by the owner) and owned by the home owner
+
+# Using SSH agent
+
+- Just a command, then it will spawn a shell for you
+```
+$ ssh-agent /bin/bash -c 'ssh-add < /dev/null && /bin/bash'
+```
+- In the spawned shell, do your work and you will get passed on SSH without passphase
+
+# Tunneling
+
+Assume the network looks like this:
+
+    [192.168.0.0/24] -- [MachineA]--[internet]--[MachineB]--[172.16.0.0/24]
+
+The game is as follows:
+
+## User at MachineA accessing 172.16.0.1
+
+A user using `MachineA` want to connect to `172.16.0.1` directly. As the Internet
+would not route for such IP, we set up a tunnel between `MachineA` and `MachineB`
+for that. The result is, SSH listen on port 3210 of `MachineA`. For whatever
+connection established to that port, it is tunneled over the Internet and, from
+`MachineB`, forwarded to `172.16.0.1:4321`
+
+This is called local binding:
+
+    MachineA$ ssh -L 3210:172.16.0.1:4321 MachineB
+
+then, `MachineA`'s `127.0.0.1:3210` is listened. Users on `MachineA` can connect to
+`127.0.0.1:3210` to mean to connect to `172.16.0.1:4321`
+
+If, on `MachineA`, `0.0.0.0:3210` shall be listened instead of `127.0.0.1:3210`, use option `-g`:
+
+    MachineA$ ssh -g -L 3210:172.16.0.1:4321 MachineB
+
+## User at MachineB allows users at MachineA accessing 172.16.0.1
+
+Same problem, but this time, a user at MachineB creates the tunnel instead of a
+user at `MachineA`:
+
+    MachineB$ ssh -R 3210:172.16.0.1:4321 MachineA
+
+This is the remote binding. Like the case above, `127.0.0.1:3210` is listened on
+`MachineA`. And also likewise, use option `-g` to listen on `0.0.0.0:3210` instead.
+
+## Creating a SOCKS server
+
+The local binding or remote binding creates an explicit tunnel for a specific
+`IP:port` pair. To make the tunnel generally usable for all `IP:port` instead of
+just one, we have to use a proxy server.
+
+SSH supports SOCKS4 and SOCKS5. It is similar to local binding except no
+destination IP and port number needed:
+
+    MachineA$ ssh -D 3210 MachineB
+
+This command creates a SOCKS server at `127.0.0.1:3210` at `MachineA`. A client
+shall speak SOCKS protocol to this port to request a connection to some port at
+a machine in `172.16.0.0/24`. Such connection will then delivered over the SSH to
+`MachineB`, i.e. encrypted. MachineB will create such connection on behalf of the
+client.
+
+# Multihop SSH tunneling
+
+In SSH, there is a feature named ProxyCommand. What this means is that, when
+you want to connect to a host, instead of directly setting up a socket to that
+host, you do it over another command. A common use is the following:
+
+    localhost <--> mediate1 <--> mediate2 <--> remotehost
+
+Then you can do a SSH login from losthost to remotehost by using ProxyCommand
+constructs. A convenient way is to set up the following in `~/.ssh/config` in
+localhost (another way is to use `-oproxycommand` in command line)
+
+```
+Host remotehost
+  user remotelogin
+  port 22
+  hostname remotehost.domain
+  ProxyCommand ssh mediate2 nc %h %p
+
+Host mediate2
+  user mediate2login
+  port 22
+  hostname mediate2.domain
+  ProxyCommand ssh mediate1 nc %h %p
+
+Host mediate1
+  user mediate1login
+  port 22
+  hostname mediate1.domain
+```
+
+Afterwards, in localhost, we can login to `remotehost` using account `remotelogin`
+by simply invoking:
+
+    $ ssh remotehost
+
+New in OpenSSH 5.4: Instead of using `netcat` externally, we can use `-W` option to
+do the same thing, now the `ProxyCommand` line becomes
+
+    ProxyCommand ssh -W %h:%p mediate2
+
+# Reference
+
+  * [Ed Cashin's intriguing papers page](http://www.noserose.net/e/papers/)
+  * ["HOWTO: set up ssh keys" by Paul Keck](http://www.arches.uga.edu/~pkeck/ssh/)
+  * OpenSSH key management, Parts 1-3, by Daniel Robbins, IBM developerWorks article
+

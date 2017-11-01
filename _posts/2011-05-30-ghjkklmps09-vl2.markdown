@@ -1,0 +1,17 @@
+---
+layout: post
+title: "Greenberg et al (2009) VL2: A Scalable and Flexible Data Center Network (SIGCOMM)"
+date: 2011-05-30 16:10:55 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "VL2: A Scalable and Flexible Data Center Network"
+  author: "Albert Greenberg and Srikanth Kandula and David A. Maltz and James R. Hamilton and Changhoon Kim and Parveen Patel and Navendu Jain and Parantap Lahiri and Sudipta Sengupta"
+  booktitle: "Proc. SIGCOMM’09"
+  month: "August 17–21"
+  year: 2009
+  address: "Barcelona, Spain"
+---
+An architecture of data center network to support virtual machines as workhorses and standard Ethernet as layer-2 with flat-addressing. Load-balancing is provided by Valiant Load Balancing (i.e. OSPF ECMP), and the multipath capability of the network is exploited by modifying the OS of hosts --- so that different MAC addresses are used to correspond to different paths. The move of VM from one hardware host to another is done by tricking the MAC address. A centralised server is used as the MAC address directory system.
+
+The topology mentioned in the paper is interesting: It claims as a Clos network but it is not a fat-tree, which is commonly called the folded Clos. The network presented is as follows: The core layer (called intermediate switches) are forming a complete bipartite graph with aggregation layer. That is, any aggregation switch connects to every core switch. The top-of-rack switch (edge) spans only two connections to two different aggregation switches.

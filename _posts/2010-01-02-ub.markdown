@@ -1,0 +1,9 @@
+---
+layout: post
+title: "Removing Universal Binary"
+date: 2010-01-02 19:20:22 -0500
+tags: system
+---
+In MacOS X, we now have universal binary to make program compatible with PPC and i386 architectures. But who's still using PPC nowadays? To strip a UB into single-architecture binary to save hard disk space, issue:
+
+    $ lipo ubprogram -extract_family i386 -output singlearchprogram

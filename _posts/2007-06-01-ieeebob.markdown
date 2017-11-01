@@ -1,0 +1,68 @@
+---
+layout: post
+title: "Best of the Best by IEEE"
+date: 2007-06-01 09:35:30 +0800
+tags: random
+---
+
+Yesterday, I came across the Swindon Bookstore and found a book "Best of the Best: Fifty Years of Communications and Networking Research" by IEEE Communications Society. It is to celebrate its 50th anniversary and this book is a compilation of some 56 important papers.
+
+The following is the contents:
+  - Physical and Link Layer Aspects of Communications
+     - Turbo Space-Time Processing to Improve Wireless Channel Capacity.
+     - A Simple Transmit Diversity Technique for Wireless Communications.
+     - A Space-Time Coding Modem for High-Data Rate Wireless Communications.
+     - Near Optimum Error Correcting Coding and Decoding: Turbo-Codes.
+     - Erlang Capacity of a Power Controlled CDMA System.
+     - Decorrelating Decision-Feedback Multiuser Detector for Synchronous Code-Division Multiple-Access Channel.
+     - Dense Wavelength Division Multiplexing Networks: Principles and Applications.
+     - Near-Far Resistance of Multiuser Detectors in Asynchronous Channels.
+     - Multiple-Symbol Differential Detection of MPSK.
+     - The Effects of Time Delay Spread on Portable Radio Communication Channels with Digital Modulation.
+     - A Statistical Model for Indoor Multipath Propagation.
+     - Standardized Fiber Optic Transmission Systems. A Synchronous Optical Network View.
+     - Analysis and Simulation of a Digital Mobile Channel Using Orthogonal Frequency Division Multiplexing.
+     - Efficient Modulation for Hand-Limited Channels.
+     - Optimum Combining in Digital Mobile Radio with Cochannel Interference.
+     - MMSE Equalization of Interference of Fading Diversity Channels.
+     - The SL Undersea Lightguide System.
+     - Distribution of the Phase Angle Between Two Vectors Perturbed by Gaussian Noise.
+     - Cochannel Interference Considerations in Frequency Reuse Small-Coverage-Area Radio Systems.
+     - GMSK Modulation for Digital Mobile Radio Telephony.
+     - Continuous Phase Modulation-Part 1: Full Response Signaling.
+     - Continuous Phase Modulation-Part II: Partial Response Signaling.
+     - Carrier and Bil Synchronization in Data Communication. A Tutorial Review.
+     - Tamed Frequency Modulation. A Novel Method to Achieve Spectrum Economy in Digital Transmission.
+     - Performance Evaluation for Phase-Coded Spread-Spectrum Multiple-Access Communication Part I: System Analysis.
+     - The Throughput of Packet Broadcasting Channels.
+     - Maximum Likelihood Receiver for Multiple Channel Transmission Systems.
+     - An Optimum Linear Receiver for Multiple Channel Transmission Systems.
+     - Adaptive Maximum-Likelihood Receiver for Carrier-Modulated Data-Transmission Systems.
+     - Error Probability in the Presence of Intersymbol Interference and Additive Noise for Multilevel Digital Signals.
+     - Coherence Demodulation of Frequency-Shift Keying with Low Deviation Ratio.
+     - Data Transmission by Frequency-Division Multiplexing Using the Discrete Fourier Transform.
+     - Viterbi Decoding for Satellite and Space Communication.
+     - Convolutional Codes and Their Performance in Communication Systems.
+     - An Adaptive Decision Feedback Equalizer.
+     - Performance of Optimum and Suboptimum Synchronizers.
+     - Correlative Digital Communication Techniques.
+     - Characterization of Randomly Time-Variant Linear Channels.
+     - On the Optimum Detection of Digital Signals in the Presence of White Gaussian Noise. A Geometric Interpretation and a Study of Three Basic Data Transmission Systems.
+     - Performance of Combined Amplitude and Phase-Modulated Communication Systems.
+     - Synchronous Communications.
+  - Networking
+     - On the Self-Similar Nature of Ethernet Traffic (Extended Version).
+     - A Generalized Processor Sharing Approach to Flow Control in Integrated Services Networks: The Single-Node Case.
+     - DQDB Networks with and without Bandwidth Balancing.
+     - Input Versus Output Queueing on a Space-Division Packet Switch.
+     - Routing in the Manhattan Street Network.
+     - Bottleneck Flow Control.
+     - Routing and Flow Control in TYMNET.
+     - OSI Reference Model. The ISO Model of Architecture for Open Systems Interconnection.
+     - Deadlock Avoidance in Store-and-Forward Networks. Store-and-Forward Deadlock.
+     - A Minimum Delay Routing Algorithm Using Distributed Computation.
+     - Packet Switching in Radio Channels: Part 1-Carrier Sense Multiple-Access Modes and Their Throughput-Delay Characteristics.
+     - Packet Switching in a Multiaccess Broadcast Channel: Performance Evaluation.
+     - A Protocol for Packet Network Intercommunication.
+     - On Distributed Communications Networks.
+     - Routing Procedures in Communications Networks. Part 1: Random Procedures.

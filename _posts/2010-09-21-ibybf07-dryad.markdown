@@ -1,0 +1,22 @@
+---
+layout: post
+title: "Isard (2007) Dryad: Distributed Data-Parallel Programs from Sequential Building Blocks(EuroSys)"
+date: 2010-09-21 14:53:59 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "Dryad: Distributed Data-Parallel Programs from Sequential Building Blocks"
+  author: "Michael Isard and Mihai Budiu and Yuan Yu and Andrew Birrell and Dennis Fetterly"
+  insitution: "Microsoft Research Silicon Valley"
+  booktitle: "Proc European Conference on Computer Systems (EuroSys)"
+  year: 2007  
+---
+Dryad is an attempt to make parallel programming easier by providing a lower-layer building blocks. It works as a "OS" layer over a "hardware" layer of computation cluster. The application can therefore built upon it.
+
+Dryad's programming model is like a generalization of UNIX unnamed pipes. Multiple program are taking input and generating output, and they are chained by pipes to produce useful result. In Dryad, the pipes is in 2D: it allows multiple pipes are connected from/to a single program.
+
+The central mechanism of Dryad is the "call graph", which a single program is a vertex and pipes are directed edges. The execution of a program is transformed into a graph with each vertex representing a sub-program, and each edge is a channel (a file, TCP, or in-memory FIFO).
+
+In Dryad, there is a centralized job manager (JM), who maintains the state of a job and control its execution. User's operation is as follows: When a user submits a job, it submits a binary to job manager, and the job manager constructs the call graph with the cluster resources information. Then it installs the binary into vertices and starts the program. The JM is vital as it can modify the graph at runtime (because sub-job is splited into stages). It can detect for failure, rerun part of a program due to slowness or failure, etc.
+
+In the paper, the authors claimed the availability of DryadLINQ, a LINQ programming language specific for Dryad that allows easy parallelized computation.

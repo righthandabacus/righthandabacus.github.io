@@ -1,0 +1,127 @@
+---
+layout: post
+title: "Introductory AJAX"
+date: 2007-03-26 08:43:36 +0800
+tags: code
+---
+
+## In Brief
+
+Below is an example given by [W3School](http://www.w3schools.com/ajax/default.asp):
+
+```html
+  <html>
+  <head><script src="clienthint.js"></script></head>
+  <body>
+  <form>
+    First Name: <input type="text" id="txt1" onkeyup="showHint(this.value)">
+  </form>
+  <p>Suggestions: <span id="txtHint"></span></p> 
+  </body>
+  </html>
+```
+
+and the corresponding JavaScript file is as follows:
+
+```javascript
+  var xmlHttp
+  function showHint(str)
+  {
+      if (str.length==0) {
+          document.getElementById("txtHint").innerHTML="";
+          return;
+      }
+      xmlHttp=GetXmlHttpObject();
+      if (xmlHttp==null) {
+          alert ("Browser does not support HTTP Request");
+          return;
+      }
+      var url="gethint.asp?";
+      url=url+"?q="+str;
+      url=url+"&sid="+Math.random();
+      xmlHttp.onreadystatechange=stateChanged;
+      xmlHttp.open("GET",url,true);
+      xmlHttp.send(null);
+  } 
+
+  function stateChanged() 
+  { 
+      if (xmlHttp.readyState==4 || xmlHttp.readyState=="complete") { 
+          document.getElementById("txtHint").innerHTML=xmlHttp.responseText;
+      };
+  } 
+
+  function GetXmlHttpObject()
+  { 
+      var objXMLHttp=null;
+      if (window.XMLHttpRequest) {
+          objXMLHttp=new XMLHttpRequest();
+      } else if (window.ActiveXObject) {
+          objXMLHttp=new ActiveXObject("Microsoft.XMLHTTP");
+      };
+      return objXMLHttp;
+  }
+```
+
+The key things in AJAX is:
+  - Label an object with CSS, e.g. the `span` tag in the example above
+  - Create a JavaScript handling function to capture for an event, e.g. the `onkeyup` event
+  - Ask the JavaScript to modify part of the HTML identified by the labelled object. In the mean time, the modification can be a result of retriving something from the web, e.g. via the `XMLHttpRequest` object.
+
+So the core function in AJAX is the `XMLHttpRequest` object, which allows you to send and receive something while you are in JavaScript. The methods provided by XMLHttpRequest are:
+  * `open(method,uri,[async,[username,[password]]])`: sets up a request to a web server.
+  * `send(requestContent)`: method sends a request to the server.
+  * `abort()`: method aborts the current server request.
+  * `setRequestHeader(key, value)`: as the name implies.
+  * `getResponseHeader(key)`: as the name implies.
+  * `overrideMimeType(type)`: interpret the response as if the specified mime type.
+
+To facilitate the program to handle the data got back from a web query, there is a `readyState` property in the `XMLHttpRequest` object to tell about the current state. Its value is an integer and it can be:
+  * 0: The request is not initialized, i.e. object created but `open()` not called
+  * 1: The request has been set up, i.e. `open()` called but not `send()`
+  * 2: The request has been sent, i.e. `send()` just called but no action is done yet
+  * 3: The request is in process, i.e. connection to the server is established and waiting for the response
+  * 4: The request is completed, i.e. everything is done
+
+Which means, we are interested in only whether `readyState==4` or not. Additional parameter to the object are:
+  * `onreadystatechange`: The function called when `readyState` changes
+  * `responseText`: The response body as text. Non-null when `readyState>=3`
+  * `responseXML`: The response body as XML pakaged as a DOM object. Non-null when `readyState>=3`
+  * `status`: The integer HTTP response status code, e.g. 200
+
+
+## Good references
+
+[W3School](http://www.w3schools.com/ajax/default.asp): 
+It provides a very brief but concise tutorial on AJAX.
+
+[Rasmus' email about AJAX](http://rajshekhar.net/blog/archives/85-Rasmus-30-second-AJAX-Tutorial.html): 
+Even shorter tutorial.
+
+Others:
+  * <http://www.maxkiesler.com/index.php/weblog/comments/round_up_of_30_ajax_tutorials/>
+  * <http://www.freeprogrammingresources.com/ajax-tutorial-libraries.html>
+  * <http://www.ajaxpatterns.org/>
+
+AJAX libraries that I am going to study:
+  * <http://script.aculo.us/>
+  * <http://openrico.org/rico/downloads.page>
+  * <http://moofx.mad4milk.net/documentation/>
+
+## prototype.js
+It seems to me that quite a number of AJAX sites uses the `prototype.js` from [Sam Stephenson](http://prototype.conio.net/).
+
+I am studying it. Following are the links about this library:
+  * <http://www.sergiopereira.com/articles/prototype.js.html>\\
+    A very comprehensive, dictionary-like documentation for `prototype.js`. The author also has an [Advanced JavaScript Guide](http://www.sergiopereira.com/articles/advjs.html)
+  * <http://prototypedoc.com/>\\
+    "Prototype Documentation List", a site that gathers the link to different `prototype.js` guides, tutorials, etc.
+  * <http://blogs.ebusiness-apps.com/jordan/pages/Prototype%20Library%20Info.htm>\\
+    Overview of the functionality of `prototype.js`
+  * <http://wiki.script.aculo.us/scriptaculous/show/Prototype>\\
+    Scriptaculous is one of the major applications based on `prototype.js` and this is the documentation wiki of scriptaculous about `prototype.js`
+  * <http://www.codecite.com/presentation/ajax/prototype>\\
+    A web-based presentation slide about `prototype.js`, it is also using AJAX for the presentation
+
+## Other stuff
+  * [An AJAX-based webmail client](http://www.roundcube.net/)

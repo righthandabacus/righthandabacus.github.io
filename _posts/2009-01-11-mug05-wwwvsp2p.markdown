@@ -1,0 +1,52 @@
+---
+layout: post
+title: "Mori, Uchida, Goto (2005) Flow Analysis of Internet Traffic: World Wide Web versus Peer-to-Peer"
+date: 2009-01-11 10:41:50 -0500
+category: paper
+bibtex:
+  type: article
+  title: "Flow Analysis of Internet Traffic: World Wide Web versus Peer-to-Peer"
+  author: "Tatsuya Mori and Masato Uchida and Shigeki Goto"
+  journal: "Systems and Computers in Japan"
+  volume: 36
+  number: 11
+  pages: "70--81"
+  year: 2005
+  note: "Translated from Denshi Joho Tsushin Gakkai Ronbunshi 電子情報通信學會論文誌, Vol. J87-D-I, No. 5, May 2004, pp. 561–571"
+---
+The paper quoted that, in mid-1990s to early-2000s, most traffic is web while
+the amount of P2P traffic became comparable to web since then. This paper is to
+measure the P2P traffic, as well as web traffic for the knowledge of traffic
+models. The measurement is made on an Internet link of Waseda University
+(早稻田大學) for a night (6pm to 12mn).
+
+The result is that, around 70% of flows are WWW and P2P flows accounts for less
+than 1%. But the traffic volue of WWW and P2P are respectively 58% and 22%. The
+flows' interarrival time are exponential in both WWW and P2P traffic, even their
+mean interarrival time are respectively 0.015s and 15s. Their correlation
+coefficient against exponential is greater than 0.99.
+
+Power spectral density is also obtained. The PSD is defined as
+
+$$ I(f)=\dfrac{1}{2\pi N}\sum_{k=1}^N T_\delta(k)e^{jkf/2}, $$
+
+where $T_\delta(k)$ are the flow interarrival times. The PSD plot shows that, in
+WWW traffic, $I(f)$ has a decrease tendency with $f$ but P2P traffic remains flat
+with $f$. This means WWW traffic has long range dependency but P2P does not have
+time correlation.
+
+Considering the flow size distributions (number of bytes), the cummulative
+percentage-flow size plot is linear in the log-log scale when we consider the
+size of 10K to 100M. This means the flow size distribution can be modelled by
+Pareto distribution. The small flow size region increases slowly and the large
+flow size region increases rapidly in the cummulative percentage The Pareto
+parameter $\alpha$ is measured to be 1.11 in the WWW traffic and 0.38 in the P2P
+traffic. Since $\alpha<1$ in P2P, it is highly heavy-tailed. But the WWW traffic
+has finite mean in flow size.
+
+The flow duration distribution of both WWW and P2P shows a non-linear behaviour
+in the log-log plot of cummulative fraction against duration. The nonlinearity
+suggests log-normal distribution, i.e. duration $\log D \sim N(\mu,\sigma^2)$,
+which is found to be a very good approximate in the middle ranges. The
+log-normal distribution is also found in the flow rate (flow size divided by
+duration).

@@ -1,0 +1,12 @@
+---
+layout: post
+title: "Mounting NFS in OSX Lion"
+date: 2011-08-03 12:05:08 -0400
+tags: system
+---
+
+A common problem in connecting NFS on OS X machines is that, they do not connect on "reserved ports" (i.e. $<$1024). Two ways to solve: On the NFS server, use "insecure" keyword in the `/etc/exports` to accept so-called insecure ports for connection. Or in OS X side, instruct to use reserved ports. Command line:
+
+    mount_nfs -o resvport server:/exported/path /local/mount/point
+
+For Cmd-K in Finder, we need a trick. First go to Disk Utility, in the "File" menu, pick "NFS Mounts" to add a remote NFS location to the list. Then, in the "Advanced Mount Parameters", type in the option "resvport". Thereafter, typing the same NFS location `nfs://server//exported/path` on Cmd-K will use this parameter.

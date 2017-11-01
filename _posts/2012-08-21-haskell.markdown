@@ -1,0 +1,15 @@
+---
+layout: post
+title: "Programming in Haskell"
+subtitle: "Graham Hutton / 2007"
+date: 2012-08-21 15:10:49 -0400
+category: book
+bibtex:
+  type: book
+  title: Programming in Haskell
+  author: Graham Hutton
+  publisher: Cambridge University Press
+  year: 2007
+  isbn: 0-521-87172-7
+---
+The best Haskell book I have ever read. Simple and straightforward. Allows the reader to do something useful very quickly, and with enough reference for further study (read: pointers to academic papers in the theory of programming languages). Highly recommended.

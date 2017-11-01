@@ -1,0 +1,17 @@
+---
+layout: post
+title: "Garcia-Lunes-Aceves (1993) Loop-Free Routing Using Diffusing Computations (TON)"
+date: 2010-06-01 23:57:51 -0400
+category: paper
+bibtex:
+  type: article
+  title: "Loop-Free Routing Using Diffusing Computations"
+  author: "J. J. Garcia-Lunes-Aceves"
+  journal: "IEEE/ACM Trans on Networking"
+  volume: 1
+  number: 1
+  pages: "130--141"
+  month: Feb
+  year: 1993
+---
+This paper describes the DUAL (diffusion update algorithm), which is used in Cisco's EIGRP. The algorithm guarantees loop-free routing at any time by imposing a constraint (feasibility condition) on route update. The feasibility condition is a conservative condition in the sense that it rejects some legitimate route update so that loops can be totally avoided.

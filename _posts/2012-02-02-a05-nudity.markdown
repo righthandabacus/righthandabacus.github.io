@@ -1,0 +1,38 @@
+---
+layout: post
+title: "Ap-Apid (2005) An Algorithm for Nudity Detection (PCSC)"
+date: 2012-02-02 03:12:00 -0500
+category: paper
+bibtex:
+  type: inproceedings
+  title: "An Algorithm for Nudity Detection"
+  author: "Rigan Ap-Apid"
+  booktitle: "Proc. 5th Philippine Computing Science Congress"
+  page: "201--205"
+  month: "Mar"
+  year: 2005
+  address: "Cebu City, Philippines"
+---
+[PDF](https://drive.google.com/open?id=0B6DoI_vm0OLfa2JyOThkbXMtcEE)
+
+I learn about this paper because of [nude.js](http://www.patrick-wied.at/static/nudejs/).
+
+This paper proposes an algorithm to classify nude pictures. Firstly, it classify pixels in a picture as "skin" and "non-skin". Then connect the skin pixels into skin regions. For the largest three skin regions, make a bounding polygon (indeed only a quadrilateral as it takes only the leftmost, rightmost, uppermost and lowermost pixels). Base on the skin regions and the polygon, a picture contains nudity unless any of the following is met:
+
+  * Total skin pixels <15% pixels in a picture
+  * Largest skin region has <35% total skin pixels AND 2nd largest has <30% AND 3rd largest has <30%
+  * Largest skin region has <45% total skin pixels
+  * Total skin pixels <30% pixels in a picture AND skin pixels in the bounding polygon <55% size of polygon
+  * Number of skin regions >60 AND average intensity within polygon <0.25
+
+In the last bullet, intensity is the saturation value in HSV space. Converting from RGB to HSV is given by the following formulae:
+
+$$
+\begin{aligned}
+H &= \arccos\frac{\frac{1}{2}[(R-G)+(R-B)]}{\sqrt{(R-G)^2+(R-B)(G-B)}} \\
+S &= 1 - 3\frac{\min(R,G,B)}{R+G+B} \\
+V &= \frac{1}{3}(R+G+B)
+\end{aligned}
+$$
+
+Extended reading: [Finding Naked People by Margaret M. Fleck and David A Forsyth](http://www.cs.hmc.edu/~fleck/naked.html)

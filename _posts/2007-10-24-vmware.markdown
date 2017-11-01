@@ -1,0 +1,62 @@
+---
+layout: post
+title: "VMware Server"
+date: 2007-10-24 11:00:03 -0400
+tags: system
+---
+
+In the past, I used to use the VMware GSX server (my university paid a lot of
+money for that!). I haven't been using it for a while but now, as I want to try
+out something with my new Athlon64 Dell, I picked it up again.
+
+Some how, the GSX series is discontinued and VMware is only selling ESX. The
+original GSX becomes *VMware Server* and it is now a freeware! Great!
+
+I downloaded and filled out an online form for a free serial number[^SN], but
+the vmmon and vmnet modules failed to compile for my kernel. I guess it is
+simply a problem of kernel code change since the VMware modules are programmed
+(this happens a lot in the history). After some kernel code hacking, the
+solutions are:
+
+``` diff
+diff -uwr vmmon-only/linux/driver.c.old vmmon-only/linux/driver.c
+--- vmmon-only/linux/driver.c.old   2007-09-06 17:59:54.000000000 -0400
++++ vmmon-only/linux/driver.c       2007-10-24 10:39:15.000000000 -0400
+@@ -1656,7 +1656,10 @@
+           current->egid == current->gid &&
+          current->fsgid == current->gid) {
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 4, 7)
+-        current->mm->dumpable = 1;
++        /* current->mm->dumpable = 1; */
++        set_bit(MMF_DUMPABLE, &currnet->mm->flags);
++        smp_wmb();
++        clear_bit(MMF_DUMP_SECURELY, &current->mm->flags);
+ #else
+         current->dumpable = 1;
+ #endif
+```
+
+and also
+
+``` diff
+diff -uwr vmnet-only/driver.c.old vmnet-only/driver.c
+--- vmnet-only/driver.c.old   2007-09-06 17:59:55.000000000 -0400
++++ vmnet-only/driver.c       2007-10-24 10:39:37.000000000 -0400
+@@ -519,11 +519,14 @@
+    int retval;
+
+    unregister_ioctl32_handlers();
++   unregister_chrdev(VNET_MAJOR_NUMBER, "vmnet");
++/*
+    retval = unregister_chrdev(VNET_MAJOR_NUMBER, "vmnet");
+    if (retval != 0) {
+       LOG(0, (KERN_WARNING "/dev/vmnet: could not unregister major device %d\n",
+              VNET_MAJOR_NUMBER));
+    }
++*/
+    VNetProtoUnregister();
+    VNetProc_Cleanup();
+ }
+```
+
+[^SN]: 90RAX-YHJ6X-20H8H-4H53N

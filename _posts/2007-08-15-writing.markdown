@@ -1,0 +1,38 @@
+---
+layout: post
+title: "Writing (in English)"
+date: 2007-08-15 05:14:22 +0800
+tags: business
+---
+
+Objectives of writing: Correctness, clarity and grace.
+
+Writing is telling a story. Hence using verbs will tell things clearer. Moreover, a distinct character and actions will make clarity. That's why passive voice is considered undermining readability, and nominalization (making verbs/adjectives into nouns) is also not good to readability sometimes because it leads to the use of passive voices.
+
+Readers tends to expect a sentence to begin with a short subject, then a verb, then the object. Hence if a subject is too long, it harms readability. This is the case where passive voice is good for clarity.
+
+Moreover, clarity came from simplicity. Reducing redundancy, omitting inferrences, and replacing long by short can make things clear.
+
+## Connectivity
+
+Sentences have to be connected. The connection can be:
+
+  * Causal: therefore, thus, because
+  * Exception: but, however, albeit, despite, in spite of
+  * Two facets of the same matter: on the one hand, on the other hand
+  * Enumeration: firstly, secondly
+  * Temporal: then, afterwards
+
+## Examples of clarity
+| Bad | Better |
+|-----|--------|
+| Better evaluation of responses to treatment modalities depends on the standardization of an index allowing accurate descriptions of learning disorder behaviors. | We could better evaluate how those with learning disorders respond to treatment if we could standardize an index that accurately describes how they behave |
+| The collapse of a dead star into a point perhaps no larger than a marble creates a black hole. | A black hole is created by the collapse of a dead star into a point perhaps no larger than a marble. |
+| Macbeth was very ambitious.  This led him to wish to become king of Scotland.  The witches told him that this wish of his would come true. The king of Scotland at this time was Duncan. Encouraged by his wife, Macbeth murdered Duncan. He was thus enable to succeed Duncan as king. | Encouraged by his wife, Macbeth achieved his ambition and realized the prediction of the witches by murdering Duncan and becoming king of Scotland in his place. |
+
+* Source: Lucid Writing by Prof Clement Lee
+
+
+## References
+  * Prof Clement Lee: "Lucid Writing" (presentation slides)
+  * [Common Bugs in writing](http://www.cs.columbia.edu/~hgs/etc/writing-bugs.html), especially focused on writing academic papers

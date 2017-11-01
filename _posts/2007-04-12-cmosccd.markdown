@@ -1,0 +1,17 @@
+---
+layout: post
+title: "Size of CCD CMOS on Common Digital Cameras"
+date: 2007-04-12 15:29:56 +0800
+tags: reference
+---
+
+|standard  |size             |models     |
+|----------|-----------------|-----------|
+|Full frame|36mm x 24mm      |Kodak Pro14n<br/> Canon EOS-1Ds Mark II|
+|APS-C     |22.7mm x 15.1mm  |Nikon D100, D70s, D50<br/> Canon EOS 10D, 20D, 300D, 350D<br/> Minolta a-7D, a-5D<br/> Pentax *ist DL|
+|FoveonX3  |20.7mm x 13.8mm  |Sigma SD9, SD10|
+|4/3-inch  |17.8mm x 13.4mm  |Olympus E-1, E-300|
+|2/3-inch  |8.8mm x 6.6mm    |Minolta A2<br/> Canon Pro1<br/> Nikon 8800<br/> Sony F828|
+|1/1.8-inch|7.178mm x 5.319mm|Sony W-17<br/> Canon G5, A95<br/> Nikon 7900<br/> Minolta 500Z|
+|1/2.5-inch|5.38mm x 4.39mm  |Ricoh R5<br/> Kodak 7590<br/> Fujifilm F510<br/> Sony H1|
+

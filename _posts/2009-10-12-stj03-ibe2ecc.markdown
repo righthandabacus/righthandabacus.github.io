@@ -1,0 +1,53 @@
+---
+layout: post
+title: "Santos et al (2003) End-to-End Congestion Control for InifiBand (INFOCOM)"
+date: 2009-10-12 00:40:19 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: End-to-End Congestion Control for InifiBand
+  author: "Jose Renato Santos and Yoshio Turner and G. (John) Janakiraman"
+  booktitle: "Proc INFOCOM"
+  year: 2003
+---
+Because InfiniBand switch are input-buffered, there would be the case that a
+victim flow choked when some other flow caused a congestion. An example would
+be, switch A has a flow to switch B port 1 which this port is oversubscribed,
+and hence congested. Switch A has another flow to switch B port 2 which it is
+this port's only user. But because of the input buffering, this victim flow
+cannot send at full speed because of backlog at the port connecting switches A
+and B. In this paper, it called congestion spreading because congestion at port
+1 spreaded its effect to other ports.
+
+IB uses FECN to mark the congestion and BECN to tell the congestion back to the
+sender. However, because of input buffering, it cannot mark the
+congestion-creating flows efficiently and leads to unfairness. This paper
+propose a solution to that, in three steps: (1) switch triggers packet marking
+whenever a buffer is full, (2) any output link that is the destination for at
+least one packet is classified as a congested link, (3) all packets that cannot
+leave the congested link immediately are marked.
+
+At the source host part, window-based control can provide self-clocked
+transmission but not suitable for IB because the BDP of IB is very small (1
+packet only). The small range of useful window size limits its ability of
+congestion control. Thus in IB, we need injection rate control. The injection
+rate is increased and decreased reactive to congestion level. There are some
+criteria for the design of rate change functions:
+
+  - Avoid congestion: The rate of a flow is expected to oscillate, i.e. increased and
+    decreased successively. In that case, we should make
+    $f_{\textrm{inc}}(f_{\textrm{dec}}(r))\le r$ to prevent congestion blow up
+  - Promote fairness: The recovery time (i.e. time between a decrease from rate $r$ to
+    return to rate $r$ of a lower rate should be faster than a higher rate.
+  - Maximizing bandwidth utilization: Reclaim link bandwidth as fast as possible,
+    i.e. recovery time shall equals to the inter-packet delay at minimum possible rate
+    $R_{\min}$
+
+The paper derived increment and decrement functions for any rate $r$. The Fast
+Increase Multiplicative Decrease (FIMD) functions are using MD for decrease and
+expoential for increase. The Linear Inter-Packet Delay functions are using
+function $f_{\mathrm{dec}}(r)=R_{\max}/(\frac{R_{\max}}{r}+1)$ as decrease
+function (so that inter-packet delay is linear to rate) and the corresponding
+increase function is $f_{\mathrm{inc}}(r)=r/(1-\frac{R_{\min}}{R_{\max}})$.
+
+The paper compares FIMD, LIPD, and AIMD control for different traffic pattern. It is found that LIPD can give highest utilization but FIMD can adapt to changes faster.

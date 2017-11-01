@@ -1,0 +1,52 @@
+---
+layout: post
+title: "Katabi et al (2002) Congestion Control for High Bandwidth-Delay Product Networks (SIGCOMM)"
+date: 2009-10-07 17:20:55 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "Congestion Control for High Bandwidth-Delay Product Networks"
+  author: "Dina Katabi and Mark Handley and Charlie Rohrs"
+  booktitle: "Proc. SIGCOMM"
+  month: "August 19-23"
+  year: 2002
+  address: "Pittsburgh PA"
+---
+The paper that proposed XCP (Explicit Control Protocol). The idea about XCP is to get routers involved in the congestion control so that efficiency and fairness can be maintained more precisely.
+
+The key idea behind is separate efficiency control and fairness control and let routers explicitly tell the sender how to react. Similar to TCP, XCP is also window-based.
+
+Senders maintain a cwnd and an estimated rtt. The packets sent contains 3 headers related to XCP: The cwnd it is using, the rtt that it estimated, and a feedback value initialized by the sender but will be modified by the routers. When the acknowledgement comes back, the sender copies the feedback value and update the cwnd accordingly.
+
+The control of XCP routers is as follows: It has a efficiency control that keeps track on how much bandwidth is used and how far it is from the optimal value. It computes a *aggregate* feedback value $\Phi=\alpha dS-\beta Q$, where $\alpha$ and $\beta$ are constants (0.4 and 0.226), $d$ is the average RTT of all flows as perceived by the router, $S$ is the spare bandwidth (incoming minus capacity), and $Q$ is the persistent queue size defined as the min queue ever seen in the last RTT. The aggregate feedback is proportional to spare bandwidth and the queue size to measure how far it is from the optimal.
+
+The fairness control is then based on the efficiency control's feedback value to announce cwnd change to each flow. If the value $\Phi$ is positive, all flows have to increase *throughput* by the same amount; if it is negative, all flows have to decrease *throughput* proportional to its current throughput. Moreover, there is bandwidth shuffling to adjust bandwidth of each flow so that fairness can be converged even if the aggregate rate stays in optimal. The amount of shuffled traffic is $h=(\gamma\cdot y-\lvert\phi\rvert)^+$ where $\gamma=0.1$ which says at least 10% of traffic are shuffled.
+
+The positive feedback is $p_i = \xi_p\dfrac{rtt_i^2\cdot s_i}{cwnd_i}$, which says that the increase in cwnd of a flow is inversely proportional to its sending rate and directly proportional to its RTT. The coefficient tells how much to increase: $\xi_p=\dfrac{h+(\phi)^+}{d\sum\frac{rtt_i\cdot s_i}{cwnd_i}}$, where $d$ is the interval of control actions.
+
+The negative feedback is $n_i = \xi_n\cdot rtt_i\cdot s_i$, which says the cwnd decrease is proportional to the packet size and RTT of a flow. The coefficient is $\xi_n=\dfrac{h+(-\phi)^+}{d\sum s_i}$.
+
+The efficiency control is undergoing MIMD so that it can converge quickly, but fairness control is running AIMD to make sure fairness convergence. Because of the decoupling, the dynamic of aggregate traffic is independent of number of flow. Moreover, because the control is delay-based, fairness can be converged quicker then legacy TCP.
+
+The stability of XCP is analysed using control theoretic method. The aggregate cwnd is designated as $w$, the interval of control is $d$, and the input traffic is $y$, we have:  
+
+$$
+\begin{aligned}
+  \sum \dfrac{dw}{dt} &= \dfrac{1}{d}\big(-\alpha d(y(t-d)-c)-\beta q(t-d)\big) \\
+  \dfrac{dy}{dt} &= \frac{1}{d^2}\big(-\alpha d(y(t-d)-c)-\beta q(t-d)\big)
+\end{aligned}
+$$
+
+These equation follows from $\Phi$. By writing the queue length as $q$, the number of flows as $N$, and the sending rate of a flow is $r_i$, we have the following:
+
+$$
+\begin{aligned}
+\dot{q}(t) &= y(t)-c \\
+\dot{y}(t) &= -\dfrac{\alpha}{d}(y(t-d)-c)-\dfrac{\beta}{d^2}q(t-d) \\
+\dot{r}_i(t) &= \dfrac{1}{N}([\dot{y}(t-d)]^+ +h(t-d))-\dfrac{r_i(t-d)}{y(t-d)}([-\dot{y}(t-d)]^+ +h(t-d))
+\end{aligned}
+$$
+
+So when $x=y-c$, we have $\dot{x}(t)=-\dfrac{\alpha}{d}x(t-d)-\dfrac{\beta}{d^2}q(t-d)=-K_1x(t-d)-K_2q(t-d)$ and the open loop transfer function is $G(s)=\dfrac{K_1s+K_2}{s^2}e^{-ds}$. By studying the magnitude and angle of the transfer function, we found that the condition to satify Nyquist stability criterion is $0<\alpha<\dfrac{pi}{4\sqrt{2}}$ and $\beta=\alpha^2\sqrt{2}$.
+
+The paper did simulation study with TCP/AQM and XCP to support its claims.

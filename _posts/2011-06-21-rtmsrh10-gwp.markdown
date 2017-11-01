@@ -1,0 +1,75 @@
+---
+layout: post
+title: "Ren et al (2010) Google-Wide Profiling: A Continuous Profiling Infrastructure for Data Centers (IEEE Micro)"
+date: 2011-06-21 04:42:47 -0400
+category: paper
+bibtex:
+  type: article
+  title: "Google-Wide Profiling: A Continuous Profiling Infrastructure for Data Centers"
+  author: "Gang Ren and Eric Tune and Tipp Moseley and Yixin Shi and Sivius Rus and Robert Hundt"
+  journal: "IEEE Micro"
+  volume: 30
+  number: 4
+  pages: "65--78"
+  month: "July/August"
+  year: 2010
+---
+Google-Wide Profiling is theoretically an extension of the Digital Continuous Profiling Infrastructure (DCPI) [Anderson et al, 1997] to data centers. It is a continuous profiling infrastructure that samples across machines in multiple data centers and collects various events. GWP collects profiles on stack traces, hardware events, lock contention profiles, heap profiles, kernel events, etc. The profiles are collected from several thousand apps running on thousands of servers.
+
+GWP sampling in two dimensions: Any moment, only a subset of all machines are profiled but the machines selected will be on event-based profiling at a suitable frequency. This is a trade off between
+
+  - If event-based profiling is for every machine, too many resources are consumed
+  - If sampling rate is too low for a machine, the data profiled are too sparse to be useful
+
+Operation:
+  - A central machine database that lists every machine with basic hardware characteristics
+  - GWP obtain the list from the database and draw a random sample from the pool
+  - Distributed collectors at selected machine are activated remotely to gather profiles
+  - Collector gather profiles sequentially (i.e. one metric after anther) or in parallel
+  - Collector monitors error conditions. Profiling ceased if the failure rate above a threshold
+
+GWP collects two categories of profiles:
+
+The machine profiles (whole-machine) gathers information on the applications running, kernel, kernel modules, daemons and other background jobs, hardware performance monitoring (HPM) event profiles, kernel event traces, power measurements. The machine profiles are done by a lightweight daemon in order to access root-only data as well as enforce access control and sampling rate limits. The HPM event profiles are collecting the CPU cycles, instructions retired, L1/L2 cache misses, branch mispredictions, etc. This is collected by OProfile in Linux.
+
+The application profiles (per-process) are resulted from [Google Performance Tools](http://code.google.com/p/google-perftools). This is a library with a simple HTTP server. The library enables a process-wide stacktrace-attributed profiling mechanisms for heap allocation, lock contention, wall time, CPU time, etc. The application linked with this library support application profiling. GWP learns from the cluster-wide job management system for what applications are running on a machine and on which port each can be contacted for remote profiling invocation.
+
+GWP has several ways to reduce the overhead. The rate of sampling is set conservatively by measuring the overhead on a set of benchmark applications. This ensures the overhead is within a few percent. Then, call stack for machine-wide profiles are done at lower sampling frequencies to avoid the high overhead of unwinding. Moreover, the profile and metadata are stored without processing. The symbolization is left to a separate set of machines. This makes the overall overhead for GWP to $<$0.01% but the profiles are still meaningful.
+
+The postprocessing of collected profiles is to symbolize them (call stacks?). This is complicated because the binary running on machines are stripped (to save bandwidth and disk). Moreover, some apps such as Java or QEMU generate binary dynamically which is not available offline. The GWP store the unstripped binaries in a global repository for symbolization use. This is done distributedly using MapReduce.
+
+GWP generates several GB data per day and already has several TB of historical performance data. The data are stored into a read-only dimensional database that is distributed across hundreds of machines. The format of a profile record is a 3-tuple: event, sample counter, and a m-dimension vector. The event is numeric, such as CPU cycles, number of instructions retired, L1/L2 cache misses, branch mispredictions, heap memory allocations, lock contention time. The m-dim vector serves as the key. It contains information such as app name, function name, platform, compiler version, image name, data center, kernel information, build revision, and builder's name. When we query from the GWP database, we choose k keys from the m-dim vector and group the data by keys.
+
+As the profiles are collected by sampling, the stability of profile (i.e. reliability of data) can be guaranteed by an entropy measure $H(W) = -\sum_{i=1}^n p(x_i)\log(p(x_i))$; where n is the total number of entries and p(x) is the fraction of profile samples on entry x. A high entropy means it is a flat profile with many samples; a low entropy can be caused by small number of samples (hence limited the variation) or most sample concentrated to few entries. Regardless the value of entropy, it should be stable between representative profiles. We also calculate the Manhattan distance of the top k entries: $M(X,Y) = \sum_{i=1}^k \lvert p_X(x_i) - p_Y(x_i)\rvert$ to identify changes between profiles. The Manhattan distance is essentially a simplified version of relative entropy between two profiles.
+
+Application of GWP:
+
+  - The infrastructure team can see a big picture of how the software stacks are being used, aggregated across every application.
+  - Identify performance-critical components: Find hot functions in an app or hot code shared across application (i.e. the code not significant in any app but common across many apps)
+    - Help create representative benchmark suites, and prioritize performance efforts
+    - Found lib accounted for 5% of all CPU cycles
+  - Evaluate hardware
+    - Whether it would be beneficial to use a special coprocessor to accelerate floating-point computation
+    - Whether old hardware should be retired for efficiency
+  - Application profiles are useful for feedback-directed compiler optimization (FDO)
+  - Optimization on scheduling: Assume $Load_{ij}$ to mean the load of app $j$ on platform $i$, etc. We find the optimal assignment of $Load_{ij}$ subject to constant CPI (cycle per instruction of app $j$ on platform $i$), total load of app $j$ and capacity of platform $i$ by
+
+$$
+\begin{aligned}
+\min &\sum_{i,j} CPI_{ij} \times Load_{ij}  \\
+\mathrm{s.t.} & \sum_j Load_{ij} = TotalLoad_j \\   
+& \sum_j CPI_{ij} \times Load_{ij} \le Capacity_i
+\end{aligned}
+$$
+
+Futher readings:
+
+```
+@inproceedings{
+  author = {J. M. Anderson and others},
+  title = {Continuous profiling: where have all the cycles gone?},
+  booktitle = {16th ACM Symp. Operating Systems Principles (SOSP'97)},
+  year = 1997,
+  pages = {357--390},
+}
+```

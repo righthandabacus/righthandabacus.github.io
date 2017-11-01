@@ -1,0 +1,36 @@
+---
+layout: page
+title: Tags
+permalink: /tag/
+foot_js:
+  - /js/tags.js
+---
+
+<div>
+  {% assign tags = site.tags | sort %}
+  <ul class="nav nav-tabs" role="tablist">
+    {% for tag in tags %}
+      <li role="presentation"{% if forloop.first %} class="active"{% endif %}>
+        <a href="#{{ tag[0]}}" aria-controls="home" role="tab" data-toggle="tab">
+          {{ tag[0] }} <span class="badge">{{ tag | last | size }}</span>
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+  <div class="tab-content">
+    {% for tag in tags %}
+      <div role="tabpanel" class="tab-pane fade{% if forloop.first %} in active{% endif %}" id="{{ tag[0] }}">
+        <ul>
+          {% for post in tag[1] %}
+            <a class="post-title" href="{{ site.baseurl }}{{ post.url }}">
+              <li>
+                {{ post.title }} &nbsp;&middot;&nbsp;
+                <small class="post-date">{{ post.date | date_to_string }}</small>
+              </li>
+            </a>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endfor %}
+  </div>
+</div>

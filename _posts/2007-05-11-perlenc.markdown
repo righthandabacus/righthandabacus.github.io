@@ -1,0 +1,59 @@
+---
+layout: post
+title: "Perl and Character Encoding"
+date: 2007-05-11 04:49:00 +0800
+tags: code
+---
+
+By default, Perl is for ASCII systems. If you need Perl for other character
+encoding, you better use Perl 5.8 and take the following precaution:
+
+## Headers
+To use UTF8, or other non-ASCII characters, put the line
+
+    use utf8;
+
+## Console I/O
+For console I/O, be sure to declare the encoding it is using beforehand:
+
+    binmode STDOUT, ":encoding(big5)";
+    binmode STDOUT, ":utf8";
+
+For file I/O, use the following syntax:
+
+    open(FILE, ">:utf8", "filename.txt");
+    open(FILE, ">:encoding(big5)", "filename.txt");
+
+or you can do this in two steps:
+
+    open(FILE, "filename.txt");
+    binmode(FILE, ":encoding(utf8)");
+
+## Conversion
+To convert a string from one encoding to another, use:
+
+    Encode::from_to($data, "utf-8", "big5");
+
+## One-liner
+
+Due to the inclusion of charset encoding engine in Perl 5.8, we can do a Big5 to
+UTF8 conversion in Perl like the following:
+
+    perl -Mencoding=big5,STDOUT,utf8 -pe1 < big5.txt > utf8.txt
+
+## HTML and LWP
+In LWP, we usually use the following to get a response:
+
+    $response = $browser->get($url);
+    $content = $response->decoded_content;
+
+This is OK for UTF8, ISO8859-1, etc. but not Big5 (because Big5 does not have
+any means to verify if it is valid). If the content encoding is known to be
+Big5, we can do the decoding manually:
+
+    $content = Encode::decode("big5", $response->content);
+
+This is to get the raw content by `$response->content` and decode it under our
+control. If the content is not decoded but it contains some non-ASCII bytes,
+undetermined behavior may occur, depended on the character encoding your Perl
+believed it is in.

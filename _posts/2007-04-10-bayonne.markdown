@@ -1,0 +1,11 @@
+---
+layout: post
+title: "Bayonne + Linux + Dialogic HOWTO"
+date: 2007-04-10 23:09:46 +0800
+tags: reference system
+---
+
+A document written by me in 2002. I used Dialogic cards to build a IVRS at that time. This document shows some detail on the hardware and OS configuration.
+
+This is the [PostScript version](/img/bayonne_linux_dialogic_howto.ps) and [LaTeX source](/img/bayonne_linux_dialogic_howto.tex) and [HTML version](/img/bayonne_linux_dialogic_howto.html)
+

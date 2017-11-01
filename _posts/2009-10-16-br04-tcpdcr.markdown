@@ -1,0 +1,15 @@
+---
+layout: post
+title: "Bhandarkar and Reddy (2004) TCP-DCR: Making TCP Robust to Non-Congestion Events (IFIP Networking)"
+date: 2009-10-16 18:41:31 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "TCP-DCR: Making TCP Robust to Non-Congestion Events"
+  author: "Sumitha Bhandarkar and A. L. Narasimha Reddy"
+  booktitle: "IFIP Networking"
+  year: 2004
+---
+Initiated by the scenario of end-to-end connection involving wireless link, this paper proposes TCP-DCR, the delayed congestion response.
+
+The congestion response is delayed only during the congestion avoidance phase. During the response delay, cwnd continue to evolve according to AIMD, but only new packet is transmitted in each dupack, so that self-clocking is maintained. When the delay timer expires, fast retransmit and fast recovery are triggered. The delay timer is either based on a clock or based on dupthresh. Because of clock granularity, it is suggested to use one SRTT as the delay timer.

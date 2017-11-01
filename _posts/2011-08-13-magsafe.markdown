@@ -1,0 +1,78 @@
+---
+layout: post
+title: "MagSafe repair"
+date: 2011-08-13 02:43:18 -0400
+tags: system
+---
+This is the *fourth* MagSafe adapter for my 2008 MacBook Pro. Basically I keep
+failing the adapter once a year. The original one has the cable broken near the
+brick (yes, the loose strand problem), I fixed it in an ugly way; then I ordered
+a second one in a black box (USD 79.99) which run perfectly for less than a year,
+then has serious stuck pin problem; the third one is an exchange in Apple Store
+in 2009, which found stuck pin again in a few months; and exchanged for the
+fourth one on April 2010, the one that I am using. This is the longest lasting
+one, for 1 year and 4 months.
+
+One year and four months means you lost your warranty. And at this time, I got
+the lose strand problem again. But this time, the loose strand is at the
+T-connector, the most commonly found problem on the web.
+
+# Fix it
+
+Actually I didn't see the loose strand. But I see the green light on the
+T-connector becomes dim (barely can tell it lighted up), and the OS X reports
+"not charging" when the connector plugged in. According to my experience with
+the first adapter, I can tell that's the problem of loose strand.
+
+The problem on MagSafe is that, it is a shielded wire, which the core and the
+shielding strands carries the positive and negative DC. So if the strands get
+loose, you break the circuit. By examining the outlook of the wire, I am quite
+sure the loose came at the T-connector side, because the plastic at that end
+didn't look smooth. Then I tried a bold move: To open up the T-connector like
+below with the smallest screw driver I have.
+
+![](/img/magsafe-1.jpg)
+
+So one can see the stretch on the metal part of the connector. That's because I
+open up the connector by a screw driver. The loose strands is obvious in the
+picture. A closer look is below, showing the "ring" that holds the strand as
+well, and the loose strands are now outside the ring:
+
+![](/img/magsafe-2.jpg)
+
+The fix is easy: Just pull over all the strands to one side so that each thread
+stay together, like below:
+
+![](/img/magsafe-3.jpg)
+
+To test over it, I plugged it into the MBP and found a *bright* green light:
+
+![](/img/magsafe-4.jpg)
+
+For reinforcement reasons, I put some soldering lead on the strands to hold them together:
+
+![](/img/magsafe-5.jpg)
+
+Then put back the ring (but now its role to hold the strands is not that
+important), pull the plastic together, and restore its original look.
+
+![](/img/magsafe-6.jpg)
+
+# Notes
+
+  - The plastic hood surrounding the end part of the cable is quite tight,
+    especially when the ring is inside. So it takes some patience to pull it
+    down
+  - After the fix, it is nearly impossible to put the hard plastic connector
+    casing back to its original position, as I cannot make the hood pass through
+    the just-fit hole in the casing. My trick is to use a tape to surround the
+    hood and the cable, to make a ramp. Afterwards, this take can help reinforce
+    the end point of the cable. As the last picture above shows.
+  - YouTube shows a lot of video on fixing various problem of the MagSafe
+    adapter. My version have minimal impact on the outlook.
+
+
+
+
+
+

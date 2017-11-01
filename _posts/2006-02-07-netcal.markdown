@@ -1,0 +1,50 @@
+---
+layout: post
+title: "Network Calculus"
+date: 2006-02-07 11:27:42 +0800
+tags: business
+---
+
+After my thesis-writing exercise, I returned to research.
+
+The current goal is to dig out more about the performance (or performance bounds) of the control mechanisms. My current idea is to study the Network Calculus (as pioneered by Rene Cruz, Chang Cheng-Shang, and Jean-Yves Le Boudec) and use it to derive something useful.
+
+## Literature
+
+### Course in EE, Linköpings Universitet, Sweden
+
+<http://www.icg.isy.liu.se/courses/netcal/>
+
+Good to start, especially the first two to three lecture notes (first half of the course). However, it is quite hard to follow afterwards.
+
+### A Short Tutorial by Le Boudec and Thiran
+
+  - Jean-Yves Le Boudec and Patrick Thiran, "A Short Tutorial on Network Calculus I: Fundamental Bounds in Communication Networks", In Proc. ISCAS 2000, Geneva Switzerland, May 2000
+  - Jean-Yves Le Boudec, Patrick Thiran and Silvia Giordano, "A Short Tutorial on Network Calculus II: Min-Plus System Theory Applied to Communication Networks", In Proc. ISCAS 2000, Geneva Switzerland, May 2000
+
+Two short papers. Nice to read but much of the results are given without proof. You may feel quite unconfortable at the first reading but it is a good summary on the elementary part of netcal.
+
+### Paper by Chang Cheng-Sheng
+
+Cheng-Sheng Chang, "On Deterministic Traffic Regulation and Service Guarantees: A Systematic Approach by Filtering", IEEE Trans on Information Theory, 44(3) 1097--1110, May 1998.
+
+Good paper, self contained. No background knowlege required and start with assumption. Obviously, Chang has simplified the work of Cruz to make it clear. It worths to read in very detail.
+
+### A Stochastic Network Calculus
+
+Yong Liu, Chen-Khong Tham, Yuming Jiang, "A Stochastic Network Calculus", Tech Report ECE-CCN-0301, Department of Electrical & Computer Engineering, National University of Singapore, Nov 2004.
+
+A TR to summarize the stochastic version of network calculus. It gives the stochastic version of delay bound/backlog bound of network.
+
+### Performance Bounds for Flow Control Protocols
+
+Rajeev Agrawal, R. L. Cruz, Clayton Okino, Rajendran Rajan, "Performance Bounds for Flow Control Protocols", April 1998
+
+A easy-to-read paper (and yet another) on net cal.
+
+## Other Literatures
+
+  - Jean-Yves Le Boudec, Patrick Thiran, Network calculus, Springer-Verlag, ISBN 3-540-42184-X.
+  - Jean-Yves Le Boudec, "Network calculus made easy", Technical Report 96/218, DI-EPFL, CH-1015 Lausanne, Switzerland, December 1996.
+  - Rene Cruz, "Quality of Service guarantees in virtual circuit switched networks", IEEE Journal on Selected Areas in Communications, 13(6):1048-1056, Aug 1995.
+  - Cheng-Shang Chang, "On deterministic traffic regulation and service guarantees: A systematic approach by filtering", IEEE Transactions on Information Theory, Vol. 44, pp. 1097-1110, 1998.

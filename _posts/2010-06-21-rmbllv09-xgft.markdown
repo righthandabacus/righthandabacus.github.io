@@ -1,0 +1,33 @@
+---
+layout: post
+title: "Rodriguez et al (2009) Oblivious Routing Schemes in Extended Generalized Fat Tree Networks (CLUSTER)"
+date: 2010-06-21 15:21:53 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "Oblivious Routing Schemes in Extended Generalized Fat Tree Networks"
+  author: "German Rodriguez and Cyriel Minkenberg and Ramon Beivide and Ronald P. Luijten and Jesus Labarta and Mateo Valero"
+  booktitle: "Proc. IEEE International Conference on Cluster Computing and Workshops"
+  howpublished: "CLUSTER'09"
+  pages: "1--8"
+  month: "Aug 31-Sep 4"
+  year: 2009
+  address: "New Orleans, LA"
+---
+The subject of study in this paper is a generalized fat tree. It has n levels of switch and each switch can have different number of downstream and upstreams. A regular fat tree, $k$-ary $n$-tree, has each switch connects to $k$ downstreams.
+
+Route a communication in fat tree is equivalent to choosing one of the nearest common ancestor (NCA) in the fat tree. Three different routing schemes are evaluated, they are namely, random, S-mod-k and D-mod-k. Random is to choose the NCA randomly. S-mod-k and D-mod-k choose the NCA by taking modulus on the source and destination address.
+
+The paper found the following:
+
+  - S-mod-k and D-mod-k are merely equivalent
+  - There are cases that random does better than S-mod-k/D-mod-k and some cases that it does worse
+
+According to the analysis, the paper propose that a better oblivious algorithms satisfies the following:
+
+  - Concentrate the endpoint contention. This is why S-mod-k/D-mod-k do better than random if there are
+    endpoint contention
+  - Distribute load amongst roots. This is why random does better if there is no endpoint contention
+  - Break down the regular dependencies of typical applications' patterns
+
+The paper suggest a relabeling of nodes and then apply S-mod-k/D-mod-k. The relabeling is like a randomization, but preserves the locality such that endpoint contention can be identified. Then the S-mod-k or D-mod-k can effectively distribute load to roots.

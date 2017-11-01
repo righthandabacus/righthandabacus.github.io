@@ -1,0 +1,49 @@
+---
+layout: post
+title: "Grid elements"
+date: 2007-07-26 15:39:19 +0800
+tags: code
+---
+
+Recently I am looking for some JavaScript grid components to use. Preferably to work like Excel or Calc in OpenOffice.org.
+
+Googling tells about a product called [dhtmlxGrid](http://www.scbr.com/docs/products/dhtmlxGrid/), which has the version 1.4 release one week ago. I downloaded, but the documentation sucks. Hence I wrote my own below.
+
+## License
+
+The site said it is distributed in GPL. However, I found some Yahoo! produced code inside which said it is in BSD. They are not compatible, however!
+
+But I just use it anyway, un-seriously.
+
+## Initialization
+
+The simplest case of use is as follows:
+
+```html
+<script type="text/javascript" src="js/dhtmlXCommon.js"></script>
+<script type="text/javascript" src="js/dhtmlXGrid.js"></script>
+<script type="text/javascript" src="js/dhtmlXGridCell.js"></script>
+
+<div id="gridbox"></div>
+<script>
+<!--
+        // Note: Must set the height
+        document.getElementById('gridbox').style.height = "600px";
+        // Create the grid
+        var mygrid = new dhtmlXGridObject('gridbox');
+        // Columns' header
+        mygrid.setHeader("alpha,beta,gamma,delta,epsilon,eta");
+        // Columns' width
+        mygrid.setInitWidths("100px,100px,100px,100px,100px,100px");
+        // Initialize and load data
+        mygrid.init();
+        mygrid.loadXML("grid.xml");
+//-->
+</script>
+```
+
+Which will show the grid on the DIV with id `grid`. The height is essential because it controls how many rows to display. If not specified, only the column headers will be shown!
+
+The column headers is essential because it counts how many columns to display. The `loadXML()` function can actually pass on a very big table but only the first few columns are shown. If the headers are not specified, no columns will be displayed and hence you get a null grid.
+
+The column width is essential as well or otherwise, width of zero is assumed and all columns overlaps.

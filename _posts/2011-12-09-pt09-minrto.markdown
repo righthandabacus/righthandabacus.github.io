@@ -1,0 +1,22 @@
+---
+layout: post
+title: "Psaras & Tsaoussidis (2009) On the properties of an adaptive TCP Minimum RTO (ComCom)"
+date: 2011-12-09 22:14:35 -0500
+category: paper
+bibtex:
+  type: article
+  title: "On the properties of an adaptive TCP Minimum RTO"
+  author: "Ioannis Psaras and Vassilis Tsaoussidis"
+  journal: "Computer Communications"
+  volume: "32"
+  pages: "888-895"
+  doi: "doi:10.1016/j.comcom.2008.12.025"
+  year: "2009"
+---
+RFC2988 says the minRTO should be 1 sec. The reason for that is due to two reasons: (1) clock granularity of the OS at that time, and (2) delay ack implementation is 200ms.
+
+The paper finds that, if minRTO < clock granularity, spurious retransmission may occur, since the OS may delay network operation by the clock granularity amount of time. Therefore, min RTO does not have negative impact on throughput if clocks are coarse-grained; but not for a finer-grained clock.
+
+RTT is a result of receiver's clock granularity + round trip propagation delay + queueing delay.
+
+This paper proposes to avoid minRTO entirely, so that the accuracy of minRTO is controlled by the OS clock's granularity. However, there would still be problem with delayed ACK. So the solution is to let the sender to count the packets that it sent in a burst, and turn on minRTO (to be larger than delayed ACK timer) only if an odd-numbered burst is sent. Since in this case, the last packet will wait for another one to generate the ACK at the receiver, which the time to wait is undetermined.

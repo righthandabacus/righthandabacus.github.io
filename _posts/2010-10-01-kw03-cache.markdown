@@ -1,0 +1,41 @@
+---
+layout: post
+title: "Kowarschik and Weiss (2003) An Overview of Cache Optimization Techniques and Cache-Aware Numerical Algorithms (LNCS 2625)"
+date: 2010-10-01 23:11:32 -0400
+category: paper
+bibtex:
+  type: incollection 
+  title: "An Overview of Cache Optimization Techniques and Cache-Aware Numerical Algorithms"
+  author: "Markus Kowarschik and Christian Weiß"
+  affiliation: "Friedrich-Alexander-Universität Erlangen-Nürnberg Lehrstuhl füur Informatik 10 Cauerstraße 6 91058 Erlangen Germany"
+  booktitle: "Algorithms for Memory Hierarchies"
+  series: "Lecture Notes in Computer Science"
+  editor: "Meyer, Ulrich and Sanders, Peter and Sibeyn, Jop"
+  publisher: "Springer Berlin / Heidelberg"
+  isbn: ""
+  pages: "213-232"
+  volume: "2625"
+  url: "http://dx.doi.org/10.1007/3-540-36574-5_10"
+  note: "10.1007/3-540-36574-5_10"
+  year: "2003"
+---
+Data access techniques to optimize code in modern processor:
+
+  - Loop interchange: Do stride-1 access rather than stride-$N$ to leverage spatial locality
+  - Loop fusion: Merge adjacent loop with same iteration space, a.k.a. loop jamming. Increases
+     instruction-level parallelism and reduces loop overhead
+  - Loop blocking: Transform a $(n+1)$-level nested loop into $(2n)$-level nested loop to improve data
+    locality. An example is blocked algorithm for matrix multiply. Also known as loop tiling.
+  - Prefetching: Some processor provide instructions to prefetch data into cache (without passing the
+    data to CPU)
+
+Data layout techniques to optimize code:
+
+  - Array padding: To prevent conflict misses, pad data (e.g. one cache line) between two
+    consecutively declared, power-of-2 arrays so that elements `A[i]` and `B[i]` uses different
+    cache lines. Inter-array padding is between different arrays and intra-array padding is
+    to reduce self-interferences.
+  - Array merging: Also known as group and transpose. Instead of arrays `A` and `B`, create array
+    `AB` which each element is a duo (e.g. `struct` in C)
+  - Array transpose: To change column-access to row-access in row-major order arrays
+  - Data copying: Temporary transpose array before intensive operations

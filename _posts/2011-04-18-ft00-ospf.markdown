@@ -1,0 +1,55 @@
+---
+layout: post
+title: "Fortz & Thorup (2000) Internet Traffic Engineering by Optimizing OSPF Weights (INFOCOM)"
+date: 2011-04-18 16:40:03 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "Internet Traffic Engineering by Optimizing OSPF Weights"
+  author: "Bernard Fortz and Mikkel Thorup"
+  booktitle: "Proc INFOCOM"
+  pages: "519--528"
+  year: 2000
+---
+This paper presents several findings on the problem of optimal routing.
+
+Consider the problem of routing traffic on a topology. The traffic pattern is
+described by a demand matrix for which each element $(s,t)$ describes the demand
+from $s$ to $t$. Each arc in the network has a specified capacity. The load on
+an arc, however, depends on the routing. The paper models the problem as an
+optimization on the sum of costs amid satisfying the traffic demand. The cost is
+defined as the sum of all link costs, which is a function of the load and
+capacity of the link. The cost function is a piecewise linear convex function in
+the paper.
+
+The first finding is that, using OSPF, multipath routing is done by even split.
+This is less flexible and less efficient, compared to MPLS. By a counter
+example, it is shown in the paper that no clever weight-setting is available for
+OSPF to be as optimal as MPLS. The example shows that (with proof), the
+optimality in OSPF is as worse as 5000 times the optimality in MPLS. Which the
+figure 5000 is from the cost function, defining the worse case to be as that
+much costly.
+
+The second finding is that, in real networks, because the topology is not as
+weird as the synthetic case, the optimality in OSPF is close to the MPLS
+optimal, within a few percent off.
+
+This paper presents a linear programming model for general (MPLS) routing in
+page 3. Adding the even split constraint, which correspond to the OSPF, makes
+the model nonlinear and NP-hard. To solve this problem, this paper proposed a
+local search heuristic. Given a weight vector (vector of all weights for all
+arcs in the network), it searches its neighbour for optimizing the cost
+function. The neighbourhood is defined as:
+
+  - Changing one single weight in the vector; or
+  - Balancing sum of weights of several paths a node and another
+
+Such search is slow and inefficient because, like simulated annealing, loop may
+occur on the search space. To avoid repeating on the same weight vector, a hash
+table is used to decide if a vector is new. This is claimed to be speeding up
+the search process.
+
+Another strategy to improve search efficiency is diversification. When the cost
+function is not improved for 300 iterations, the weight vector is randomly
+perturbed and the hash table is reset. This is to avoid "long valleys" in the
+search space, which is difficult to escape.

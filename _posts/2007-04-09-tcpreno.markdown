@@ -1,0 +1,53 @@
+---
+layout: post
+title: "TCP Algorithm (NewReno)"
+date: 2007-04-09 15:31:09 +0800
+tags: code
+---
+
+NewReno = AIMD, slow start, fast recovery, triple acknowledgement
+
+```c
+if (seqno > _last_acked) {		/* new data arrived */
+	if (! _in_fast_recovery) {
+		_last_acked = seqno;
+		_dupacks = 0;
+		inflate_window();	/* AI part of AIMD */
+		send_packets(now());
+		_last_sent_time = now();
+	} else if (seqno < _recover) {
+		uint32 new_data = seqno - _last_acked;
+		_last_acked = seqno;
+		if (new_data < _cwnd) {
+			_cwnd -= new_data;
+		} else {
+			_cwnd = 0;
+		};
+		_cwnd += _mss;
+		retransmit_packet(now());
+		send_packets(now());
+	} else {
+		uint32 flightsize = _highest_sent - seqno;
+		_cwnd = min(_ssthresh, flightsize + _mss);
+		_last_acked = seqno;
+		_dupacks = 0;
+		_in_fast_recovery = FALSE;
+		send_packets(now());
+	};
+} else if (_in_fast_recovery) {
+	_cwnd += _mss;			/* AI part of AIMD */
+	send_packets(now());
+} else {				/* old data duplicated */
+	_dupacks++;
+	if (_dupacks != 3) {
+		send_packets(now());
+	} else {
+		_ssthresh = max(_cwnd/2, (uint32)(2 * _mss));
+					/* MD part of AIMD */
+		retransmit_packet(now());
+		_cwnd = _ssthresh + 3*_mss;
+		_in_fast_recovery = TRUE;
+		_recover = _highest_sent;
+	};
+}
+```

@@ -1,0 +1,42 @@
+---
+layout: post
+title: "Replace a Search Tree with Skiplist for Performance"
+date: 2012-02-26 21:34:56 -0500
+tags: code
+---
+
+Reading <http://www.codeproject.com/Articles/27799/Stree-A-fast-std-map-and-std-set-replacement>,
+learned about the paper [Deterministic skip lists](http://dl.acm.org/citation.cfm?id=139478&coll=portal&dl=ACM)
+by Munro, Papadakis, and Sedgewick in 1992.
+
+The idea on that page is that, when we are using a search tree, as the nodes are distinct objects in memory, we cannot make use of the cache line for performance. But in fact, we can change the search tree structure to make cache line usable. Firstly, this is the 1-2-3 skiplist in the 1992 paper:
+
+```
+O---------------X
+|               |
+O---O-----O-----O---X
+|   |     |     |   |
+O-O-O-O-O-O-O-O-O-O-O-X
+```
+
+The 1-2-3 skiplist is a skip list with arbitrary levels, but at each level, the "next" element on the list translates to 2-3 elements in the level immediately beneath. Such list can replace (binary) search trees (say, of integers) in the sense that:
+
+  - The rightmost node on any level stores infinity as the sentinel
+  - Any node has two pointers, right and down, and stores a value
+  - The node at right pointer contains larger value (c.f. right arm of BST)
+  - The node at down pointer contains smaller value (c.f. left arm of BST)
+
+To make use of the cache line, and since 1-2-3 skiplist has only 2-3 elements in the level beneath between two adjacent nodes, we can make an array of 3 elements, each holding a value and a pointer:
+
+``` c
+struct sTreeNode {
+  int value[3];
+  struct sTreeNode* down[3];
+  struct sTreeNode* right;
+  int count;
+}
+```
+
+Then by reading across a level, the data structure falls in the same cache line (by reading array `value`). If a particular "down" has to be selected, follow the pointer in the respective element of array `down`. If we exhausted all 2 or 3 elements in such node, follow the pointer `right` to move along the same level in the skiplist. The number of valid element in such data structure is specified by the variable `count`.
+
+The link above provide a LGPL drop-in replacement of STL set and map that uses such data structure instead of red-black tree. A copy is made [here](/img/stree_src.zip)

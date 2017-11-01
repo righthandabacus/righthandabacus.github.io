@@ -1,0 +1,35 @@
+---
+layout: post
+title: "ns3: Use of pointers"
+date: 2010-01-03 17:07:45 -0500
+tags: code
+---
+
+In NS-3, the pointers are `Ptr<T>`, which is a smart pointer template that wraps a real C pointer.
+
+Such pointer can be used as if a C pointer in most cases, such as
+
+```c
+Ptr<obj> X, Y;
+//...
+X = Y;
+X->function();
+```
+
+To assign or create a pointer, we can do either of the following:
+
+```c
+Ptr<obj> X = CreateObject<obj>(arg1,arg2);
+Ptr<obj> Y = Ptr<obj>(new obj(arg1, arg2));
+```
+
+The nice thing about such smart pointer is that, we can get a pointer of a derived class from a pointer of base class, just like the `dynamic_cast` construct in C++,
+
+```c
+Ptr<base> X;
+//...
+Ptr<derived> Y = X->GetObject<derived>();
+Ptr<derived> Z = DynamicCast<derived>(X);
+```
+
+The `GetObject` is preferred because in NS-3, we have object aggregation as well as object hierarchy. The `DynamicCast` construct works only for the object hierarchy but `GetObject` works for both.

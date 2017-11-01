@@ -1,0 +1,93 @@
+---
+layout: post
+title: "Financial Origami, How the Wall Street Model Broke"
+subtitle: "Brendan Moynihan / 2001"
+date: 2013-01-17 14:18:15 -0500
+category: book
+bibtex:
+  type: book
+  title: "Financial Origami, How the Wall Street Model Broke"
+  author: Brendan Moynihan
+  library: BPL
+  publisher: Wiley
+  year: 2001
+  classification: 332.601 M
+  classification: HG176.7.M69 2011
+---
+
+Alan Greenspan: I know that you think you know what i said. but i am not sure whether you understood that what you heard is what i meant.
+
+*Financial origami* is the way the author says *financial engineering*. The author claims that the game played in Wall Street is to create illusions, so as to cover up how they make profit. This is a book to explain the cause of the 2008 financial crisis.
+
+The author describes the Wall Street business as follows. Wall Street is a risk-transferring business. The primary instruments of Wall Street are securities: Those to secure a claim on financial fortunes (i.e., income streams). Examples are bonds and stocks. Then we have derivatives, such as options, futures, and swaps. They are not securities as nothing is secured by holding them, but rather, they are contracts that offers insurance-like protections. Securities can be based on a business, or standing on top of a pool of assets. Funds are the typical example of the latter. There are two kinds of funds: Mutual fund, which its operation is supported by a management fee, pools resources to buy a portfolio of assets. Then the shares of interest in those assets are sold to investors. Hedge fund, which aims for growth, is supported by the management fee plus a percentage of profit to provide incentives. The innovation in the industry is driven by the change of constraints, such as laws and regulations.
+
+The Wall Street firms traditionally are segmented. The investment banks, such as Morgan Stanley, First Boston, and Dillon Read, were on the business of advisory on M&A, financing, and underwriting sales of stocks and bonds. Trading firms, such as Salomon Brothers, were to deal with institutional clients wanting to acquire or offload large blocks of stock. The actual handling of buy and sell orders are done by brokerage firms (also known as the wire houses), such as Merrill Lynch. The brokers were paid by salary, not commissions in the old days. The segmentation is a result of Glass-Steagall Act introduced during Great Depression, which mandates a separation between banks, insurers, and securities underwriters. These firms were in private partnership. But after 1971, the law allows them to go public. This means they are doing business with "other people's money", and they become risk-seeking.
+
+The story of the financial crisis starts in 1990s.
+
+Traditionally, investment banks need three years of profitability to underwrite the securities of a company. This is to guarantee the value of the security and protect the banks' reputation. This rule was gradually changed in mid-1990s to allow more IPOs, so that the bank can profit from taking the customary 7% fee in each deal. To protect the bank's reputation, the bank always underprice the security to ensure a soaring price on the first day of trade. This is how the illusional profitability of tech-company and the dot-com bubble was created. The best example of this would be VA Linux Systems. It listed on Dec 9, 1999 with its share goes from $30 to $239.25 on the first day. Because of the profitability due to underpricing, the banks start to hold some shares back from the public and distribute them to favoured or prospective clients in hopes of getting future business.
+
+The dot-com bubble ends with the recession. The federal budget had surplus in 1998 to 2001. The recession starts on 2001. This is unusual in the sense that the consumer spending, contributes for 2/3 of the US GDP, did not decline with the recession. In 2002, the Fed Funds rate is set to a record low 1.25%. This is in contrast wit the 8.38% average yield on 30-year T-bond at 1981-2003 and 7% at 1990s. The 6-month T-bond in 2002 to 2003 was at an average yield of 1.53%, down from 5.53% in 1990s. The law interest rate was meant to boost the economy but also created the "risk-free cash-flow crisis". It hurts the insurance companies and pension funds but raises the value and volume of home sales.
+
+The low interest rate creates incentive for mortgage. The bankers increasingly borrowed money to lend to potential homebuyers, with the explicit intent of selling those mortgage for packaging. The mortgage-packaging works like a mutual fund: Instead of pooling resources to buy a portfolio of assets then sells to investors the shares of interest, mortgage-backed securities pools mortgage and sells to a special purpose entity (SPE), which sells investors certificates representing claims to the cash flows of the principal and interest payments. The first MBS was the Government National Mortgage Association Pass-Through Certificate, then in 1971, Freddie Mac introduced its Participation Certificate, and Fannie Mae introduced its MBS in 1981.
+To handle the risk of pre-payment in mortgages, collateralised mortgage obligations (CMOs) are created. Similar securitisation created collateralised loan/bond/debt obligations.
+
+The aggressive creation of mortgages by banks created risks of nonpayment. In order to make the packaged securities worthy, the banks bundle the riskier, non-guaranteed assets on bank balance sheets and create mini-companies, i.e. SPEs behind the CDOs, CLOs, and CBOs. These SPEs are lower-rated tranches that absorbed defaults until their capital was depleted, so the top of the securitisation chain is AAA-rated. To create the AAA-rated group, rating agencies needed to ascertain the likelihood that many borrowers would default at the same time, which is based on the copula formula. The SPEs paid the rating agencies for the credit rating and then used it to convince creditors to loan money. Therefore, the rating impacts the borrowing costs as well as the pool of potential investors permitted to buy its debt. This creates a conflict of interest: the firms consulted with the rating agencies during structuring. They modify the structure of the CDOs to make sure the rating met the grade. This created 64000 AAA-grade structured products in Jan 2008 while only 12 companies at the time has AAA rating.
+
+This movement is driven by both sides. Because of the low interest rate, the Wall Street needs products of investment grade with higher yield. For example, in 2002, Bear Stearns has 41% of its revenue, of USD 1.9 billion, from fixed-income trading, more than a double of its investment banking unit. The bankers also have incentives to package mortgages: Firstly, holding mortgages ties up capital. Secondly, the regulatory capital to set aside is lower if it is held as a AAA-rated CDO. Thirdly, if sold, all future revenue of the mortgage can be reported in the current year. As the securitisation transfers risk of holding mortgage to investors, the bank relaxed its standards for granting mortgages, permitting low documentation and "ninja" (no income, job, or asset) loans.
+
+As it is easy to get mortgage, the house price were rising at 15% per year in 2000 to 2006, with the interest rate of only 3%.This means the subprime borrowers would build equity in the house for 2 to 3 years. They may take out the accumulated equity by refinancing the loan. In order to prevent this, the bank imposed refinance penalty. But if the house price failed to rise, the borrower can always default. If the homeowners defaulted, the investor would stop receiving the income stream and the underlying asset's trustee would sold the property, often at 70-80 cents on a dollar. This means a loss of equity for the investor. To prevent the loss of equity, the CDOs would have credit default swaps (CDS) as an insurance. With a CDS, the regulatory considers the risk is shifted to a third party and the loan is protected. Thus no regulatory capital needed to be set aside. This is a loop to encourage more mortgage.
+
+Since 9 Oct 2002 until 26 Feb 2007, it was a bull market with low volatility. This means the risk was low. The Wall Street's business of risk transfer has little to do. The reaction of Wall Street is to do more, do something new, and leverage. It created CDS on interest rates. First as an agent between two parties, but later as the market makers. Then the swaps are packaged into speculative vehicles for betting on changes of interest rate. It amounts to USD 800 billion in 2002 but becomes USD 62 trillion in 2007. As CDS provides income stream in terms of insurance premiums, it was further packaged into CDOs, also known as the synthetic CDOs.
+
+This highly leveraged products eventually ruin the market in 2008.
+
+## Further readings mentioned in the book
+  - Harry Markowitz, "Portfolio selection". The Journal of Finance, vol 7 no 1 pp 77-91, March 1952.
+     - Points out that expected return of portfolio is the average
+       return of the comprising securities. The risk, or the expected
+       variability of return, is not a simple average however
+  - David X Li, "On Default Correlation: A Copula Function Approach". Journal of Fixed Income, January 2000.
+     - The copula formula the rating companies are using
+     - It assumes the past correlation would not change in the future, just as Black-Scholes-Merton formula assumes the convergence of price variables based on their correlations in the past
+
+## Time line of Wall Street
+  - 1933
+      - Roosevelt's executive order 6102 forbids possession of gold
+      - Glass-Steagall Act mandates the separation between commercial banks
+        and brokerage firms
+  - 1946: Bretton Woods accord  
+    at that time, US dollar was pegged to gold at the rate of USD 35 per troy
+    ounce and major European currencies were pegged to dollar within a narrow
+    band of fluctuation, due to the gold standard
+  - 1971.8.15, Nixon slammed shut the gold window
+  - 1981
+      - Cash-settled future contracts emerged
+      - First currency swap: IBM and World Bank on CHF and USD
+      - Salomon Brother goes public
+  - 1981.10: T-bond 30yr interest rate at peak of 15.84pc
+  - 1984: Bear Stearns goes public
+  - 1986: Morgan Stanley goes public
+  - 1993: Lehman Brothers goes public
+  - 1999: Goldman Sachs goes public
+  - 1999.11: The Graham-Leach-Bliley Act, ends Glass-Steagall Act
+      - Commercial banks then engaged in investment banking, but investment
+        banks are not taking deposits because of the federal regulations and
+        scrutiny
+  - 2002.7: WorldCom Inc bankruptcy filing, USD 104 billion
+  - 2003: HSBC acquires Illinois-based Household International
+      - added 50 million subprime clients, many of poor credit histories
+  - 2008.9: Lehman Brothers bankruptcy filing, USD 639 billion
+
+## Ten largest bankruptcy filings
+
+| Lehman Brothers Holding Inc | 639.0 | 09/15/2008 |
+| WorldCom Inc                | 103.9 | 07/21/2002 |
+| Enron Corp                  |  63.4 | 12/02/2001 |
+| Conseco Inc                 |  61.4 | 12/18/2002 |
+| Texaco Inc                  |  35.9 | 04/12/1987 |
+| Financial Corp of America   |  33.9 | 09/09/1988 |
+| Refco Inc                   |  33.3 | 10/17/2005 |
+| IndyMac Bancorp Inc         |  32.7 | 07/31/2008 |
+| Global Crossing Ltd         |  30.2 | 01/28/2002 |
+| Calpine Corp                |  27.2 | 12/20/2005 |

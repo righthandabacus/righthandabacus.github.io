@@ -1,0 +1,18 @@
+---
+layout: post
+title: "Huawei SmartAX MT900 VDSL Modem"
+date: 2007-04-17 14:39:23 +0800
+tags: system
+---
+
+I am currently using Hutchison Broadband at home. It is a VDSL link and PPPoE is required. I have no comment about the speed: I didn't stress tested it and I found myself happy for whatever I downloaded. However, it is very disgusting that the VDSL modem hangs always!
+
+Hang means "hang up" here. The symptom is the VDSL Link (as told by the LED) disconnecting all the time when you are using it. Seems it is OK when it is idle --- but what's for, then?! When I try connected via PPPoE, and download a couple hundred bytes, then the Link LED goes out. The Ethernet link LED will last for a while afterwards and soon, it found the VDSL link is not there, the Ethernet link on the modem goes out as well. I guess it is going to reset itself --- after 17 seconds, the VDSL Link LED lighted and a couple of seconds later, the Ethernet link LED lighted as well. Then I can tell the computer to reconnect PPPoE and the story repeats forever and ever and ever.
+
+It is strange! I phoned the HGC support hotline and nobody can tell me why is so. They suck of course. Everyone in the industry knows the support staff are the weakest ones in terms of knowledge, qualification and salary. However, when you found the VDSL link can always recover after a reset, you can guess what happened.
+
+Actually the VDSL link and the phone line are fully working. Only the fxxking Huawei modem cause any problem. It is warm when you touch its cover. So you can either replace it with another model or brand (recommended, but why I have to buy another one to replace something not owned by me?) or you can try to make it work more comfortable. The way I do is to peel off the four covering cushion at the bottom and take away the four screws. Then you can put away the top cover (the grey one in the picture below) and it now works smoothly. It is simply too hot to keep a continuous connection!
+
+![huawei](/img/huawei.jpg)
+
+PS: For those who don't know, Huawei is a Shenzhen-based company and it is famous for cloning Cisco devices and re-brand it as Huawei devices. What's interesting is that, somebody reported you can use Cisco firmware and configuration scripts in the Huawei systems without any modification.

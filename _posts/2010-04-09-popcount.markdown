@@ -1,0 +1,153 @@
+---
+layout: post
+title: "popcount"
+date: 2010-04-09 14:40:34 -0400
+tags: code
+---
+
+`popcount` is a function that returns the number of 1-bit in a bit vector. It is
+implemented in x86-64 instruction set and the software implementation is trivial
+(but not necessarily fastest).
+
+The intuitive way is:
+
+```c
+unsigned popcount(unsigned v)
+{
+    unsigned count = 0;
+    while (v) {
+        count = count + (v % 2);
+        v >> 1;
+    };
+    return count;
+}
+```
+
+However, the intuitive and fastest way is to look up a table. For example, if
+`v` is assumed to be only 4-bits long, the table is:
+
+```c
+unsigned popcount(unsigned v)
+{
+    assert(v<16);
+    unsigned count[] = {0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4};
+    return count[v];
+};
+```
+
+----
+
+Since I am asked for what `x = x & (x - 1)` means some years ago, this simply
+says to reset the last 1-bit in `x` to zero. So we can reduce the first code
+segment into one with fewer loops:
+
+```c
+unsigned popcount(unsigned v)
+{
+    unsigned count = 0;
+    while (v) {
+        count++;
+        v &= v-1;
+    };
+    return count;
+}
+```
+
+Similar to table method, we can also do divide and conquer. Assuming 64-bit
+vector,
+
+```c++
+unsigned popcount(unsigned v)
+{
+    // popcount = sum of all 1-bits in v
+    unsigned odd1  = v & 0x5555555555555555;
+    unsigned even1 = v & 0xAAAAAAAAAAAAAAAA;
+    even1 >>= 1;
+    unsigned sum1 = odd1 + even1;
+
+    // popcount = sum of every 2-bit segments in sum1, e.g. 0110 => 01 (=1) + 10 (=2) = 11 (=3)
+    unsigned odd2  = sum1 & 0x3333333333333333;
+    unsigned even2 = sum1 & 0xCCCCCCCCCCCCCCCC;
+    even2 >>= 2;
+    unsigned sum2 = odd2 + even2;
+
+    // popcount = sum of every 4-bit segments in sum2, but each 4-bit values is at most 4
+    unsigned odd3  = sum2 & 0x0F0F0F0F0F0F0F0F;
+    unsigned even3 = sum2 & 0xF0F0F0F0F0F0F0F0;
+    even3 >>= 4;
+    unsigned sum3 = odd3 + even3;
+
+    // popcount = sum of every 8-bit segments in sum3, but each 8-bit values is at most 8
+    unsigned odd4  = sum3 & 0x00FF00FF00FF00FF;
+    unsigned even4 = sum3 & 0xFF00FF00FF00FF00;
+    even4 >>= 8;
+    unsigned sum4 = odd4 + even4;
+
+    // popcount = sum of every 16-bit segments in sum4, but each 16-bit values is at most 16
+    unsigned odd5  = sum4 & 0x0000FFFF0000FFFF;
+    unsigned even5 = sum4 & 0xFFFF0000FFFF0000;
+    even5 >>= 16;
+    unsigned sum5 = odd5 + even5;
+
+    // popcount = sum of every 32-bit segments in sum5, but each 32-bit values is at most 32
+    unsigned odd6  = sum5 & 0x00000000FFFFFFFF;
+    unsigned even6 = sum5 & 0xFFFFFFFF00000000;
+    even6 >>= 32;
+    unsigned sum6 = odd6 + even6;
+
+    // Now sum6 is at most 64, which is the number of 1-bits
+    return sum6;
+}
+```
+
+----
+
+However, there is a much faster approach by MIT Hacker's Memo: (for 32-bit vector)
+
+```c++
+unsigned popcount(unsigned v)
+{
+    unsigned u;
+    u = v - ((v>>1) & 033333333333) - ((v>>2) & 011111111111);
+    return ((u + (u>>3)) & 030707070707) % 63;
+ }
+```
+
+The idea is as follows: If we write a 32-bit integer as `n`$=b_{31}2^{31}+b_{30}2^{30}+...+b_12+b_0$,
+we also notice that $b2^k-b2^{k-1}\equiv b2^{k-1}$,
+then we have `n-(n>>1)`$=(b_{31}+b_{30})2^{30}+(b_{30}+b_{29}2^{29}+...+(b_1+b_0)$, so for
+
+    n - (n>>1) - (n>>2) - (n>>3) - ... - (n>>31)
+
+it is equals to exactly $b_{31}+b_{30}+...+b_1+b_0$, which is the popcount. Now
+consider only three bits `v`, the popcount will be `v-(v>>1)-(v>>2)`. When `v`
+is 32-bit, the shift operation is on 3-bit unit, thus the AND-mask in the above
+segment. Next, the 32-bit popcount is the addition of every 3-bits in `u`,
+firstly, make it into every-6-bit counts, the number is put into 6-bit slots:
+
+    (u + (u>>3)) & 030707070707
+
+which you can view as $c_5 (2^6)^{5} + ... + c_1 2^6 + c_0$, by remainder
+theorem, the polynomial in $2^6$ divide by $2^6-1$ (=63), the remainder is the
+polynomial with all $2^6$ substitute by 1, which is exactly the sum
+$c_5+c_4+...+c_1+c_0$.
+
+Now move on to 64-bit. The modulus-63 operation is more then enough for 32-bit,
+but at least modulus-65 is required for 64-bit, or otherwise we can never have
+63 or 64 bits set in our data. By the same virtue, the code will be:
+
+```c++
+unsigned popcount(unsigned v)
+{
+    unsigned u;
+    u = v - ((v>>1) & 0x7777777777777777) - ((v>>2) & 0x3333333333333333) - ((v>>3) & 0x1111111111111111);
+    return ((u + (u>>4)) & 0x0F0F0F0F0F0F0F0F) % 0xFF; /* Modulus-255 */
+ }
+```
+
+----
+
+Final note: \\
+The popcount is also known as the Hamming weight, see
+<http://en.wikipedia.org/wiki/Hamming_weight>. The MIT Hacker Memo mentioned above
+is available at <http://home.pipeline.com/~hbaker1/hakmem/hakmem.html>

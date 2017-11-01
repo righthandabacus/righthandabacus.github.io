@@ -1,0 +1,40 @@
+---
+layout: post
+title: bash string manipulation
+date: Wed, 18 Oct 2017 20:55:14 -0400
+tags: system reference
+category: blog
+---
+
+Let `$string` be a string.
+
+Substring extraction:
+
+  - `${string:n}` extract string from position `n` onward, which `n`$\ge 0$.
+  - `${string:n:m}` extract string from position `n` onward for `m` characters, which `n`$\ge 0$ and `m`$\ge 1$.
+
+Substring replacement:
+
+  - `${string/pattern/replacement}` replace only the first match. The pattern is a globbing and replacement is a text string.
+  - `${string//pattern/replacement}` replace with all matches.
+  - `${string/#pattern/replacement}` replace only if pattern at beginning of the string.
+  - `${string/%pattern/replacement}` replace only if pattern at end of the string.
+
+Substring removal:
+
+  - `${string##pattern}` delete the longest match of substring from the front of string, pattern is a globbing
+  - `${string%%pattern}` delete the longest match of substring from the back of string
+  - `${string#pattern}` delete the shortest match of substring from the front of string
+  - `${string%pattern}` delete the shortest match of substring from the back of string
+
+String length:
+
+  - `${#string}` gives the number of characters in string
+
+With these, a basename command can be replaced by the following
+
+```bash
+PATHNAME=/path/to/myfile.pdf
+FILENAME=${PATHNAME##*/} # myfile.pdf
+BASENAME=${FILENAME%.pdf} # myfile
+```

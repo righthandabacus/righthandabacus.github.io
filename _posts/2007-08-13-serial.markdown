@@ -1,0 +1,613 @@
+---
+layout: post
+title: "Serial console 串列埠連接"
+date: 2007-08-13 12:13:36 +0800
+tags: system
+---
+
+The Thecus N1200 box *has* a serial port prepared. If you connect to it, you
+can see it got booted. This page documents the way of doing.
+
+Thecus N1200其實己經準備好一個串列埠，只要接上去，你就可以看到它怎樣啟動。下文記錄了它的接駁方法。
+
+## Set-up
+
+![](/img/serial-1.jpg)
+
+Firstly, you have to find a serial port connector. Either DB-9 or DB-25 are
+fine. The above figure shows a module which came from the purchase of
+motherboard. I unscrewed the DB-9 connector from the module for use.
+
+首先，要找一個串列埠的連接頭，無論是DB-9的還是DB-25的都可以。上圖就是我在買底板時附送的模塊，我把DB-9的串列埠拆下來待用。
+
+![](/img/serial-2.jpg)
+
+Things to note: The other side of the DB-9 connector must be a 2x5 pin socket
+like the picture above. The upper-left corner is pin 1, lower-left corner is pin
+2, the odd pins are counting on the upper row where the even pins are on the
+lower row. The pin at upper-right corner is pin 9. Pin 10 is unused in serial.
+
+重要的是串列埠的連接介面：一定是選單排電線夾在一個2x5針孔的。上圖所示，左上角就是第一針，左下角是第二針，單數的在上面，雙數的在下面，數到右上角就是第九針，而第十針是沒用的。
+
+![](/img/serial-3.jpg)
+
+The picture above shows a Thecus N1200 motherboard. The one in the center with a
+heatsink is the Freescale PowerPC processor. The connector at the middle near
+the front edge is the serial connection. It has only 8 pins, the lower-left
+corner is pin 1, upper-left is pin 2, lower-right corner is pin 7, upper-right
+is pin 8. The 9th pin is not used in serial console but modem, hence 8 pins are
+sufficient. Below is a close-up picture.
+
+上圖的就是Thecus N1200的底板，中央有散熱片的就是Freescale的PowerPC處理器。前沿中間的就是串列埠的連接，它只有八針（兩排四針），從左下角起是第一針，左上角是第二針，右下角是第七針，右上角是第八針，第九針只供modem使用，在Serial console沒有作用，所以八針已足夠。下面是它的特寫。
+
+![](/img/serial-4.jpg)
+
+![](/img/serial-5.jpg)
+
+Connect the DB-9 connector to the motherboard as above.
+
+把那個DB-9的串列埠接到底板上就如上圖。
+
+![](/img/serial-6.jpg)
+
+Cisco products can also be managed through serial console. The picture above
+shows a serial cable bundled with some Cisco equipments. This version makes one
+end of a rollover cable into a DB-9 connector, hence we only need one more
+RJ45-to-DB9 adaptor to make it into a null modem cable for our use. In case what
+you have is the black cable with RJ45 jacks at both ends, you have a rollover
+cable. You need two adaptors.
+
+Cisco也有用serial console，上圖就是Cisco的東西夾帶的cable，這個版本已把rollover cable的其中一端改成DB-9了，我們只要多一個RJ45-to-DB9 adaptor就可以把它變成serial console cable（null modem cable）。如果是黑色的版本就是普通的rollover cable，兩端都是RJ-45的，須要用兩個RJ45-to-DB9 adaptor。
+
+![](/img/serial-7.jpg)
+
+The above is a RJ45-to-DB9 adaptor.
+
+上圖是一個RJ45-to-DB9 adaptor。
+
+![](/img/serial-8.jpg)
+
+Making both ends of a Cisco serial cable in DB9 will make a null modem cable.
+
+把Cisco的Serial cable兩端都接上DB9的adaptor就變成一條null modem cable。
+
+![](/img/serial-9.jpg)
+
+Connect to the Thecus motherboard, then you can see it boots on your computer.
+
+接到Thecus的底板上，就可以用電腦看到它的開機情況。
+
+
+
+## Theory of serial console
+
+See [the RS-232 specification](http://www.mastervideo.com/rs232specs.htm) for detail of the stuff below.
+
+Pin assignments for 9-pin RS-232C: \\
+九針的RS-232C的分工：
+
+  - **DCD** (Data carrier detect):\\
+    For singalling from DCE to tell DTE that a valid carrier is detected \\
+    讓DCE告訴DTE已得到載波訊號
+  - **RXD** (Receive):\\
+    Send data from DCE to DTE \\
+    從DCE傳送資料去DTE
+  - **TXD** (Transmit):\\
+    Send data from DTE to DCE \\
+    從DTE傳送資料去DCE
+  - **DTR** (Data terminal ready): \\
+    For signalling from DTE to tell DCE that it is ready to operate \\
+    讓DTE告訴DCE它已準備好
+  - **GND** (Ground): \\
+    Signal ground, defining what is 0 volt \\
+    接地訊號，也就是0V的標準
+  - **DSR** (Data set ready): \\
+    For signalling from DCE to tell DTE that it is ready to operate \\
+    讓DCE告訴DTE它已準備好
+  - **RTS** (Ready to send): \\
+    For signalling from DTE to tell DCE that it is going to send data \\
+    讓DTE告訴DCE它打算傳送資料
+  - **CTS** (Clear to send): \\
+    For signalling from DCE to tell DTE that it is ready to accept data,
+    in response to RTS \\
+    讓DCE告訴DTE它打算接收資料
+  - **RI** (Ring indicator): \\
+    For singalling from DCE to tell DTE that the phone is ringing \\
+    讓DCE告訴DTE有來電
+
+Connection between two DTE for two-way communication: (null modem cable) \\
+連接兩台DTE的方法：(null modem cable)
+
+```
+(2)RXD ------ ------- RXD(2)
+             X
+(3)TXD ------ ------- TXD(3)
+
+(4)DTR -----    ----- DTR(4)
+            \  / 
+(6)DSR --+   \/   +-- DSR(6)
+         |   /\   |
+(1)DCD ------  ------ DCD(1)
+
+(5)GND -------------- GND(5)
+
+(7)RTS ------ ------- RTS(7)
+             X
+(8)CTS ------ ------- CTS(8)
+
+(9)RI  ---o      o--- RI (9)
+```
+
+The Cisco's rollover cable uses the following pin layout: \\
+Cisco的rollover cable就用下面的針腳：
+
+| DCE Signal | RJ45 Pin | RJ45 Pin | DB-9 Pin | DTE Signal |
+|------------|----------|----------|----------|------------|
+| RTS | 1 | 8 | 8 | CTS |
+| DTR | 2 | 7 | 6 | DSR |
+| TXD | 3 | 6 | 2 | RXD |
+| GND | 4 | 5 | 5 | GND |
+| GND | 5 | 4 | 5 | GND |
+| RXD | 6 | 3 | 3 | TXD |
+| DSR | 7 | 2 | 4 | DTR |
+| CTS | 8 | 1 | 7 | RTS |
+
+So using a rollover cable with two RJ45-to-DB9 adapter can make a null modem
+cable with full handshake (i.e. with the DCD pin connected to air). \\
+所以用一條Rollover cable和兩個RJ45-to-DB9的轉接器就可造出一條null modem cable了。
+
+## Software
+
+After you connected to the serial port, you can watch the Thecus N1200 booting.
+The serial port configuration is 115200 bps of baud rate, 8 bit data, 1 stop
+bit, odd parity (115200 8N1). Hardware flow control can be on or off.
+
+接好串列埠後，就可以用電腦看看Thecus N1200的開機情況。接口的設定是Baud rate 115200 bps、8 bit資料、1 bit Stop bit、odd parity（115200 8N1），有沒有hardware flow control也可。
+
+I use minicom in Linux for the connection. Plug in the power, then push the
+button to turn it on and you will see the following output in minicom:
+
+我在Linux用minicom來連接。接好了以後，駁上電源，再按下按鈕開機，就會見到以下內容：
+
+{% raw %}
+```
+U-Boot 1.1.3 (FSL Development) (Feb  6 2007 - 12:26:26) MPC83XX
+
+Clock configuration:
+  Coherent System Bus:  266 MHz
+  Core:                 266 MHz
+  Local Bus Controller: 266 MHz
+  Local Bus:             33 MHz
+  DDR:                  266 MHz
+  I2C:                  266 MHz
+  TSEC1:                266 MHz
+  TSEC2:                266 MHz
+  USB MPH:               88 MHz
+  USB DR:                88 MHz
+CPU: MPC83xx, Rev: 11 at 266.666 MHz
+Board: Thecus N1200
+I2C:   ready
+DRAM:  SDRAM on Local Bus is NOT available!
+   DDR RAM: 128 MB
+FLASH:  8 MB
+PCI1 32bit on PMC1 & PMC2 & PMC3
+In:    serial
+Out:   serial
+Err:   serial
+Net:   Freescale TSEC0: PHY is Realtek RTL8211B (1cc912)
+Freescale TSEC1: PHY id 1410c87 is not supported!
+Freescale TSEC1: No PHY found
+Freescale TSEC0, Freescale TSEC1
+Thecus Version: 4, PIC version: 4
+Hit any key to stop autoboot:  1  0 
+## Booting image at fe180000 ...
+   Image Name:   Linux-2.6.11.12
+   Image Type:   PowerPC Linux Kernel Image (gzip compressed)
+   Data Size:    1355589 Bytes =  1.3 MB
+   Load Address: 00000000
+   Entry Point:  00000000
+   Verifying Checksum ... OK
+   Uncompressing Kernel Image ... OK
+## Loading RAMDisk Image at fe320000 ...
+   Image Name:   uboot ramdisk
+   Image Type:   PowerPC Linux RAMDisk Image (gzip compressed)
+   Data Size:    4531202 Bytes =  4.3 MB
+   Load Address: 00000000
+   Entry Point:  00000000
+   Verifying Checksum ... OK
+   Loading Ramdisk to 07b5d000, end 07faf402 ... OK
+Linux version 2.6.11.12 (root@dev_222) (gcc version 3.4.3) #3 Wed Apr 18 11:38:42 CST 2007
+Built 1 zonelists
+Kernel command line: root=/dev/ram init=/linuxrc rw console=ttyS0,115200 ramdisk_size=32768
+IPIC (128 IRQ sources, 8 External IRQs) at fe000700
+PID hash table entries: 1024 (order: 10, 16384 bytes)
+Console: colour dummy device 80x25
+Dentry cache hash table entries: 32768 (order: 5, 131072 bytes)
+Inode-cache hash table entries: 16384 (order: 4, 65536 bytes)
+Memory: 122272k available (2200k kernel code, 616k data, 104k init, 0k highmem)
+Mount-cache hash table entries: 512 (order: 0, 4096 bytes)
+checking if image is initramfs...it isn't (no cpio magic); looks like an initrd
+Freeing initrd memory: 4425k freed
+NET: Registered protocol family 16
+PCI: Probing PCI hardware
+PCI: Cannot allocate resource region 0 of device 0000:00:00.0
+PCI: Cannot allocate resource region 2 of device 0000:00:00.0
+PCI: Failed to allocate mem resource #2:80000000@0 for 0000:00:00.0
+SCSI subsystem initialized
+NTFS driver 2.1.22 [Flags: R/O].
+JFFS2 version 2.2. (C) 2001-2003 Red Hat, Inc.
+Initializing Cryptographic API
+Serial: 8250/16550 driver $Revision: 1.90 $ 4 ports, IRQ sharing disabled
+ttyS0 at MMIO 0xe0004500 (irq = 9) is a 16550A
+ttyS1 at MMIO 0xe0004600 (irq = 10) is a 16550A
+io scheduler noop registered
+io scheduler anticipatory registered
+io scheduler deadline registered
+io scheduler cfq registered
+RAMDISK driver initialized: 16 RAM disks of 32768K size 1024 blocksize
+loop: loaded (max 8 devices)
+eth0: Gianfar Ethernet Controller Version 1.4, 00:14:fd:10:99:6c 
+eth0: MTU = 1500 (frame size=1514,truesize=1800)
+eth0: Running with NAPI enabled
+eth0: 64/64 RX/TX BD ring size
+eth0: Socket buffer recycling mode enabled
+eth1: Gianfar Ethernet Controller Version 1.4, 00:14:fd:10:99:6d 
+eth1: MTU = 1500 (frame size=1514,truesize=1800)
+eth1: Running with NAPI enabled
+eth1: 64/64 RX/TX BD ring size
+eth1: Socket buffer recycling mode enabled
+SKB Handler initialized(max=64)
+PPP generic driver version 2.4.2
+PPP Deflate Compression module registered
+PPP BSD Compression module registered
+ipddp.c:v0.01 8/28/97 Bradford W. Johnson <johns393@maroon.tc.umn.edu>
+ipddp0: Appletalk-IP Encap. mode by Bradford W. Johnson <johns393@maroon.tc.umn.edu>
+sata_sil(0000:00:10.0): cache line size not set.  Driver may not function
+sata_silApplying R_ERR on DMA activate FIS errata fix
+ata1: SATA max UDMA/100 cmd 0xC9050E80 ctl 0xC9050E8A bmdma 0xC9050E00 irq 20
+ata2: SATA max UDMA/100 cmd 0xC9050EC0 ctl 0xC9050ECA bmdma 0xC9050E08 irq 20
+ata1: dev 0 ATA, max UDMA/133, 976773168 sectors: lba48
+ata1: dev 0 configured for UDMA/100
+scsi0 : sata_sil
+ata2: no device found (phy stat 00000000)
+scsi1 : sata_sil
+  Vendor: ATA       Model: WDC WD5000ABYS-0  Rev: 12.0
+  Type:   Direct-Access                      ANSI SCSI revision: 05
+Thecus Tray: 1, sda
+SCSI device sda: 976773168 512-byte hdwr sectors (500108 MB)
+SCSI device sda: drive cache: write back
+SCSI device sda: 976773168 512-byte hdwr sectors (500108 MB)
+SCSI device sda: drive cache: write back
+ sda: sda1 sda2 sda3
+Attached scsi disk sda at scsi0, channel 0, id 0, lun 0
+MPC8349MDS flash device: 800000 at fe000000 Partition number 5
+MPC8349MDS Flash Map Info: Found 1 x16 devices at 0x0 in 16-bit bank
+ Intel/Sharp Extended Query Table at 0x0031
+Using buffer write method
+cfi_cmdset_0001: Erase suspend on write enabled
+Creating 5 MTD partitions on "MPC8349MDS Flash Map Info":
+0x00000000-0x00040000 : "u-boot"
+0x00040000-0x00080000 : "u-boot config"
+0x00080000-0x00180000 : "user"
+0x00180000-0x00320000 : "kernel"
+0x00320000-0x00800000 : "ramdisk"
+MPC8349MDS flash device initialized
+mice: PS/2 mouse device common for all mice
+i2c /dev entries driver
+Attaching PIC16F72
+md: raid1 personality registered as nr 3
+md: md driver 0.90.1 MAX_MD_DEVS=256, MD_SB_DISKS=27
+NET: Registered protocol family 2
+IP: routing cache hash table of 1024 buckets, 8Kbytes
+TCP established hash table entries: 8192 (order: 4, 65536 bytes)
+TCP bind hash table entries: 8192 (order: 3, 32768 bytes)
+TCP: Hash tables configured (established 8192 bind 8192)
+NET: Registered protocol family 1
+NET: Registered protocol family 17
+NET: Registered protocol family 5
+md: Autodetecting RAID arrays.
+md: autorun ...
+md: considering sda1 ...
+md:  adding sda1 ...
+md: sda2 has different UUID to sda1
+md: created md1
+md: bind<sda1>
+md: running: <sda1>
+raid1: raid set md1 active with 1 out of 2 mirrors
+md: considering sda2 ...
+md:  adding sda2 ...
+md: created md0
+md: bind<sda2>
+md: running: <sda2>
+raid1: raid set md0 active with 1 out of 2 mirrors
+md: ... autorun DONE.
+RAMDISK: Compressed image found at block 0
+VFS: Mounted root (ext2 filesystem).
+Freeing unused kernel memory: 104k init
+In linuxrc ...
+Setting system time from hardware clock...
+Checking filesystems
+/dev/sda3: recovering journal
+/dev/sda3: clean, 13/126976 files, 74460/506044 blocks (check in 3 mounts)
+kjournald starting.  Commit interval 5 seconds
+EXT3 FS on sda3, internal journal
+EXT3-fs: mounted filesystem with ordered data mode.
+Boot from hdd ...
+EXT2-fs warning: mounting unchecked fs, running e2fsck is recommended
+Mounting root device read-only...
+Remounting root device read-write...
+EXT2-fs warning: mounting unchecked fs, running e2fsck is recommended
+Mounting other local filesystems...
+warning: can't open /etc/mtab: No such file or directory
+tmpfs on /var type tmpfs (rw)
+devpts on /dev/pts type devpts (rw,gid=5,mode=620)
+proc on /proc type proc (rw)
+none on /sys type sysfs (rw)
+cloop: Initializing cloop v2.01
+cloop: loaded (max 8 devices)
+cloop: losetup_file: 129 blocks, 65536 bytes/block, largest block is 61669 bytes.
+cloop: losetup_file: 65 blocks, 65536 bytes/block, largest block is 19920 bytes.
+cloop: losetup_file: 469 blocks, 65536 bytes/block, largest block is 59487 bytes.
+Setting up loopback networking...
+In /etc/cfg/rc ...
+Attaching F75375
+eth0: PHY is Realtek RTL8211B (1cc912)
+eth0: Full Duplex
+eth0: Speed 100BT
+eth0: Link is up
+eth1: PHY is Marvell 88E6060 (1410c87)
+/etc/cfg/rc: /etc/cfg/rc: 109: cannot create /proc/thecus_eventc: Directory nonexistent
+mdadm: device /dev/md1 already active - cannot assemble it
+mdadm: device /dev/md0 already active - cannot assemble it
+Degraded
+Check RAID Status
+ReiserFS: md0: found reiserfs format "3.6" with standard journal
+ReiserFS: md0: using writeback data mode
+ReiserFS: md0: journal params: device md0, size 8192, journal first block 18, max trans len 1024, max batch 900, max commit age 30, max trans age 30
+ReiserFS: md0: checking transaction log (md0)
+ReiserFS: md0: Using r5 hash to sort names
+[Mon Aug 13 21:27:32 2007] [error] (669998)APR does not understand this error code: Could not resolve host name _default_: -- ignoring!
+Active NTP in mode : [ auto ]
+Set NTP Server to : clock.isc.org
+FTPD works in Anonymous No Access mode !!
+FTPD is now working..
+info, udhcpd (v0.9.9-pre) started
+error, max_leases value (254) not sane, setting to 100 instead
+DHCPD is now running ...
+killall: cupsd: no process killed
+
+/dev/sda:
+ setting standby to 241 (30 minutes)
+/dev/sdb: No such device or address
+usbcore: registered new driver hub
+driver fsl-usb2-mph, $Revision: 1.11 $
+fsl-usb2-mph fsl-usb2-mph1: new USB bus registered, assigned bus number 1
+fsl-usb2-mph fsl-usb2-mph1: park 0
+fsl-usb2-mph fsl-usb2-mph1: USB 0.0 initialized, EHCI 1.00, driver $Revision: 1.11 $
+hub 1-0:1.0: USB hub found
+hub 1-0:1.0: 2 ports detected
+Initializing USB Mass Storage driver...
+usbcore: registered new driver usb-storage
+USB Mass Storage support registered.
+usbcore: registered new driver usblp
+drivers/usb/class/usblp.c: v0.13: USB Printer Device Class driver
+zd1211 - http://zd1211.ath.cx/ - r83
+Based on www.zydas.com.tw driver version 2.5.0.0
+usbcore: registered new driver zd1211
+Adding 1003896k swap on /dev/md1.  Priority:-1 extents:1
+ZD1211B - http://zd1211.ath.cx/ - r83
+Based on www.zydas.com.tw driver version 2.5.0.0
+usbcore: registered new driver zd1211b
+killall: sshd: no process killed
+chmod: /raid/module/SSH/sshkeys/*: No such file or directory
+cp: /raid/module/SSH/sshkeys/*: No such file or directory
+Installing knfsd (copyright (C) 1996 okir@monad.swb.de).
+/
+
+Please press Enter to activate this console. 
+```
+{% endraw %}
+
+You will see the following when you turn it off:
+
+如果按下按鈕關機，就會見到以下內容：
+
+```
+umount: /dev/md0 busy - remounted read-only
+umount: /dev/cloop2 busy - remounted read-only
+umount: /dev/cloop0 busy - remounted read-only
+umount: proc busy - remounted read-only
+umount: Cannot remount tmpfs read-only
+umount: Couldn't umount /var: No such file or directory
+umount: Cannot remount /dev/mtdblock2 read-only
+umount: Couldn't umount /etc: Inappropriate ioctl for device
+umount: Cannot remount /dev/loop0 read-only
+umount: Couldn't umount /: Device or resource busy
+umount: Cannot remount /dev/sda3 read-only
+umount: Couldn't umount /initrd/boot: Inappropriate ioctl for device
+umount: /dev/root busy - remounted read-only
+umount: Cannot remount rootfs read-only
+umount: Couldn't umount /: No such file or directory
+The system is going down NOW !!
+Sending SIGTERM to all processes.
+eth0: Link is down
+Sending SIGKILLmd: md1 in immediate safe mode
+ to all processemd: md0 in immediate safe mode
+s.
+nfsd: last server has exited
+nfsd: unexporting all filesystems
+The system is halted.
+md: stopping all md devices.
+md: md1 switched to read-only mode.
+md: md0 still in use.
+Synchronizing SCSI cache for disk sda: 
+System halted.
+```
+
+
+## dmesg
+
+Below is the `dmesg` output, which shows the kernel is loaded with serial console enabled: \
+下面是`dmesg`的輸出，可見到核心啟動時已指定使用serial console：
+
+```
+Linux version 2.6.11.12 (root@dev_222) (gcc version 3.4.3) #3 Wed Apr 18 11:38:42 CST 2007
+On node 0 totalpages: 32768
+  DMA zone: 32768 pages, LIFO batch:8
+  Normal zone: 0 pages, LIFO batch:1
+  HighMem zone: 0 pages, LIFO batch:1
+Built 1 zonelists
+Kernel command line: root=/dev/ram init=/linuxrc rw console=ttyS0,115200 ramdisk_size=32768
+IPIC (128 IRQ sources, 8 External IRQs) at fe000700
+PID hash table entries: 1024 (order: 10, 16384 bytes)
+Console: colour dummy device 80x25
+Dentry cache hash table entries: 32768 (order: 5, 131072 bytes)
+Inode-cache hash table entries: 16384 (order: 4, 65536 bytes)
+Memory: 122272k available (2200k kernel code, 616k data, 104k init, 0k highmem)
+Calibrating delay loop... 177.15 BogoMIPS (lpj=88576)
+Mount-cache hash table entries: 512 (order: 0, 4096 bytes)
+checking if image is initramfs...it isn't (no cpio magic); looks like an initrd
+Freeing initrd memory: 4425k freed
+NET: Registered protocol family 16
+PCI: Probing PCI hardware
+PCI: Cannot allocate resource region 0 of device 0000:00:00.0
+PCI: Cannot allocate resource region 2 of device 0000:00:00.0
+PCI: Failed to allocate mem resource #2:80000000@0 for 0000:00:00.0
+Registering ipic with sysfs...
+SCSI subsystem initialized
+NTFS driver 2.1.22 [Flags: R/O].
+JFFS2 version 2.2. (C) 2001-2003 Red Hat, Inc.
+Initializing Cryptographic API
+Serial: 8250/16550 driver $Revision: 1.90 $ 4 ports, IRQ sharing disabled
+ttyS0 at MMIO 0xe0004500 (irq = 9) is a 16550A
+ttyS1 at MMIO 0xe0004600 (irq = 10) is a 16550A
+io scheduler noop registered
+io scheduler anticipatory registered
+io scheduler deadline registered
+io scheduler cfq registered
+RAMDISK driver initialized: 16 RAM disks of 32768K size 1024 blocksize
+loop: loaded (max 8 devices)
+eth0: Gianfar Ethernet Controller Version 1.4, 00:14:fd:10:99:6c 
+eth0: MTU = 1500 (frame size=1514,truesize=1800)
+eth0: Running with NAPI enabled
+eth0: 64/64 RX/TX BD ring size
+eth0: Socket buffer recycling mode enabled
+eth1: Gianfar Ethernet Controller Version 1.4, 00:14:fd:10:99:6d 
+eth1: MTU = 1500 (frame size=1514,truesize=1800)
+eth1: Running with NAPI enabled
+eth1: 64/64 RX/TX BD ring size
+eth1: Socket buffer recycling mode enabled
+SKB Handler initialized(max=64)
+PPP generic driver version 2.4.2
+PPP Deflate Compression module registered
+PPP BSD Compression module registered
+ipddp.c:v0.01 8/28/97 Bradford W. Johnson <johns393@maroon.tc.umn.edu>
+ipddp0: Appletalk-IP Encap. mode by Bradford W. Johnson <johns393@maroon.tc.umn.edu>
+libata version 1.10 loaded.
+sata_sil version 0.9
+sata_sil(0000:00:10.0): cache line size not set.  Driver may not function
+sata_silApplying R_ERR on DMA activate FIS errata fix
+ata1: SATA max UDMA/100 cmd 0xC9050E80 ctl 0xC9050E8A bmdma 0xC9050E00 irq 20
+ata2: SATA max UDMA/100 cmd 0xC9050EC0 ctl 0xC9050ECA bmdma 0xC9050E08 irq 20
+ata1: dev 0 cfg 49:2f00 82:746b 83:7f61 84:4163 85:7469 86:be41 87:4163 88:007f
+ata1: dev 0 ATA, max UDMA/133, 976773168 sectors: lba48
+ata1: dev 0 configured for UDMA/100
+scsi0 : sata_sil
+ata2: no device found (phy stat 00000000)
+scsi1 : sata_sil
+  Vendor: ATA       Model: WDC WD5000ABYS-0  Rev: 12.0
+  Type:   Direct-Access                      ANSI SCSI revision: 05
+Thecus Tray: 1, sda
+SCSI device sda: 976773168 512-byte hdwr sectors (500108 MB)
+SCSI device sda: drive cache: write back
+SCSI device sda: 976773168 512-byte hdwr sectors (500108 MB)
+SCSI device sda: drive cache: write back
+ sda: sda1 sda2 sda3
+Attached scsi disk sda at scsi0, channel 0, id 0, lun 0
+MPC8349MDS flash device: 800000 at fe000000 Partition number 5
+MPC8349MDS Flash Map Info: Found 1 x16 devices at 0x0 in 16-bit bank
+ Intel/Sharp Extended Query Table at 0x0031
+Using buffer write method
+cfi_cmdset_0001: Erase suspend on write enabled
+0: offset=0x0,size=0x20000,blocks=64
+Creating 5 MTD partitions on "MPC8349MDS Flash Map Info":
+0x00000000-0x00040000 : "u-boot"
+0x00040000-0x00080000 : "u-boot config"
+0x00080000-0x00180000 : "user"
+0x00180000-0x00320000 : "kernel"
+0x00320000-0x00800000 : "ramdisk"
+MPC8349MDS flash device initialized
+mice: PS/2 mouse device common for all mice
+i2c /dev entries driver
+Attaching PIC16F72
+md: raid1 personality registered as nr 3
+md: md driver 0.90.1 MAX_MD_DEVS=256, MD_SB_DISKS=27
+NET: Registered protocol family 2
+IP: routing cache hash table of 1024 buckets, 8Kbytes
+TCP established hash table entries: 8192 (order: 4, 65536 bytes)
+TCP bind hash table entries: 8192 (order: 3, 32768 bytes)
+TCP: Hash tables configured (established 8192 bind 8192)
+NET: Registered protocol family 1
+NET: Registered protocol family 17
+NET: Registered protocol family 5
+md: Autodetecting RAID arrays.
+md: autorun ...
+md: considering sda1 ...
+md:  adding sda1 ...
+md: sda2 has different UUID to sda1
+md: created md1
+md: bind<sda1>
+md: running: <sda1>
+raid1: raid set md1 active with 1 out of 2 mirrors
+md: considering sda2 ...
+md:  adding sda2 ...
+md: created md0
+md: bind<sda2>
+md: running: <sda2>
+raid1: raid set md0 active with 1 out of 2 mirrors
+md: ... autorun DONE.
+RAMDISK: Compressed image found at block 0
+VFS: Mounted root (ext2 filesystem).
+Freeing unused kernel memory: 104k init
+kjournald starting.  Commit interval 5 seconds
+EXT3 FS on sda3, internal journal
+EXT3-fs: mounted filesystem with ordered data mode.
+EXT2-fs warning: mounting unchecked fs, running e2fsck is recommended
+EXT2-fs warning: mounting unchecked fs, running e2fsck is recommended
+cloop: Initializing cloop v2.01
+cloop: loaded (max 8 devices)
+cloop: losetup_file: 129 blocks, 65536 bytes/block, largest block is 61669 bytes.
+cloop: losetup_file: 65 blocks, 65536 bytes/block, largest block is 19920 bytes.
+cloop: losetup_file: 469 blocks, 65536 bytes/block, largest block is 59487 bytes.
+Attaching F75375
+eth0: PHY is Realtek RTL8211B (1cc912)
+eth1: PHY is Marvell 88E6060 (1410c87)
+ReiserFS: md0: found reiserfs format "3.6" with standard journal
+ReiserFS: md0: using writeback data mode
+ReiserFS: md0: journal params: device md0, size 8192, journal first block 18, max trans len 1024, max batch 900, max commit age 30, max trans age 30
+ReiserFS: md0: checking transaction log (md0)
+ReiserFS: md0: Using r5 hash to sort names
+eth0: Full Duplex
+eth0: Speed 100BT
+eth0: Link is up
+usbcore: registered new driver hub
+driver fsl-usb2-mph, $Revision: 1.11 $
+fsl-usb2-mph fsl-usb2-mph1: new USB bus registered, assigned bus number 1
+fsl-usb2-mph fsl-usb2-mph1: park 0
+fsl-usb2-mph fsl-usb2-mph1: USB 0.0 initialized, EHCI 1.00, driver $Revision: 1.11 $
+hub 1-0:1.0: USB hub found
+hub 1-0:1.0: 2 ports detected
+Initializing USB Mass Storage driver...
+usbcore: registered new driver usb-storage
+USB Mass Storage support registered.
+usbcore: registered new driver usblp
+drivers/usb/class/usblp.c: v0.13: USB Printer Device Class driver
+zd1211 - http://zd1211.ath.cx/ - r83
+Based on www.zydas.com.tw driver version 2.5.0.0
+usbcore: registered new driver zd1211
+ZD1211B - http://zd1211.ath.cx/ - r83
+Based on www.zydas.com.tw driver version 2.5.0.0
+usbcore: registered new driver zd1211b
+Adding 1003896k swap on /dev/md1.  Priority:-1 extents:1
+Installing knfsd (copyright (C) 1996 okir@monad.swb.de).
+```

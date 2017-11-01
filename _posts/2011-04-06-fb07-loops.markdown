@@ -1,0 +1,20 @@
+---
+layout: post
+title: "Francois (2007) Avoiding Transient Loops During the Convergence of Link-State Routing Protocols (TON)"
+date: 2011-04-06 15:31:44 -0400
+category: paper
+bibtex:
+  type: article
+  title: "Avoiding Transient Loops During the Convergence of Link-State Routing Protocols"
+  author: "Pierre Francois and Olivier Bonaventure"
+  journal: Trans Networking
+  year: 2007
+---
+This paper studies the problem of transient loops in the time of link-state routing protocol convergence. When a link failure or recovery occurs in a link state protocol, there could be problems of transient loops. The loop is transient because it is a result of mixing the old routes with new routes. For example, from A to D was A-B-C-D and but converged to A-C-B-D due to a failure. In the middle of such convergence, if the routing table of B is not updated but C does, the packet will be forwarded as A-C-B-C and that is a loop.
+
+This paper proposed a method of ordering nodes and links so that there shall be a strict order in updating the routing table, and so that the transient loops can be avoided. In simple terms, the route update shall follow these two rules:
+
+  - Link down or metric increase event on link (X,Y) shall update router R after all routers who used R to reach Y
+  - Link up or metric decrease event on link (X,Y) shall update router R before all routers who used R to reach Y
+
+The paper proves why it is so and proposes an algorithm to find out such ordering, using a reverse shortest path tree.

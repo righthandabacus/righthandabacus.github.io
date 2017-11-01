@@ -1,0 +1,80 @@
+---
+layout: post
+title: "Using Canon PowerShot A80 in Linux"
+date: 2004-11-27 01:33:45 +0800
+tags: system
+---
+
+My sis got a Canon PowerShot A80 digital camera. But what I am used to is those
+Sony brands. The Sony brands is very friendly to Linux that, they are just a USB
+disk when connected to the computer. However, Canon doesn't work in this way.
+
+Canon's cam is neither a USB disk nor any other device with drivers. But it is
+not unusable at all --- I can use gphoto2 with it.
+
+First of all, of course, you need to install the gphoto2 in Linux. After that, I
+list out to see if the program can support the A80 cam by:
+
+    $ gphoto2 --list-cameras | grep A80
+           "Canon PowerShot A80 (normal mode)"
+           "Canon PowerShot A80 (PTP)"
+
+That's it! It is essential that you describe your cam exactly as the above string. Here is what I did:
+
+    $ gphoto2 --camera="Canon PowerShot A80 (normal mode)" -L
+    Detected a 'Canon:PowerShot A80 (normal mode)'.
+    There are no files in folder '/'.
+    There are no files in folder '/DCIM'.
+    There are 6 files in folder '/DCIM/100CANON':
+    #1     AUT_0001.JPG               rd   791 KB image/jpeg
+    #2     AUT_0002.JPG               rd   839 KB image/jpeg
+    #3     AUT_0003.JPG               rd   757 KB image/jpeg
+    There are no files in folder '/DCIM/CANONMSC'.
+    There are no files in folder '/MISC'.
+
+Now I can see that I have in my cam. The next thing is to get all the photos out of the cam:
+
+    $ gphoto2 --camera="Canon PowerShot A80 (normal mode)" -f '/DCIM/100CANON' -P
+    Detected a 'Canon:PowerShot A80 (normal mode)'.
+    Downloading 'AUT_0001.JPG' from folder '/DCIM/100CANON'...
+    Saving file as AUT_0001.JPG
+    Downloading 'AUT_0002.JPG' from folder '/DCIM/100CANON'...
+    Saving file as AUT_0002.JPG
+    Downloading 'AUT_0003.JPG' from folder '/DCIM/100CANON'...
+    Saving file as AUT_0003.JPG
+
+After that, I can free up the memory from the compact flash card by deleting the files and removing the directioy:
+
+    $ gphoto2 --camera="Canon PowerShot A80 (normal mode)" -f '/DCIM/100CANON' -D
+    Detected a 'Canon:PowerShot A80 (normal mode)'.
+    $ gphoto2 --camera="Canon PowerShot A80 (normal mode)" -f '/DCIM' -r 100CANON
+    Detected a 'Canon:PowerShot A80 (normal mode)'.
+
+Afterwards, have a check to make sure I did these correctly:
+
+    $ gphoto2 --camera="Canon PowerShot A80 (normal mode)" -L
+    Detected a 'Canon:PowerShot A80 (normal mode)'.
+    There are no files in folder '/'.
+    There are no files in folder '/DCIM'.
+    There are no files in folder '/DCIM/CANONMSC'.
+    There are no files in folder '/MISC'.
+
+As a reference, I keep the gphoto2 command line options here:
+
+    $ gphoto2
+    Usage: gphoto2 [-?|--help] [--usage] [--debug] [--quiet] [--force-overwrite]
+           [-v|--version] [--list-cameras] [--list-ports] [--stdout]
+           [--stdout-size] [--auto-detect] [--port=path] [--speed=speed]
+           [--camera=model] [--filename=filename] [--usbid=usbid]
+           [-a|--abilities] [-f|--folder folder] [-R|--recurse] [--no-recurse]
+           [-l|--list-folders] [-L|--list-files] [-m|--mkdir STRING]
+           [-r|--rmdir STRING] [-n|--num-files] [-p|--get-file STRING]
+           [-P|--get-all-files] [-t|--get-thumbnail STRING]
+           [-T|--get-all-thumbnails] [--get-raw-data=STRING] [--get-all-raw-data]
+           [--get-audio-data=STRING] [--get-all-audio-data]
+           [-d|--delete-file STRING] [-D|--delete-all-files]
+           [-u|--upload-file STRING] [--config] [--capture-preview]
+           [--capture-image] [--capture-movie] [--capture-sound]
+           [--show-exif=STRING] [--show-info=STRING] [--summary] [--manual]
+           [--about] [--shell]
+

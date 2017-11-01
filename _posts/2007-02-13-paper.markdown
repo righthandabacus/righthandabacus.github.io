@@ -1,0 +1,229 @@
+---
+layout: post
+title: "ISO Paper Sizes"
+date: 2007-02-13 20:59:08 +0800
+tags: reference
+---
+
+## ISO A Series
+
+|Paper         | Width (mm)   | Length (mm)  |
+|--------------|--------------|--------------|
+|4A0           | 1682         | 2378         |
+|2A0           | 1189         | 1682         |
+|A0            | 841          | 1189         |
+|A1            | 594          | 841          |
+|A2            | 420          | 594          |
+|A3            | 297          | 420          |
+|A3-Extension  | 483          | 329          |
+|A4            | 210          | 297          |
+|A5            | 148          | 210          |
+|A6            | 105          | 148          |
+|A7            | 74           | 105          |
+|A8            | 52           | 74           |
+|A9            | 37           | 52           |
+|A10           | 26           | 37           |
+
+## ISO B Series
+
+|Paper         | Width (mm)   | Length (mm)  |
+|--------------|--------------|--------------|
+|B0            | 1000         | 1414         |
+|B1            | 707          | 1000         |
+|B2            | 500          | 707          |
+|B3            | 353          | 500          |
+|B4            | 250          | 353          |
+|B4(JIS)       | 257          | 364          |
+|B5            | 176          | 250          |
+|B5(JIS)       | 182          | 257          |
+|B6            | 125          | 176          |
+|B7            | 88           | 125          |
+|B8            | 62           | 88           |
+|B9            | 44           | 62           |
+|B10           | 31           | 44           |
+
+## ISO C Series (Envelope)
+
+|Paper         | Width (mm)   | Length (mm)  |
+|--------------|--------------|--------------|
+|C0            | 917          | 1296         |
+|C1            | 648          | 917          |
+|C2            | 458          | 648          |
+|C3            | 324          | 458          |
+|C4            | 229          | 324          |
+|C5            | 162          | 229          |
+|C6            | 114          | 162          |
+|C7            | 81           | 114          |
+|C8            | 57           | 81           |
+|C9            | 40           | 57           |
+|C10           | 28           | 40           |
+
+# Other Metric Sizes
+
+|Paper         | Width (mm)   | Length (mm)  |
+|--------------|--------------|--------------|
+|DL            | 110          | 220          |
+|F4            | 210          | 330          |
+
+## Untrimmed A series (Untrimmed Raw Paper)
+
+|Paper         | Width (mm)   | Length (mm)  |
+|--------------|--------------|--------------|
+|RA0           | 860          | 1220         |
+|RA1           | 610          | 860          |
+|RA2           | 430          | 610          |
+|RA3           | 305          | 430          |
+|RA4           | 215          | 305          |
+
+## Untrimmed A series (Supplementary Raw Paper)
+
+|Paper         | Width (mm)   | Length (mm)  |
+|--------------|--------------|--------------|
+|SRA0          | 900          | 1280         |
+|SRA1          | 640          | 900          |
+|SRA2          | 450          | 640          |
+|SRA3          | 320          | 450          |
+|SRA4          | 225          | 320          |
+
+## ISO 7810 identification cards
+
+|Paper         | Width (mm)   | Length (mm)  |
+|--------------|--------------|--------------|
+|ID-1          | 85.60        | 53.98         |
+|ID-2 = A7     | 105          | 74            |
+|ID-3 = B7     | 125          | 88            |
+
+# Imperial Sizes
+
+## British papers
+
+|Paper                           | Width (in)   | Length (in)  |
+|--------------------------------|--------------|--------------|
+|Emperor                         | 72           | 48           |
+|Double Quad Crown               | 60           | 40           |
+|Antiquarian                     | 53           | 21           |
+|Quad Demy                       | 45           | 35           |
+|Grand Eagle                     | 42           | 28.75        |
+|Quad Crown                      | 40           | 30           |
+|Double Elephant                 | 40           | 27           |
+|Double Demy (poster)            | 35           | 22.5         |
+|Colombier                       | 34.5         | 23.5         |
+|Atlas                           | 34           | 26           |
+|Quad Foolscap                   | 34           | 27           |
+|Double Large Post               | 33           | 21           |
+|Double Post (poster)            | 31.5         | 19.5         |
+|Double Demy (writing paper)     | 31           | 20           |
+|Double Post (writing paper)     | 30.5         | 19           |
+|Imperial                        | 30           | 22           |
+|Double Crown                    | 30           | 20           |
+|Elephant                        | 28           | 23           |
+|Super Royal (poster)            | 27.5         | 20.5         |
+|Super Royal (writing paper)     | 27           | 19           |
+|Double Foolscap (poster)        | 27           | 17           |
+|Double Foolscap (writing paper) | 26.5         | 16.5         |
+|Cartridge                       | 26           | 21           |
+|Royal (poster)                  | 25           | 20           |
+|Royal (writing paper)           | 24           | 19           |
+|Medium (poster)                 | 23           | 18           |
+|Demy (poster)                   | 22.5         | 17.5         |
+|Medium (writing paper)          | 22           | 17.5         |
+|Large Post                      | 21           | 16.5         |
+|Copy (Draught)                  | 20           | 16           |
+|Demy/Music Demy                 | 20           | 15.5         |
+|Crown                           | 20           | 15           |
+|Post (poster)                   | 19.25        | 15.5         |
+|Post (writing paper)            | 19           | 15.25        |
+|Pinched Post                    | 18.5         | 14.75        |
+|Foolscap                        | 17           | 13.5         |
+|Brief                           | 16.5         | 13.25        |
+|Pott                            | 15           | 12.5         |
+
+## American Papers
+
+|Paper                           | Width (in)   | Length (in)  |
+|--------------------------------|--------------|--------------|
+|Eight Crown                     | 57.5         | 41.75        |
+|Antiquarian                     | 53           | 21           |
+|Quad Demy                       | 53           | 32.5         |
+|Double Princess                 | 53           | 28           |
+|Architectural-E                 | 48           | 36           |
+|ANSI-E                          | 44           | 34           |
+|Architectural-F                 | 42           | 30           |
+|Quad Crown                      | 40           | 30           |
+|ANSI-F                          | 40           | 28           |
+|Double Elephant                 | 40           | 27           |
+|Architectural-D                 | 36           | 24           |
+|Double Demy                     | 35           | 22.5         |
+|ANSI-D                          | 34           | 22           |
+|Imperial                        | 30           | 22           |
+|Princess                        | 28           | 21.5         |
+|Architectural-C                 | 24           | 18           |
+|Demy                            | 23           | 18.5         |
+|ANSI-C (Broadsheet)             | 22           | 17           |
+|Super-B                         | 19           | 13           |
+|Brief                           | 18.5         | 13.13        |
+|Architectural-B                 | 18           | 12           |
+|ANSI-B (Ledger; Tabloid)        | 17           | 11           |
+|Legal (Legal-2)                 | 14           | 8.5          |
+|Legal-1                         | 13           | 8.5          |
+|Folio (F4)                      | 13           | 8.25         |
+|Foolscap E                      | 13           | 8            |
+|Architectural-A                 | 12           | 9            |
+|ANSI-A (Letter)                 | 11           | 8.5          |
+|US Government                   | 11           | 8            |
+|Quarto                          | 10.75        | 8.5          |
+|Executive                       | 10.5         | 7.25         |
+|Index Card 10x8 (Photo 10x8)    | 10           | 8            |
+|Crown Quarto                    | 9.5          | 7.25         |
+|Royal Octavo                    | 9.5          | 6            |
+|Statement                       | 8.5          | 5.5          |
+|Foolscap Quarto                 | 8.13         | 6.5          |
+|Index Card 8x5                  | 8            | 5            |
+|Crown Octavo                    | 7.13         | 4.75         |
+|Photo 7x5                       | 7            | 5            |
+|Origami (Old Dollar Bill)       | 7            | 3            |
+|Photo 6x4                       | 6            | 4            |
+|Post Card                       | 5.82         | 3.94         |
+|Photo 5x4                       | 5            | 4            |
+|Photo 5x3                       | 5            | 3            |
+|Business Card                   | 3.5          | 2            |
+
+
+## Photos
+
+|Size           | Width (in) | Length (in) |
+|---------------|------------|-------------|
+|Passport photo | 1.5        | 2           |
+|2R             | 2.5        | 3.5         |
+|3R             | 3.5        | 5           |
+|4R             | 4          | 6           |
+|5R             | 5          | 7           |
+|6R             | 6          | 8           |
+|8R             | 8          | 10          |
+|S8R/12R        | 8          | 12          |
+|10R            | 10         | 12          |
+|S10R           | 10         | 15          |
+
+# Notes
+
+Conversion factor:
+  * 1 inch = 25.4 mm
+  * 1 inch = 72 points
+
+Paper folding terminology:
+  * folio (fo, f): Folded in half
+  * Quarto (4to, 4<sup>o</sup>): Folded into 4
+  * Sixmo, aka sexto (6to, 6mo, 6<sup>o</sup>): Folded into 6
+  * Octavo (8vo, 8<sup>o</sup>): Folded into 8
+  * Twelvemo, aka duodecimo (12mo, 12<sup>o</sup>): Folded into 12
+  * Sixteenmo, aka sextodecimo (16mo, 16<sup>o</sup>): Folded into 16
+  * Eighteenmo, aka octodecimo (18mo, 18<sup>o</sup>): Folded into 18
+  * Twenty-fourmo, aka vincesimo-quarto, or vigesimo-quarto (24mo, 24<sup>o</sup>): Folded into 24
+  * Thirty-twomo, aka trigesimo-segundo (32mo, 32<sup>o</sup>): Folded into 32
+  * Forty-eightmo, aka quadragesimo-octavo (48mo, 48<sup>o</sup>): Folded into 48
+  * Sixty-fourmo, aka sexagesimo-quarto (64mo, 64<sup>o</sup>): Folded into 64
+
+Reference on history and standard of ISO paper sizes (and others): <http://www.cl.cam.ac.uk/~mgk25/iso-paper.html>
+
+Reference on Imperial and American paper sizes: <http://www.gwydir.demon.co.uk/jo/units/print.htm>
+

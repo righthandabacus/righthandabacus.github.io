@@ -1,0 +1,621 @@
+---
+layout: post
+title: "Python"
+date: 2012-01-19 17:19:49 -0500
+tags: code
+---
+
+This is how I learnt Python.
+
+## Running Python
+
+Run with debugger:
+
+    $ python -m pdb script.py
+
+Benchmark a Python code:
+
+    $ python -m timeit 'r = range(0, 1000)' 'for i in r: pass'
+
+A python script will be compiled to byte-code (*.pyc) if it is to be imported by
+another script. The main script, however, is never compiled because it will be
+recompiled every time it is run. Note, compiled script makes the loading time
+faster, but the execution time is the same.
+
+To look for help, do these three inside the interpreter:
+
+```
+>>> dir(sorted)
+>>> help(sorted)
+>>> sorted.__doc__
+```
+
+## Built-in types
+
+Python built-in types:
+
+- `bool()` (`True` and `False`)
+- `int()`, `float()`, `long()`, `complex()`)
+- `str()`, `unicode()`
+- `list()`, literals use square brackets
+- `tuple()`, literals use parentheses
+- `dict()`, literals use braces, like `{key: value, key: value}`
+- `set()`, literals use braces
+- `frozenset()`
+- `file`
+
+Python numbers are C's long int and double. Python's long is the unlimited size
+numbers, with suffix `L` or `l`. If a normal number overflew, it is converted to
+long automatically. Python code hex and oct numbers as in C.
+
+Python's complex number is real + imaginary `j`, where `j` or `J` is the
+imaginary number's suffix. The real part of a complex number is optional
+
+Python is dynamic typed: Types are associated with objects but not variables.
+Variables are just references to objects. Thus an assignment of something to a
+variable means: firstly, create an object if necessary; and then set the
+variable as a reference to that object. We may consider Python variables are
+pointers to memory area. Thus changing a mutable object may be reflected in many
+variables. Hence we should explicitly ask for copying an object if necessary
+when assigning it to a variable. For the same reason,
+
+     x = y = z = 1
+
+is valid, but when any of `x`, `y`, `z` changes, all other changes. Since Python
+is not "copying" the value but referencing it at the assignment. Setting to
+`None`, however, is fine since `None` is a singleton object in Python.
+
+`type(object)` returns the type.
+
+## Syntax
+
+Operators in precedence order:
+
+| Operators | Description |
+| --------- | ----------- |
+| `(...)`, `[...]`, `{...}`, `...` | Tuple, list, dictionary display and string conversion |
+| `x[i]`, `x[i:j]`, `x(arg...)`, `x.attr` | Subscription, slicing, call, attribute reference |
+| `**` | Exponentiation |
+| `+x`, `-x`, `~x` | Positive, negative and bitwise NOT |
+| `*`, `/`, `//`, `%` | Multiplication, division, floor division, and modulus |
+| `+`, `-` | Addition and subtraction  |
+| `<<`, `>>` | Shifts |
+| `&` | Bitwise AND |
+| `^` | Bitwise XOR |
+| `|` | Bitwise OR |
+| `in`, `not in`, `is`, `is not`, `<`, `<=`, `>`, `>=`, `<>`, `!=`, `==` | Comparisons and membership tests |
+| `not` | Boolean NOT |
+| `and` | Boolean AND |
+| `or` | Boolean OR |
+| `if`-`else` | Ternary conditional operator |
+| `lambda` | Lambda expression |
+
+Syntax:
+
+- Quote string with `'` or `"`
+- Escape character in quoted strings with `\`
+- Variable assignment using `=`
+- Separate tuples with `,`
+- In the interpreter, we can show the defined names of module X by `dir(X)`
+  or ask for more information on a function by `help(x.function)`
+- Comparison operators may be cascaded, Python just breaks the chain into individual neighbouring tokens:
+
+```python
+10 > x <= 9 # translates to 10 > x and x <= 9
+A in B == C in D # translates to (A in B) and (B == C) and (C in D)
+```
+
+Statements and flow control:
+
+```python
+# comment starts with pound sign \
+# with long lines continued with backslash
+s = 'abc'                # string
+s1 = s[:]                # copy a string
+s2 = s + s1              # concatenation
+
+t = (1, 2, 3)            # named tuple variable 
+n = t[0]                 # access tuple element 
+(a,b,c) = t              # unpack tuple
+
+list = [1,2,3]           # list variable 
+c = list[-1]             # access last element 
+
+d = {'a':0, 'b':1}       # dictionary 
+d['a']                   # access by key 
+
+(a,b) = (0,2)
+c = a or b               # equivalent: c = a if a else b
+c = a and b              # equivalent: c = b if a else a
+
+str = 2 * 'a'            # repeats a string: 'abcabc' 
+
+if a > b:
+  doThis(); doThat()     # semicolon as statement separator
+elif a == b:
+  pass
+else:
+  pass                   # pass is a placeholder
+
+while key in dictionary: # while loop 
+  break
+  continue
+else:
+  pass                   # run when while condition becomes false but not when break was executed
+
+for item in sequence:
+  pass
+else:                    # run when the for loop didn't execute, i.e. not found
+  print 'not found'
+
+for line in open('myfile.txt'): # print lines of a file 
+    print line
+
+try:                     # except clause executed if exception matches 
+except exception,value:  # omitted exception part matches any exception 
+else:                    # else clause executed if no exception 
+
+def func( arg1, arg2 = 10 )     # second arg has a default 
+def func( *arg )                # arg is a tuple (arbitrary number of arguments) 
+foo( name='eggs', age='12' )    # args can be specified by name 
+def func( arg1, **arg2 )        # final arg is a dictionary
+
+class Class:
+    msCnt = 0         # right 
+    Class.msCnt = 0   # wrong (the class name isn't valid yet) 
+
+    def __init__( self ):  # constructor
+        print msCnt        # wrong (non-existent local var) 
+        print s.msCnt      # technically wrong (will work): class attribute confused as instance attribute 
+        print Class.msCnt  # right 
+        self.msCnt += 1    # wrong: changes this instance's attribute, not class attribute 
+        Class.msCnt += 1   # right
+class Derived(Parent1,Parent2):  # multiple inheritence
+    def __init__(self):
+        Parent1.__init__(self)   # constructor of base classes must be explicitly called
+        global x                 # use keyword global to access variable in global scope, otherwise local variable is created upon invoke
+```
+
+## Truth value
+
+- Empty object is false, all else is true
+- Zero value is false, all else is true
+
+Boolean short-cuts is available in Python as in C:
+
+- `and` returns first false value or last value if all true
+- `or` returns first true value or last value if all false
+
+Therefore, the following can replace flow control, as long as the functions have return values
+
+```python
+if cond1: func1()
+else cond2: func2()
+else: func3()
+```
+
+equivalent to
+```python
+(cond1 and func1()) or (cond2 and func2()) or (func3())
+```
+
+if functions are not returning anything, we may wrap it with dummy return value
+
+## Import
+
+`import X` means load `X.py` and run it, repeating this needs `reload(X)`
+
+Assume a file `F.py` declares
+
+```python
+a = 'hello'
+```
+and we do
+
+```python
+import F
+print F.a
+```
+
+it prints the variable `a`, i.e. a string `hello`. The following is doing the same
+
+```python
+from F import a
+print a
+```
+
+## Strings
+
+Python prefers to print strings in single-quote, but allows string literals to
+be specified in single- or double-quotes. We may even use triple (single- or
+double-) quotes if the string is multiline.
+
+Adjacent string literals are concatenated, e.g.
+
+    "hello " "world"     # same as "hello world"
+
+Raw string is useful to ignore backslashes, e.g.
+
+     r"\n"    # a two-character string
+
+We usually encode regex in raw strings to avoid clutters.
+
+### String operations
+
+- Concatenation: `string+string`
+- Repetition: `string * integer`
+- Extract a character: `string[0]`, `string[-1]`
+- Conversion: `int("42")`, `float("1.5")`, `str(42)`
+
+Slicing:
+
+```python
+a = "1234567890"
+a[0:-1]    # "123456789"
+a[0:]      # the string a itself, also a[:]
+a[1:]      # "23456789"
+```
+
+Strings are immutable, i.e. we cannot change a string by `string[0]="x"`, but have to do this:
+
+    "x" + string[1:]
+
+We can construct a string using printf-like formatting, e.g.
+
+    "a%sb" % "c"    # equivalent to "acb"
+
+The general structure of the format code is `%[(name)][flags][width][.precision]code`, e.g.
+
+    "%03d" % 3      # flag and width, equivalent to "  3"
+    "%(n)d %(x)s" % {"n":1, "x":"spam"}    # dictionary substitution, equivalent to "1 spam"
+
+### String methods
+
+| `len(S)` | Length of string S |
+| `list(S)` | Convert string into list of characters |
+| `S.capitalize()` | |
+| `S.center(width[, fillchar])` | |
+| `S.count(sub[, start[, end]])` | Count the non-overlapping occurrences of substring sub |
+| `S.decode([encoding])` | Decode the string using the codec registered for encoding |
+| `S.encode([encoding])` | Encode the string using the codec registered for encoding |
+| `S.endswith(suffix[, start[, end]])` | Tells if S ends with suffix, which can be a tuple to test for suffix[start] to suffic[end] |
+| `S.expandtabs([tabsize])` | Default tabsize=8 |
+| `S.find(sub[, start[, end]])` | Tell if sub is found in S[start:end], returns index if found or -1 otherwise |
+| `S.format(args, kwargs)` | |
+| `S.index(sub[, start[, end]])` | Like find() but raise ValueError if sub not found |
+| `S.isalnum()` | True iff all characters are alphanumeric |
+| `S.isalpha()` | |
+| `S.isdigit()` | |
+| `S.islower()` | |
+| `S.isspace()` | |
+| `S.istitle()` | True iff string is titlecased, i.e. uppercase may only follow uncased chars, and lowercase may only follow cased ones |
+| `S.isupper()` | |
+| `S.join(iterable)` | Return concatenation of strings with S as delimiter |
+| `S.ljust(width[, fillchar])` | |
+| `S.lower()` | |
+| `S.lstrip([chars])` | Return string with all leading characters in chars removed, default is whitespaces |
+| `S.partition(sep)` | Split the string at the first occurrence of sep, return a 3-tuple of before, sep, and after |
+| `S.replace(old, new[, count])` | |
+| `S.rfind(sub[, start[, end]])` | Like find, but search from right |
+| `S.rindex(sub[, start[, end]])` | Like index, but search from right |
+| `S.rjust(width[, fillchar])` | |
+| `S.rpartition(sep)` | Like partition, but search from right |
+| `S.rsplit([sep[, maxsplit]])` | Like split, but split the rightmost ones if maxsplit is given |
+| `S.rstrip([chars])` | Like lstrip, but remove trailing characters |
+| `S.split([sep[, maxsplit]])` | Split a string using delimiter sep, at most split to maxsplit pieces. Return list of substrings with sep removed. If sep is not given, any variable-length whitespace is the delimiter |
+| `S.splitlines([keepends])` | Break the string into lines. Line breaks removed unless keepends==True |
+| `S.startswith(prefix[, start[, end]])` | Tells if S starts with any string in prefix[start] to prefix[end] |
+| `S.strip([chars])` | Returns the string with the leading and trailing characters removed |
+| `S.swapcase()` | |
+| `S.title()` | Return a titlecased version of the string |
+| `S.translate(table[, deletechars])` | table must be a string of length 256, it remove all occurrence of characters in deletechars and then map S through table. If table==None, no translation is done |
+| `S.upper()` | |
+| `S.zfill(width)` | Return the numeric string left filled with zeros in a string of length width, with sign prefix handled correctly. |
+
+### Substring checking
+
+Using string methods:
+
+    if string.find('substring') != -1: print 'Match'
+
+Using operator:
+
+    if 'substring' in string: print 'Match'
+
+## List
+
+| `list.append(x)` | Append an item |
+| `list.extend(L)` | Append a list |
+| `list.insert(i, x)` | Insert, x will become list[i] |
+| `list.remove(x)` | Remove first occurrence of x |
+| `list.pop([i])` | Remove and return list[i] or list[-1] if not specified |
+| `list.index(x)` | Return the index of first occurance |
+| `list.count(x)` | |
+| `list.sort()` | In place sort |
+| `list.reverse()` | In place reverse |
+
+### List comprehensions
+
+list comprehension:
+
+    [x for x in range(100) if x % 5 == 0]
+
+dict comprehension:
+
+    {x: x**2 for x in range(10)}
+
+set comprehension:
+
+    {x % 5 for x in range(100)}       # Python 2.7 only
+
+### List-related functions & features
+
+enumerate:
+
+```python
+tokens = ['a', 'b', 'c', 'd']
+for index, value in enumerate(tokens):
+    print index, value,
+    # gives: 0 a 1 b 2 c 3 d
+```
+
+zip:
+```python
+tokens = ['a', 'b', 'c', 'd']
+caps = ['A', 'B', 'C', 'D']
+nums = [2, 3, 5, 7]
+for t, c, n in zip(tokens, caps, nums):
+    print t,c,n,
+    # gives: a A 2 b B 3 c C 5 d D 7
+```
+
+Slicing using `[begin:end:increments]`
+
+```python
+a = [1,2,3,4,5]
+a[0:2]  #[1,2]
+a[2:-1] #[3,4]
+a[2:]   #[3,4,5]
+a[:2]   #[1,2]
+a[:]    #[1,2,3,4,5]
+a[::2]  #[1,3,5]
+a[::-1] #[5,4,3,2,1]
+"hello"[::-1]   #"olleh"
+```
+
+Flatten a list:
+
+```python
+# use itertools.chain
+a = [[1,2], [3,[4,5]]]
+list(chain(*a)) # chain returns an iterator, this line print [1,2,3,[4,5]]
+# equivalently, use comprehension
+[x for y in a for x in y]
+```
+
+## Set
+
+```python
+a = set([1,2,3,4])
+b = set([3,4,5,6])
+a | b == {1,2,3,4,5,6}  # union
+a & b == {3,4}      # intersection
+a < b == False      # subset
+a - b == {1,2}      # difference
+a ^ b == {1,2,5,6}  # symmetric difference
+```
+
+## Generator
+
+Generator expression
+  - Behaves like a list but without the need to load the whole list into memory
+  - Generator object is created, only one element is loaded into memory at a time
+  - Good for iterables, such as for-loop
+  - Syntax: `genObject = (i for i in tuples)`
+  - Similar to list comprehension, but use parentheses instead of brackets
+
+Generator objects is a function with `yield x` statement, which `x` is returned
+each time the function is called with `next()`. Normally this `yield` statement
+is put in a loop to generate multiple values. When the function finishes, one
+can call no more `next()`.
+
+Generator can take in values with `yield` as rvalue:
+
+```python
+def mygen():
+    a = 5
+    while True:
+        f = (yield a)
+        if f is not None:
+            a = f
+g = mygen()
+```
+
+then `g.next()` to get a value, 5 as default, or `g.send(x)` to reset the value to `x`
+
+## Iterators
+
+Build an iterator:
+
+```python
+x = iter(callable, sentinal)    # Iterator that calls the callable without arg until sentinal is returned
+y = iter(collection)    # Convert a collection (e.g. list, dictionary's keys) into interator
+```
+
+For example: read through a file until empty line is found
+
+```python
+with open(filename) as fp:
+    for line in iter(fp.readline, ''):
+        process(line)
+```
+
+Copying iterator will share the same iteration:
+
+```python
+    x = (1,2,3,4)
+    z = iter(x)
+    y = z
+    z.next() # print 1
+    y.next() # print 2
+```
+
+To make independent iterators, use itertools.tee:
+
+```python
+    a = itertools.tee(z)    # default tee into 2
+    a[0].next()     # a[0]==z, so same as z.next(), print 3
+    a[0].next()     # print 4
+    a[1].next()     # a[1] is a copy of z, print 3
+```
+
+## User-defined Functions
+
+Be careful with mutable default arguments:
+
+    def foo(x=[]):
+        x.append(1)
+        print x
+
+will give
+
+    >>> foo()
+    [1]
+    >>> foo()
+    [1, 1]
+
+the correct way to denote default is None:
+
+    def foo(x=None):
+        x = x or []
+        x.append(1)
+        print x
+    >>> foo()
+    [1]
+    >>> foo()
+    [1]
+
+Use of decorators: Decorators is to wrap a function in another function to add
+functionality or modify argument or results. Decorator is used one line above
+the function to be wrapped, with the `@` sign, e.g.
+
+```python
+def print_args(function)
+    def wrapper(*args, **kwargs):
+        print 'Arguments:', args, kwargs
+        return function(*args, **kwargs)
+    return wrapper
+@print_args
+def write(text):
+    print text
+```
+
+Function argument unpacking
+
+```python
+def draw_point(x,y)
+    ...
+point_list = (3,4)
+point_dict = {'x': 4, 'y':3}
+draw_point(*point_list) == draw_point(3,4)
+draw_point(**point_dict) == draw_point(x=4, y=3)
+```
+
+This only works when used in function argument
+
+## Misc below
+
+Print out the python regex parse tree using the experimental re.DEBUG flag:
+
+```
+>>> re.compile("^\[font(?:=(?P<size>[-+][0-9]{1,2}))?\](.*?)[/font]",
+    re.DEBUG)
+at at_beginning
+literal 91
+literal 102
+literal 111
+literal 110
+literal 116
+max_repeat 0 1
+  subpattern None
+    literal 61
+    subpattern 1
+      in
+        literal 45
+        literal 43
+      max_repeat 1 2
+        in
+          range (48, 57)
+literal 93
+subpattern 2
+  min_repeat 0 65535
+    any None
+in
+  literal 47
+  literal 102
+  literal 111
+  literal 110
+  literal 116
+```
+
+Print without newline (or anything in place of newline):
+
+    print(something, end='')
+
+for...else syntax:
+
+    found = False
+    for i in foo:
+        if i == 0:
+            found = True
+            break
+    if not found: 
+        print("i was never 0")
+
+is equivalent to
+
+    for i in foo:
+        if i == 0:
+            break
+    else:
+        print("i was never 0")
+
+Built-in pow function:
+
+    pow(x,y,z) == (x ** y) % z
+
+zip can transpose a matrix:
+
+    a = [(1,2), (3,4), (5,6)]
+    zip(*a) == [(1,3,5), (2,4,6)]
+
+but for tuples of uneven length, use map:
+
+    a = [(1,2), (3,4,5), (6,)]
+    map(None, *a) == [(1,3,6), (2,4, None), (None, 5, None)]
+
+on the same ground, unzip is actually zip(*zip):
+
+```python
+a = [(1,2), (3,4), (5,6)]
+zip(*a) == [(1,3,5), (2,4,6)]
+zip(*zip(*a)) == a
+```
+
+Note, trilling comma at `(6,)` is ignored, but needed to denote that it is a list, but not a bracket in computation.
+
+Function as objects:
+
+```python
+def sq(x):
+    return x*x
+def plus(x)
+    return x+x
+(sq,plus)[y>x](y)
+```
+
+In the last line, the tuple makes a list of function, which can be selected by
+`y>x`, which is either 0 or 1 when the boolean is casted into integer. Then the
+function is called with argument `y`
+
+Every class in Python has a `__dict__` object which stores the class's attributes

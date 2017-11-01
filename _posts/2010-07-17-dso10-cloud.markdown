@@ -1,0 +1,21 @@
+---
+layout: post
+title: "Doyle et al (2010) An Experimental Evaluation of Distributed Rate Limiting for Cloud Computing Applications (ANCS)"
+date: 2010-07-17 11:24:29 -0400
+category: paper
+bibtex:
+  type: unpublished
+  title: "An Experimental Evaluation of Distributed Rate Limiting for Cloud Computing Applications"
+  author: "Joseph Doyle and Robert Shorten and Donal O'Mahony"
+  howpublished: "ANCS (submitted)"
+  year: 2010
+---
+Assuming there are $N$ different data centers together worked as a computation cloud. User submit job to one of the $N$ data center but the SLA upperbounded the total throughput over all $N$ data centers.
+
+From the service provider's point of view, it has to limit the throughput to not over the SLA to protect its interest. However, it is not suitable to have a fixed bound to *each* data center because it is not known beforehand how the users are using each of them. Therefore, we need a dynamic rate limiter to each of them, and by their cooperation, their aggregated rate meets the SLA.
+
+Two dynamic rate limiting algorithms are presented in the paper, C3P (Could Control with Constant Probabilities) and D2L2 (Distributed Deficit Round Robin). The C3P algorithm moves quota from less-used data center away and adds to the heavily-loaded ones, so that packet drop probability is reduced. D2L2 algorithm, however, aimed at maintaining per-flow fair share of bandwidth. Quota is moved from one to another based on the number of flows using each data center.
+
+These two algorithms have the problem of failure resilience. The paper proposed a new way to handle multiple failures. The idea is, instead of "best-friend" algorithm which one data center pick up all the quota when another data center fails, it uses the "good neighbour" algorithm which neighbouring data center shares the quota of the failed one. This help balancing the quota distribution right after failure, so that the quota distribution can be converged faster.
+
+These proposal are evaluated by simulation.

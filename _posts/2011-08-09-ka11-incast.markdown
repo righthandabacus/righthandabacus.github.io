@@ -1,0 +1,22 @@
+---
+layout: post
+title: "Kulkarni & Agrawal (2011) A Probabilistic Approach to Address TCP Incast in Data Center Networks (ICDCS)"
+date: 2011-08-09 19:41:26 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "A Probabilistic Approach to Address TCP Incast in Data Center Networks"
+  author: "Santosh Kulkarni and Prathima Agrawal"
+  booktitle: "Proc. 31st International Conference on Distributed Computing Systems Workshops"
+  pages: "26--33"
+  month: "Jun"
+  year: "￼￼2011"
+---
+Existing solution to incast:
+
+  - Larger buffer to pospone the onset of incast, but this is expensive
+  - Larger SRU (probably avoids block tail timeout), but normal request size ≤ 256KB
+  - Reduce min RTO, but need hrtimer and harmful to WAN
+  - Use of ECN (i.e. DCTCP)
+
+This paper propose a probabilistic retransmission to solve incast. For each TCP connection, it runs a kernel thread to exercise probabilistic retransmission. That is, whenever it is run, it sends the *highest* (i.e. of greatest sequence number) unacknowledged segment with probability *p* or do nothing otherwise. The segment retransmitted in this way has a mark on the reserved bits. When the receiver found this segment, it will either be ignored if the original segment was already received, or treated as new otherwise. If this is not a duplicated segment, enough number of ACK are sent in a batch to trigger fast retransmit at the sender, so the RTO is avoided. To avoid control conflict, during fast retransmit, the probabilistic retransmission kernel thread is suspended at the sender.

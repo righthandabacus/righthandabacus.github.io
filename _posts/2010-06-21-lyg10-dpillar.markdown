@@ -1,0 +1,17 @@
+---
+layout: post
+title: "Liao et al (2010) DPillar: Scalable Dual-Port Server Interconnection for Data Center Networks (ICCCN)"
+date: 2010-06-21 16:37:57 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "DPillar: Scalable Dual-Port Server Interconnection for Data Center Networks"
+  author: "Yong Liao and Dong Yin and Lixin Gao"
+  booktitle: "Proc. ICCCN"
+  year: 2010
+---
+This paper proposed a server-centric method to connect a large number of servers to build a data center network.
+
+The DPillar network requires a number of commodity legacy switch to connect servers with two NICs each (dual-port servers). The servers are workstations as well as intermediate nodes for relaying traffic. It connects the servers and switches to make it similar to a wrapped butterfly network.
+
+In the paper, the routing algorithm and fault tolerance capabilities are discussed.

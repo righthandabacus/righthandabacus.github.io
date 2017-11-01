@@ -1,0 +1,21 @@
+---
+layout: post
+title: "TTCap options"
+date: 2004-11-02 22:20:19 +0800
+tags: system
+---
+
+Below are the options for TTCap, to use with XTT or FreeType in Linux to make TrueType fonts works.
+
+  * `fn` - face number (int)
+  * `ai` - slant rate (real)
+  * `fp` - font metric calicurate (y/n) -- note: maybe obsolated by `fs`?
+  * `fs` - force spacing (p/m/c)
+  * `bw` - width rate (real), valid for fixed fonts only
+  * `ds` - double striking, i.e. pseudo bold (y/n)
+  * `vl` - very lazy method to caliculate metrics (y/n)
+  * `eo` - code conversion module name (string)
+  * `hi` - hinting (y/n)
+  * `cr` - restrict code range for unicode fonts (range,range,... where range is `a` or `a-b` or `-b` or `a-`)
+  * `eb` - use embedded bitmaps (y/n), use only with `bs` but not recommended with `vl` or `eb`
+  * `bs` - embedded bitap bounding box width rate (real)

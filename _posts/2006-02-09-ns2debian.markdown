@@ -1,0 +1,46 @@
+---
+layout: post
+title: "Installing ns2 (v2.29) on Debian Sid"
+date: 2006-02-09 13:05:02 +0800
+tags: code
+---
+
+There are tremendous references on how to install NS2 (<http://www.isi.edu/nsnam/ns/>), such as [this](http://wiki.splitbrain.org/ns2) and [this](http://www.isi.edu/nsnam/ns/ns-build.html). This is just yet another one.
+
+## Core
+
+  - Prepare a Debian system. I chose Debian Sid as of Feb 8, 2006
+  - Install some essential things by apt-get: \\
+    `apt-get install tcl8.4 tk8.4 tcl8.4-dev tk8.4-dev`
+  - Obtain `ns-allinone-2.29.2.tar.gz` from the repository. See <http://www.isi.edu/nsnam/ns/> for download instructions
+  - Find a place (e.g. `/opt`) to untar the all-in-one package\\
+    `tar zxf ns-allinone-2.29.2.tar.gz`
+  - Compile otcl from the source:
+    1. `cd octl-1.11`
+    2. Patch the file `configure` with [otcl-1.11-patch.txt](/img/otcl-1.11-patch.txt)
+    3. `./configure && make`
+    4. `cd ..`
+  - Compile tclcl from the source:\\
+    `cd tclcl-1.17 && ./configure && make && cd ..`
+  - Modify `ns-2.29/configure`:\\
+    Look for the block `TK_H_PLACES` and then add the line
+```
+/usr/include/tcl$TK_VERS \
+```
+    simply speaking, use this patch: [ns2.29-patch.txt](/img/ns2.29-patch.txt)
+  - Compile ns: \\
+    `cd ns-2.29 && ./configure && make`
+  - Validate the ns compilation (caution: take an hour to do):\\
+    `./validate`
+
+## nam
+
+1. `apt-get install libxmu-dev`
+2. `cd nam-1.11`
+3. `./configure && make`
+
+## Clean-up
+
+Clean up for the unused:
+
+    rm -rf tcl8.4.11 tk8.4.11 xgraph-12.1 zlib-1.2.3

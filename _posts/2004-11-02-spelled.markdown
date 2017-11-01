@@ -1,0 +1,35 @@
+---
+layout: post
+title: "Spelled Speech"
+date: 2004-11-02 22:20:19 +0800
+tags: reference
+---
+
+| Letter | ICAO Spelled Speech | US Military Spelled Speech |
+|--------|---------------------|----------------------------|
+| A      | Alpha/Alfa          | Able                       |
+| B      | Bravo               | Baker                      |
+| C      | Charlie             | Charlie                    |
+| D      | Delta               | Dog                        |
+| E      | Echo                | Echo                       |
+| F      | Foxtrot             | Fox                        |
+| G      | Golf                | George                     |
+| H      | Hotel               | How                        |
+| I      | India               | Item                       |
+| J      | Juliet              | Jig                        |
+| K      | Kilo                | King                       |
+| L      | Lima                | Love                       |
+| M      | Mike                | Mike                       |
+| N      | November            | Nan                        |
+| O      | Oscar               | Oboe                       |
+| P      | Papa                | Peter                      |
+| Q      | Quebec              | Quebec                     |
+| R      | Romeo               | Roger                      |
+| S      | Sierra              | Sugar                      |
+| T      | Tango               | Tare                       |
+| U      | Uniform             | Uncle                      |
+| V      | Victor              | Victor                     |
+| W      | Whisky              | William                    |
+| X      | Xray                | Xray                       |
+| Y      | Yankee              | Yoke                       |
+| Z      | Zulu                | Zebra                      |

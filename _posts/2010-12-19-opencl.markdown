@@ -1,0 +1,460 @@
+---
+layout: post
+title: "OpenCL programming on Mac OS X"
+date: 2010-12-19 02:29:45 -0500
+tags: code
+---
+
+Below shows how to bootstrap OpenCL programming in Mac OS X with the
+boilerplates included.
+
+## Compile
+OpenCL is supported by `clang` compiler, with OpenCL framework:
+
+    $ clang -framework opencl -o helloworld helloworld.c
+
+## Macros to make your life easier
+
+Error checking macros to guard against failures ([`opencl-helper.h`](/img/opencl-helper.h))
+
+```c
+/* helper.h - OpenCL helper macros
+ * Copyright 2010 (c) Adrian Sai-wah Tam <adrian.sw.tam@gmail.com>
+ * Released under GNU LGPL.
+ */
+
+#ifndef __OPENCL_HELPER_MACROS__
+#define __OPENCL_HELPER_MACROS__
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <OpenCL/opencl.h>
+
+#define CL_WRAPPER(FUNC) \
+    { \
+        cl_int err = FUNC; \
+        if (err != CL_SUCCESS) { \
+            fprintf(stderr, "Error %d executing %s on %s:%d (%s)\n", \
+                err, #FUNC, __FILE__, __LINE__, cl_error_to_str(err)); \
+            abort(); \
+        }; \
+    }
+
+/* The following macro assumes the assignment will store the error code to err */
+int err;  // error code returned from api calls
+#define CL_ASSIGN(ASSIGNMENT) \
+    { \
+        ASSIGNMENT; \
+        if (err != CL_SUCCESS) { \
+            fprintf(stderr, "Error %d executing %s on %s:%d (%s)\n", \
+                err, #ASSIGNMENT, __FILE__, __LINE__, cl_error_to_str(err)); \
+            abort(); \
+        }; \
+    }
+
+
+const char *cl_error_to_str(cl_int e)
+{
+    switch (e) {
+        case CL_SUCCESS: return "success";
+        case CL_DEVICE_NOT_FOUND: return "device not found";
+        case CL_DEVICE_NOT_AVAILABLE: return "device not available";
+#if !(defined(CL_PLATFORM_NVIDIA) && CL_PLATFORM_NVIDIA == 0x3001)
+        case CL_COMPILER_NOT_AVAILABLE: return "device compiler not available";
+#endif
+        case CL_MEM_OBJECT_ALLOCATION_FAILURE: return "mem object allocation failure";
+        case CL_OUT_OF_RESOURCES: return "out of resources";
+        case CL_OUT_OF_HOST_MEMORY: return "out of host memory";
+        case CL_PROFILING_INFO_NOT_AVAILABLE: return "profiling info not available";
+        case CL_MEM_COPY_OVERLAP: return "mem copy overlap";
+        case CL_IMAGE_FORMAT_MISMATCH: return "image format mismatch";
+        case CL_IMAGE_FORMAT_NOT_SUPPORTED: return "image format not supported";
+        case CL_BUILD_PROGRAM_FAILURE: return "build program failure";
+        case CL_MAP_FAILURE: return "map failure";
+
+        case CL_INVALID_VALUE: return "invalid value";
+        case CL_INVALID_DEVICE_TYPE: return "invalid device type";
+        case CL_INVALID_PLATFORM: return "invalid platform";
+        case CL_INVALID_DEVICE: return "invalid device";
+        case CL_INVALID_CONTEXT: return "invalid context";
+        case CL_INVALID_QUEUE_PROPERTIES: return "invalid queue properties";
+        case CL_INVALID_COMMAND_QUEUE: return "invalid command queue";
+        case CL_INVALID_HOST_PTR: return "invalid host ptr";
+        case CL_INVALID_MEM_OBJECT: return "invalid mem object";
+        case CL_INVALID_IMAGE_FORMAT_DESCRIPTOR: return "invalid image format descriptor";
+        case CL_INVALID_IMAGE_SIZE: return "invalid image size";
+        case CL_INVALID_SAMPLER: return "invalid sampler";
+        case CL_INVALID_BINARY: return "invalid binary";
+        case CL_INVALID_BUILD_OPTIONS: return "invalid build options";
+        case CL_INVALID_PROGRAM: return "invalid program";
+        case CL_INVALID_PROGRAM_EXECUTABLE: return "invalid program executable";
+        case CL_INVALID_KERNEL_NAME: return "invalid kernel name";
+        case CL_INVALID_KERNEL_DEFINITION: return "invalid kernel definition";
+        case CL_INVALID_KERNEL: return "invalid kernel";
+        case CL_INVALID_ARG_INDEX: return "invalid arg index";
+        case CL_INVALID_ARG_VALUE: return "invalid arg value";
+        case CL_INVALID_ARG_SIZE: return "invalid arg size";
+        case CL_INVALID_KERNEL_ARGS: return "invalid kernel args";
+        case CL_INVALID_WORK_DIMENSION: return "invalid work dimension";
+        case CL_INVALID_WORK_GROUP_SIZE: return "invalid work group size";
+        case CL_INVALID_WORK_ITEM_SIZE: return "invalid work item size";
+        case CL_INVALID_GLOBAL_OFFSET: return "invalid global offset";
+        case CL_INVALID_EVENT_WAIT_LIST: return "invalid event wait list";
+        case CL_INVALID_EVENT: return "invalid event";
+        case CL_INVALID_OPERATION: return "invalid operation";
+        case CL_INVALID_GL_OBJECT: return "invalid gl object";
+        case CL_INVALID_BUFFER_SIZE: return "invalid buffer size";
+        case CL_INVALID_MIP_LEVEL: return "invalid mip level";
+#if defined(cl_khr_gl_sharing) && (cl_khr_gl_sharing >= 1)
+        case CL_INVALID_GL_SHAREGROUP_REFERENCE_KHR: return "invalid gl sharegroup reference number";
+#endif
+#ifdef CL_VERSION_1_1
+        case CL_MISALIGNED_SUB_BUFFER_OFFSET: return "misaligned sub-buffer offset";
+        case CL_EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST: return "exec status error for events in wait list";
+        case CL_INVALID_GLOBAL_WORK_SIZE: return "invalid global work size";
+#endif
+        default: return "invalid/unknown error code";
+    }
+}
+
+#endif
+```
+
+## Device check program
+
+OpenCL provided a series of `clGetSomething()` calls to retrieve the device's
+information. The following code does the check ([`opencl-checkdevice.c`](/img/opencl-checkdevice.c))
+
+```c
+/* checkdevice.c - Code to check details of an OpenCL device
+ * Adrian Sai-wah Tam <adrian.sw.tam@gmail.com>
+ * Sun, 19 Dec 2010 01:35:33 -0500
+ */
+
+#include "helper.h"
+
+int main(int argc, char** argv)
+{
+	cl_uint platform_count;		// Number of platforms
+	cl_uint device_count;		// Number of devices
+	cl_uint totaldevices;		// Total number of devices
+
+	/*** Detecting platforms and print platform info ***/
+	CL_WRAPPER( clGetPlatformIDs(0, NULL, &platform_count) );
+	printf("There are %d platforms found\n", platform_count);
+	cl_platform_id* platforms = (cl_platform_id*) malloc(platform_count*sizeof(cl_platform_id));
+	CL_WRAPPER( clGetPlatformIDs(platform_count, platforms, NULL) );
+	for (cl_uint i = 0; i < platform_count; ++i) {
+		char buf[1024]; // can't be too small or the list of extensions don't fit
+		CL_WRAPPER( clGetPlatformInfo(platforms[i], CL_PLATFORM_PROFILE, sizeof(buf), buf, NULL) );
+		printf("  Platform[%d] profile:    %s\n", i, buf);
+		CL_WRAPPER( clGetPlatformInfo(platforms[i], CL_PLATFORM_VERSION, sizeof(buf), buf, NULL) );
+		printf("  Platform[%d] version:    %s\n", i, buf);
+		CL_WRAPPER( clGetPlatformInfo(platforms[i], CL_PLATFORM_NAME, sizeof(buf), buf, NULL) );
+		printf("  Platform[%d] name:       %s\n", i, buf);
+		CL_WRAPPER( clGetPlatformInfo(platforms[i], CL_PLATFORM_VENDOR, sizeof(buf), buf, NULL) );
+		printf("  Platform[%d] vendor:     %s\n", i, buf);
+		CL_WRAPPER( clGetPlatformInfo(platforms[i], CL_PLATFORM_EXTENSIONS, sizeof(buf), buf, NULL) );
+		printf("  Platform[%d] extensions: %s\n", i, buf);
+		/*** Detecting devices ***/
+		CL_WRAPPER( clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, 0, NULL, &totaldevices) );
+		printf("Platform[%d] has %d devices", i, totaldevices);
+		CL_WRAPPER( clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_CPU, 0, NULL, &device_count) );
+		printf(" (%d CPU", device_count);
+		CL_WRAPPER( clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_GPU, 0, NULL, &device_count) );
+		printf(", %d GPU", device_count);
+		CL_WRAPPER( clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ACCELERATOR, 0, NULL, &device_count) );
+		printf(", %d accelerator)\n", device_count);
+		cl_device_id *devices = (cl_device_id*) malloc(totaldevices * sizeof(cl_device_id));
+		CL_WRAPPER( clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, totaldevices, devices, NULL) );
+		for (cl_uint j = 0; j < totaldevices; ++j) {
+			char buf[1024]; // can't be too small or the list of extensions don't fit
+			long long val;
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_TYPE, sizeof(val), &val, NULL) );
+			printf("  Device %d type: 0x%llx", j, val );
+			if (val & CL_DEVICE_TYPE_DEFAULT) printf(" default");
+			if (val & CL_DEVICE_TYPE_CPU) printf(" CPU");
+			if (val & CL_DEVICE_TYPE_GPU) printf(" GPU");
+			if (val & CL_DEVICE_TYPE_ACCELERATOR) printf(" accelerator");
+			printf("\n");
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_NAME, sizeof(buf), buf, NULL) );
+			printf("  Device %d name: %s by ", j, buf);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_VENDOR, sizeof(buf), buf, NULL) );
+			printf("%s (", buf);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_VENDOR_ID, sizeof(val), &val, NULL) );
+			printf("0x%llx)\n", val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DRIVER_VERSION, sizeof(buf), buf, NULL) );
+			printf("  Device %d driver version: %s\n", j, buf);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_PROFILE, sizeof(buf), buf, NULL) );
+			printf("  Device %d profile: %s\n", j, buf);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_VERSION, sizeof(buf), buf, NULL) );
+			printf("  Device %d version: %s\n", j, buf);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_EXTENSIONS, sizeof(buf), buf, NULL) );
+			printf("  Device %d extensions: %s\n", j, buf);
+
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_EXECUTION_CAPABILITIES, sizeof(val), &val, NULL) );
+			printf("  Device %d execution capabilities: 0x%llx", j, val );
+			if (val & CL_EXEC_KERNEL) printf(" kernel");
+			if (val & CL_EXEC_NATIVE_KERNEL) printf(" native");
+			printf("\n");
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_GLOBAL_MEM_CACHE_TYPE, sizeof(val), &val, NULL) );
+			printf("  Device %d global mem cache type: 0x%llx", j, val );
+			if (val == 0) printf(" None");
+			if (val == 1) printf(" Read-only");
+			if (val == 2) printf(" Read-write");
+			printf("\n");
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_LOCAL_MEM_TYPE, sizeof(val), &val, NULL) );
+			printf("  Device %d local mem type: 0x%llx", j, val );
+			if (val == 1) printf(" Local");
+			if (val == 2) printf(" Global");
+			printf("\n");
+
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_SINGLE_FP_CONFIG, sizeof(val), &val, NULL) );
+			printf("  Device %d single FP config: 0x%llx\n", j, val );
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_DOUBLE_FP_CONFIG, sizeof(val), &val, NULL) );
+			printf("  Device %d double FP config: 0x%llx\n", j, val );
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_QUEUE_PROPERTIES, sizeof(val), &val, NULL) );
+			printf("  Device %d queue properties: 0x%llx\n", j, val );
+
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(val), &val, NULL) );
+			printf("  Device %d max compute units: %lld\n", j, val );
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(val), &val, NULL) );
+			printf("  Device %d max work group size: %lld\n", j, val );
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, sizeof(val), &val, NULL) );
+			printf("  Device %d max work item dimensions: (", j);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_MAX_WORK_ITEM_SIZES, sizeof(long long)*val, buf, NULL) );
+			for (int k=0; k<val; ++k) {
+				if (k > 0) printf(", ");
+				printf("%lld", ((long long*)buf)[k]);
+			};
+			printf(")\n");
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR, sizeof(val), &val, NULL) );
+			printf("  Device %d preferred vector width: char(%lld), ", j, val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT, sizeof(val), &val, NULL) );
+			printf("short(%lld), ", val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT, sizeof(val), &val, NULL) );
+			printf("int(%lld), ", val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG, sizeof(val), &val, NULL) );
+			printf("long(%lld), ", val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT, sizeof(val), &val, NULL) );
+			printf("float(%lld), ", val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE, sizeof(val), &val, NULL) );
+			printf("double(%lld)\n", val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_ADDRESS_BITS, sizeof(val), &val, NULL) );
+			printf("  Device %d address bits: %lld\n", j, val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_IMAGE_SUPPORT, sizeof(val), &val, NULL) );
+			printf("  Device %d image support: %lld\n", j, val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_MAX_CLOCK_FREQUENCY, sizeof(val), &val, NULL) );
+			printf("  Device %d max clock frequency: %lld MHz\n", j, val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_MAX_MEM_ALLOC_SIZE, sizeof(val), &val, NULL) );
+			printf("  Device %d max malloc size: %lld\n", j, val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_MAX_READ_IMAGE_ARGS, sizeof(val), &val, NULL) );
+			printf("  Device %d max read image args: %lld\n", j, val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_MAX_WRITE_IMAGE_ARGS, sizeof(val), &val, NULL) );
+			printf("  Device %d max write image args: %lld\n", j, val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_IMAGE2D_MAX_WIDTH, sizeof(val), &val, NULL) );
+			printf("  Device %d max width * height for 2D image: %lld * ", j, val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_IMAGE2D_MAX_HEIGHT, sizeof(val), &val, NULL) );
+			printf("%lld\n", val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_IMAGE3D_MAX_WIDTH, sizeof(val), &val, NULL) );
+			printf("  Device %d max width * height * depth for 3D image: %lld * ", j, val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_IMAGE3D_MAX_HEIGHT, sizeof(val), &val, NULL) );
+			printf("%lld * ", val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_IMAGE3D_MAX_DEPTH, sizeof(val), &val, NULL) );
+			printf("%lld\n", val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_MAX_SAMPLERS, sizeof(val), &val, NULL) );
+			printf("  Device %d max samplers: %lld\n", j, val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_MAX_PARAMETER_SIZE, sizeof(val), &val, NULL) );
+			printf("  Device %d max parameter size: %lld\n", j, val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_MEM_BASE_ADDR_ALIGN, sizeof(val), &val, NULL) );
+			printf("  Device %d mem base addr align: %lld\n", j, val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE, sizeof(val), &val, NULL) );
+			printf("  Device %d min data type align size: %lld\n", j, val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_GLOBAL_MEM_SIZE, sizeof(val), &val, NULL) );
+			printf("  Device %d global mem: size %lld bytes, ", j, val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_GLOBAL_MEM_CACHE_SIZE, sizeof(val), &val, NULL) );
+			printf("cache size %lld bytes, ", val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE, sizeof(val), &val, NULL) );
+			printf("cacheline size %lld bytes\n", val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE, sizeof(val), &val, NULL) );
+			printf("  Device %d max constant buffer size: %lld\n", j, val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_MAX_CONSTANT_ARGS, sizeof(val), &val, NULL) );
+			printf("  Device %d max constant args: %lld\n", j, val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_LOCAL_MEM_SIZE, sizeof(val), &val, NULL) );
+			printf("  Device %d local mem size: %lld bytes\n", j, val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_ERROR_CORRECTION_SUPPORT, sizeof(val), &val, NULL) );
+			printf("  Device %d error correction support: %lld\n", j, val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_PROFILING_TIMER_RESOLUTION, sizeof(val), &val, NULL) );
+			printf("  Device %d profiling timer resolution: %lld\n", j, val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_ENDIAN_LITTLE, sizeof(val), &val, NULL) );
+			printf("  Device %d little endian: %lld\n", j, val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_COMPILER_AVAILABLE, sizeof(val), &val, NULL) );
+			printf("  Device %d compiler available: %lld\n", j, val);
+			CL_WRAPPER( clGetDeviceInfo(devices[j], CL_DEVICE_AVAILABLE, sizeof(val), &val, NULL) );
+			printf("  Device %d available: %lld\n", j, val);
+		};
+		free(devices);
+	};
+	free(platforms);
+
+	return 0;
+}
+```
+
+## Hello world program
+
+The following code runs a hello world program on the first GPU
+([`opencl-helloworld.c`](/img/opencl-helloworld.c))
+
+```c
+/* helloworld.c - Hello World program for OpenCL, modified from an example from the web
+ * Adrian Sai-wah Tam <adrian.sw.tam@gmail.com>
+ * Sun, 19 Dec 2010 01:35:33 -0500
+ */
+
+#include "helper.h"
+
+const char *KernelSource =
+"__kernel square(__global float* input,    \n" \
+"                __global float* output,   \n" \
+"                const unsigned int count) \n" \
+"{                                         \n" \
+"   int i = get_global_id(0);              \n" \
+"   if (i < count)                         \n" \
+"       output[i] = input[i] * input[i];   \n" \
+"}                                         \n";
+
+int main(int argc, char** argv)
+{
+	const int count = 4096;		// Size of data
+	float data[count];		// Input data set
+	float results[count];		// Output data set
+
+	cl_device_id device_id;		// Compute device
+	cl_context context;		// Compute context
+	cl_command_queue commands;	// Compute command queue
+	cl_program program;		// Compute program
+	cl_kernel kernel;		// Compute kernel
+
+	cl_mem input;			// Device memory used for the input array
+	cl_mem output;			// Device memory used for the output array
+
+	/*** Fill input data with random float values ***/
+	for(int i = 0; i < count; i++)
+		data[i] = rand() / (float)RAND_MAX;
+
+	/*** Prepare a compute device ***/
+	const int gpu = 1;
+	printf("Connecting to the 1st %s device\n", gpu ? "GPU" : "CPU");
+	CL_WRAPPER( clGetDeviceIDs(NULL, gpu ? CL_DEVICE_TYPE_GPU : CL_DEVICE_TYPE_CPU, 1, &device_id, NULL) );
+	printf("Creating context on the compute device\n");
+	CL_ASSIGN( context = clCreateContext(0, 1, &device_id, NULL, NULL, &err) );
+
+	const int do_profiling = 0;
+	cl_command_queue_properties qprop = 0;
+	if (do_profiling) {
+		qprop |= CL_QUEUE_PROFILING_ENABLE;
+	}
+	printf("Creating command queue %s profiling\n", do_profiling ? "with" : "without");
+	CL_ASSIGN( commands = clCreateCommandQueue(context, device_id, qprop, &err) );
+
+	/*** Prepare kernel code ***/
+	printf("Making program object with one kernel:\n%s", KernelSource);
+	CL_ASSIGN( program = clCreateProgramWithSource(context, 1, (const char**)&KernelSource, NULL, &err) );
+
+	printf("Compiling and linking program executable\n");
+	char const *options = NULL;
+	err = clBuildProgram(program, 0, NULL, options, NULL, NULL);
+	if (err != CL_SUCCESS) {
+		size_t len;
+		clGetProgramBuildInfo(program, device_id, CL_PROGRAM_BUILD_LOG, 0, NULL, &len);
+		char* buffer = (char*) malloc(len);
+		clGetProgramBuildInfo(program, device_id, CL_PROGRAM_BUILD_LOG, sizeof(buffer), buffer, &len);
+		printf("%s\n", buffer);
+		printf("Error %d: Failed to build program executable (%s)\n", err, cl_error_to_str(err));
+		free(buffer);
+		abort();
+	}
+
+	/*** Preparing kernel function and I/O memory ***/
+	char* kernel_name = "square";  // name of the function in the kernel code
+	printf("Extracting the __kernel function named `%s'\n", kernel_name);
+	CL_ASSIGN( kernel = clCreateKernel(program, kernel_name, &err) );
+
+	printf("Preparing input and output memory in device\n");
+	CL_ASSIGN( input = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(float) * count, NULL, NULL) );
+	CL_ASSIGN( output = clCreateBuffer(context, CL_MEM_WRITE_ONLY, sizeof(float) * count, NULL, NULL) );
+
+	printf("Transferring data to input memory in device\n");
+	CL_WRAPPER( clEnqueueWriteBuffer(commands, input, CL_TRUE, 0, sizeof(float) * count, data, 0, NULL, NULL) );
+
+	/*** Prepare to run: Set arguments, set workgroup size ***/
+	printf("Setting arguments to kernel\n");
+	CL_WRAPPER(clSetKernelArg(kernel, 0, sizeof(cl_mem), &input) |
+		   clSetKernelArg(kernel, 1, sizeof(cl_mem), &output) |
+		   clSetKernelArg(kernel, 2, sizeof(unsigned int), &count)
+	);
+
+	size_t global, local; // Size of context and size of workgroup
+	CL_WRAPPER( clGetKernelWorkGroupInfo(kernel, device_id, CL_KERNEL_WORK_GROUP_SIZE, sizeof(local), &local, NULL) );
+	printf("Setting the kernel to run on maximum workgroup size %lu over a global data set of size %u\n", local, count);
+
+	/*** Run the kernel ***/
+	global = count;
+	CL_WRAPPER( clEnqueueNDRangeKernel(commands, kernel, 1, NULL, &global, &local, 0, NULL, NULL) );
+	printf("Kernel running\n");
+	clFinish(commands); // Wait for the command queue finish
+
+	/*** Retrieve output from device memory, and verify result ***/
+	printf("Retrieving output data from device\n");
+	CL_WRAPPER( clEnqueueReadBuffer(commands, output, CL_TRUE, 0, sizeof(float) * count, results, 0, NULL, NULL ) ); 
+
+	printf("Validating results\n");
+	int correct = 0;
+	for (int i = 0; i < count; i++) {
+		if (results[i] == data[i] * data[i])
+			correct++;
+	}
+	printf("Computed '%d/%d' correct values!\n", correct, count);
+
+	/*** Clean up ***/
+	clReleaseMemObject(input);
+	clReleaseMemObject(output);
+	clReleaseKernel(kernel);
+	clReleaseProgram(program);
+	clReleaseCommandQueue(commands);
+	clReleaseContext(context);
+
+	return 0;
+}
+```
+
+## Models
+
+Computation Model 
+  * Each piece of metal is a host
+  * Each host contains several OpenCL compute devices (e.g. GPU)
+  * Each compute device contains several compute units (e.g. workgroup)
+  * Each compute unit contains several processing elements (e.g. workitem, ALU in GPU)
+
+Memory model
+  * Global memory: Memory on GPU board, accessible by everyone
+  * Local memory: Local to compute unit, accessible by processing elements in
+    the same compute unit
+  * Constant memory: A piece of memory expected to be read only. If declared a
+    memory to be constant, it is also supposed to fit into a constant memory
+    at runtime. Otherwise, use global memory which would be slower but not
+    bounded by the local memory size.
+  * Private memory: Memory local to a work item
+
+## Debug
+Dump log messages to stdout (otherwise hidden):
+
+    export CL_LOG_ERRORS=stdout
+
+When you found the command queue or context destroyed unexpectedly, it is likely that the kernel access to an unallocated memory.
+
+## References
+  * Nvidia: <http://www.nvidia.com/object/cuda_opencl_new.html>
+  * AMD/ATI: <http://developer.amd.com/zones/OpenCLZone/Pages/default.aspx>
+  * Khronos Group: <http://www.khronos.org/opencl/>

@@ -1,0 +1,32 @@
+---
+layout: post
+title: RAM
+date: Fri, 06 Oct 2017 23:13:36 -0400
+tags: system
+category: blog
+published: false
+---
+
+Low-voltage ICs: 1.3V to 1.5V
+
+SDRAM (synchronous dynamic random access memory) is made up of arrays of
+storage (2D lattice of word lines intersecting with bit lines). Each grid is
+called a bank.
+
+One side of the DIMM housing make up one *rank*, which is a group containing
+multiple banks. DDR is in groups of 2, DDR2 is in groups of 4, DDR3 is in
+groups of 8. Usually each bank is in one IC.
+
+If each row has 1K columns and each column stores 8 bits, and each IC has 8 cnotiguous banks, then each memory page is 8 KByte.
+
+Bank n spread across the total number of ICs per rank. And in one IC, there is 8 distinct stacked banks.
+
+DDR3 core has 8n-prefetch where n=number of banks per rank: each access reads a minimum of 8 bytes
+  - 
+
+![functional diagram of DDR3 memory](https://images.anandtech.com/doci/3851/DRAM%20Memory%20Topology.png "Functional diagram of DDR3 RAM")
+
+# Reference:
+1. [Everything You Always Wanted to Know About SDRAM (Memory): But Were Afraid to Ask][1]
+
+[1]: https://www.anandtech.com/show/3851/everything-you-always-wanted-to-know-about-sdram-memory-but-were-afraid-to-ask

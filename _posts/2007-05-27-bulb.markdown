@@ -1,0 +1,12 @@
+---
+layout: post
+title: "Bulb mode and Time mode"
+date: 2007-05-27 23:22:56 +0800
+tags: business
+---
+
+My D70 camera actually supports mirror lock-up for shotting in a limited sense.
+
+In D70, the so-called mirror lock-up is for CCD cleaning only. It doesn't support shotting. The longest exposure time in D70 is 30 seconds. However, there is a "bulb mode" or B-mode for long exposure time. Turn to M mode and rotate the dial for longer exposure time beyond 30 seconds will have "bulb" showed up on the LCD panel. Then you're in the B-mode. If you keep pushing the shutter button, the shutter will keep open.
+
+When you are in the bulb mode, but you choose to use IR for shutter release, you are actually in the "time mode" or T-mode. The first push on the IR remote will open the shutter and the second push will close it. However, to make it work, your IR receiver on D70 must stay alert, which is a 15 min at most.

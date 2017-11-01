@@ -1,0 +1,21 @@
+---
+layout: post
+title: "Guérin & Orda (2002) Computing Shortest Paths for Any Number of Hops (TON)"
+date: 2011-07-13 00:21:57 -0400
+category: paper
+bibtex:
+  type: article
+  title: "Computing Shortest Paths for Any Number of Hops"
+  author: "Roch Guérin and Ariel Orda"
+  year: "2002"
+  journal: "IEEE/ACM Transactions on Networking"
+  volume: "10"
+  number: "5"
+  month: "Oct"
+  pages: "613--620"
+---
+Brief read.
+
+This paper gives algorithm on solving the "All Hops Optimal Path Problem", which is the following:
+
+Given a graph $G=(V,E)$, and a source node $s$, destination node $u$, and a maximal hop count $H$, and a link weight for each edge, find for *each* hop count value $h$ ($1\le h\le H$) an $h$-hop optimal path between $s$ and $u$, where the optimality can be additive (sum of weights of all edges) or bottleneck (max of weights of all edges) or other form of non-decreasing function.

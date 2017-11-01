@@ -1,0 +1,39 @@
+---
+layout: page
+title: Papers I Read
+subtitle: or skimmed, or not finished reading
+show_avatar: true
+css:
+  - https://cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css
+  - "/css/datatables.override.css"
+foot_js:
+  - https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js
+  - "/js/papers.js"
+---
+
+<table id="fordatatable" class="display nowrap" cellspacing="0", width="100%">
+  <thead><tr>
+    <th>Author</th>
+    <th>Title</th>
+    <th>Year</th>
+    <th>How</th>
+    <th>Type</th>
+    <th>Date</th>
+  </tr></thead>
+  <tbody>
+  {% for paper in site.categories.paper %}
+    <tr>
+      {% capture authornames %}
+        {% assign authorlist = paper.bibtex.author | replace:'and others','' | strip | split:' and ' %}
+        {% for a in authorlist %}{{ a | split:' ' | last }} {% endfor %}
+      {% endcapture %}
+      <td><a href="{{ paper.url | prepend: site.baseurl }}">{{ authornames | strip | split:' ' | join:', ' | truncate:30 }}</a></td>
+      <td><a href="{{ paper.url | prepend: site.baseurl }}">{{ paper.bibtex.title | default: paper.title }}</a></td>
+      <td><a href="{{ paper.url | prepend: site.baseurl }}">{{ paper.bibtex.year }}</a></td>
+      <td><a href="{{ paper.url | prepend: site.baseurl }}">{{ paper.bibtex.howpublished | default: paper.bibtex.journal | default: paper.bibtex.booktitle | replace:'Proc. ','' | replace:'Proc ','' | truncate: 30 }}</a></td>
+      <td><a href="{{ paper.url | prepend: site.baseurl }}">{{ paper.bibtex.type }}</a></td>
+      <td><a href="{{ paper.url | prepend: site.baseurl }}">{{ paper.date | date: "%Y-%m-%d" }}</a></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>

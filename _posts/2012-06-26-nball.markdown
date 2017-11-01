@@ -1,0 +1,251 @@
+---
+layout: post
+title: "Volume of n-ball"
+date: 2012-06-26 17:39:25 -0400
+tags: math
+---
+
+If we denote the Cartesian coordinate of a $n$-dimensional Euclidean space by a
+$n$-vector $\mathbf{x}$, then a $n$-ball centered at the origin with radius $r$
+is the set of points that satisfy
+
+$$
+||\mathbf{x}||_2 \le r
+$$
+
+Taking this definition, a 1-ball is the line segment $[-r,r]$, which its
+"volume" is $2r$ and has no surface area. A 2-ball is a circle with radius $r$,
+which has the "surface" area of $2\pi r$ and "volume" of $\pi r^2$.
+
+Let us denote the volume of an $n$-ball with radius $r$ by $V_n(r)$, and
+consider that $n$-ball is defined by
+
+$$
+\begin{align}
+||\mathbf{x}||_2 = x_1^2 + x_2^2 + \cdots + x_{n-1}^2 + x_n^2 &\le r  \\
+x_1^2 + x_2^2 + \cdots + x_{n-1}^2 &\le r - x_n^2
+\end{align}
+$$
+
+Obviously
+
+$$
+0 \le r - x_n^2  \\
+-r \le x_n \le r.
+$$
+
+Therefore, we can find $V_n(r)$ recursively:
+
+$$
+\begin{align}
+V_n(r) &= \int_{-r}^r V_{n-1}(\sqrt{r^2-x_n^2})dx_n  \\
+&= \int_{-r}^r V_{n-1}(r\sqrt{1-u^2})d(ru)  \\
+&= r\int_{-1}^1 V_{n-1}(r\sqrt{1-u^2})du.  \\
+\end{align}
+$$
+
+## Proportionality of Volume
+Firstly, we prove $V_n(r)$ is proportional to $r^n$ by induction:
+
+Consider $n=1$, $V_1(r)=2r=rV_1(1)$. If we have $V_k(r)=r^kV_k(1)$, then
+
+$$
+\begin{align}
+V_{k+1}(r) &= r\int_{-1}^1 V_k(r\sqrt{1-u^2})du  \\
+&= r\int_{-1}^1 (r\sqrt{1-u^2})^kV_k(1)du  \\
+&= r^{k+1}\int_{-1}^1 (\sqrt{1-u^2})^kV_k(1)du  \\
+&= r^{k+1}\int_{-1}^1 V_k(\sqrt{1-u^2})du  \\
+&= r^{k+1}V_{k+1}(1).
+\end{align}
+$$
+
+Thus
+
+$$
+V_n(r) = r^n V_n(1).
+$$
+
+## Formula for Volume
+
+$$
+\begin{align}
+V_n(1) &= \int_{-1}^1 V_{n-1}(\sqrt{1-u^2})du \\
+&= \int_{-1}^1 (\sqrt{1-u^2})^{n-1}V_{n-1}(1)du \\
+&= V_{n-1}(1)\int_{-1}^1 (\sqrt{1-u^2})^{n-1}du.
+\end{align}$$
+
+If we denote for $n>1$,
+
+$$
+I_n = \int_{-1}^1 (\sqrt{1-u^2})^n du \\
+$$
+
+then
+
+$$\begin{align}
+V_n(1) &= V_{n-1}(1)I_{n-1} \\
+&= V_{n-2}(1)I_{n-2}I_{n-1} \\
+&= V_1(1)I_1I_2\cdots I_{n-1} \\
+&= 2I_1I_2\cdots I_{n-1},
+\end{align}$$
+
+and
+
+$$
+V_n(r) = 2r^nI_1I_2\cdots I_{n-1},
+$$
+
+valid for $n\ge 1$ if we specially define $I_0=1$, and which
+
+$$
+I_n = \int_{-1}^1 (\sqrt{1-u^2})^n du = \int_{-\pi/2}^{\pi/2} \cos^{n+1}t dt = \int_0^{\pi} \sin^{n+1}t dt = \frac{\Gamma(\frac{n}{2}+1)}{\Gamma(\frac{n+3}{2})}\sqrt{\pi}
+$$
+
+where the Gamma function is defined as
+
+$$
+\Gamma(z) = \int_0^\infty e^{-t}t^{z-1} dt,
+$$
+
+with the property that $z\Gamma(z) = \Gamma(z+1)$, and $\Gamma(n)=(n-1)!$ for
+positive integers $n$. But we can also consider $I_n$ without resolving to the
+Gamma function. Consider that
+
+$$\begin{align}
+I_n &= \int_0^{\pi} \sin^{n+1}t dt  \\
+&= \int_0^{\pi} \sin^n t \sin t dt  \\
+&= [(-\cos t)\sin^n t]_0^{\pi} + \int_0^{\pi} n\cos^2 t\sin^{n-1} t dt  \\
+&= n\int_0^{\pi} (1-\sin^2 t)\sin^{n-1} t dt  \\
+&= n[I_{n-2}-I_n]  \\
+\textrm{therefore}\quad I_n &= \frac{n}{n+1} I_{n-2}.
+\end{align}$$
+
+It is easy to see that $I_1=\pi/2$, $I_2=4/3$, $I_3=3\pi/8$, and
+
+$$
+I_nI_{n-1} = \frac{n}{n+1}I_{n-2}\frac{n-1}{n}I_{n-3} = \frac{n-1}{n+1}I_{n-2}I_{n-3}
+$$
+
+thus
+
+$$\begin{align}
+I_{2k}I_{2k-1}\cdots I_1 &= \frac{2k-1}{2k+1}(I_{2k-2}I_{2k-3})^2I_{2k-4}I_{2k-5}\cdots I_1 \\
+&= \frac{2k-1}{2k+1}(\frac{2k-3}{2k-1})^2(I_{2k-4}I_{2k-5})^3I_{2k-6}I_{2k-7}\cdots I_1 \\
+&= \frac{1}{2k+1}\frac{(2k-3)^2}{2k-1}(I_{2k-4}I_{2k-5})^3I_{2k-6}I_{2k-7}\cdots I_1 \\
+&= \frac{1}{2k+1}\frac{1}{2k-1}\cdots\frac{1}{7}\frac{3^{k-1}}{5}(I_2I_1)^k \\
+&= \frac{1}{2k+1}\frac{1}{2k-1}\cdots\frac{1}{7}\frac{3^{k-1}}{5}(\frac{2\pi}{3})^k \\
+&= \frac{1}{2k+1}\frac{1}{2k-1}\cdots\frac{1}{7}\frac{1}{5}\frac{1}{3}(2\pi)^k \\
+&= \frac{2^k k!}{(2k+1)!} (2\pi)^k  \\
+&= \frac{2^{2k} k!}{(2k+1)!}\pi^k
+\end{align}$$
+
+and
+
+$$\begin{align}
+I_{2k-1}I_{2k-2}\cdots I_1 &= \frac{2k-2}{2k}(I_{2k-3}I_{2k-4})^2I_{2k-5}I_{2k-6}\cdots I_1 \\
+&= \frac{2k-2}{2k}(\frac{2k-4}{2k-2})^2(I_{2k-5}I_{2k-6})^3I_{2k-7}I_{2k-8}\cdots I_1 \\
+&= \frac{1}{2k}\frac{(2k-4)^2}{2k-2}(I_{2k-5}I_{2k-6})^3I_{2k-7}I_{2k-8}\cdots I_1 \\
+&= \frac{1}{2k}\frac{1}{2k-2}\cdots\frac{4^{k-2}}{6}(I_3I_2)^{k-1}I_1 \\
+&= \frac{1}{2k}\frac{1}{2k-2}\cdots\frac{4^{k-2}}{6}(\frac{\pi}{2})^k \\
+&= \frac{1}{2k}\frac{1}{2k-2}\cdots\frac{2^{k-4}}{6}\pi^k \\
+&= \frac{1}{k}\frac{1}{k-1}\cdots\frac{1}{3}\frac{\pi^k}{4} \\
+&= \frac{1}{k!}\frac{\pi^k}{2}.
+\end{align}$$
+
+Therefore we have
+
+$$\begin{align}
+V_{2k+1}(r) &= 2r^{2k+1}\frac{2^{2k}k!}{(2k+1)!}\pi^k = \frac{2^{2k+1}k!}{(2k+1)!}\pi^kr^{2k+1} \\
+V_{2k}(r) &= 2r^{2k}\frac{1}{k!}\frac{\pi^k}{2} = \frac{1}{k!}\pi^kr^{2k}.
+\end{align}$$
+
+Indeed, we can also prove by induction that
+
+$$
+V_n(1) = \frac{\pi^{n/2}}{\Gamma(\frac{n}{2}+1)}.
+$$
+
+And the surface area of the $n$-ball is obtained by $\frac{d}{dr}V_n(r)$.
+
+## Alternative Derivation
+
+Below is an alternative derivation by Greg Huber (1982). "Gamma function
+derivation of n-sphere volumes". Am. Math. Monthly 89(5):301–302
+([PDF](https://drive.google.com/open?id=0B6DoI_vm0OLfLTJjUkJIQTVYdEk))
+
+Consider
+
+$$\begin{align}
+\Gamma(z) &=\int_0^{\infty} e^{-t}t^{z-1} dt  \\
+&= \int_0^{\infty} e^{-u^2}u^{2z-2} d(u^2)  \\
+&= 2 \int_0^{\infty} e^{-u^2}u^{2z-1} du.  \\
+\Gamma(\tfrac{1}{2}) &= 2\int_0^{\infty} e^{-u^2} du = \sqrt{\pi},
+\end{align}$$
+
+for the reason that $\int_{-\infty}^{\infty} \frac{1}{\sqrt{2\pi\sigma^2}}\exp(-\frac{x^2}{2\sigma^2}) du = 1$.
+
+Denote the surface of $n$-ball by $\omega_{n-1}(r)$, we can write the volume as
+the integration of surface area as the radius expands from zero:
+
+$$
+V_n(r) = \int_0^r \omega_{n-1}(1)u^{n-1} du = \frac{r^n}{n}\omega_{n-1}(1)
+$$
+
+or the volume as the integration of all the points in the ball:
+
+$$
+V_n(r) = \iint\cdots\int_{||\mathbf{x}||\le R} dx_1dx_2\cdots dx_n.
+$$
+
+Consider the density integration on an infinitely large $n$-ball, where the
+density at point $\mathbf{x}$ is $e^{-r^2}$ with $r$ defined by
+
+$$
+r^2 = x_1^2 + x_2^2 + \cdots + x_n^2.
+$$
+
+Using the first integral we have (assumed radius 1)
+
+$$
+\int_0^{\infty} \omega_{n-1}r^{n-1}e^{-r^2}dr = \omega_{n-1}\int_0^\infty e^{-r^2}r^{n-1}dr = \frac{1}{2}\omega_{n-1}\Gamma(\frac{n}{2}).
+$$
+
+But using the second integral we have
+
+$$\begin{align}
+& \iint\cdots\int_{||\mathbf{x}||\le \infty} e^{-r^2} dx_1dx_2\cdots dx_n  \\
+=&\iint\cdots\int_{||\mathbf{x}||\le \infty} e^{-x_1^2-x_2^2-\cdots-x_n^2} dx_1dx_2\cdots dx_n \\
+=&\iint\cdots\int_{||\mathbf{x}||\le \infty} e^{-x_1^2}dx_1 e^{-x_2^2}dx_2\cdots e^{-x_n^2}dx_n \\
+=&\left(\int_{-\infty}^{\infty} e^{-x^2}dx\right)^n \\
+=&\pi^{n/2}.
+\end{align}$$
+
+Because they shall be equal, we have
+
+$$\begin{align}
+\frac{1}{2}\omega_{n-1}\Gamma(\frac{n}{2}) &= \pi^{n/2}  \\
+\omega_{n-1} &= \frac{2\pi^{n/2}}{\Gamma(\frac{n}{2})}  \\
+\omega_{n-1}(r) &= \frac{2\pi^{n/2}r^{n-1}}{\Gamma(\frac{n}{2})}  \\
+V_n = \frac{1}{n}\omega_{n-1} &= \frac{2\pi^{n/2}}{n\Gamma(\frac{n}{2})}  \\
+&= \frac{\pi^{n/2}}{\frac{n}{2}\Gamma(\frac{n}{2})}  \\
+&= \frac{\pi^{n/2}}{\Gamma(\frac{n}{2}+1)}  \\
+V_n(r) &= \frac{\pi^{n/2}r^n}{\Gamma(\frac{n}{2}+1)}.
+\end{align}$$
+
+We can also verify that $\frac{d}{dr}V_n(r) = \omega_{n-1}(r)$.
+
+## Properties of n-ball
+If we consider the $n$-ball with unit diameter instead of unit radius, its
+volume is $V_n(1/2)$. We can see that, due to the exponential nature in the
+denominator,
+
+$$
+\lim_{n\to\infty} V_n(\tfrac{1}{2}) = 0.
+$$
+
+Therefore, the higher the dimension, the denser we can pack the balls. I first learned this result from Professor Raymond Yeung.
+
+## Reference
+  * <http://en.wikipedia.org/wiki/N-sphere>
+  * <http://en.wikipedia.org/wiki/Deriving_the_volume_of_an_n-ball>
+

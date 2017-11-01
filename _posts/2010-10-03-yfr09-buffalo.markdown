@@ -1,0 +1,22 @@
+---
+layout: post
+title: "Yu et al (2009) BUFFALO: Bloom Filter Forwarding Architecture for Large Organizations (CoNEXT)"
+date: 2010-10-03 01:21:53 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "BUFFALO: Bloom Filter Forwarding Architecture for Large Organizations"
+  author: "Minlan Yu and Alex Fabrikant and Jennifer Rexford"
+  booktitle: "Proc. CoNext"
+  year: 2009
+---
+
+This paper proposes a new architecture on how a switch should forward packet, so that it can (1) reduce the memory requirement for storing a forwarding table and (2) reduce the processing time by not looking up the forwarding table.
+
+The idea is to use Bloom filters in a switch, one BF per each output port. The BF is storing the set of MAC addresses that an output port can reach to on the shortest path. The shortest path routing information is computed using link-state routing protocol.
+
+When a switch has to forward a packet, it checks all its BFs and find the output port that matches the packet's destination MAC address. If there are none, the packet is dropped as it means the destination does not exists in the network. If there are more than one matching output port, the packet is sent to any one randomly unless the output port is also the input port for that packet.
+
+The BF is maintained by a counting BF, which is stored in a slower memory. The CBF is required to handle route updates and topology changes. The BF used for forwarding is deduced from the CBF, which is supposed to change rarely compared to the packet arrival rate.
+
+The paper calculates (1) bound for the stretch (i.e. in case the path to destination is not the shortest path, how much longer would it be). The stretch is due to false positives in BF which causes the switch to forward a packet randomly; (2) the memory requirement in this BF-using switches.

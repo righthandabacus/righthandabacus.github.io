@@ -1,0 +1,13 @@
+---
+layout: post
+title: "Gude et al (2008) NOX: Towards an Operating System for Networks (CCR)"
+date: 2010-09-29 11:59:05 -0400
+category: paper
+bibtex:
+  type: article
+  title: "NOX: Towards an Operating System for Networks"
+  author: "Natasha Gude and Teemu Koponen and Justin Pettit and Ben Pfaff and Martín Casado and Nick McKeown and Scott Shenker"
+  journal: "ACM Computer Communication Review"
+  year: 2008
+---
+NOX, Network Operating System, is proposing an "OS" layer on top of network hardware. Similar to OS in a computer, it abstracts the network functions into API and user can write "applications" on top of those API to control the network. The idea is to make network management easier by providing a middle layer and a central point to hold network-wide view.

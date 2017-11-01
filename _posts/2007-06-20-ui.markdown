@@ -1,0 +1,28 @@
+---
+layout: post
+title: "User Interface Design for Mere Mortals"
+subtitle: "Eric Butow / 2007"
+date: 2007-06-20 02:20:34 +0800
+category: book
+bibtex:
+  type: book
+  title: User Interface Design for Mere Mortals
+  author: Eric Butow
+  publisher: Addison-Wesley
+  year: 2007
+  library: ULib
+  classification: QA 76.9 U83 B88 2007
+---
+
+This is a book about UI design, but in a depth, although a bit boring.
+
+It is a book with careful research and good support references. I suggest to everyone who want to do a serious study on the theory of user interface design. There are two interesting things I learnt from this book: Firstly, any user interface is classified into four categories:
+
+  - **sovereign**: those who will occupy the whole screen for a long time, and it is the one that user
+     spend most of the time on to do his work
+  - **transient**: the one that will come and go, such as the auxiliary tools like search dialog
+  - **daemonic**: the one that usually does not shown to the user but works in the background
+  - **auxiliary**: something between sovereign and transient, which will sit on the screen for a long
+     time but normally does not interact with the user. Examples are the toolbar and status bar.
+
+When you can classify the UI components into categories, you can think of how it shall be presented. But actually, how? It depends on the user base. Scientists and morons are different and the UI for them are different as well. The book proposes to use MBTI (Myers-Briggs Type Indicator, see [Wikipedia](http://en.wikipedia.org/wiki/MBTI)) to imagine different types of users whom will use the UI. Then think of the most convenient and intuitive way of doing for those people. The most-intuitive approach can solve a bunch of problems but in case it does not, resort to the "common way of doing".

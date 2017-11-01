@@ -1,0 +1,22 @@
+---
+layout: post
+title: "Kvalbein et al (2009) Multiple Routing Configurations for Fast IP Network Recovery (TON)"
+date: 2011-04-16 10:21:40 -0400
+category: paper
+bibtex:
+  type: article
+  title: "Multiple Routing Configurations for Fast IP Network Recovery"
+  author: "Amund Kvalbein and Audun Fosselie Hansen and Tarik Cicic and Stein Gjessing and Olav Lysne"
+  journal: "IEEE/ACM Transactions on Networking"
+  volume: 17
+  number: 2
+  pages: "473--486"
+  year: 2009
+---
+A paper briefly skimmed.
+
+This paper propose to use multiple route configuration to do fast reroute to mitigate single network failures. Assume the network is healthy, the route configuration is a result of the link weights in OSPF. However, when a network component is failed (link or node), the resulting route configuration can be viewed as a modified OSPF link weights: Set the failed link to very high cost or all the links attached to the failed node to very high cost.
+
+By preparing for every component to fail, we can prepare a large number of fail scenarios, each with a corresponding route configuration. In this sense, if we put all the route configuration into routers, and whenever a failure occurs, the neighbouring routers adapt to a suitable route configuration, we achieve the fast reroute recovery.
+
+The problem of this approach is obviously the large number of configurations to be installed to routers. Therefore the theme of this paper is on how to reduce the number of configurations, using a heuristic algorithm. The process in using these multiple configurations is also described.

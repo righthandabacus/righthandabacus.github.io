@@ -1,0 +1,41 @@
+---
+layout: post
+title: "The Design Pattern in NS-3 Random Variables"
+date: 2011-12-27 12:14:12 -0500
+tags: code
+---
+I saw a very useful pattern in the random variable design in NS-3, but I can't remember the name for such pattern. It goes as follows:
+
+When we need a generic random variable in C++, we write this:
+
+```c++
+RandomVariable* rv;
+rv = new SomeDistribution();
+rv->GetValue();
+```
+
+It works fine under C++ polymorphism. But we see a problem when we need to clone it (e.g. pass it on as a parameter to a function): As the copy constructor of the base class is called, the variables that are specific to the daughter class is not copied. The solution is to make the implementation independent of the interface:
+
+```c++
+class RandomVariable {
+  Implementation* realRV;
+}
+class SomeDistribution : public RandomVariable {
+  SomeDistribution ()
+  {
+    realRV = new SomeImplementation ();
+  }
+  double GetValue ()
+  {
+    realRV->GetValue ();
+  }
+}
+class SomeImplementation : public Implementation {
+  double GetValue ()
+  {
+    // Real calculation here
+  }
+}
+```
+
+In this way, when you clone, you copy the pointer and doesn't need to care about the real thing beneath.

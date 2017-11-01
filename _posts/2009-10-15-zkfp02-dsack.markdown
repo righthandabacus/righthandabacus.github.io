@@ -1,0 +1,70 @@
+---
+layout: post
+title: "Zhang et al (2002) RR-TCP: A Reordering-Robust TCP with DSACK (ICSI Tech Report)"
+date: 2009-10-15 15:50:47 -0400
+category: paper
+bibtex:
+  type: techreport
+  title: "RR-TCP: A Reordering-Robust TCP with DSACK"
+  author: Ming Zhang and Brad Karp and Sally Floyd and Larry Peterson  
+  howpublished: ICSI Tech Report
+  institution: International Computer Science Institute
+  number: TR-02-006
+  month: July
+  year: 2002  
+---
+An abridged version available under the same title in Proc. ICNP 2003, pp.95-106, Nov 2003.
+
+The Tech Report that proposes DSACK-TAES to make TCP perform well under reordering networks, and support the proposal with simulation.
+
+DSACK can report dup packets to the sender to help sender learn about a
+spurious retransmission. Such spurious retransmission is called *false fast
+retransmit* in the paper, as it is caused by the fast retransmission algorithm
+in TCP. The paper proposed that, when FFR is detected, the window reduction can
+be undone as there was no congestion.
+
+To prevent future FFR, one can set a larger dupthresh, so that FR would not
+kick in before enough dup ACKs to confirm a lost. But a large dupthresh makes
+the TCP sender react slower after real packet drop. In FR, RFC3042 allows a
+*limited transmit* which the sender can send new data packet (under self-clock)
+once upon several duplicated ACKs received. Default is only for each of the
+first two dup ACKs. But upon a real loss, this limited transmit can delay the
+reduction of cwnd.
+
+The core idea in this paper is the DSACK scoreboard. The sender record each
+FR's starting time and the amount of cwnd reduction in the scoreboard for the
+retransmitted packet. If the FR is later found a FFR, the time between the
+start and the end of the FFR are recorded. Simply speaking, this measures the
+reordering length, and it aggregates the reordering length samples into a
+histogram. Then the dupthresh is set using the data in the scoreboard
+histogram. The histogram keeps the data for the recent confirmed FFR incidents.
+Base on the histogram, we can deduce the reordering length that fits into a
+certain percentile of reordring events. Then dupthresh is set accordingly. For
+example, we found that 90% of reordering involves 8 or less packets, then
+setting dupthresh to 9 can prevent 90% of FFR. The percentile is called the FA
+(FFR Avoidance) ratio and this scheme is called DSACK-FA in the paper.
+
+DSACK-FA can be furthered to make the FA ratio adaptive to maximize throughput.
+The RTO event in TCP is doing more harm. If we created a RTO because of the
+dupthresh too high, the cost would be losing the opportunity to send a lot of
+packets. Also, FFR has the similar cost because it sends slower during FR
+because we can confirm it is an FFR. And the limited transmit has the cost of
+making the sender idle at the time that it can send packets. So taking these
+costs, we can adapt the FA ratio such that: (1) Upon FFR, increase the FA ratio
+by S, (2) upon RTO, decrease the FA ratio by $\dfrac{C_{TO}}{C_{FFR}}S$
+where $C_{TO}$ is the cost of RTO and $C_{FFR}$ is the cost of FFR, (3) upon limited
+transmit-causing idle period, decrease the FA ratio by
+$\dfrac{C_{LT}}{C_{FFR}}S$. The value of S given in the paper is 0.01.
+This is called DSACK-TA for Timeout Avoidance.
+
+Moreover, in DSACK, as we have the timestamp reported by the sender, we can
+differentiate an ACK of retransmitted packet from an ACK of original packet.
+While Karn's Algorithm says not to sample RTT during retransmit because of
+ambiguity, such ambiguity is avoided by the timestamp. Thus we can get a more
+accurate RTT estimate if we make use of the reported timestamp. Indeed, the
+Karn's Algorithm is biased against short RTT paths and gives an over-estimated
+RTT value. Such improvement is called DSACK-ES, for Enhanced RTT Sampling in
+the paper.
+
+The simulation in this paper shows that, DSACK-TAES can significantly improve
+TCP's througput performance in face of reordering.

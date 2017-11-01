@@ -1,0 +1,20 @@
+---
+layout: post
+title: "Minkenberg et al (2009) Adaptive Routing for Convergence Enhanced Ethernet (HPSR)"
+date: 2011-07-08 17:10:08 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "Adaptive Routing for Convergence Enhanced Ethernet"
+  author: "Cyriel Minkenberg and Alessandra Scicchitano and Mitchell Gusat"
+  howpulished: HPSR
+  booktitle: "Proc Int Conf on High Performance Switching and Routing"
+  pages: "1--8"
+  month: "Jun 22-24"
+  year: 2009  
+---
+This paper proposes adaptive routing for CEE, i.e. 802.1Qau, 802.1Qbb, TRILL.
+
+Adaptive routing can be minimal (only shortest path) or non-minimal; and partially adaptive (not all messages to use any path) or fully adaptive. This paper proposes to use fully adaptive, non-minimal routing for congestion control in Ethernet.
+
+The idea is of the proposed AR is to take advantage of the congestion notification of 802.1Qau switches. These CN travels backward to the sender and the intermediate switches can snoop these CNs to learn about the congestion in downstream. "By marking ports as congested with respect to specific destinations, a switch can reorder its preferences of the corresponding output ports contained in the routing table entry for that destination. Clearly, uncongested ports will be preferred over congested ones."

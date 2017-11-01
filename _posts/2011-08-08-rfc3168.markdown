@@ -1,0 +1,43 @@
+---
+layout: post
+title: "Ramakrishnan et al (2001) The Addtion of Explicit Congestion Notification (ECN) to IP (RFC3168)"
+date: 2011-08-08 19:34:30 -0400
+category: paper
+bibtex:
+  type: misc
+  title: "The Addtion of Explicit Congestion Notification (ECN) to IP"
+  author: "K. Ramakrishnan and S. Floyd and D. Black"
+  howpublished: "IETF RFC 3168"
+  url: "http://www.ietf.org/rfc/rfc3168.txt"
+  month: "Sep"
+  year: "2001"
+---
+This is the standard for ECN.
+
+ECN is introduced to help active queue management. Routers can set the congestion experienced (CE) codepoint in the IP header of packets from ECN-capable transports to signal congestion. The problem of traditional approach (drop-tail) is that, it treat the network as a black-box and loss as the indication of congestion. The drop-tail policy may even lead to synchronisation of loss across multiple flows.
+
+ECN utilizes the last two bits in the TOS field as the ECN field. The codepoints are: 00 for not ECN-capable, 01 or 10 for ECN-capable transport, and 11 for congestion experienced. Having two codepoint for ECN-capable transport (ECT) is to allow mechanisms for data sender to verify that network elements are not erasing the CE codepoint. If only one codepoint is being used, use 10, the ECT(0). A router set a ECT packet as CE only when there is congestion. If no congestion, may it be data corruption or policy enforcement, CE must not be set. Moreover, the CE codepoint must not due to instantaneous queue size but as an indication of persistent congestion. Hence in RED, a moving average of queue size is used instead.
+
+ECN assumes the end-systems should react to congestion at most once per window of data (i.e. once per RTT). In TCP, the CWR and ECE flags are introduced to cooperate with ECN. They are the last two bits in the reserved field, adjacent to the flags. The operation of ECN-capable TCP transport is as follows:
+
+  - Host A sends a SYN packet with both CWR and ECE flags on to host B, indicating its intention to use ECN
+  - Host B respond with SYN-ACK packet with ECE set but CWR flag cleared, indicating its capability to use ECN as well
+  - Host A send the ACK to complete the three-way handshake
+  - Then hosts A and B can then send data with ECT codepoint
+  - When a party, say, host A received the data packet with CE codepoint, it send the ACK with ECE set to indicate the noticed congestion. The ECE is set in all the subsequent ACKs until it receives a packet from host B with CWR.
+  - When host B received an ACK with ECE, it reduces its window as if the mentioned packet is lost. Afterwards, the first sent data packet has CWR flag set. All subsequent received ACK with ECE set is ignored for this window.
+  - When host A received a packet with CWR, it stops sending ACK with ECE set, unless another CE is received.
+
+The two different setting in CWR+ECE flags in the SYN and SYN-ACK packets are because there exists some faulty TCP implementation that copies the reserved field in response to received packets. Thus a different setting can help distinguish a ECN-capable transport from a faulty implementation.
+
+Regarding the case that the cwnd is one MSS when a ECE is received, the standard way to simulate "half MSS" cwnd is to use a timer. By the time when ECE is received when cwnd is one, such timer shall be reset. In case delayed ACK is used, the receiver shall send ACK with ECE whenever any packet this ACK corresponds has CE codepoint. Moreover, when a received data packet is out of the receiver's window, the CE codepoint should be ignored.
+
+There are some rules in using such ECN transport:
+
+  - A host must not set the ECT codepoint unless it has negotiated with its peer
+  - ECT must not be set on SYN or SYN-ACK packets
+  - ECT must not be set on pure ACK packets where no data is carried
+  - ECT must not be set on retransmitted packets
+  - The standard way to simulate "half MSS" cwnd is to use a timer, therefore, when cwnd is one MSS and ECE is received, given that cwnd cannot be further reduced, such timer shall be reset
+  - When delayed ACK is used, the receiver shall send ACK with ECE whenever any packet this ACK corresponds has CE codepoint
+  - When rwnd is zero, the sender will send window probe packets of one byte data. Such probe packet must not have ECT nor CWR set.

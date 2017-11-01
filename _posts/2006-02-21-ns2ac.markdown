@@ -1,0 +1,178 @@
+---
+layout: post
+title: "Dairy on the Implementation of AC in NS2"
+date: 2006-02-21 14:16:35 +0800
+tags: code business
+---
+I have the experience on coding NS2, but I put it aside for a year already. Now I think I must implement the AC code into NS2 so that we can do some "experiments". The next step after the NS2 coding would be a Linux kernel hack.
+
+The NS2 used is of version 2.29.
+
+## Code survey
+In the [class hierarchy](http://www.isi.edu/nsnam/nsdoc-classes/index.html), I see there are two possibilies for the stub of AC, they are the `TfrcAgent` and `IntTcpAgent`. The former is the bare standalone agent class but the later is a sub-class of `TcpAgent`. If the former is used, I have to implement some sort of window flow control but the later may impose some more constrain on my coding. No idea which one to start with yet.
+
+The following is the grep output for `IntTcpAgent`:
+
+```
+ns-2.29 $ grep -rli IntTcpAgent .
+./CHANGES.html
+./tcp/chost.cc
+./tcp/chost.h
+./tcp/tcp-int.cc
+./tcp/tcp-int.h
+./tcp/tcp-session.cc
+./tcp/tcp-session.h
+./ns
+ns-2.29 $ grep -lri IntTcp .
+./CHANGES.html
+./tcl/test/test-suite-tcp.tcl
+./tcp/chost.cc
+./tcp/chost.h
+./tcp/tcp-int.cc
+./tcp/tcp-int.h
+./tcp/tcp-session.cc
+./tcp/tcp-session.h
+./ns
+```
+
+and this is for `TfrcAgent`:
+
+```
+ns-2.29 $ grep -rli TfrcAgent .
+./apps/telnet.h
+./tcp/tfrc.cc
+./tcp/tfrc.h
+./ns
+ns-2.29 $ grep -rli Tfrc .
+./apps/telnet.h
+./CHANGES.html
+./common/packet.h
+./FILES
+./Makefile.in
+./makefile.vc
+./ns-tutorial/nsnew.html
+./tcl/ex/red-pd/monitoring.tcl
+./tcl/ex/red-pd/README
+./tcl/ex/red-pd/red-pd.tcl
+./tcl/ex/red-pd/runall.sh
+./tcl/ex/red-pd/sources.tcl
+./tcl/ex/red-pd/tfrc/tfrc.gp
+./tcl/ex/red-pd/tfrc/tfrc.pl
+./tcl/ex/red-pd/tfrc/tfrc.sh
+./tcl/ex/red-pd/topology.tcl
+./tcl/ex/red-pd/traffic.tcl
+./tcl/ex/wireless-scripts/mtp.tcl
+./tcl/ex/wireless-scripts/runall.cmd
+./tcl/lib/ns-default.tcl
+./tcl/lib/ns-packet.tcl
+./tcl/test/FullTCP.notes
+./tcl/test/test-suite-friendly.tcl
+./tcl/test/test-suite-pktExample.tcl
+./tcl/test/test-suite-quiescent.tcl
+./tcl/test/test-suite-simple.tcl
+./tcp/tfrc-sink.cc
+./tcp/tfrc-sink.h
+./tcp/tfrc.cc
+./tcp/tfrc.h
+./tools/cbr_traffic.cc
+./trace/trace.cc
+./validate.out
+./ns
+./gen/ns_tcl.cc
+./Makefile
+```
+
+For no reason, I chose `TfrcAgent` to start. First of all, I try to clone the `TfrcAgent` to make sure the architecture works.
+
+ --- *2006/02/09*
+
+## Cloning
+
+Thanks to the marvellous GNU `grep`. I cloned the "TFRC" source and sink to "TFAC", with exactly the same function but different name. The patch is here: [tfac-step1.tar.gz](/img/tfac-step1.tar.gz)
+
+The patch is the new files created (a test suite and four files in `ns-2.29/tcp/`) and a patch file for the modifications due to the addition of new agents. I spent around four working hours (excluding compilation and so on) to produce this and perform the smoke test. Not difficult to do.
+
+PS: The test is done as follows: Firstly, go into `tcl/test`. Then run the command `./test-all-tfac QUIET`. The `QUIET` argument is necessary for the automated testing. If everything goes fine, it will tell you that "Test output agrees with reference output".
+
+ --- *2006/02/10*
+
+## Code Reading
+
+The `TFRC` agent is inherited from `Agent` class. Over there, a number of virtual functions are defined so that we can do some extensions. The general use of `Agent` is as follows:
+
+```tcl
+set udp0 [new Aget/UDP]
+$ns attach-agent $n0 $udp0
+
+set cbr0 [new Application/Traffic/CBR]
+...
+$cbr0 attach-agent $udp0
+
+set null0 [new Agent/Null]
+$ns attach-agent $n1 $null0
+
+$ns connect $udp0 $null0
+```
+
+So the agent is a middle layer between `Application` and the simulator core. 
+
+ --- *2006/02/10*
+
+## Finish reading the code
+Finished reading the code and wrote some write-up [here](../2006-02-14-ns2guide/).
+ --- *2006/02/14*
+
+## Thinking
+Implementing the "protocol" is definitely not easy. At least, you have much more things to concern than in the paper. So far, two things in my mind:
+  * The protocol is using retransmission, i.e. loss is recovered. Then according to what the TCP is doing, we should implement somewhat similar to RFC2581 (W. Richard Steven's RFC on TCP slow-start, fast retransmission and fast recovery) and RFC2582 (Sally Floyd's RFC on NewReno and SACK)
+  * The protocol never retransmit. Just send without recovering loss. Then how can we know about the loss? Do we have the scoreboard?
+
+ --- *2006/02/17*
+
+## Implementing reliable transfer
+Forget about the lusty things. Let me do the TCP-emulating AC first. I found the following things in the mechanism of packet generation:
+  * The packet generation is done by `Packet* p = allocpkt()`. The function call `allocpkt()` is from `Agent` class. The other version is `allocpkt(n)` which you can specify the packet size explicitly
+  * If no packet size is given, the default packet size is `size_`, which is a member variable of `Agent` class. In TFRC and TCP for example, they inherited from `Agent` and bound the `size_` variable as `packetSize_` in OTcl
+
+ --- *2006/02/18*
+
+## TCP emulation
+Finished the TCP emulation part of my AC protocol. Below are the important details:
+  * Important TCP references are: RFC793 (Base TCP standard), RFC2581 (Congestion Avoidance, Fast Retransmission and Fast Recovery), RFC2988 (Computing RTO)
+  * Other related references are: RFC813 (Clark's algorithm on window management), RFC896 (Nagle's algorithm on congestion), RFC816 (Silly Window Syndrome)
+  * The receiver side buffer is implemented in linked list (thanks NS, I don't need to care the payload). I am not sure if there is other implementations
+  * Now, the NS will give the sequence number in the trace file. The clue is, modify `trace/trace.cc`, in function `int Trace::get_seqno(Packet* p)`, tell NS how to get the sequence number from your packet. More sophisticated trace file format can be done by modifying `void Trace::format(int tt, int s, int d, Packet* p)`
+
+Warning: If you want to implement something, better reference the RFC yourself rather than do code hacking. The code is awful to read (at least TCP).
+
+The trace file is in the following format:
+
+```
+  + 0.00 1 2 TFAC 1000 ------- 0 1.0 2.0 12345 1
+  ^    ^ ^ ^    ^    ^       ^ ^   ^   ^     ^ ^
+  |    | | |    |    |       | |   |   |     | +--- Packet ID (int)
+  |    | | |    |    |       | |   |   |     +----- Sequence number (int)
+  |    | | |    |    |       | |   |   +----------- Destination address
+  |    | | |    |    |       | |   +--------------- Source address
+  |    | | |    |    |       | +------------------- Flow ID (int)
+  |    | | |    |    |       +--------------------- Flags (string)
+  |    | | |    |    +----------------------------- Packet size (int)
+  |    | | |    +---------------------------------- Packet name (string)
+  |    | | +--------------------------------------- Destination node (int)
+  |    | +----------------------------------------- Source node (int)
+  |    +------------------------------------------- Time (double)
+  +------------------------------------------------ Event (r=Receive, d=Drop, e=Error, +=Enqueue, -=Dequeue)
+```
+
+ --- *2006/02/22*
+
+## References to ns2
+- [Wiki of ns2](http://nsnam.isi.edu/nsnam/index.php/Main_Page)
+- [Sam’s Network Simulation Cradle Blog](http://www.wand.net.nz/~stj2/blog/)
+- [ns2 Documentation](http://www.isi.edu/nsnam/ns/ns-documentation.html)
+- [ns2 C++ class list](http://www.isi.edu/nsnam/nsdoc-classes/classes.html)
+- [NS by Example, at Worcester Polytechnic Inst.](http://nile.wpi.edu/NS/)
+- [ns2 documentation at INRIA Sophia-Antipolis](http://www-sop.inria.fr/planete/software/ns-doc/ns-current/)
+- [Web of Polly Huang](http://cc.ee.ntu.edu.tw/~phuang/)
+- [The web of Ke Chih-Heng](http://140.116.72.80/~smallko/ns2/ns2.htm)
+

@@ -1,0 +1,58 @@
+---
+layout: post
+title: "A Study of the Coexistence of Heterogeneous Flows on Data Networks"
+date: 2006-01-11 00:49:16 +0800
+tags: business
+---
+
+[Whole file](https://drive.google.com/open?id=0B6DoI_vm0OLfNmVjeE9yMkNjeEU)\\
+[Slides for Oral Defence](https://drive.google.com/open?id=0B6DoI_vm0OLfWkVkdmVaSWpxOTA)\\
+[Source code of the simulation program](https://drive.google.com/open?id=0B6DoI_vm0OLfUHBHTy0yWVozWG8)
+
+## Abstract
+In data networks, there are two types of flows, elastic and inelastic.
+Elastic flows can work with a wide range of throughput but inelastic
+flows can only proceed with a particular data rate, not higher and
+not lower. Elastic flows is the dominating type in the Internet. There
+is abundant prior work in the literature on how to regulate elastic
+data flows in the network. The introduction of inelastic flows to
+coexist with elastic flows creates a problem. Inelastic flows, by
+definition, do not want to be subjected to congestion control; yet
+without control, they are likely to compete unfairly with elastic
+flows.
+
+This thesis is a study of such traffic coexistence. We study several
+different control mechanisms that can be adopted by the inelastic
+flows, namely TCP-friendly congestion control, a variety of admission
+control and no control. We then formulate metrics and methodologies
+to evaluate these control mechanisms. Finally, we discuss the feasibility
+and concerns of implementing these control mechanisms to shed a light
+on the way to realise our proposals.
+
+Our work shows that in a traffic coexistence environment, the inelastic
+flows can use admission control besides congestion control to make
+the resource allocation fair. Moreover, admission control is more
+suitable for inelastic flows because it makes the throughput of inelastic
+flows predictable. According to our analysis, certain ways of doing
+admission control can perform no worse than TCP-friendly congestion
+control in various metrics. Therefore, admission control on traffic
+coexistence environment is a field of worthwhile study.
+
+## Table of Contents
+  * Abstract
+  * Part 1: Background
+    * 1. Background on coexistence
+    * 2. Model of Heterogeneous Flows
+  * Part 2: Evaluation
+    * 3. Stability of network under different controls
+    * 4. Bandwidth allocation
+    * 5. Evaluation based on utility functions
+    * 6. Blocking probability
+    * 7. Population
+  * Part 3: Conclusion
+    * 8. Conclusion
+  * Appendices
+    * A. Glossary
+    * B. Introduction to Poisson counter driven stochastic differential equations
+    * C. Simulation
+

@@ -1,0 +1,49 @@
+---
+layout: post
+title: "AJAX Mistakes"
+date: 2007-07-26 14:40:45 +0800
+tags: code
+---
+
+As taken from <http://alexbosworth.backpackit.com/pub/67688>, there are a couple of things to avoid/think about before using AJAX:
+
+  - Using Ajax for the sake of Ajax \\
+    When you took AJAX as a cool toy
+  - Breaking the back button \\
+    Back button is for the whole page, given that pages doesn't refresh
+    on AJAX actions, it is dysfunctioned
+  - Not giving immediate visual cues for clicking widgets \\
+    AJAX means wait for action complete without refreshing pages. But
+    refreshing a page can be a visual clue to the users, which AJAX removed
+    it. Work around: The red "loading..." at the top-right corner in Gmail.
+  - Leaving offline people behind \\
+    Offline = no AJAX. So you can't open a tab or so.
+  - Don’t make me wait for Ajax \\
+    In case the network is slow, it sucks.
+  - Sending sensitive information in the clear \\
+    Something we have to care about: doing encryption in Javascript.
+  - Assuming AJAX development is single platform development \\
+    There is *one* non-standard browser flying around: IE
+  - Too much code makes the browser slow \\
+    Remember: Javascript runs on client browser
+  - Not having a plan for those who do not enable or have JavaScript \\
+    Still, 11% people don't support JavaScript.
+  - Inventing new UI conventions \\
+    DIV can be clicked? People expects buttons. So give more clue.
+  - Changing state with links (GET requests) \\
+    A fetched page will have different look-and-feel at different time,
+    which confuses cache.
+  - Blinking and changing parts of the page unexpectedly \\
+    Annoying and confusing
+  - Not using links I can pass to friends or bookmark \\
+    AJAX can't be bookmarked, unless extra work is done, preferably by the
+    server side, such as providing a "bookmark this" button.
+  - Not cascading local changes to other parts of the page
+  - Asynchronously performing batch operations \\
+    Synchronization on parallel tasks
+  - Scrolling the page and making me lose my place
+  - Blocking Spidering \\
+    Even if you allow people to bookmark it, search engine can't correctly
+    index the page.
+
+So you got a list of reasons to turn down the use of AJAX.

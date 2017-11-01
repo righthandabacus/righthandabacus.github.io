@@ -1,0 +1,37 @@
+---
+layout: post
+title: "Kandula et al (2005) Walking the Tightrope: Responsive Yet Stable Traffic Engineering (SIGCOMM)"
+date: 2009-10-21 20:17:35 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "Walking the Tightrope: Responsive Yet Stable Traffic Engineering"
+  author: "Srikanth Kandula and Dina Katabi and Bruce Davie and Anna Charny"
+  booktitle: "Proc. SIGCOMM'05"
+  month: "August 21-26"
+  year: 2005
+  address: "Philadelphia, Pennsylvania, USA"
+---
+This paper is about how to do traffic engineering in a multipath network, so
+that traffic can be splitted to different paths and in the same time, change the
+splitting ratio to adapt to network utilization levels.
+
+We assume the network has multipath and the different path from between two edge
+routers are known. This paper than proposes the TeXCP protocol for distributed
+traffic engineering (TE) so that load can be balanced across different paths.
+TeXCP tries to minimize the maximum link utilization in the network.
+
+TeXCP is supplied with a set of paths, configured by the ISP and pined with
+reservation protocols like RSVP-TE. Then TeXCP pick the shortest K paths and
+distribute traffic among them. It sends periodic probe packet from an edge to
+another edge across all different paths. The probe packet contains a link
+utilization field which is overwritten by the routers and echoed by the end
+point of the path. The echoed probe tells the sending edge router the highest
+utilization on the path. Then, TeXCP periodically runs load balancer to adjust
+the load share, so that the maximum load among different paths can be lowered
+after the adjustment.
+
+To avoid oscillation, TeXCP adopts the approach similar to
+[XCP](/2009-10-07-khr02-xcp), that the router supplies positive and negative
+feedback for load changes, so that multiple TeXCP agents can be coordinated in
+catching the bandwidth share.

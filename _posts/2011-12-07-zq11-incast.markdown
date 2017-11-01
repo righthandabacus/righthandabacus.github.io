@@ -1,0 +1,17 @@
+---
+layout: post
+title: "Zheng & Qiao (2011) An Effective Approach to Preventing TCP Incast Throughput Collapse for Data Center Networks (GLOBECOM)"
+date: 2011-12-07 01:01:42 -0500
+category: paper
+bibtex:
+  type: inproceedings
+  title: "An Effective Approach to Preventing TCP Incast Throughput Collapse for Data Center Networks"
+  author: "Hongyun Zheng and Chunming Qiao"
+  booktitle: "Proc GLOBECOM"
+  month: "Dec"
+  year: "2011"
+---
+This paper proposes an application-layer control on the number of concurrent
+senders in an incast application. The ideal number of concurrent senders is
+computed using the SRU, RTT and bottleneck buffer size. The paper assumes these
+parameters are available to the incast application.

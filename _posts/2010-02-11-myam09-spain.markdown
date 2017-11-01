@@ -1,0 +1,101 @@
+---
+layout: post
+title: "Mudigonda (2009) SPAIN: Design and Algorithms for Constructing Large Data-Center Ethernets from Commodity Switches (HP TechRep)"
+date: 2010-02-11 17:52:43 -0500
+category: paper
+bibtex:
+  type: techreport
+  title: "SPAIN: Design and Algorithms for Constructing Large Data-Center Ethernets from Commodity Switches"
+  author: "Jayaram Mudigonda and Praveen Yalagandula and Mohammad Al-Fares and Jeffrey C. Mogul"
+  howpublished: "HP TechRep"
+  institution: HP
+  number: "2009-241"
+  year: 2009
+---
+
+This paper describes SPAIN, a method to build data center networks (load balanced networks) from commodity ethernet switches and specialized hosts.
+
+The hosts are required with no special hardware but a specialized driver so that all the packets sending out are in a VLAN and all the hosts are capable of doing some kind of signalling to other hosts. The idea is, for all hosts to any other hosts, we find $k$ paths, preferably disjoin but not required, and combine them into a small number of VLAN spanning trees. Then the switches are configured with those VLANs with hand-coded forwarding tables. The host is then send packets with a per-flow random VLAN so that the traffic can be balanced. The merit of this paper is in the algorithm to combine paths into VLANs.
+
+# Summary
+
+Problem of ethernet:
+
+  - Spanning tree
+     - STP makes a tree, which means inefficient use of cross-sectional bandwidth
+     - STP makes network susceptible to failure near root
+     - Making STP network of high bandwidth need ultra-fast cores, which is expensive
+  - Packet floods	
+     - Ethernet learns and relearns the location of MAC
+     - If packet's address is not known at the moment, packets are flood to all ports
+  - Host broadcasts
+     - Protocols such as ARP, DHCP relies on bcast
+
+SPAIN: Use VLAN to select different trees, so that total comm. bandwidth can be larger than a single VLAN
+
+VLAN building:
+
+  - Find k paths from node s to node t, disjoint paths preferred, but not required
+  - Among all the paths, build loop-free aggregates (VLAN trees)
+     - Each path belongs to a unique tree
+     - Number of trees are minimized
+  - Optimal solution is NP-hard, so heuristic algorithm is used
+
+Performance
+
+  - Compare different topologies: FatTree, BCube, 2D HyperX, CiscoDC
+  - The algorithm works good: Number of VLANs is close to optimal
+  - The algorithm is doing stochastic VLAN packing, the time required is reasonable
+
+Fault tolerance
+
+  - Either by Per-VLAN Spanning Tree (Cisco) / Multiple Spanning Tree (IEEE 802.1s)
+  - Or by end-host failure mechanisms
+  - End-host failure mechanisms can do faster repair
+
+FIB pinning: Directly program the FIB tables on the switches
+
+  - Requires central knowledge of MAC locations
+  - Program the VLAN map and FIB tables on all switches
+  - Disadvantage: May produce a larger FIB table
+     - If FIB is learning-based, unused host are not recorded
+     - FIB pinning will always have an entry for all possible destinations
+  - Typical switch FIB table: 16K entries on SRAM, 128K entries on DRAM
+
+End host algorithm
+
+  - Five goals:
+     - Spread load
+     - Minimize overhead of bcast and flooding
+     - Detect and react to failures
+     - Facilitate mobility (e.g. VM migration)
+     - Enable incremental deployment
+  - Send packet:
+     - Select an usable VLAN and send (randomly select)
+     - If no candidate VLAN, send on default VLAN (VLAN 1)
+     - Probe on all candidate but not usable VLANs
+        - Send unicast chirp message to the destination on a VLAN
+        - Rx of chirp signals VLAN usable at rx side
+        - Respond of chirp may be requested
+  - Re-pinning: Change a flow's selected VLAN
+     - Only in case of
+        - Failure (immediate re-pin)
+        - VM migration (immediate re-pin)
+        - Improve load balance
+        - Probe for revived VLANs
+     - Re-pin algorithm for a flow
+        - This host moved
+        - My destination host moved
+        - This flow is new
+        - Non-TCP flow hasn't re-pinned for too long
+        - TCP flow becomes too slow (cwnd < threshold) due to rexmit
+  - Receive packet
+     - If chirp packet, do respond as requested on unicast
+     - Any incoming packet is a proof of the health of the source on this VLAN
+     - If chirp hasn't been sent, send one to the source to signal for healthy VLAN
+  - End hosts keeps the following information
+     - VLAN in use for a dest switch (addr)
+     - VLAN usable for a dest switch (addr)
+     - These info are cleared periodically
+  - Failure detection: By no packet received in VLAN
+     - Stop using that VLAN for that destination

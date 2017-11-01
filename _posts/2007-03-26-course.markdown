@@ -1,0 +1,59 @@
+---
+title: "Math Courses and Tutorials"
+date: 2007-03-26 08:45:15 +0800
+tags: business math
+---
+Below are the materials derived from my courses or tutorials. Hope that somebody will find it useful.
+
+## ERG2011A (Engineering Math)
+
+This is the engineering math course by Prof Kim Chang-su in the fall sem of
+2004-2005 year. Totally 11 tutorial sessions and the notes are as follows:
+
+  * Tutorial 1 (Sep 13 and 15)\\
+    [Fundamental Vector Calculus](/img/erg2011a-tuto-01.pdf)
+  * Tutorial 2 (Sep 20 and 22)\\
+    Vector Differentiation [part 1](/img/erg2011a-tuto-02a.pdf) [part 2](/img/erg2011a-tuto-02b.pdf)
+  * Tutorial 3 (Sep 27)\\
+    [Vector Integration](/img/erg2011a-tuto-03.pdf)
+  * Tutorial 4 (Oct 4 and Oct 6)\\
+    [More Vector Integration](/img/erg2011a-tuto-04.pdf)
+  * Tutorial 5 (Oct 11 and 13)\\
+    [Two Big Theorems in Vector Analysis](/img/erg2011a-tuto-05.pdf)
+  * Tutorial 6 (Oct 25 and 27, Nov 1 and 3)\\
+    [Differential Equations](/img/erg2011a-tuto-06.pdf) [filled](/img/erg2011a-tuto-06-filled.pdf) [nb](/img/erg2011a-tuto-06.nb.pdf)
+  * Tutorial 7 (Nov 8 and 10)\\
+    [Second-Order Linear Differential Equations](/img/erg2011a-tuto-07.pdf)
+  * Tutorial 8 (Nov 15 and 17)\\
+    [Laplace Transform](/img/erg2011a-tuto-08.pdf)
+  * Tutorial 9 (Nov 22 and 24)\\
+    [Step and Impulse Functions; Fourier Series](/img/erg2011a-tuto-09.pdf)
+  * Reference material:
+    [Table of Laplace Transforms](/img/erg2011a-laplace.pdf), [mini version](/img/erg2011a-minilaplace.pdf)
+  * Tutorial 10 (Nov 29 and Dec 1)\\
+    [Fourier Series and Fourier Transform](/img/erg2011a-tuto-10.pdf)
+  * Tutorial 11 (Dec 6)\\
+    [Ultimate Tutorial: Whole Semester in a Nutshell](/img/erg2011a-tuto-11.pdf)
+
+## ERG2013 (Engineering Math)
+
+This is the engineering math course by Prof Will W.-Y. Ng and Prof Calvin C.-S.
+Chen in the fall sem of 2005-2006 year. I am responsible for the remedial class
+for those who do not have enough background in calculus. Below are the calculus
+notes:
+
+  * Remedial Lesson 1\\
+    [Review of calculus Techniques](/img/calculus-01-student.pdf) [instructor version](/img/calculus-01-instructor.pdf)
+  * Remedial Lesson 2\\
+    [All the Differentiation You Needed](/img/calculus-02-student.pdf) [instructor version](/img/calculus-02-instructor.pdf)
+  * Remedial Lesson 3\\
+    [Indefinite Integrals](/img/calculus-03-student.pdf) [instructor version](/img/calculus-03-instructor.pdf)
+  * Remedial Lesson 4\\
+    [More Indefinite Integrals](/img/calculus-04-student.pdf) [instructor version](/img/calculus-04-instructor.pdf)
+  * Remedial Lesson 5\\
+    [Definite Integrals](/img/calculus-05-student.pdf) [instructor version](/img/calculus-05-instructor.pdf)
+  * Remedial Lesson 6\\
+    [Application of calculus I](/img/calculus-06-student.pdf) [instructor version](/img/calculus-06-instructor.pdf)
+  * Remedial Lesson 7\\
+    [Application of calculus II](/img/calculus-07-student.pdf) [instructor version](/img/calculus-07-instructor.pdf)
+

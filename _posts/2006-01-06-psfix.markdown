@@ -1,0 +1,18 @@
+---
+layout: post
+title: "Fixing Postscript Files as Obtained from Windows Print-to-File"
+date: 2006-01-06 06:07:18 +0800
+tags: system
+---
+
+If you want to create a postscript file from a MS Windows machine, the easiest
+way to do is to get a PS printer installed then choose "print to file" in the
+dialog box. However, the output is not very conformant to the PS standard and it
+may look worse in ghostview.
+
+The way of fixing is easy:
+
+  - Edit the PS File, remove the first few lines until you see the fingerprint line:  `%!PS-Adobe`
+  - Loop until you finish the whole file
+    - Search for the line `%%BeginPageSetup`
+    - Before this line, add a line `%%Page: 1 1` or `%%Page: 2 2` and so on, where the number is the page number

@@ -1,0 +1,16 @@
+---
+layout: post
+title: "Podlesny & Williamson (2011) An Application-Level Solution for the TCP-incast Problem in Data Center Networks (IWQoS)"
+date: 2011-07-20 01:12:55 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "An Application-Level Solution for the TCP-incast Problem in Data Center Networks"
+  author: "Maxim Podlesny and Carey Williamson"
+  booktitle: "Proc. 19th IWQoS"
+  pages: "1--3"
+  month: "Jun"
+  year: "2011"
+  address: "San Jose, CA"
+---
+A short paper on limiting the number of concurrent senders as a solution to TCP incast. The paper gives the optimal performance as a closed form solution, which the transfer time is in terms of just-fit, no-loss use of buffer at the bottleneck. To achieve this, we can send no more than $N$ flows at a time and more flows are proceeded only after these $N$ flows completed. Therefore, for a high fan-in transfer with $n$ flows, the $i$-th flow shall be sent in batch $\mod(i-1, \textrm{ceil}(n/N))$.

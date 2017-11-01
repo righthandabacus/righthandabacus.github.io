@@ -1,0 +1,69 @@
+---
+layout: post
+title: "Image Scanning Tips"
+date: 2007-02-13 07:04:24 +0800
+tags: business
+---
+
+According to "dscans", about smoothing skins:
+
+  * Part 1:
+    - Scan at 600 dpi, use PS to downsample to 300 dpi
+    - Run despeckle filter once on each colour channel (red, green blue)
+    - Use the quick mask tool to paint in areas of skin you want to smooth. In
+      quick mask, use black colour to paint in your selection, white colour to
+      deselect. Use a soft brush to feather at th edges!
+    - Save your selection as an alpha channel. I call this selection "skin".
+    - Next, use a hard-edged brush to paint away areas you don't want to smooth,
+      like eyes, eye lashes, outline of the nose, lips, and other skin creases
+      etc.
+    - Save this selection as an alpha channel. Name this selection "masked".
+    - With the masked selection active, float in to a new layer (CTRL-J).
+    - Use the Gaussian blur on this new layer (radius 14 pixels). Quite a high
+      setting, but play with the settings till you get the effect you want.
+      Usually, the bigger the scan, or the bigger the skin area, requires a
+      higher Gaussian blur setting.
+    - Set opacity of the blurred layer to 70%. Check to see if effect is
+      pleasing. (Do not overblur and kill detail!) The best effect is still to
+      see a little of the skin detail, like pores, etc.
+    - Save your work and downsample to 95dpi.
+  * Part 2: Run USM to bring out details
+    - I ran unsharp mask at settings (25%, radius 0.5 and threshold 0%) 4 times.
+      Remember not to oversharpen!
+    - Next, I loaded in the "skin" selection, and ran further unsharp mask at
+      this settings
+      1. 25%, radius 0.5, threshold 0%
+      2. 25%, radius 0.3, threshold 0%
+      3. 15%, radius 0.3, threshold 0%
+      4. 8%, radius 0.3, threshold 0%
+    - It's better to run the unsharp mask filter multiple times at smaller
+      settings rather than to run it once at a large setting.
+    - Select the background behind the head, and floating it on a new layer and
+      ran a Gaussian blur filter on it to smoothen the grain arising from the
+      sharpening process.
+    - During the sharpening process on the base layer, you'll find that the 2nd
+      blurred layer is nicely masking the grain of the skin arising from the
+      sharpening
+  * Part 3: Step back and take a look
+    - decided to bring out a little more skin detail by reducing the opacity of
+      the blurred skin layer from 70% to 65%.
+    - Added in text, logo and border.
+    - Finished! 
+
+--------
+How to make "soft light" or "soft focus":
+
+  - Duplicate the image (layer A) as a new layer (layer B)
+  - Gaussian blur the layer
+  - Duplicate the Gaussian blurred layer (layer C)
+  - Stacking: bottom is A, top is C
+  - Take layer C as "screen" mode, set opacity of layer B to around 20-30% but layer C to 40-70%
+
+--------
+Image Retouching with L channel
+
+  - Duplicate the image layer
+  - Convert the duplicated layer into Lab color space
+  - Select just the L channel and copy, than paste into the layer (i.e. keep just the L channel)
+    * Select the overlay layer as Luminosity mode: Brightness effect
+    * Tune the overlay layer for higher contrast: Better contrast tunning for portraits 

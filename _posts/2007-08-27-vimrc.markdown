@@ -1,0 +1,121 @@
+---
+layout: post
+title: "My ~/.vimrc file"
+date: 2007-08-27 01:04:05 +0800
+tags: reference
+---
+
+```vim
+" Configuration file for vim
+set runtimepath=~/.vim,/usr/share/vim/addons,/usr/share/vim/vimfiles,/usr/share/vim/vimcurrent,/usr/share/vim/vimfiles/after,/usr/share/vim/addons/after,~/.vim/after
+
+" Suffixes that get lower priority when doing tab completion for filenames.
+" These are files we are not likely to want to edit or read.
+set suffixes=.bak,~,.swp,.o,.info,.aux,.log,.dvi,.bbl,.blg,.brf,.cb,.ind,.idx,.ilg,.inx,.out,.toc
+
+" Using vim-extensions
+set nocompatible        " Use Vim defaults instead of 100% vi compatibility
+set backspace=indent,eol,start  " more powerful backspacing
+
+" allow backspacing over everything in insert mode
+set backspace=indent,eol,start
+
+if has("vms")
+  set nobackup          " do not keep a backup file, use versions instead
+else
+  set backup            " keep a backup file
+endif
+
+" For Win32 GUI: remove 't' flag from 'guioptions': no tearoff menu entries
+" let &guioptions = substitute(&guioptions, "t", "", "g")
+
+" Switch syntax highlighting on, when the terminal has colors
+" Also switch on highlighting the last used search pattern.
+if &term =~ "xterm-debian" || &term =~ "xterm-xfree86"
+  set t_Co=16
+  set t_Sb=^[[4%dm
+  set t_Sf=^[[3%dm
+endif
+if &t_Co > 2 || has("gui_running")
+  syntax on
+  "set hlsearch
+endif
+
+" Only do this part when compiled with support for autocommands.
+if has("autocmd")
+  " Enable file type detection.
+  " Also load indent files, to automatically do language-dependent indenting.
+  filetype plugin indent on
+
+  " Put these in an autocmd group, so that we can delete them easily.
+  augroup vimrcEx
+  au!
+
+  " In text files, always limit the width of text to 78 characters
+  autocmd BufRead *.txt set tw=78
+
+  " When editing a file, always jump to the last known cursor position.
+  autocmd BufReadPost *
+    \ if line("'\"") > 0 && line("'\"") <= line("$") |
+    \   exe "normal g`\"" |
+    \ endif
+
+  augroup END
+
+  " Automatically save and restore folding
+  au BufWinEnter * silent loadview
+  au BufWinLeave * mkview
+
+else
+  "set autoindent                " always set autoindenting on
+  set si
+endif " has("autocmd")
+
+" cscope
+if has("cscope") && filereadable("/usr/bin/cscope")
+   set csprg=/usr/bin/cscope
+   set csto=0
+   set cst
+   set nocsverb
+   " add any database in current directory
+   if filereadable("cscope.out")
+      cs add cscope.out
+   " else add database pointed to by environment
+   elseif $CSCOPE_DB != ""
+      cs add $CSCOPE_DB
+   endif
+   set csverb
+endif
+
+" Set paper size from /etc/papersize if available (Debian-specific)
+if filereadable("/etc/papersize")
+  try
+    let s:shellbak = &shell
+    let &shell="/bin/sh"
+    let s:papersize = matchstr(system("cat /etc/papersize"), "\\p*")
+    let &shell=s:shellbak
+    if strlen(s:papersize)
+      let &printoptions = "paper:" . s:papersize
+    endif
+  catch /^Vim\%((\a\+)\)\=:E145/
+  endtry
+endif
+
+set nobackup            " don't make filename~
+"set autowrite          " Automatically save before buffer changes
+set autowriteall        " auto write everything when buffer changes
+set showbreak="> "      " show break symbol
+set showmatch           " match brackets
+set encoding=utf8       " use UTF-8 if possible
+set fileencoding=utf8
+set termencoding=utf8
+set history=50          " keep 50 lines of command line history
+set ruler               " show the cursor position all the time
+set showcmd             " display incomplete commands
+"set incsearch          " do incremental searching
+"set textwidth=0
+"set linebreak          " auto-insert linebreak
+set ignorecase          " case insensitive matching
+set background=dark     " usually, dark background is used
+set foldmethod=manual   " Manual folding
+```

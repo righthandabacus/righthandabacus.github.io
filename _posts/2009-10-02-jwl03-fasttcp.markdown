@@ -1,0 +1,49 @@
+---
+layout: post
+title: "Jin et al (2003) FAST TCP: Motivation, Architecture, Algorithms, Performance (Caltech CS TR)"
+date: 2009-10-02 16:44:21 -0400
+category: paper
+bibtex:
+  type: techreport
+  title: "FAST TCP: Motivation, Architecture, Algorithms, Performance"
+  author: "Cheng Jin and David X. Wei and Steven H. Low"
+  institution: "Caltech"
+  number: "CS Technical Report CaltechCSTR:2003.010"
+  howpublished: "Caltech CS TR"
+  year: 2003
+---
+The tech report about developing FAST TCP.
+
+Standard AIMD: Window $w(t)$ of a source increase by 1 packet per RTT and decrease per unit time by $x(t)q(t)\frac{1}{2}\frac{4}{3}w(t)$ packets. The 4/3 is the peak window size before seeing loss and 1/2 is the MD factor. The rate is denoted by $x(t)$ (window size over RTT) and the loss probability is $q(t)$. Thus the flow-level model of AIMD can be expressed as the differential equation:  
+
+$$ \dot{w}(t)=\frac{1}{T(t)}-\frac{2}{3}x(t)q(t)w(t) $$
+
+From the D.E., the window size in equilibrium is $q=\frac{3}{2w^2}$ and this means on average we have $qw=\frac{3}{2w}$ packets lost per RTT. Moreover, the D.E. can be expressed as:  
+
+$$ \dot{w}(t)=\kappa(t)\big(1-\frac{q(t)}{u(t)}\big) $$
+
+which it is found that all TCP have such structure, different variants with different gain function $\kappa(t)$, utility function $u(t)$ and congestion measure (loss or delay) $q(t)$.
+
+The dynamic of different TCP is illustrated in P.7: Reno oscillates about the point that is marginal to loss and with large queueing delay, while FAST and Vegas tries to stabilize at the knee of minimal queueing delay.
+
+Loss-based TCP includes Reno, HSTCP and Scalable TCP. The HSTCP defines the equilibrium relation between e2e loss prob and window size as $q = \frac{0.0789}{w^{1.1976}}$, which then makes the AIMD of cwnd follows  
+
+$$
+\begin{aligned}
+w &:= w + a(w)/w, \textrm{ and} \\
+w &:= w - b(w)w
+\end{aligned}
+$$
+
+respectively with the values of functions $a$ and $b$ depend on window size. Scalable TCP is MIMD:
+
+$$
+\begin{aligned}
+w &:= w + a, \textrm{ and} \\
+w &:= w - bw
+\end{aligned}
+$$
+
+with $a$ and $b$ equals to 0.01 and 0.125 respectively.
+
+T.B.C.

@@ -1,0 +1,20 @@
+---
+layout: post
+title: "Porting to Dovecot"
+date: 2006-04-24 02:26:21 +0800
+tags: system
+---
+Recently, I changed the IMAP daemon used in IEAA server from UW-IMAPd (which is using mbox format) to Dovecot. The transition is easy, but not trivial as I originally expect. Here are the steps if you want to do so:
+
+  - apt-get install dovecot-imapd, usually, your old imapd would be removed
+  - then, edit `/etc/dovecot/dovecot.conf`, simply change the line `protocols=`, to make it support for imap protocol on 143 port
+  - make sure `default_mail_env = mbox:%h/mail:INBOX=/var/mail/%u`, which should be suitable for most cases
+  - now the most tedious thing: for every user, go to his home directory
+    - create the directory `~/mail` to store the users' own mail box (non-INBOX boxes)
+    - create `~/mail/.subscriptions` to list the mail boxes, which is exactly the same function (and format) as `~/.mailboxlist`, so you can simply issue
+      `mv .mailboxlist mail/.subscriptions`
+    - move the old mbox files to `~/mail`
+
+Done.
+
+BTW: If you're using any IMAP clients (e.g. Mozilla), better clean up all their cache or otherwise, there would be some strange behavior on the clients.

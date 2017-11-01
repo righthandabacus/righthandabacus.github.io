@@ -1,0 +1,139 @@
+#############################
+# General settings ##########
+
+# For GitHub page:
+#url:     "http://righthandabacus.github.io"
+#baseurl: ""
+
+# For GitHub project page:
+#url:     "http://username.github.io/projectname"
+#baseurl: "/projectname"
+
+title:       "∫ntegrabℓε ∂ifferentiαℓs"
+description: "unorganised memo, notes, code, data, and writings of random topics"
+url_pretty:  "http://righthandabacus.github.io"
+
+
+#############################
+# Build settings
+
+# Exclude these from production
+exclude: ["Gemfile","Gemfile.lock","LICENSE","README.md","CNAME","*.bak","NOTES.md",".gitignore",".git","_draft/"]
+
+timezone:      "America/New_York"
+markdown:      kramdown
+highlighter:   rouge
+permalink:     /:year-:month-:day-:title/
+paginate:      5
+paginate_path: '/page/:num'
+
+kramdown:
+  input: GFM
+
+gems:
+  - jekyll-feed
+  - jekyll-paginate
+  - jekyll-sitemap
+  - jemoji
+
+# Jekyll 3.0 collections: hack to use as multiblog
+#collections:
+#  papers:
+#    output: true
+#    permalink: /papers/:name/
+#  books:
+#    output: true
+#    permalink: /books/:name/
+#  notes:
+#    output: true
+#    permalink: /notes/:name/
+#  projects:
+#    output: true
+#    permalink: /projects/:name/
+#  talks:
+#    output: true
+#    permalink: /talks/:name/
+
+
+#############################
+# Navigation bar config
+
+# Square image to show in the navigation bar (optional)
+avatar: "/img/avatar.png"
+
+# List of links in the navigation bar
+navbar:
+  Resources:
+    - OpenCulture: "http://www.openculture.org/"
+    - g0v.hk: "https://g0vhk.io/"
+  Collections:
+    - Papers: "papers"
+    - Books: "books"
+  About: "about"
+
+
+#############################
+# Footer options
+
+author:
+  name: "Right-handed Abacus"
+  email: "righthandabacus@users.github.com"
+  facebook: "codeposer"
+  github: "righthandabacus"
+  twitter: yourname
+  google_plus: +yourname
+  linkedin: yourname
+  xing: yourname
+  stackoverflow: yourlink
+  snapchat: yourname
+  instagram: yourname
+  youtube: yourlink
+  spotify: yourname
+
+# Select which links to show in the footer
+footer_links_active:
+  rss: true
+  facebook: true
+  email: true
+  twitter: false
+  google_plus: false
+  github: true
+  linkedin: false
+  xing: false
+  stackoverflow: false
+  snapchat: false
+  instagram: false
+  youtube: false
+  spotify: false
+
+# Fill in your Disqus shortname (NOT the userid) if you want to support Disqus comments
+disqus: "righthandabacus"
+
+# Fill in your Google Analytics ID to track your website using GA
+google_analytics: "UA-1542635-4"
+
+#############################
+# All others
+tag_page: "/tag/"
+cat_page: "/cat/"
+
+defaults:
+  -
+    scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+      comments: true  # add comments to all blog posts
+      social-share: true # add social media sharing buttons to all blog posts
+  -
+    scope:
+      path: "" # all files
+    values:
+      layout: "page"
+      show_avatar: true
+  -
+    scope:
+      path: "_posts"
+    values:
+      category: "blog"

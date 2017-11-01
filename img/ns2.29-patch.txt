@@ -1,0 +1,12 @@
+--- configure.old	2006-02-09 17:31:09.000000000 +0800
++++ configure	2006-02-09 17:38:36.000000000 +0800
+@@ -4892,6 +4892,9 @@
+ 		$d/include/tk$TK_VERS \
+ 		$d/include/tk$TK_HI_VERS \
+ 		$d/include/tk$TK_OLD_VERS \
++		$d/include/tcl$TK_VERS \
++		$d/include/tcl$TK_HI_VERS \
++		$d/include/tcl$TK_OLD_VERS \
+                 $d/include"
+ TK_H_PLACES=" \
+ 		../include \

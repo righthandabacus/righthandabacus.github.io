@@ -1,0 +1,20 @@
+---
+layout: post
+title: "Devkota & Reddy (2010) Performance of Quantized Congestion Notification in TCP Incast Scenarios of Data Centers (MASCOTS)"
+date: 2011-07-20 01:21:17 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "Performance of Quantized Congestion Notification in TCP Incast Scenarios of Data Centers"
+  author: "Prajjwal Devkota and A. L. Narasimha Reddy"
+  booktitle: "Proc. MASCOTS"
+  year: "2010"
+---
+This paper studies the problem of TCP in-cast in 802.1Qau network environment. This paper reveals that,
+
+  - TCP with RTO shortened (~10ms) can improve in-cast
+  - QCN cannot solve in-cast. Sometimes it worsens the scenario
+  - If QCN do sampling more frequent (e.g. sample every packet), the in-cast problem is mitigated
+  - When timeout occurs, it would be good if the rate increment in AI phase is smaller, so that when RTO expires, there would not be a big burst
+
+The paper then implements such modification in ns2 and shows the improvement.

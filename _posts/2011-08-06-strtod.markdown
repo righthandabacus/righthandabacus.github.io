@@ -1,0 +1,49 @@
+---
+layout: post
+title: "Converting a decimal to IEEE 754 floating point"
+date: 2011-08-06 01:13:19 -0400
+tags: code
+---
+Source: <http://www.exploringbinary.com/decimal-to-floating-point-needs-arbitrary-precision/>
+
+In IEEE-754 specification, a double precision is presented in 64 bits, with 1 sign bit + 11-bit exponent + 52-bit mantissa representing a 53-bit significant. Converting a decimal to such a floating point number may lost precision. The way to do the conversion is as follows:
+
+  - Convert the decimal number $f$ to an integer times non-positive power-of-10,
+    i.e. $d \times 10^{-k}$
+  - Since the significant has 53 bits only, for best precision, we scale the integer
+    to $[2^{52}, 2^{53})$ by multiplying with $2^n$,
+    i.e. $f = (d\times 2^n) \times 2^{-n} \times 10^{-k}$
+  - Then round off the number $d \times 2^n \times 10^{-k}$. The rounding
+    is done according to IEEE 754 round half to even rule, i.e.
+      - if the remainder is less than half of the divisor, then round down
+      - if the remainder is more then half of the division, then round up
+      - if the remainder is half of the divisor, then round up for even quotient or round down otherwise
+  - Then express the number in normalised binary scientific notation and encode to binary
+
+Two examples are given in the above link, which demonstrates the algorithm clearly:
+
+Consider $f = 3.14159$,
+  - $3.14159 = 314159 \times 10^{-5}$
+  - $314159 = 707423177667543826432 \times 2^{-51}$
+  - $707423177667543826432 \times 10^{-5} = 7074231776675438$ with remainder 26432,
+    as $26432 < (10^5 / 2)$, thus round down to 7074231776675438
+  - Thus $f = 1.1001001000011111100111110000000110111000011001101110 \times 2^{-51} \times 2^{52}$  
+    $= 1.1001001000011111100111110000000110111000011001101110 \times 2^1$
+  - Encode into binary becomes:
+      - Sign bit = 0
+      - Exponent bits = 1 + exponent bias (1023) = 1024 = 10000000000
+      - Mantissa bits = 1001001000011111100111110000000110111000011001101110
+      - Value in decimal = 3.14158999999999988261834005243144929409027099609375
+
+Consider $f = 1.2345678901234567 \times 10^{22}$
+  - $f = 12345678901234567000000$
+  - $12345678901234567000000 = (12345678901234567000000 \times 2^{-21}) \times 2^{21}$
+  - $12345678901234567000000 \times 2^{-21} = 5886878443352969} with remainder 1355712,
+    as $1355712 > (2^{21} /2)$, thus round up to 5886878443352970
+  - Thus $f = 1.0100111010100001010110110010011100111011001110001010 \times 2^{21} \times 2^{52}$  
+    $= 1.0100111010100001010110110010011100111011001110001010 \times 2^{73}$
+  - Encode into binary becomes:
+      - Sign bit = 0
+      - Exponent bits = 73 + exponent bias (1023) = 1096 = 10001001000
+      - Mantissa bits = 0100111010100001010110110010011100111011001110001010
+      - Value in decimal = 12345678901234567741440

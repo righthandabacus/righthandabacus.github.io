@@ -1,0 +1,33 @@
+---
+layout: post
+title: "Wu, Xiao, Li, Sun (2008) A Distributed Algorithm for Finding Global Icebergs with Linked Counting Bloom Filters (ICC'08)"
+date: 2008-12-23 22:46:00 -0500
+category: paper
+bibtex:
+  type: inproceedings
+  title: A Distributed Algorithm for Finding Global Icebergs with Linked Counting Bloom Filters
+  author: "Kui Wu and Yang Xiao and Jie Li and Bo Sun"
+  booktitle: "ICC'08"
+  year: 2008
+---
+Objective: A collection of objects are stored in multiple hosts distributively
+such that each host only has a partial collection. The problem is to tell the
+icebergs amongst these objects *without* using centralised server.
+
+The solution proposed is called *linked counting bloom filter*. This is a
+counting bloom filter, but instead of a counter in each "bin", a linked list is
+used. The way it works is as follows: When a host counts, it insert the object
+into the counting bloom filter. The counters are incremented only if the
+counters correspond to the set of hash functions are all the same. This could
+be either zero (the object is new) or non-zero (the object already included).
+However, if not all counters are the same, this means the object is new but
+experiencing a crash. Instead of simply incrementing the counters, a new
+counter will be created and chained as a linked list with the old one.
+
+Afterward, we say that an object is already included in the counting bloom
+filter only if every bin correspond to the hash functions has a counter of
+common value. Not that only the counters exists in the bloom filter and we
+still cannot retrieve the object from it.
+
+To count distributively, we pass on the bloom filter from node to node and
+after it pass through all the nodes, we can check for icebergs.

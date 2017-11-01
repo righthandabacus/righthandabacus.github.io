@@ -1,0 +1,27 @@
+---
+layout: post
+title: "IPW2200 in Linux"
+date: 2004-11-02 22:20:19 +0800
+tags: system
+---
+
+My laptop is running Centrino with the IPW2200 as the Wi-Fi. Here, I describe
+the way to build a kernel to support it.
+
+Firstly, download the kernel source, definitely. At the time of writing, I used
+the kernel version 2.6.8.1 for that. Afterwards, several things more to do:
+
+  - Download the IPW2200 driver from <http://ipw2200.sourceforge.net>. At the time of writing, it is version 0.7 and named `ipw2200-0.7.tgz`
+  - Extract the kernel source, and go to `drivers/net/wireless`, then extract `ipw2200-0.7.tgz` here
+  - Rename the directory `ipw2200-0.7` to just `ipw2200`
+  - Back to the root of your kernel source, and run this command: `patch -p1 < drivers/net/wireless/ipw2200/patches/ipw2200-2.6.8-patch`
+  - `make menuconfig` and make up your components, then build
+  - Finished
+
+With a new kernel supporting Wi-Fi, and with the firmware (downloaded from
+<http://ipw2200.sourceforge.net>) placed inside `/usr/lib/hotplug/firmware`,
+I've did `modprobe ipw2200` and a new Wi-Fi device is up.
+
+Afterwards, I can simply use the wireless tools (e.g. `iwconfig`, `iwlist`) to set
+up other stuff and play.
+

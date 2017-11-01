@@ -1,0 +1,103 @@
+---
+layout: post
+title: "Firmware Handling"
+date: 2007-08-09 05:42:29 +0800
+tags: system
+---
+
+The Thecus firmware is actually a tarball but encrypted with DES. Interesting
+enough, the key for the DES encryption is actually the model number: `n1200` for
+my box and `n2100` for another model.
+
+To do DES encryption/decryption, it is best with OpenSSL. But OpenSSL asks for
+keys in 64-bit binary form. To make that, you have to use the function call:
+
+    #include <openssl/des.h>
+    void* DES_string_to_key(const char* string, DES_cblock* key)
+
+The `DES_cblock` is actually a 8-byte array of characters. So below is my program for the string-to-key convertor (OpenSSL library required):
+
+```c
+/* string2key: String to DES key
+ * written by Adrian Sai-wah Tam
+ * Thu Aug  9 17:27:33 HKT 2007
+ *
+ * Compile with
+ *   gcc -o string2key string2key.c -lssl
+ */
+#include <openssl/des.h>
+#include <stdio.h>
+
+int main(int argc, char** argv)
+{
+    DES_cblock key;
+    int j;
+    if (argc != 2) {
+        printf("Synopsis:\n");
+        printf("    %s [string]\n",argv[0]);
+        printf("It will give the DES key from string using the OpenSSL's DES_string_to_key()\n");
+        return 1;
+    };
+    DES_string_to_key(argv[1], &key);
+    printf("DES_string_to_key(%s) = ",argv[1]);
+    for (j=0;j<8;j++) {
+        printf("%02x",key[j]);
+    };
+    printf("\n");
+    return 0;
+};
+```
+
+Hence you will see:
+
+    $ ./string2key n1200
+    DES_string_to_key(n1200) = 578991a8c84a5b0d
+
+At the time of writing, a beta version of the N1200 firmware is out on Thecus'
+website: <http://www.thecus.com/Downloads/beta/n1200upgrade.1.0.07.2.bin>
+
+We can decode it into tarball using the following command, with the key found above:
+
+    $ openssl enc -d -des -in n1200upgrade.1.0.07.2.bin \
+      -out n1200upgrade.1.0.07.2.tar.gz -K 578991a8c84a5b0d \
+      -iv 0 -nosalt -nopad
+
+And it is what inside the tarball:
+
+```
+$ tar ztf n1200upgrade.1.0.07.2.tar.gz
+upgrade/
+upgrade/rc
+upgrade/diff
+upgrade/ca-bundle.crt
+upgrade/conf.db
+upgrade/pre_message
+upgrade/hdroot.new.md5
+upgrade/up.sh
+upgrade/u-boot.version
+upgrade/u-boot.bin
+upgrade/u-boot.bin.md5
+upgrade/hdroot.new.gz
+upgrade/scsi.agent
+upgrade/server.crt
+upgrade/server.key
+upgrade/uramdisk
+upgrade/httpd.conf
+upgrade/passwd
+upgrade/ssl.conf
+upgrade/uImage
+upgrade/version
+upgrade/up2.sh
+upgrade/rc.factory
+upgrade/manifest.txt
+upgrade/uImage.md5
+upgrade/php.ini
+upgrade/crond.conf
+upgrade/uramdisk.md5
+upgrade/hdroot.new.gz.md5
+upgrade/conf.db.awk
+
+gzip: stdin: decompression OK, trailing garbage ignored
+tar: Child returned status 2
+tar: Error exit delayed from previous errors
+```

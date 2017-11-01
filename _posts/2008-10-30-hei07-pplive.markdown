@@ -1,0 +1,20 @@
+---
+layout: post
+title: "Hei et al (2007) A Measurement Study of a Large-Scale P2P IPTV System (IEEE T. of Multimedia 9(8))"
+date: 2008-10-30 18:31:04 -0400
+category: paper
+bibtex:
+  type: article
+  title: "A Measurement Study of a Large-Scale P2P IPTV System"
+  author: "Xiaojun Hei and Chao Liang and Jian Liang and Yong Liu and Keith W.  Ross"
+  journal: "IEEE T. of Multimedia"
+  volume: 9
+  number: 8
+  year: 2007
+---
+Measuring PPLive by setting up a couple clients and trace the packets by passive
+sniffing. Following information are harvested: (1) Diurnal and weekly trend; (2)
+Peer arrival and departures, i.e. flash crowd; (3) geographic distribution; (4)
+overheads of content; (5) redundancy; (6) upload-download ratio; (7) live time
+of each connections made; (8) number of peers, their dynamic and locality; (9)
+buffering and playback quality

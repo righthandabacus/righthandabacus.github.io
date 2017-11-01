@@ -1,0 +1,27 @@
+---
+layout: post
+title: "Bohacek et al (2006) A New TCP for Persistent Packet Reordering (TON)"
+date: 2009-10-15 05:07:09 -0400
+category: paper
+bibtex:
+  type: article
+  title: "A New TCP for Persistent Packet Reordering"
+  author: "Stephan Bohacek and João P. Hespanha and Junsoo Lee and Chansook Lim and Katia Obraczka"
+  journal: "IEEE/ACM Trans. Networking"
+  volume: 14
+  number: 2
+  pages: "369--382"
+  month: Apr
+  year: 2006
+---
+This paper proposes TCP-PR, a TCP variant to support *persistent* packet reordering. Assume a network support multipath routing and packets are routed over different paths without concerning their association with a flow, due to delay differences, reordering occurs.
+
+In order to support this kind of network and help TCP differentiate between loss and reordering, TCP-PR is proposed. The algorithm of TCP-PR is driven by two events: drop detected or ACK received. Drop is defined as the current time passes the packet's sent time + `mxrtt`. For every packets sent, the sent time is recorded and there is a max rtt estimate `mxrtt` defined as the `srtt` times a constant $\beta$. The `srtt` will be replaced by the current rtt sample if it is smaller or if it is larger than the current rtt sample, it is decreased by a factor $\alpha^{\lfloor cwnd\rfloor}$, which causes the `srtt` value decrease by a factor of $\alpha$ every rtt.
+
+When a packet is believed to be dropped, it is retransmitted and the current not yet ACK'ed packets are remembered. The cwnd is then halved and ssthresh is reset to the halved cwnd. When multiple drop detected in the same window (i.e. amongst those remembered packets), the cwnd is not changed to prevent too conservative transmission.
+
+When an ACK is received, the cwnd is updated as traditional TCP, either increase by 1 in slow start or increase by 1/cwnd in congestion avoidance. The `mxrtt` and `srtt` are updated as well.
+
+The paper gives a condition for the worst-case of spurious timeouts. For a spurious timeout occur under TCP-PR, we have to have two paths, one slow (`rtt_s`) and one fast (`rtt_f`). We sent most packets over the fast path, so that the `mxrtt` is evaluated to `rtt_f` and the RTO is set to $\beta$ * `mxrtt`. Thus when we switch to a slow path, spurious timeout occurs only if $\beta$ * `rtt_f` $<$ `rtt_s`.
+
+Furthermore, once we have a spurious timeout, we see the next spurious timeout only after the `mxrtt` reset to `rtt_f` again. Which, according to the paper, equals to this number of packets to be sent: $\dfrac{\log\beta}{-\log\alpha}\times\overline{RTT}$.

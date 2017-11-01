@@ -1,0 +1,22 @@
+---
+layout: post
+title: "Kamp (2010) You're doing it wrong (CACM)"
+date: 2010-07-17 09:39:38 -0400
+category: paper
+bibtex:
+  type: article
+  title: "You're doing it wrong"
+  author: "Poul-Henning Kamp"
+  journal: "Communications of the ACM"
+  volume: 53
+  number: 7
+  pages: "55--59"
+  month: July
+  year: 2010  
+---
+
+This is written by a FreeBSD kernel developer. It discussed the effect of OS-level caching to algorithm performance. The story is that, one has to do store/retrieve operation on a heap. If the heap is made of a balanced binary tree, usually it is implemented as an array such that `array[n]` is the parent of `array[2n]` and `array[2n+1]`. In this way, traversing the tree vertically means to visit sparsed locations of the array.
+
+The author proposed a B-heap structure, such that locality can be exploited. A subtree (descendants of a node) is kept in proximal memory locations as much as possible. For example, each memory block is of size `n`, then if the descendant subtree has size smaller than that, they are kept in one piece. Otherwise, part of them would be separated to another block. The structure is similar to B-tree.
+
+Algorithmically, B-heap and binary heap does not have performance difference. In practice, however, because of the locality, there would be less page fault when B-heap is used and thus a better performance.

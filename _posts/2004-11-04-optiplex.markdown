@@ -1,0 +1,191 @@
+---
+layout: post
+title: "Debian Workstation on Dell Optiplex"
+date: 2004-11-04 09:42:28 +0800
+tags: system
+---
+
+I got a research computer a few days ago. It is a Dell Optiplex GX270 with a
+Pentium 4 2.4 GHz HT and half a GB memory. A good profile for most purposes.
+Because it is Dell, it has Windows. But I seldom use a Windows and most of my
+work needs a UNIX-compat to run. So I write here to record how do I convert it
+into a Debian workstation.
+
+## Hardware Properties
+
+| Brand         |Dell Optiplex GX270                    |
+| CPU           |Pentium 4 2.4GHz with HyperThreading   |
+| RAM           |256 MB DDR x 2                         |
+| Hard disk     |Seagate EIDE 80 GB ST380011A           |
+| LAN           |Intel 82540EM Gigabit Ethernet (on-board)|
+| Display       |Intel 82865 Integrated Display         |
+| USB           |UHCI x 4, EHCI x 1 (Intel built-in)    |
+| Audio         |ICH5 AC'97 Audio                       |
+| Others        |ICH5's SATA, SMBus                     |
+
+## Baseline Debian
+
+Installed Sarge using the brandnew netinst CD. I obtained it from the links on
+the [Debian-Installer page](http://www.debian.org/devel/debian-installer/) (the
+one I used is <http://cdimage.debian.org/pub/cdimage-testing/sarge_d-i/i386/current/sarge-i386-netinst.iso>).
+
+With the disc, I boot it and then install in the straight-forward way:
+
+  - Upon boot prompt, type in `linux26` to select kernel version 2.6.8
+  - In the menu, select "English -> Hong Kong -> American Keyboard" for the language setting
+  - Partition the hard disk like this:
+    * Root (ext3), 6G, /dev/hda1
+    * Swap, 1G, /dev/hda2
+    * /home (ext3), 73G, /dev/hda3
+  - After format, mount, then wait for the installation finish
+  - Reboot
+  - After first boot, configure the clock (hardware, time zone =
+    Asia/Hong_Kong), root password, create new user (cancel for not-creating),
+    configure apt-get system (both sarge and sid), choose packages to install
+    (cancel for none)
+  - Finally, configure the MTA:
+    - Using "Mail sent by smarthost; received via SMTP or fetchmail"
+    - Empty mail name
+    - Listen on 127.0.0.1
+    - No other destination to be accepted for relay
+    - Relay for nobody
+    - Machine handling outgoing mail is "smtp.ie.cuhk.edu.hk"
+    - Hide local mail name is "no"
+    - root and postmaster mail recipient: empty (no forwarding)
+  - That's it.
+
+## Installing software
+
+Once the baseline system is set up. It occupies only 200MB and hence you should
+not expect it can do anything useful. In order to make it usable, some tools are
+needed and some are not needed. Here are my procedure:
+
+### Installing console tools
+
+Remove unused packages (package management UI, network utils, inferior tools)
+
+    # apt-get --purge remove tasksel apt-utils aptitude
+    # apt-get --purge remove ipchains ppp pppoe pppconfig pppoeconf
+    # apt-get --purge remove nano nvi pcmcia-cs mailx fdutils
+
+Install stuffs I needs
+
+    # apt-get install ssh unison rsync ncftp wget lynx
+    # apt-get install sudo syslog-ng hdparm smartmontools ntpdate convmv
+    # apt-get install less hexedit vim bc screen
+    # apt-get install rar unzip zip bzip2
+
+Clean up
+
+    # dpkg -P sysklogd klogd
+
+### Installing networking utilities and network troubleshooting tools
+
+    # apt-get install tcpdump nbtscan traceroute iftop
+    # apt-get install dnsutils smbc iftop rdesktop
+
+### Development tools
+
+    # apt-get install make gcc g++
+    # apt-get install manpages-dev stl-manual
+    # apt-get install dpkg-dev libncurses5-dev
+    # apt-get install subversion subversion-tools
+
+### X11
+
+Base X11
+
+    # apt-get install x-window-system fvwm wdm
+
+Fonts (non-TTF and TTF)
+
+    # apt-get install xfonts-75dpi xfonts-base xfonts-cmex-big5p \   
+      xfonts-intl-arabic xfonts-intl-asian xfonts-intl-chinese \   
+      xfonts-intl-european xfonts-intl-japanese xfonts-intl-phonetic \   
+      xfonts-scalable xfonts-efont-unicode xfonts-efont-unicode-ib \   
+      unifont
+    # apt-get install ttf-arphic-bkai00mp ttf-arphic-bsmi00lp \   
+      ttf-arphic-gbsn00lp ttf-arphic-gkai00mp ttf-freefont ttf-baekmuk \   
+      ttf-kochi-mincho-naga10 ttf-opensymbol ttf-thryomanes
+
+Font tools
+
+    # apt-get install ttf2pt1 ttf2pt1-chinese fontconfig qt3-qtconfig \   
+      x-ttcidfont-conf ttmkfdir
+
+### Printing support
+
+    # apt-get install enscript bg5ps ttfprint
+    # apt-get install foomatic-filters foomatic-db cupsys
+
+### LaTeX
+
+    # apt-get install lyx-qt tetex-base tetex-bin tetex-extra
+    # apt-get install cjk-latex latex-xft-fonts latex-ucs hbf-cns40-b5 \   
+      tfm-arphic-bsmi00lp tfm-arphic-bkai00mp
+    # apt-get install tth aspell-en
+
+### Postscript, PDF, Djvu
+
+    # apt-get install gv gs-cjk-resource gsfonts gsfonts-other gsfonts-11 \   
+      cmap-adobe-cns1 cmap-adobe-gb1 cmap-adobe-japan1 cmap-adobe-japan2 \   
+      cmap-adobe-korea1
+    # apt-get install pspresent psutils epstool
+    # apt-get install xpdf-i xpdf-utils xpdf-chinese-traditional dvipdfm pdftk 
+    # apt-get install djview djvulibre-bin
+
+### Multimedia apps
+
+    # apt-get install vlc
+    # apt-get install esound xmms xmms-cdread vorbis-tools aumix
+    # apt-get install abcde mp3burn cdparanoia
+    # apt-get install dvd+rw-tools dvdrtools xcdroast cdrdao mkisofs cdrecord
+
+### Chinese tools
+
+    # apt-get install xcin pydict
+
+### Other X11 apps
+
+    # apt-get install xscreensaver xloadimage gimageview
+    # apt-get install dia gimp scribus sodipodi
+    # apt-get install gnuplot graphviz
+    # apt-get install xchm gocr gocr-gtk openoffice.org
+    # apt-get install emelfm bubblefishymon jpilot mlterm mlterm-tools
+    # apt-get install mozilla mozilla-chatzilla licq licq-plugin-qt
+
+Afterwards, it needs some tuning.
+
+## Tuning
+### Tuning the baseline system
+
+I did several things after the baseline system is made:
+
+* Configure the network (by modifying `/etc/network/interfaces` to make `eth0` configure itself using DHCP)
+* Replace `/etc/profile` with Gentoo's for a prettier `$PS1` prompt
+* Modify `/etc/inetd.conf` to disable everything
+* Execute "`update-rc.d -f inetd remove`" to prevent inetd start upon boot
+* Modify `/boot/grub/menu.lst` to add "`idebus=66`" to the boot prompt
+* Modify `/boot/grub/menu.lst` to add "`vga=796`" to the boot prompt
+
+### Tuning other applications
+
+#### sudo
+
+Let all users run sudo if they are in root group:
+
+    # cat >> /etc/sudoers
+    %root ALL=(ALL) ALL
+    ^D
+
+#### vim
+
+Customerize vim:
+
+    # cat > /etc/vim/vimrc.local
+    syntax on
+    set background=dark
+    set autowrite
+    set showmatch
+    set fileencodings=big5,utf-8,euc-jp,gbk,euc-kr,utf-bom,iso8859-1
+

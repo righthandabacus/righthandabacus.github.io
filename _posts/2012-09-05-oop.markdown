@@ -1,0 +1,36 @@
+---
+layout: post
+title: "Object Oriented Design"
+date: 2012-09-05 17:36:10 -0400
+tags: code
+---
+Object-oriented programming is easy. You just need to know how to use the "class" keyword in C++ and you're done. It takes an hour to learn, at most two.
+
+But doing a good object-oriented programming is hard. In essence, you need to have a good design so that the OOP can be efficient, and enjoy code reuse. It takes years to equip yourself with good design skill. I always criticize about the OO design in other's (and sometimes mine) code, but I do not have a theory on why some is good and some is bad.
+
+Recently I read about the article by Uncle Bob, i.e., Robert C. Martin: 
+<http://www.butunclebob.com/ArticleS.UncleBob.PrinciplesOfOod>
+
+This is the excerpt:
+
+> The first five principles are principles of class design. They are:
+
+> |SRP|The Single Responsibility Principle|A class should have one, and only one, reason to change.|
+> |OCP|The Open Closed Principle|You should be able to extend a classes behavior, without modifying it.|
+> |LSP|The Liskov Substitution Principle|Derived classes must be substitutable for their base classes.|
+> |DIP|The Dependency Inversion Principle|Depend on abstractions, not on concretions.|
+> |ISP|The Interface Segregation Principle|Make fine grained interfaces that are client specific.|
+
+> The next six principles are about packages. In this context a package is a binary deliverable like a .jar file, or a dll as opposed to a namespace like a java package or a C++ namespace.
+
+> The first three package principles are about package cohesion, they tell us what to put inside packages:
+
+> |REP|The Release Reuse Equivalency Principle|The granule of reuse is the granule of release.|
+> |CCP|The Common Closure Principle|Classes that change together are packaged together.|
+> |CRP|The Common Reuse Principle|Classes that are used together are packaged together.|
+
+> The last three principles are about the couplings between packages, and talk about metrics that evaluate the package structure of a system.
+
+> |ADP|The Acyclic Dependencies Principle|The dependency graph of packages must have no cycles.|
+> |SDP|The Stable Dependencies Principle|Depend in the direction of stability.|
+> |SAP|The Stable Abstractions Principle|Abstractness increases with stability.|

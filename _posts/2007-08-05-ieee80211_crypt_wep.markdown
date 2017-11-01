@@ -1,0 +1,36 @@
+---
+layout: post
+title: "ieee80211_crypt_wep"
+date: 2007-08-05 13:47:20 +0800
+tags: system
+---
+
+Since some recent version of the Linux kernel, the WEP on WiFi is broken.
+
+I upgraded my notebook to kernel 2.6.21 some months ago and until now, I need
+some WEP to connect to Internet. It was OK before but I found it shows the
+following message when I try to set the WEP key using `iwconfig`:
+
+    ieee80211_crypt_wep: could not allocate crypto API arc4
+    eth1: could not initialize WEP: load module ieee80211_crypt_wep.o
+
+Google can't tell you the solution, but the source code does: In the previous
+version of the kernel, the `ieee80211_crypt` module did all the so-called
+encryption work, but not it is doing some division of labour. The
+`ieee80211_crypt_wep` is handling the WEP part but it does no encryption,
+however, and it relies on the cryptographic modules to do the data manipulation
+in general. Because WEP is close to block cipher in structure but some-how using
+RC4 stream cipher for the data. So it uses the `ecb` block module with `arc4`
+algorithm module. Nevertheless, the `ieee80211_crypt_wep` doesn't know it has to
+load `ecb` (for unknown reason), so it don't work.
+
+Solution: Simply execute the following commands to load the modules before the
+`iwconfig` command,
+
+    modprobe ecb
+    modprobe arc4
+    modprobe ieee80211
+    modprobe ieee80211_crypt
+    modprobe ieee80211_crypt_wep
+    modprobe ipw2200     # because I am using Intel's cards
+    iwconfig ...

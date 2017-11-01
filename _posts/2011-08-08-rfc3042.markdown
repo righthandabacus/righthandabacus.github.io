@@ -1,0 +1,19 @@
+---
+layout: post
+title: "Allman et al (2001) Enhancing TCP's Loss Recovery Using Limited Transmit (RFC3042)"
+date: 2011-08-08 15:41:21 -0400
+category: paper
+bibtex:
+  type: misc
+  title: "Enhancing TCP's Loss Recovery Using Limited Transmit"
+  author: "M. Allman and H. Balakrishnan and S. Floyd"
+  howpublished: "IETF RFC 3042"
+  url: "http://tools.ietf.org/rfc/rfc3042.txt"
+  month: "Jan"
+  year: "2001"
+---
+A small change to TCP to reduce its reliance on the retransmission timer: 
+
+It allows the sender to send at most two segments beyond the congestion window when the first two consecutive duplicated ACKs are received. This does not change cwnd during the receive of duplicated ACK or transmit of new segments. This is to target for reordered but not lost packets.
+
+The limited transmit follows the conservation of packets principle, as each of the duplicated ACKs indicate a segment arrives at the receiver, hence a new segment can be sent. Upon a new ACK is received, as the limited transmit already sent out two segments, the burst due to shift of window is avoided.

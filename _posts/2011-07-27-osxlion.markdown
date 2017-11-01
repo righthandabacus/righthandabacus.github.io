@@ -1,0 +1,13 @@
+---
+layout: post
+title: "Mac OS X Lion"
+date: 2011-07-27 23:21:04 -0400
+tags: system
+---
+To celebrate the release of Mac OS X Lion, I bought a 750GB HDD to upgrade my MBP, and install the new OS X. Installing the Lion is not smooth, but all is done now. Below are some random hassles that I encountered:
+
+My MBP has its Superdrive failed. I was too ambitious to replace the old 200GB hard disk with 750GB one and insert the Lion DVD into the Superdrive to try to boot. It failed to start. Even worse, I can't even get back the disc. The pressing Option during boot, or pressing the eject key during boot or even holding the MBP up side down never work. Finally, I used a trick mentioned on the web: Hold a folded business card onto the Superdrive and apply some force to keep the DVD steady during boot. Then the disc won't rotate and gave pressure to the spring inside the Superdrive. After a the Superdrive learnt that it can't spin, I took away the business card. A couple seconds later, the disc ejected.
+
+Since the Superdrive failed, I tried to install Lion onto the new hard disk using external disc drive. Some how, also failed. I guess the reason is the disc drive is too slow to load the disc during boot time, so the MBP timed out for that. The final solution: Get back my 200GB hard disk to boot into Snow Leopard, then plug in the disc drive into USB to load the disc. After the disc is loaded, plug in the 750GB hard disk into another USB, format it, and install Lion onto it. Afterwards, replace the 200GB with this 750GB hard disk but keep the DVD drive connected to the MBP's USB. Then boot the system. Now you'll have a very unhappy Lion sitting in the hard disk asking you to reinstall the system. Then set your system to boot using the DVD drive on USB and reboot. Afterwards, you can install Lion onto this 750GB hard disk.
+
+When Lion is up and running on my new hard disk, I found my biggest disappointment: No 大易輸入法 in OS X Lion. The solution is easy: Copy the one from Snow Leopard. Open Terminal and go to `/System/Library/Input Methods/` and delete `TCIM.app`. Then copy the `TCIM.app` from Snow Leopard and you are done.

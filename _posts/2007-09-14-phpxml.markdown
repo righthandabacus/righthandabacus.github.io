@@ -1,0 +1,67 @@
+---
+layout: post
+title: "SimpleXML in PHP5"
+date: 2007-09-14 02:53:12 +0800
+tags: code
+---
+
+PHP5 supports XML natively in certain extent. The usage is demonstrated as follows in a number of examples:
+
+## Create XML content
+
+{% raw %}
+```php
+<?php
+// Create a DOM
+$dom = new DomDocument('1.0');
+// Create root node
+$root = $dom->appendChild($dom->createElement('books'));
+// Create sub-node
+$sub = $root->appendChild($dom->createElement('book'));
+// Add text node
+$sub->appendChild($dom->createTextNode('Foo Bar')); 
+// Generate xml 
+$dom->formatOutput = true;
+$xmlContent = $dom->saveXML();  // save to a variable
+$dom->save('file.xml');         // save to a file
+?>
+```
+{% endraw %}
+
+## Imports XML from string variable
+
+{% raw %}
+```php
+<?php
+$xmlStr = <<<XML
+<books>
+  <book>Foo bar</book>
+  <book><title>Blah</title><author>John Doe</author></book>
+  <book type="draft">Foo bar</book>
+</books>
+XML;
+$xml = new SimpleXMLElement($xmlStr); 
+
+echo $xml->book[0]; // Foo bar
+echo $xml->book[1]->author; // John Doe
+echo (string) $xml->book[2]['type']; // draft, casting to string is required
+
+// Process by a loop
+foreach ($xml->book as $book) {
+   process($book);
+}
+
+// Adding nodes
+$book = $xml->addChild("book");
+$book->addChild("title","A Title of a Book");
+$book->addAttribute("type","reprints");
+
+// Output
+echo $xml->asXML();
+?>
+```
+{% endraw %}
+
+## References
+
+  * [IBM deverloperWorks article: XML for PHP developers](http://www.ibm.com/developerworks/library/x-xmlphp1.html)

@@ -1,0 +1,74 @@
+---
+layout: post
+title: "Automated GDB"
+date: 2009-05-11 22:58:11 -0400
+tags: code
+---
+
+Instead of tracing program manually, we can automate the trace procedure in GDB. The magic is the `commands...end` construct:
+
+```
+break somePoint
+
+commands
+[gdb commands here]
+end
+```
+
+The `commands` construct will attach a piece of GDB commands to the last-defined
+break point. Whenever the break point is reached, the piece of command is
+executed as if it is typed by us. For example, we can do the following to show
+how many outstanding objects are there whenever we reached `FunctionX`:
+
+```
+set pagination off
+
+set $count=0
+
+break CreatorFunction
+
+commands
+silent
+set $count = $count + 1
+continue
+end
+
+break DestroyFunction
+
+commands
+silent
+set $count = $count - 1
+continue
+end
+
+break FunctionX
+
+commands
+silent
+print $count
+continue
+end
+
+run
+```
+
+The line `set pagination off` is to turn off manual intervention when the screen
+is full. And the key point in the above is the `continue` command right before
+the `end` construct to let the break point continue.
+
+Sometimes, we may not just want the things automate, but to stop when some
+condition is met. This can also be done. The way to do is:
+
+    break FunctionY if FunctionZ()==0
+
+Then, the break point will really break only if the condition is met. The
+condition can also be written using out-of-band variables, for example:
+
+    break FunctionY if $count==0
+
+Which the `$count` is a variable defined inside GDB. In case it is an address,
+just call `*$addr` to dereference it, as in C. If we wrote everything in a file,
+we can do the automation in command line by:
+
+    gdb -x script program_to_debug
+

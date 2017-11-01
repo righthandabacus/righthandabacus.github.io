@@ -1,0 +1,23 @@
+---
+layout: post
+title: "Pipes (in bash)"
+date: 2009-06-17 00:33:11 -0400
+tags: system
+---
+
+In UNIX, pipeline is a great feature. However, a pipe by definition is single input to single processor. How about we do a SIMD kind of stuff?
+
+What I mean is to make a single input to a pipeline and the pipeline calls up a couple different programs to process the **identical** input **concurrently**. This sounds not possible by definition of a pipe but in bash, we have a solution:
+
+    bzcat bigfile.bz | tee >(filter1 > output1) | filter2 > output2
+
+Use of `tee` is trivial but in bash, we have a very nice `>(list)` construct that allows a command in place of a file as a redirected output. Obviously we can chain up a lot of tees to get more filters to work concurrently, but that's the idea.
+
+(I need this because I have a terabyte of bzip2'ed data and decompressing it multiple times to pass through different filter is not green.)
+
+
+
+
+
+
+

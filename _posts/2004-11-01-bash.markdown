@@ -1,0 +1,258 @@
+---
+layout: post
+title: Linux Shell Scripting with Bash
+subtitle: Ken O. Burtch / 2004
+date: 2004-11-01
+tags: reference
+categories: book
+bibtex:
+  type: book
+  title: Linux Shell Scripting with Bash
+  author: Ken O. Burtch
+  year: 2004
+  publisher: Sams Publishing
+---
+
+Summary of the book.
+
+# Operating the Shell
+
+- Editing key in Bash is controlled by (1) `shopt` command, like `shopt -o emacs` (2) `stty` command
+- Command history in bash:
+  - `!x` - Run the last command line that begin with letter `x`
+  - `!!` - Run the last command line
+  - `!-2` - Run the 2nd command line back from the history
+  - `!456` - Run the command line number 456 of the output of history
+  - `history 10` - Show the last 10 command lines
+  - `history -p !d` - Show the command line that match the criteria of beginning with letter `d`
+  - `history -d 456` - Delete the entry number 456 in the command line history
+  - `!?frag` - Run the last command that contains string fragment `frag`
+  - `^str1^str2^` - Run the last command again with replacing `str1` with `str2`
+
+# Shell Customization
+
+- `bind -P` - Show the current command line editing key bindings
+- `bind -l` - List all possible keyboard functions
+- `bind -q <function>` - Query the key binding of a particular function
+- `bind -u <function>` - Remove (unbind) a key binding from a particular function, if there are several, remove the first one
+- `bind -r <key seq>` - Remove a binding by its key sequence
+- `bind "<key seq>:<function>"` - Assign a key binding to a particular function
+- `bind -v` / `bind -V` - Show the keyboard options
+- `bind "set <option> on|off"` - Turn on|off a keyboard option
+- `bind -s`/ `bind -S` - List all currently defined keyboard macros
+
+Alternatively: `inputrc`
+
+# Script basics
+
+- Suspend a script and wait until a signal: `suspend`
+- Reading keyboard input and put into `$VAR`: `read VAR`
+  - With prompt: `read -p "Enter a value: " VAR`
+  - By default, read understands backslash escaping of characters. To read as raw (i.e. backspace is a character), use: `read -r VAR`
+  - With 5 sec timeout for reading input: `read -t 5 VAR`
+  - With a limit of 10 characters max (no need Enter if reached): `read -n 10 VAR`
+  - If no variables is given, by default read will store the value into `$REPLY`
+- Redirecting stderr and stdin:
+  - `command > file.output >&2`
+  - `command &> file.output`
+
+# Variables
+
+- Declare a variable as integer: `declare -i VAR`
+  - If a string is assigned to a variable declared as integer, the value will be 0
+- Show the variable declaration: `declare -p VAR`
+- Turn off the integer declaration: `declare +i VAR`
+- Create variable with constant (read-only) content: `declare -r VAR="value"`
+  - Writing a read-only variable will generage an error
+  - To turn off the read-only attribute of an variable, use: `declare +r VAR`
+- Decalre an array: `declare -a VAR`
+  - With initilization: `declare -a VAR[0]="value0" VAR[1]="value1"`
+  - Use with: `echo ${VAR[0]}`
+  - Set with: `VAR[0]="value0"`
+  - Assign multivalues: `VAR=("value0" "value1" "value2")`
+  - Assign multivalues with subscript: `VAR=([3]="value3" [2]="value2" [1]="value1")`
+  - Entire array as one string separated with `$IFS`: `$VAR[*]`
+  - Entire array as separate strings: `$VAR[@]`
+  - Return number of items in the array: `${#VAR[*]} or ${#VAR[@]}`
+
+# Expressions
+
+- Pattern recognition (globbing):
+```
+if [[ $VAR = A* ]]; then ... fi
+if [[ $VAR = A?? ]]; then ... fi
+if [[ $VAR = [ABC]* ]]; then ... fi
+if [[ $VAR = [A-Z]* ]]; then ... fi
+if [[ $VAR = [^a-z]* ]]; then ... fi
+if [[ $VAR = [!a-z]* ]]; then ... fi
+```
+- Extended globbing (enabled by: `shopt -s extglob`):
+  - `?(pattern)` - Matches zero or one occurrence of given patterns
+  - `*(pattern)` - Matches zero or more occurrence of given patterns
+  - `+(pattern)` - Matches one or more occurrences of the given patterns
+  - `@(pattern)` - Matches exactly one of the given patterns
+  - `!(pattern)` - Matches anything except one of the given patterns
+  - Separate list of patterns by using vertical bar (`|`)
+  - Example: `if [[ $VAR = @(Hello|Hallo) ]]; then ... fi`
+  - Common character classes:
+    - `[:alnum:]` - Alphanumeric
+    - `[:alpha:]` - Alphabetic
+    - `[:ascii:]` - ASCII chars
+    - `[:blank:]` - Space or tab
+    - `[:cntrl:]` - Control characters
+    - `[:digit:]` - Decimal digits
+    - `[:graph:]` - Non-blank
+    - `[:lower:]` - Lowercase
+    - `[:print:]` - Non-control
+    - `[:prunt:]` - Punctuation characters
+    - `[:space:]` - Whitespace
+    - `[:upper:]` - Uppercase
+    - `[:xdigit:]` - Hexadecimal digits
+- Turn off globbing: `shopt -s -o noglob`
+- Substitute the globbing into null string if not matched: `shopt -s nullglob`
+- Disable case sensitivity: `shopt -s nocaseglob`
+- Turn off special treatment of loading dot in filenames: `shopt -s dotglob`
+- Treat a list of string as filenames rather than globbing expressions: `GLOBIGNORE=<string1>:<string2>:<string3>:...`
+- Dollar sign substitutions:
+  - ANSI C Escape: `$'<string>'`\\
+    Treat the string as ANSI C expression, allows the following escapes:
+     - `\a` = Bell (alarm)
+     - `\b` = Backspace
+     - `\cC` = Control-C
+     - `\e` = Escape character
+     - `\r` = Carriage return
+     - `\t` = Horizontal tab
+     - `\v` = Vertical tab
+     - `\\` = Literal backslash
+     - `\'` = Single quote
+     - `\nnn` = ASCII character in octal value (up to 3 digits)
+     - `\xnnn` = ASCII character in hexadecimal value (up to 3 digits)
+  - Locale translation: `$"<string>"`\\
+    Translate the string into the character set of the current locale
+  - Variable name matching: `${!<VAR>*}`\\
+    Returns a list of variable names that start with the specified string
+  - Variable length: `${#VAR}`\\
+    Returns the length of the variable's content
+  - Default values: `${VAR:-value}`\\
+    Return value if the variable is empty
+  - Assign default: `${VAR:=value}`\\
+    If the variable is empty, return the value and assign it to the variable as well
+  - Existence check: `${VAR:?message}`\\
+    If the variable does not exist, print the message and Bash exists
+  - Overriding default: `${VAR:+value}`\\
+    If the variable is not empty, set it to value and return this value. If it is empty, just return that value and keep the variable empty.
+  - Substrings: `${VAR:n}`\\
+    Return the value started from the n-th character, first character as 0th.
+  - Substrings: `${VAR:n:m}`\\
+    Return the value started from the n-th character, first character as 0th. But the returned value should not exceed m characters
+  - Substring removal: `${VAR#pattern}`\\
+    Return the (right-hand-side) substring after removing the globbing pattern from `VAR`, with smallest possible matching
+  - Substring removal: `${VAR##pattern}`\\
+    Return the (right-hand-side) substring after removing the globbing pattern from `VAR`, with largest possible matching
+  - Replace substring: `${VAR/pattern/replacement}`\\
+    Replace the first occurance. If `#` in the pattern, it matches the beginning; if `$` in the pattern, it matches the end
+  - Replace substring: `${VAR//pattern/replacement}`\\
+    Replace all the occurances
+  - Delete substring: `${VAR/pattern}`
+  - Delete all occurances of substring: `${VAR//pattern}`
+  - Command substitution: `$(<command line>)`
+  - Arithmetic expression substitution: `$((<arith expression>))`
+
+# Debugging and Version Control
+
+- Checking a script for syntax errors without running it: `bash -n script.sh`
+- Terminates the shell script if a command returns an error code: `shopt -s -o errexit`
+- Terminates with an error if nonexistent (unset) variables are referenced: `shopt -s -o nounset`
+- Displays each command before it's executed: `shopt -s -o xtrace`
+
+# Parameters and Subshells
+
+- Replacement for `basename $0` : `$BASENAME=${0##*/}`
+- Walking through the script parameters: `while`-loop and `shift`
+- Better parameter handling: `getopts`-builtin
+  - Example:\\
+```
+#!/bin/bash
+getopts "hc:" SWITCH
+printf "The first switch is %s Switch argument is %s Position of next parameter is %s\n" $SWITCH $OPTARG $OPTIND
+```
+  - Advanced parameter handling: `getopt command (/usr/bin/getopt):`
+- Subshell:
+   - Calling compound commands without a subshell: `{ command1 ; command2 ; }`
+   - Calling compound commands with a subshell: `( command1: command 2 )`
+     - No semicolon after the last command in subshell style
+     - Calling subshell will shield the compound commands from the current shell's environment
+
+# Job control and Signals
+
+- In script, to stop itself can be done with:\\
+```
+suspend
+kill -SIGSTOP $$
+```
+- To enable job control in script (to make suspend work): `shopt -s -o monitor`
+- When Bash (non-interactive session) get SIGHUP, it will passing the signal to all sub-scripts, unless `disown -h` is used
+- When Bash in interactive session, setting `shopt -s -o huponexit` will pass SIGHUP to all its children process upon exit
+- Use of trap: `trap <action command string> <signal> ...`
+  - Run the specified string as command line when the specified signal is received
+  - View the current trap setting: `trap -p <signal>`
+- Run command when script exits: Use trap and the non-existent signal `EXIT`
+
+# Text file basics
+
+- Get file information (mtime, ctime, atime, etc.): `stat <filename>`
+  - In machine readable (one-line, space separated) format: `state -t <filename>`
+  - Specifying output format: `statftime` (another version of stat)
+- `csplit` - split a file into sections determined by context lines
+- `expand` - convert tabs into spaces
+- `unexpand` - Convert space back to tabs
+- Process substitution:
+  - Example: `grep -f <(ls -1) /var/log/filelist.log`
+  - Example: `cat textfile > >(wc -l)`
+  - `<(list)` will substitute on-the-fly with a FIFO, which can be read to obtain the output of list
+  - `<(list)` will substitute on-the-fly with a FIFO, which can be written to, and list will read the content as if it is from console input
+- File descriptors:
+  - `exec 3< filename; read LINE <&3;`\\
+    Open filename as input and assign to file descriptor number 3
+  - `3< filename; read LINE <&3;`\\
+    Open filename as input and assign to file descriptor number 3. But once assigned, 3 cannot be reassigned nor the file can be reopened.
+  - `exec 4<&3`\\
+    Copy an input file descriptor. If 4 is omitted, 0 is assumed (as for input file descriptor)
+  - `exec 4<&3-`\\
+    Copy input file descriptor 3 to file descriptor 4, then close file descriptor 3.
+  - `exec 4>&3`\\
+    Copy output file descriptor
+  - `exec 4>log.txt ; command >&4`\\
+    Use of output file descriptor
+  - `exec 3<>filename`\\
+    Open a file for both input and output. But if you output something at the middle, the content pending for input will be overwritten. Think of a file position pointer concept.
+  - `exec 3<&-`\\
+    Close input file descriptor
+  - `exec 4>&-`\\
+    Close output file descriptor
+  - `/dev/fd/n`\\
+    Refer to file descriptor `n`
+- `tail +n filename` - Open a file, skip the first `n` lines and print the rest.
+- `fold` - wrap text lines
+- `column` - Similar to paste command, but create fixed-width columns.
+- `merge` - Three-way file merge
+
+# Text file processing
+
+- Example of find: `find . "(" -name "*.txt" -or -name "*.sh" ) -type f`
+  - modified in more than one day: `-mtime +0`
+  - accessed in last 10 to 60 minutes: `-amin +9 -amin -61`
+
+# Console Scripting
+
+- `tty` - Show the name of the terminal (e.g. `/dev/tty1`, `/dev/pts1`)
+- `fgconsole` - Print the console number (e.g. `tty1` = 1), Report an error if not a console
+- Commands that can only run in console:
+  - `showkey`: Determines the keyboard data (e.g. reports the scan code, key code)
+  - `setleds`
+  - `dumpkeys`
+  - `setterm`
+
+# Network Programming
+
+Open a socket: `exec 3<> /dev/tcp/hostname/port`

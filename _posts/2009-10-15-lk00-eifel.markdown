@@ -1,0 +1,19 @@
+---
+layout: post
+title: "Ludwig and Katz (2000) The Eifel Algorithm: Making TCP Robust Against Spurious Retransmissions (CCR)"
+date: 2009-10-15 04:36:10 -0400
+category: paper
+bibtex:
+  type: article
+  title: "The Eifel Algorithm: Making TCP Robust Against Spurious Retransmissions"
+  author: "Reiner Ludwig and Randy H. Katz"
+  journal: "ACM SIGCOMM Computer Comm Review"
+  volume: 30
+  number: 1
+  pages: "30--36"
+  month: Jan
+  year: 2000
+---
+The Eifel Algorithm: Proposes to exploit the TCP timestamp option to detect spurious retransmissions. Because the receiver have to ACK the seqno together with the sender's timestamp, we can make use of it to differentiate an ACK is for the originally sent segment or the retransmitted segment. Before we do retransmission, we record the timestamp used and observe if we receive an ACK whose seqno is retransmitted but the timestamp is older than the recorded one. If so, the retransmission is spurious and we can restore the TCP's cwnd and ssthresh and continue the transfer.
+
+The paper says that, using Eifel Algorithm, as well as the original retransmission algorithm, bursts may occur and thus it is good to have a complementing pacing algorithm at the sender.

@@ -1,0 +1,18 @@
+---
+layout: post
+title: "Ford et al (2011) TCP Extensions for Multipath Operation with Multiple Addresses (Internet Draft)"
+date: 2011-12-06 23:41:08 -0500
+category: paper
+bibtex:
+  type: misc
+  title: "TCP Extensions for Multipath Operation with Multiple Addresses"
+  author: "A. Ford and C. Raiciu and M. Handley and O. Bonaventure"
+  url: "http://tools.ietf.org/html/draft-ietf-mptcp-multiaddressed-04"
+  month: "Jul"
+  year: "2011"
+---
+The internet draft of MPTCP. MPTCP is a layer above TCP, so that the data stream from application is delivered by multiple TCP streams at the transport layer. The MPTCP layer is to merge the TCP streams into one stream, and deliver it to the application.
+
+In order to make the merge possible, the data will carry a sequence number, independent of the TCP sequence number, as the latter is for the "subflows". The extra information is carried by a TCP option. So that from the network's point of view, the parallel TCP flows looks just like TCP flows.
+
+The internet draft also provides the detailed protocol setup/tear down procedure, as well as the signalling between the communication parties at MPTCP level.

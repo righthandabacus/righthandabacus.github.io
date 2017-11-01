@@ -1,0 +1,164 @@
+---
+layout: post
+title: Ciphers and OpenSSH
+date: Mon, 17 Jul 2017 18:29:15 -0400
+tags: system
+category: blog
+---
+
+This is about how to configure OpenSSH. Especially many configuration
+parameters becomes aged in recent version of OpenSSH, most notably DSA keys are
+obsoleted and disabled by default.
+
+This summary mostly based on [StackExchange][1] and the famous [github page][4].
+
+# Structure of OpenSSH
+
+Establishing a connection via OpenSSH: All begins with a key exchange, then a
+public key encryption for host authentication and then client authentication.
+Afterwards, data stream is encrypted by symmetric ciphers. Encrypted data also
+comes with the message authentication code to allow integrity check.
+
+# Key exchange
+
+There is only two ways to do key exchage: Diffie-Hellman and elliptic
+Diffie-Hellman. In OpenSSH, only 8 key exchange protocols supported: 
+`curve25519-sha256` (ECDH over Curve25519 + SHA2),
+`diffie-hellman-group{1,14}-sha1` (1024/2048-bit DH + SHA1), 
+`diffie-hellman-group-exchange-sha{1,2}` (Custom DH + SHA1/SHA2),
+`ecdh-sha2-nistp{256,384,521}` (ECDH over NIST P-256/384/521 with SHA2).
+
+Elliptic curve implementation ECDSA is commonly based on NIST standard, which
+prescribes a few curves. However, it is believed that [the curves are weak][3]
+and suspicious for NSA backdoors. Curve25519 and Curve1174 are suggested
+alternatives.
+
+SHA1 is broken, so SHA2 should be used in all application. An a key length of
+1024 bit is not considered sufficient today. This leaves only two key exchange
+protocols as options: `curve25519-sha256`,
+`diffie-hellman-group-exchange-sha2`.
+
+# Public key encryption
+
+Host authentication is always key-based. For SSHv2, there are four algorithms
+available: DSA with SHA1, ECDSA with SHA256/385/512 (depends on key size),
+Ed25519 with SHA512, RSA (with key size 1024 or 2048) with SHA1.
+
+DSA is invented at the time when RSA *was* patented. RSA is based on integer
+factorization while DSA is based on discrete logarithm. It is reported that DSA
+is faster in signature generation and decryption but slower in signature
+validation and encryption.
+
+There is a chance that RSA and DSA both become [mathematically broken][2] in a
+short future due to mutual research advance in the General Number Field Sieve
+algorithm to factor integers and the Function Field Sieve algorithm to solve
+discrete log. Therefore elliptic curve should be the direction for today.
+
+Another issue with DSA is the implementation allows only 1024-bit key for the
+compliance to NIST FIPS 186-2, which is insufficient today. RSA allows 2048-bit
+alternative, but not DSA in recent version's OpenSSH.
+
+Both DSA and ECDSA assumes a good RNG. The cipher has a parameter $k$ that
+required to be random, secure, and unique. If the machine has a poor RNG, the
+algorithm may fail. For example, same $k$ used twice can help figure out
+private key.
+
+Therefore, the accepted cipher are only `ed25519` and `rsa`.
+
+# Symmetric cipher
+
+OpenSSH supports quite a number of symmetric cipher: `3des-cbc`,
+`aes{128,192,256}-{cbc,ctr}`, `aes{128,256}-gcm@openssh.com`, `arcfour`,
+`arcfour{128,256}`, `blowfish-cbc`, `cast128-cbc`,
+`chacha20-poly1305@openssh.com`.
+
+3DES and arcfour are not considered secure. Block ciphers blowfish and cast128
+are with only 64-bit block size, which is too short (128 bit or above should be
+recommended).
+
+Cipher modes AE (authenticated encryption) is recommended but CTR should be
+allowed for compatibility, given CTR with encrypt-then-MAC is provably secure.
+AES-GCM has the weakness of SSH not encrypt the message size when GCM is in
+use, which may allow some traffic analysis without decrypting data.
+
+This leaves the usable ciphers be chacha20 and the five AES.
+
+# Message authentication code
+
+Options: `hmac-md5`, `hmac-md5-96`, `hmac-ripemd160`, `hmac-sha1`,
+`hmac-sha1-96`, `hmac-sha2-{256,512}`, `umac-{64,128}`,
+`hmac-md5-etm@openssh.com`, `hmac-md5-96-etm@openssh.com`,
+`hmac-ripemd160-etm@openssh.com`, `hmac-sha1-etm@openssh.com`,
+`hmac-sha1-96-etm@openssh.com`, `hmac-sha2-{256,512}-etm@openssh.com`,
+`umac-{64,128}-etm@openssh.com`
+
+MAC is for data integrity while encryption is for confidentiality. If AE cipher
+mode is selected, integrity is already given. Otherwise we need a MAC.
+
+There are 3 common ways to combine cipher and MAC:
+
+1. Encrypt-then-MAC: encrypt(message) + MAC(encrypt(message))
+2. MAC-then-encrypt: encrypt(message + MAC(message))
+3. Encrypt-and-MAC: encrypt(message) + MAC(message)
+
+MAC-then-encrypt have lead to many attacks on TLS. Encrypt-and-MAC also lead to some
+attacks on SSH. Only encrypt-then-MAC (ETM) should be used, because otherwise the time to
+confirm decryption failure and MAC verification failure is different. CTR-and-HMAC can
+be considered sufficient even there is no security proof for it.
+
+MD5 and SHA1 are considered weak. Tag size and key size both should be at least 128
+bits. This leaves only the SHA2, umac-128, and ripemd160 in ETM mode as MAC.
+
+# Config files
+
+Below are the snippet of configuration files for OpenSSH.
+`PasswordAuthentication` (RFC4252, section 8) should always be disabled. If
+password is allowed for client authentication, use
+`ChallengeResponseAuthentication` instead. The latter is the keyboard
+interactive (RFC4256) authentication that requires password to be type via tty
+device. This will forbid authentication in this way:
+
+    echo $PASSWORD | ssh $HOST $CMD
+
+For `/etc/ssh/sshd_config`:
+
+```
+Protocol 2
+HostKey /etc/ssh/ssh_host_ed25519_key
+HostKey /etc/ssh/ssh_host_rsa_key
+PubkeyAuthentication yes
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-ripemd160-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,hmac-ripemd160,umac-128@openssh.com
+```
+
+For `/etc/ssh/ssh_config`:
+
+```
+Host *
+    KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256
+    PubkeyAuthentication yes
+    PasswordAuthentication no
+    ChallengeResponseAuthentication no
+    HostKeyAlgorithms ssh-ed25519-cert-v01@openssh.com,ssh-rsa-cert-v01@openssh.com,ssh-ed25519,ssh-rsa
+    Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+    MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-ripemd160-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,hmac-ripemd160,umac-128@openssh.com
+```
+
+Further enhancing the security of SSH: consider fail2ban to keep off brute force attack by lock out IPs upon several failed attempt; and libpam-google-authenticator for 2nd factor authentication.
+
+
+# Reference:
+1. [Information Security StackExchange (2012) RSA vs DSA for SSH][1]
+2. [Ptacek et al (2013) The factoring dead, BlackHat 2013 presentation][2]
+3. [Bernstein and Lange (2013) Security dangers of the NIST curves][3]
+4. [Stribika (2015) Secure Secure Shell][4]
+5. [NIST FIPS 186-4 (2016)][5]
+
+[1]: https://security.stackexchange.com/questions/5096/rsa-vs-dsa-for-ssh-authentication-keys
+[2]: https://isecpartners.com/media/105564/ritter_samuel_stamos_bh_2013_cryptopocalypse.pdf
+[3]: http://www.hyperelliptic.org/tanja/vortraege/20130531.pdf
+[4]: https://stribika.github.io/2015/01/04/secure-secure-shell.html
+[5]: http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf

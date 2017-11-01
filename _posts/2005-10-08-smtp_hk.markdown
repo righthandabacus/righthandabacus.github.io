@@ -1,0 +1,23 @@
+---
+layout: post
+title: "SMTP servers of the ISPs in Hong Kong"
+date: 2005-10-08 13:36:18 +0800
+tags: reference
+---
+
+| ISP        | SMTP Server                                    |
+|------------|------------------------------------------------|
+| ABC Net    | mail.hkabc.net                                 |
+| CTI        | smtp3.ctimail3.com                             |
+| HGC        | mail.on-nets.com                               |
+| HKBN       | smtpo.hkbn.net                                 |
+| HKC        | smtp.hkcmail.com                               |
+| HKNet      | smtp.hknet.com                                 |
+| I-Cable    | smtp.i-cable.com                               |
+| iSmart     | smtp.ismart.net                                |
+| NET Front  | mail.netfront.net                              |
+| Netvigator | mail.netvigator.com, corpmail1.netvigator.com  |
+| OneBB      | smtp.onebb.net                                 |
+| Pacific Supernet | smtp.pacific.net.hk                      |
+| So-net     | smtp.so-net.com.hk                             |
+

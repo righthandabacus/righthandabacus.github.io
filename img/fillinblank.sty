@@ -1,0 +1,54 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% fillinblank package,             2005-09-16          %%
+%% Copyright (C) 2005  Adrian Sai-wah TAM               %%
+%%   adrian@ieaa.org                                    %%
+%%                                                      %%
+%% This program is a free software, distributed under   %%
+%% the GNU General Public License, version 1.0 or later %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Revision History
+%%  2005-09-12	v1.0	Initial version
+%%  2005-09-16	v1.1	Added command \answerspace
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{fillinblank}[2005/09/12 v1.0 Fill-in-blank macros]
+\RequirePackage{ifthen}
+\RequirePackage{color}
+
+%% Options
+\newboolean{@answer}
+\DeclareOption{noanswers}{\setboolean{@answer}{false}}
+\DeclareOption{answers}{\setboolean{@answer}{true}}
+\ExecuteOptions{noanswers}
+\ProcessOptions*
+
+%% Real-time switching
+\DeclareRobustCommand{\showanswers}{\setboolean{@answer}{true}}
+\DeclareRobustCommand{\noshowanswers}{\setboolean{@answer}{false}}
+
+%% Fill in blanks
+\DeclareRobustCommand{\fillinunderline}[1]{%
+\ifthenelse{\boolean{@answer}}{\underbar{~~~ #1 ~~~}}{\underbar{\phantom{~~~ #1 ~~~}}}%
+}
+
+\DeclareRobustCommand{\fillinspace}[1]{%
+\ifthenelse{\boolean{@answer}}{#1}{\phantom{#1}}%
+}
+
+\DeclareRobustCommand{\fillinblank}[1]{%
+\ifmmode\begingroup\@ifstar{\fillinunderline{#1}}{\fillinspace{#1}}\endgroup%
+\else\begingroup\@ifstar{\fillinspace{#1}}{\fillinunderline{#1}}\endgroup%
+\fi}
+
+%% A large blank spaces or answers
+%\DeclareRobustCommand{\answerspace}[2]{\ifthenelse{\boolean{@answer}}{#2}{\vspace{#1}}}
+\newsavebox{\answerspacebox}
+\newlength{\answerspaceheight}
+\DeclareRobustCommand{\answerspace}[1]{%
+	\newline
+	\sbox{\answerspacebox}{\parbox{\columnwidth}{#1}}
+	\setlength{\answerspaceheight}{\ht\answerspacebox}	% Height
+	\addtolength{\answerspaceheight}{\dp\answerspacebox}% Depth
+	\ifthenelse{\boolean{@answer}}{\usebox{\answerspacebox}}{\vspace{\answerspaceheight}}%
+}
+\endinput

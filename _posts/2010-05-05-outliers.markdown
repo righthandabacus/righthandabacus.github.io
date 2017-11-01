@@ -1,0 +1,37 @@
+---
+layout: post
+title: "Outliers: The Story of Success"
+subtitle: "Malcolm Gladwell / 2008"
+date: 2010-05-05 15:14:34 -0400
+category: book
+bibtex:
+  type: book
+  title: "Outliers: The Story of Success"
+  author: "Malcolm Gladwell"
+  publish: "Little, Brown and Company"
+  year: 2008
+  library: Dibner
+  classification: BF637.S8.G533 2008
+---
+
+A nice leisure book from a good author.
+
+The book is about so-called 'outliers', which are the exception cases standing out of the norm. It starts by a theory my wife is known for long: Kids born in earlier half of the school year is smarter by definition. While we all try to adapt to it and thinking about how to deal with the situation for our kids, Malcolm says it is a tragedy. It surely is because you are losing talents because of that.
+
+I heard of some where (I forgot where) that kindergarten is in trimesters rather than years. So kindergateners in a class under that system will be ranges within a few months of age rather than a year. This is exactly the way to overcome what the book called the Matthew effect. (I first knew of Matthew effect in Professor K-T Hau's Ed Psy class)
+
+So this is the introduction in the book. It says outliners are outliners not because of luck or some random things. Every success has a predictable course. So as the examples of Bill Gates (of Microsoft fame) and Bill Joys (of Java and BSD socket fame) and Beatles (the band). They are success not just because of they are good but they are prepared. What prepared them is the 10K hours rule --- you can become an expert on a field after 10K hours. So what prepares you for the 10K hours? Somehow, unplanned coincidence, or in simpler terms, luck.
+
+Luck brings in the opportunity for the preparation to success. It does not mean the preparation causes a success but it won't be a success without such preparation. So it is all about an opportunity -- the theme of the first part of the book.
+
+There is a contrasting example in chapter 3 and 4: The stories of Robert Oppenheimer and Chris Langan. While Langan is equally intelligent as Oppenheimer, he does not achieve as much as Oppenheimer. The book explains the difference by their family background: Oppenheimer is from a middle-class family but Langan is very grass-root. There is a page describing how Langan respond to taking a job at Harvard. His answer is very interesting and so different to the common believe: He said working in a university is very bureaucratic and loss of freedom. The reason to have such perception is because of his experience at childhood. By comparing Langan the layman and Oppenheimer to nuke inventor, I see what I lacked: to bargain and fight. The book describe this as 'practical intelligence'. The story of the Jewish men in chapter 5 is an example on how these properties combined together to make a success.
+
+The second half of the book bears the title "legacy". I feel less interesting then the first half of the book but it tries to explain why somebody is more aggressive then another, why someone will question while other to defer to, and why someone works hard and others don't. I agree with the explanation on why Asian kids do good math, but I don't think hard working is an important factor on that. However, working out math for long enough hours really help solve the problem of English-speaking kids.
+
+In summary, to be an outlier,
+
+  - Timing is crucial (Chapter 1)
+  - Preparation is crucial (Chapter 2)
+  - Family background/education is crucial (Chapters 3-5)
+  - Legacy plays an important role on how we think (Chpater 6-8)
+  - And sometimes legacy brings us good (Chapter 8) and bad (Chapter 7), and we need to work against it (Chapter 9)

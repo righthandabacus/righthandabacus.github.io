@@ -1,0 +1,52 @@
+---
+layout: post
+title: "Mathis & Mahdavi (1996) Forward Acknowledgement: Refining TCP Congestion Control (CCR)"
+date: 2012-01-06 23:16:16 -0500
+category: paper
+bibtex:
+  type: article
+  title: "Forward Acknowledgement: Refining TCP Congestion Control"
+  author: "Matthew Mathis and Jamshid Mahdavi"
+  journal: "ACM SIGCOMM Computer Communication Review"
+  volume: "26"
+  number: "4"
+  month: "Oct"
+  year: "1996"
+---
+FACK TCP is using SACK option for better recovery. It decouples the congestion control from data recovery algorithms, i.e. when and how much data to send vs what to send.
+
+Conservation of packets: New segment not injected into the network until and old segment has left
+
+Self-clocking: The way TCP implements conservation of packets, i.e. segment transmissions are triggered by returning acknowledgements
+
+Congestion avoidance: The equilibrium state algorithm for TCP
+
+Slow-start: The algorithm which TCP uses to reach the equilibrium state
+
+SACK implementation:
+
+  - Fast retransmit and fast recovery are not resending already SACK'ed segments
+
+Forward-most data: The highest seqnum that is correctly received
+
+FACK:
+
+  - `snd.fack` = Forward most ACK
+  - `retran_data` = size of outstanding retransmitted data
+  - New ACK: `snd.fack` = `snd.una` = ACK'ed sequence number
+  - DupACK: `snd.una` = ACK'ed sequence number, but `snd.fack` = highest seq in SACK
+  - available window: `awnd = snd.nxt - snd.fack + retran_data`
+  - Send new data whenever `awnd < cwnd`
+     - If send new data, advanced `snd.nxt`
+     - If retransmitting old data, increases `retran_data`
+  - An incoming ACK: either decreases `retran_data` or advance `snd.fack`
+  - If ACK advances `snd.fack` beyond `snd.nxt` at the time a segment was retx, the retx is lost
+
+FACK start recovery when reassembly queue is longer than 3 MSS, i.e.
+
+    if ((snd.ack - snd.una) > (3*MSS) || (dupacks == 3)) {
+        retransmit
+    }
+
+Recovery ends when `snd.una` advanced beyond `snd.nxt` at the time the first lost is detected
+During recovery, cwnd held constant

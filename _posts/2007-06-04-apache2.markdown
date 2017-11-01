@@ -1,0 +1,47 @@
+---
+layout: post
+title: "Apache 2 Virtual Host"
+date: 2007-06-04 05:18:44 +0800
+tags: system
+---
+
+I helped my previous laboratory to move the server, and upgrade to Debian 4.0r0
+with Apache 2. Upgrading to Apache 2 is somewhat tedious, because a lot of
+configuration need to be changed. Below are two notes:
+
+# Virtual Host
+
+The correct way of doing in Apache 2 is:
+
+```
+NameVirtualHost *
+<VirtualHost *>
+    ServerName www.site_one.net
+    # Something else
+</VirtualHost>
+<VirtualHost *>
+    ServerName www.site_two.net
+    # Something else
+</VirtualHost>
+```
+
+Note about the asterisk used. Only those labeled on `NameVirtualHost` can be
+used in `VirtualHost` tag. These virtual host configuration is stored in
+`/etc/apache2/sites-available` and a symlink is created in
+`/etc/apache2/sites-enabled`. Their use is self-explanatory.
+
+# User Dir
+
+The Debian's version of configuration file has some problem on the external
+modules. Search for `modes-available` and you will see these:
+
+    Include /etc/apache2/mods-enabled/*.load
+    Include /etc/apache2/mods-enabled/*.conf
+
+which means you should create symlinks of *both* `.load` and `.conf` files on
+the `mods-enabled` directory. Actually you should have
+
+    Include /etc/apache2/mods-available/*.conf
+
+However, when you do that, remember to correct some `.conf` files as they ain't
+enclosed in a pair of `IfModule` tag.

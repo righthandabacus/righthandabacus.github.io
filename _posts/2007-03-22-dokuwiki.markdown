@@ -1,0 +1,213 @@
+---
+layout: post
+title: "DokuWiki notes"
+date: 2007-03-22 00:36:13 +0800
+tags: system
+---
+
+# Administration work
+
+### Remove some files
+
+Remove backup (attic): Go to DokuWiki home, and run
+
+    rm -rf data/attic/[^_]*
+
+Remove cache: Go to DokuWiki home, and run
+
+    rm -rf data/cache/[^_]*
+
+Remove metadata (e.g. change log): Go to DokuWiki home, and run
+
+    rm -rf data/meta/[^_]*
+
+### Rebuild stuff
+Some plug-ins (e.g. blog, indexmenu) rely on the page index and cdate index to sort pages correctly. To rebuild them, do the following (Linux assumed):
+
+```
+cd $DOKUWIKI_HOME
+cd data/pages
+find * -type f|sed -e 's/.txt$//;s#/#:#g;'|sort > ../cache/page.idx
+ls -l --time-style=+%s `find * -type f`|sed -e 's/ \+/ /g'|cut -f6 -d' ' > ../cache/cdate.idx
+for x in `find * -type f`; do
+    CTIME=`ls -l --time-style=+%s $x|sed -e 's/ \+/ /'|cut -f6 -d' '`;
+    FN=`echo $x|sed -e 's/.txt$//'`;
+    ID=`echo $FN|sed -e 's#/#:#g'`;
+    echo -e "$CTIME\t137.189.89.206\tC\t$ID\tadrian\tcreated">../meta/$FN.changes;
+done
+```
+
+# Plug-ins
+
+These are the plug-ins currently using in this instance of DokuWiki:
+  * autosearch - Search if not exists, and redirect to index page if just the folder is specified
+  * bibtex - put bibtex snippets in a pair of `<bibtex>` tag, and the bibliography will be shown
+  * blog - make a blog
+  * captcha - create CAPTCHAs to prevent spam
+  * hidden comment - Allow comments to be put on pages. It uses C and <nowiki>C++</nowiki> style comments.
+  * csv - make tables using CSV syntax
+  * discussion - helper for blog plug-in, to allow discussions (I didn't use it elsewhere)
+  * dokutexit - generate LaTeX and PDF files from any page
+  * feed - required for blog plug-in, to generate Atom and RSS feeds
+  * folded - to fold text: `++title|content++` for inline content and `++++title|content++++` for block content
+  * googleads - Google Adsense
+  * googleanalytics - Google Analytics
+  * gtd - get things done, the task list
+  * iframe - put another page in an `<iframe>`
+  * include - include another DokuWiki page in the current one. Required for blog plug-in
+  * indexmenu - give a hierarchy of page lists in a given namespace
+  * latex - enclose equation in a pair of `<latex>` to generate pictures on the fly. All stuff will be further enclosed by a pair of dollar-sign before feeding into LaTeX.
+  * pagelist - required for the blog plug-in
+  * remotescript - required for the indexmenu plug-in for the AJAX part
+  * snmplive - collect SNMP data on the fly, try with `<snmplive ip="xx.xx.xx.xx" oid=".x.x.x.x">`
+  * source - include a piece of source code into the current DokuWiki page
+  * tag - tagging pages, required for the blog plug-in
+
+### Blog plug-in
+Show the blog entries:
+
+    [blog>[namespace]?[number]&[flags]}]
+
+Show the table of entry titles:
+
+    [archive>[namespace]?[YYYY-MM|*]&[flags]}]
+
+The flags are: fullpage, firstseconly, footer, nofooter
+
+### CSV plug-in
+Include a file in media and display as a table:
+
+    <csv wiki:test.csv></csv>
+
+Or in-line:
+
+```
+<csv [options]>
+1,2,3
+4,5,6
+</csv>
+```
+
+Options include
+  * `hdr_rows=<n>` - Format the first `<n>` rows of data from the CSV as column headers. Default=1
+  * `span_empty_cols=[01]` - Create colspans for each empty (two adjacent commas) cell following a cell with content. Default=1
+
+### dokutexit plug-in
+
+To make dokutexit work, add the following at the begin of the DokuWiki page:
+
+```
+<texit info>
+author=MySelf
+title=MyTitle
+</texit>
+```
+
+which will show a button for generate / download the PDF version of the page. Other possible entries for the `info` block are:
+  * `subject`, `keywords`: Add to PDF properties
+  * `date`: Date to be shown on the document instead of current date
+  * `recurse=on|off|chapter`: Add internals links as appendix
+  * `recurse_file=on|off`: Add internals media non image as appendix
+  * `backgroundtext`: Add background text on each page
+  * `usetablefigure=on|off`: Put table in a figure/float
+
+Additional LaTeX mark-up can be inserted to the document by enclosing with `<texit>` tag.
+
+### gtd plug-in
+
+Syntax:
+
+```
+<gtd>
+[#] [@context] [p:project] [describing text] [yyyy-mm-dd|mm-dd]
+</gtd>
+```
+
+| `[#]` | A leading '#' marks a Todo as done | optional |
+| `[@context]` | The context of the Todo ( `_` will be transformed to space ). | required |
+| `[p:project]` | Specifies if a todo item belongs to a certain project ( `_` will be transformed to space ). | optional |
+| `[describing text]` | Describing text. Must be on one line (Wiki Syntax can be used to format). | required |
+| `[yyyy-mm-dd]` | The date until when the task should be done. | optional |
+| `[mm-dd]` | Special date, useful for birthdays and recurring tasks. The current year will be added automatically. | optional |
+
+### iframe plug-in
+Syntax:
+
+    [url>http://someurl/}]
+    [url>http://someurl/|alternate-text}]
+    [url>http://someurl/ [width,height]|alternate-text}]
+
+Examples:
+
+    [url>http://www.somesite.com/somepage.html}]
+    [url>http://www.somesite.com/somepage.html|Just an example}]
+
+Default width and height are 98% and 400px respectively. Brackets around the dimension are essential.
+
+### include plug-in
+Syntax:
+
+    [page>[id]#[section]&[flags]}]
+    [section>[id]#[section]&[flags]}]
+
+where `id` are the page ID to include; `section` means to include specific section of a page, the whole page is included if not specified. The `flags` are same as those used in the blog plug-in. The `page` syntax will not merge indentation, i.e. they are in a separate block. The `section` syntax will align the included part into the current indentation level.
+
+The page ID can be specified using the following macros:
+
+  * `@USER@`: username of the current user
+  * `@NAME@`: full name of the current user
+  * `@GROUP@`: first group the user belongs to
+  * `@YEAR@`: in YYYY format
+  * `@MONTH@`: in MM format
+  * `@DAY@`: in DD format
+
+### indexmenu v2 plug-in
+
+Syntax:
+
+    [indexmenu>namespace[#[n][+nons]][#sort+[!]<sort_type>] [|js[#[theme][+ajax]]]}]
+
+where:
+  * namespace: Namespace name from which the index starts
+  * n: Number that specifies the max level of the tree index nodes
+  * nons: Exclude namespaces nodes from index
+  * sort: Enable sorting by `<sort_type>`, which can be `fn`, `title`, `date` to mean filename, page heading and creation date respectively.
+  * ! (exclamation mark): in front of the sorting mode means reversed sort
+  * js: Use JavaScript to add fancy dynamic stuff to the menu
+  * theme: Skin name for indexmenu2, when in js mode. Options: `IndexMenu` and `Simple`
+  * ajax: Enables Ajax-driven index for submenus below [n]
+
+### latexrender plug-in
+
+The picture will be generated by using the following preamble and footer:
+```
+\documentclass[10pt]{article}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{eurosym}
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+\usepackage{amssymb}
+\pagestyle{empty}
+\begin{document}
+$ [latex code inserted here] $
+\end{document}
+```
+
+So the way to have display equation is:
+
+    $ $\begin{equation*} ... \end{equation*}$ $ 
+
+beware the space before the first dollar sign and after the last dollar sign.
+
+### source plug-in
+Syntax
+
+    <source filename [#start-end] [language] [|title]>
+
+where
+  * `filename`: the file to be included, can either be a path or a URI, better surrounded by quotation marks if there are spaces
+  * `#start-end`: only show lines from start to end, first line in the file is 1
+  * `language`: the language to be passed to GeSHi for syntax highlighting, deduce from extension if not specified
+  * `title`: a title to be displayed above the file contents, file name will be used if not specified.
+
