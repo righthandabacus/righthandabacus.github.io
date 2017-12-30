@@ -1,0 +1,90 @@
+---
+layout: post
+title: 粵語拼音對照表
+subtitle:
+date: Fri, 17 Nov 2017 21:19:59 -0500
+tags: random reference
+---
+
+----
+
+|      |        | 粵拼  | 黃錫凌| 耶魯  | 廣州  |國際音標| 教院 | 劉錫祥|
+|------|:------:|-------|-------|-------|-------|-------|-------|-------|
+| 聲母 | /p/    | b     | b     | b     | b     | p     | b     | b     |
+|      | /pʰ/   | p     | p     | p     | p     | pʰ    | p     | p     |
+|      | /m/    | m     | m     | m     | m     | m     | m     | m     |
+|      | /f/    | f     | f     | f     | f     | f     | f     | f     |
+|      | /t/    | d     | d     | d     | d     | t     | d     | d     |
+|      | /tʰ/   | t     | t     | t     | t     | tʰ    | t     | t     |
+|      | /n/    | n     | n     | n     | n     | n     | n     | n     |
+|      | /l/    | l     | l     | l     | l     | l     | l     | l     |
+|      | /k/    | g     | g     | g     | g     | k     | g     | g     |
+|      | /kʰ/   | k     | k     | k     | k     | kʰ    | k     | k     |
+|      | /ŋ/    | ng    | ŋ     | ng    | ng    | ŋ     | ng    | ng    |
+|      | /h/    | h     | h     | h     | h     | h     | h     | h     |
+|      | /ts/   | z     | dz    | j     | z     | tʃ    | dz    | j     |
+|      | /tsʰ/  | c     | ts    | ch    | c     | tʃʰ   | ts    | ch    |
+|      | /s/    | s     | s     | s     | s     | ʃ     | s     | s     |
+|      | /kʷ/   | gw    | gw    | gw    | gu    | kʷ    | gw    | gw    |
+|      | /kʰʷ/  | kw    | kw    | kw    | ku    | kʰʷ   | kw    | kw    |
+|      | /j/    | j     | j     | y     | y     | j     | j     | y     |
+|      | /w/    | w     | w     | w     | w     | w     | w     | w     |
+
+|      |        | 粵拼  | 黃錫凌| 耶魯  | 廣州  |國際音標| 教院 | 劉錫祥|
+|------|:------:|-------|-------|-------|-------|-------|-------|-------|
+| 韻母 | /aː/   | aa    | a     | a     | a     | aː    | a     | a     |
+|      | /aːi/  | aai   | ai    | aai   | ai    | aːi   | aai   | aai   |
+|      | /aːu/  | aau   | au    | aau   | ao    | aːu   | aau   | aau   |
+|      | /aːm/  | aam   | am    | aam   | am    | aːm   | aam   | aam   |
+|      | /aːn/  | aan   | an    | aan   | an    | aːn   | aan   | aan   |
+|      | /aːŋ/  | aang  | aŋ    | aang  | ang   | aːŋ   | aang  | aang  |
+|      | /aːp̚/  | aap   | ap    | aap   | ab    | aːp   | aap   | aap   |
+|      | /aːt̚/  | aat   | at    | aat   | ad    | aːt   | aat   | aat   |
+|      | /aːk̚/  | aak   | ak    | aak   | ag    | aːk   | aak   | aak   |
+|      | /ɐi/   | ai    | ɐi    | ai    | ei    | ɐi    | ai    | ai    |
+|      | /ɐu/   | au    | ɐu    | au    | eo    | ɐu    | au    | au    |
+|      | /ɐm/   | am    | ɐm    | am    | em    | ɐm    | am    | am    |
+|      | /ɐn/   | an    | ɐn    | an    | en    | ɐn    | an    | an    |
+|      | /ɐŋ/   | ang   | ɐŋ    | ang   | eng   | ɐŋ    | ang   | ang   |
+|      | /ɐp̚/   | ap    | ɐp    | ap    | eb    | ɐp    | ap    | ap    |
+|      | /ɐt̚/   | at    | ɐt    | at    | ed    | ɐt    | at    | at    |
+|      | /ɐk̚/   | ak    | ɐk    | ak    | eg    | ɐk    | ak    | ak    |
+|      | /ɛː/   | e     | ɛ     | e     | é     | ɛː    | e     | e     |
+|      | /ei/   | ei    | ei    | ei    | éi    | ei    | ei    | ei    |
+|      | /ɛːu/  | eu    | (ɛu)  | (eu)  | (éu)  | ɛːu   | (eu)  | (eu)  |
+|      | /ɛːm/  | em    | (ɛm)  | (em)  | (ém)  | ɛːm   | (em)  | (em)  |
+|      | /ɛːŋ/  | eng   | ɛŋ    | eng   | éng   | ɛːŋ   | eng   | eng   |
+|      | /ɛːp̚/  | ep    | (ɛp)  | (ep)  | (éb)  | ɛːp   | (ep)  | (ep)  |
+|      | /ɛːk̚/  | ek    | ɛk    | ek    | ég    | ɛːk   | ek    | ek    |
+|      | /iː/   | i     | i     | i     | i     | iː    | i     | i     |
+|      | /iːu/  | iu    | iu    | iu    | iu    | iːu   | iu    | iu    |
+|      | /iːm/  | im    | im    | im    | im    | iːm   | im    | im    |
+|      | /iːn/  | in    | in    | in    | in    | iːn   | in    | in    |
+|      | /ɪŋ/   | ing   | iŋ    | ing   | ing   | ɪŋ    | ing   | ing   |
+|      | /iːp̚/  | ip    | up    | ip    | ib    | iːp   | ip    | ip    |
+|      | /iːt̚/  | it    | it    | it    | id    | iːt   | it    | it    |
+|      | /ɪk̚/   | ik    | ik    | ik    | ig    | ɪk    | ik    | ik    |
+|      | /ɔː/   | o     | ɔ     | o     | o     | ɔː    | o     | oh    |
+|      | /ɔːi/  | oi    | ɔi    | oi    | oi    | ɔːi   | oi    | oi    |
+|      | /ou/   | ou    | ou    | ou    | ou    | ou    | ou    | o     |
+|      | /ɔːn/  | on    | ɔn    | on    | on    | ɔːn   | on    | on    |
+|      | /ɔːŋ/  | ong   | ɔŋ    | ong   | ong   | ɔːŋ   | ong   | ong   |
+|      | /ɔːt̚/  | ot    | ɔt    | ot    | od    | ɔːt   | ot    | ot    |
+|      | /ɔːk̚/  | ok    | ɔk    | ok    | og    | ɔːk   | ok    | ok    |
+|      | /uː/   | u     | u     | u     | u     | uː    | u     | oo    |
+|      | /uːi/  | ui    | ui    | ui    | ui    | uːi   | ui    | ooi   |
+|      | /uːn/  | un    | un    | un    | un    | uːn   | un    | oon   |
+|      | /ʊŋ/   | ung   | uŋ    | ung   | ung   | ʊŋ    | ung   | ung   |
+|      | /uːt̚/  | ut    | ut    | ut    | ud    | uːt   | ut    | oot   |
+|      | /ʊk̚/   | uk    | uk    | uk    | ug    | ʊk    | uk    | uk    |
+|      | /œː/   | oe    | œ     | eu    | ê     | œː    | oe    | euh   |
+|      | /œːŋ/  | oeng  | œŋ    | eung  | êng   | œːŋ   | oeng  | eung  |
+|      | /œːk̚/  | oek   | œk    | euk   | êg    | œːk   | oek   | euk   |
+|      | /ɵy/   | eoi   | œy    | eui   | êu    | θy    | oey   | ui    |
+|      | /ɵn/   | eon   | œn    | eun   | ên    | θn    | oen   | un    |
+|      | /ɵt̚/   | eot   | œt    | eut   | êd    | θt    | oet   | ut    |
+|      | /yː/   | yu    | y     | yu    | ü     | yː    | y     | ue    |
+|      | /yːn/  | yun   | yn    | yun   | ün    | yːn   | yn    | uen   |
+|      | /yːt̚/  | yut   | yt    | yut   | üd    | yːt   | yt    | uet   |
+|      | /m̩/    | m     | m̩     | m     | m     | m̩     | m     | m     |
+|      | /ŋ̩/    | ng    | ŋ̩     | ng    | ng    | ŋ̩     | ng    | ng    |

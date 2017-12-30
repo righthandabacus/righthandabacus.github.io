@@ -5,3 +5,6 @@ table.dataTable.display tfoot td {
     padding: 1px;
     border: 0px;
 }
+table.dataTable a {
+    text-decoration: none !important;
+}

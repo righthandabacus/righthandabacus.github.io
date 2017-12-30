@@ -1,0 +1,88 @@
+---
+layout: post
+title: Zotac ID12 as Kodi Box
+date: 2016-05-28
+lastedit: Wed, 27 Dec 2017 10:29:07 -0500
+tags: system
+---
+
+[Zotac ID 12](https://www.zotac.com/us/product/mini_pcs/id12) hardware spec:
+
+- Intel Atom CPU D525 @1.8GHz (x64, dualcore, hyperthreading, SSE2, SSE3, SSSE3)
+- 4GB memory (204-pin SO-DIMM DDR3-800 x2, max 4GB)
+- Intel GMA 3150 graphics
+- HDMI and VGA output
+- SATA II storage
+- 6-in-1 card reader (MMC/SD/SDHC/MS/MS Pro/xD)
+- Realtek RTL8169 Ethernet (10/100/1000Mbps)
+- Atheros AR9285 Wireless (802.11n/g/b)
+- Audio, bluetooth, CIR infrared port, USB 2.0 (6 ports), eSATA
+
+# Install Debian
+Making bootable SD card: Use `dd` in Linux as OSX will have input file size >
+output size:
+
+    dd if=debian.iso of=/dev/rdisk3 bs=4M
+    sync
+
+Install barebone Debian on it. All hardware should work immediately. Extra
+packages to install:
+
+- xserver-xorg
+- kodi-standalone
+- xinit
+
+# Install kodi
+The kodi packages are available from the following apt source:
+
+```
+deb http://www.deb-multimedia.org jessie main non-free
+deb http://www.deb-multimedia.org jessie-backports main
+```
+
+Because Debian is using `systemd`, the following script should be added to
+`/etc/systemd/system/kodi.service`:
+
+```
+[Unit]
+Description = Kodi Open Source Home Theatre
+# After = syslog.target
+
+[Service]
+User = kodi
+Group = kodi
+PAMName = login
+TTYPath=/dev/tty7
+StandardInput = tty
+Type = simple
+Restart = always
+RestartSec = 5
+KillMode = process
+ExecStart = /usr/bin/xinit /usr/bin/kodi-standalone -- :0 -nolisten tcp vt7
+
+[Install]
+WantedBy = multi-user.target
+```
+
+which a dedicated user `kodi` should be added for this:
+
+    adduser --disabled-password --disabled-login --gecos "" kodi
+    usermod -a -G cdrom,audio,video,plugdev,users,dialout,dip,input,netdev kodi
+
+and finally reconfigure X11 to allow anyone (i.e., kodi) to start X server
+
+    dpkg-reconfigure x11-common
+
+Then enable and start kodi:
+
+    systemctl enable kodi
+    systemctl start kodi
+
+# Stretch upgrade
+(update 2017-12-27) The box was installed with jessie. Upgrade to stretch is to
+change the apt source lists (both Debian itself and deb-multimedia). In fact,
+kodi (17.1) is available in stretch's standard repository and deb-multimedia is no
+longer necessary.
+
+And Debian changed `/dev/tty*` to owned by group `tty`, hence kodi should be
+added to that group as well

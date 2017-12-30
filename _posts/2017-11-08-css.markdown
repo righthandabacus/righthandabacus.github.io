@@ -1,0 +1,77 @@
+---
+layout: post
+title: CSS layout
+date: Wed, 08 Nov 2017 13:44:42 -0500
+tags: code
+---
+
+The following describes some important CSS attributes to layout elements on a
+page.
+
+### display attribute
+
+`display` attribute present in every HTML element, it takes the value of the
+following among others:
+
+- `block`: begin from a new line and extend for full width, like a `<p>`
+- `inline`: element to place inside a paragraph, like a `<span>` or `<a>`
+- `none`: element is not shown *and* not occupy any space, like `<script>`
+  - on contrary, `visibility:hidden` will occupy space but not shown
+- `inline-box`: like `inline` but honours `width` and `height` to set the box
+    size
+  - `vertical-align` set for what should be the baseline for the box element
+
+other possible values of `display`: `flow`, `table`, or `list-item`, etc.
+
+### Box model
+
+`margin` attribute: clearance outside a box model. Set to `auto` to make an
+element with fixed width (e.g., `width` or `max-width` attributes) to position
+at the middle.
+
+`padding` attribute: clearance inside a box model, between border and the
+content.
+
+`border` attribute: the border of a box model, in between `margin` and `padding`
+
+`box-sizing` attribute: define what `width` should measure. By default it is the
+content. Setting this to `border-box` will make the width measuring border which
+includes the padding outisde content.
+
+`flex` attribute is for "remaining width" on a row. All elements on the row with
+the `flex` attribute set to a number will divide the width in proportion according to this
+value. `flex: none` will exclude the element from sharing the remaining width
+but keeps the size it specified by `width` attribute.
+
+### positioning
+
+The `position` attribute describes how `left`, `right`, `top`, and `bottom`
+should be interpreted. It can be `static` (default, in its current position),
+`relative` (offset from its current position), `fixed` (fixed relative to
+browser window according), `absolute` (relative to its closest parent container
+that has `position` attribute set to `relative`, `fixed` or `absolute`.
+
+The `float` attribute (set to `left` or `right`) is to move elements to left or
+right of the "row" regardless its position in the DOM. With a fixed size can
+make text flowing around an image, for example. Setting `clear` attribute to
+`left` or `right` or `both` can forbid other floating elements to position at this
+element's left or right but at its top and bottom instead. 
+
+When a container has a `float` element, it may overflow as a `float` element
+too big may not bounded by the container. Setting `overflow` attribute to `auto`
+will expand the container to cover it.
+
+If we do not set `display: inline-box`, using `float` is the solution to
+position a sequence of boxes on a row.
+
+### multiple columns
+
+Only in CSS3, setting `column-count` and the `column-gap` can layout text inside
+a box element in multiple columns
+
+### Reference
+- [學習css版面配置](http://zh-tw.learnlayout.com/no-layout.html)
+- Mozilla doc for [`display` element](https://developer.mozilla.org/en-US/docs/Web/CSS/display),
+  [`box-sizing` - element](https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing)
+- [Clearfix solutions (stackoverflow)](https://stackoverflow.com/questions/211383/what-methods-of-clearfix-can-i-use)
+- 

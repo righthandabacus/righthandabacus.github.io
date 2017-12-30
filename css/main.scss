@@ -48,7 +48,7 @@ $colour_text_meta: $colour2;
 $colour_text_more: $colour2;
 $colour_border: lighten($colour2,20%);
 $colour_marker: darken($colour2,20%);
-$colour_pager: $colour_bg_aux;
+$colour_pager: darken($colour_bg_aux,15%);
 
 $tableborder: 1px solid $colour_border;
 
@@ -81,6 +81,7 @@ $tableborder: 1px solid $colour_border;
  */
 header, section, footer, aside, nav, main, article, figure {
   display: block;
+  text-decoration: none !important;
 }
 
 
@@ -194,6 +195,9 @@ footer {
   border-top: $tableborder;
   font-size: 14px;
   margin: 0;
+  a {
+    text-decoration: none !important;
+  };
   .list-inline {
     padding: 0;
   };
@@ -297,17 +301,20 @@ hr.small {
   font-family: $font_title;
   letter-spacing: 2px;
   color: $colour_text_aux;
+  text-decoration: none !important;
 
   .nav li a {
     /*text-transform: uppercase;*/
     font-weight: 300;
     color: $colour_text_aux;
+    text-decoration: none !important;
   };
 
   /* sitename at left corner */
   .navbar-brand {
     font-size: 18px;
     color: $colour_text_main;
+    text-decoration: none !important;
   };
   .navbar-brand:hover,
   .navbar-brand:focus {
@@ -356,7 +363,6 @@ hr.small {
       a {
         padding: 10px;
         padding-left: 30px;
-        text-decoration: none !important;
         border-width: 0 1px 1px 1px;
       };
     };
@@ -691,5 +697,12 @@ td.code pre {
 td.gutter {
   padding-top: 3px;
 }
+
+/* tab navigation
+ */
+ul.nav.nav-tabs a,
+a.post-title {
+  text-decoration: none !important;
+};
 
 /* vim:set et ts=2 sw=2 bs=2 */

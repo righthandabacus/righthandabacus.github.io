@@ -1,0 +1,179 @@
+---
+layout: post
+title: The Minto Pyramid Principle
+subtitle: Barbara Minto / 2014
+date: 2017-12-20 17:33:00 -0500
+category: book
+bibtex:
+  type: book
+  title: The Minto Pyramid Principle. Logic in Writing, Thinking and Problem Solving
+  author: Barbara Minto
+  publisher: Minto International Inc
+  year: 2003
+  isbn: 0-9601910-4-6
+---
+
+The clearest sequence to write is "top-down", i.e., give summarizing idea before
+the individual ideas being summarized. This approach require the reader to
+comprehend with least mental effort.
+
+The idea to include in a writing therefore forms a pyramid, and should follow
+the following rules: [Ch1]
+
+- Ideas at any level must always summaries the ideas grouped below
+- Ideas in each grouping must be the same kind of idea
+- Ideas in each grouping must be logically ordered
+  - Deductively (major premise, minor premise, conclusion)
+  - Chronologically (first, second, third)
+  - Structurally (Boston, New York, Washington)
+  - Comparatively (most important, next most important)
+
+The vertical relationship in a pyramid structure is a "question-answer" dialogue
+with the reader. To ensure reader attention, we should not raise the question in
+reader's mind until we are ready to write the answer.
+
+The horizontal relationship, i.e., ideas in a group, should either be deductive
+(argument in successive steps) or inductive (ideas that can be described by the
+same plural noun, e.g., reasons or steps). [Ch2]
+
+# Build a pyramid
+Writing should be storytelling. Flow of a story is *situation, complication,
+question, and answer* (S-C-Q-A). It is easier to arouse reader's interest by
+reminding reader the questions he can expect to answer. [Ch2]
+
+Situation should be proposed to build reader's interest. It creates a
+psychological effect to tell reader the things he will agree prior to things he
+may disagree. Complication of the situation is what happened that inevitably
+leads to a question. [Ch4]
+
+There are two ways to build a pyramid structure:
+
+- Top-down
+  - Make up Q & A, then identify the S & C
+  - Build pyramid after recheck the logic make sense
+- Bottom up
+  - List all points you want to make
+  - Work out the relationship (cause-and-effect) between them, then draw conclusions
+
+Usually it is easier to think by starting from situation. And more efficient to
+communicate by inductive grouping of ideas. [Ch3]
+
+In writing, however, there could be different orders of S-C-Q-A: [Ch4]
+
+- Standard: situation-complication-solution
+- Direct: Solution-situation-complication
+- Concerned: Complication-situation-solution
+- Aggressive: Question-situation-complication
+
+# Thinking
+Deductive ideas are connected with "therefore", and inductive ideas are several
+different things similar in some way that brings them together in a group.
+
+Inductive groupings: [Ch6]
+
+- Time order: cause and effects
+  - grouping of steps of actions
+  - should be <5 items, include only the closely related ones
+- Structural order
+  - reflects what you see once you have visualized something
+  - points should be mutually exclusive of each other and collectively
+    exhaustive of the whole (MECE)
+- Degree order
+  - class groupings (grouping = rough categories of smaller items)
+
+After grouping for inductive ideas, we write the summary point. The summary
+point should not be *intellectually blank*, e.g., not to say "he did it for
+three reasons" but to say "he did it because they are teh same kind of people".
+The summary should state the specific effects achieved by subordinate ideas
+together.
+
+We should avoid gibberish sentences. The effect mentioned in the summary point
+should be specific and avoiding vague language. A good summary should reflect a
+direct end product from the actions. It should answer the following:
+[Ch7]
+
+- What we are expected to do?
+- How will we know we have done it?
+
+A proper summary statement helps to find out what you really think and verifies
+the grouping is correct. The grouping should be:
+
+- All ideas that possess a characteristic in common, which the summary will be
+  the significance of their similarity
+- Actions that must be taken together to achieve a desired effect, which the
+  summary will be the effect
+
+# Problem solving techniques
+
+Sequential analysis:
+1. Is there likely to be a problem or opportunity? (*Define the problem*)
+2. Where does it lie?
+3. Why does it exist? (*Structure the analysis*)
+4. What could we do about it? (*Find the solution*)
+5. What should we do about it?
+
+Four elements to define a problem: [Ch8]
+1. Starting point/Opening scene
+2. The disturbing event
+   - external (competitor, new technology)
+   - internal (expanded to new market, change of business process)
+   - recently recognized (lagging performance, shift in customer attitude)
+3. Undesired result (R1)
+4. Desired result (R2)
+
+In 1950-1960s, the early days of consulting, the standard approach is to
+identify the key factor for success in the industry and compare with client's
+strength and weaknesses. Then develop specific recommendations to capitalize on
+opportunities and solve problems. This approach was wasteful as the facts found
+by the consultants are only marginally connected to the client's real problem.
+
+The improved approach is to structure the analysis of the problem before
+gathering any data (the classic scientific method):
+1. Generate alternative hypotheses
+2. Devise crucial experiments with alternative possible outcomes, each should
+   exclude one ore more of the hypotheses
+3. Carry out experiments
+4. Plan remedial actions accordingly
+
+Picture techinques to diagnose a problem (for revealing a problem, not to be
+confused with decision trees or PERT diagrams):
+
+- structure chart: Trace the cause-effect elements, activities, or tasks that
+  make up a particular end result
+- choice diagram: visualize the sequential process, and possible bifurcations
+- logic tree: generate possible solutions and the likely impact (step 4-5 in sequential analysis)
+
+The picture is a explanatory vehicle for communication, you can tell
+
+- What the structure/system looks like today as it delivers R1
+- What the structure/system ideally should look like to deliver the desired R2
+- What are the major decision variables (MDVs, environmental, economic,
+  administrative, and social factors affecting each activity), and how the MDVs
+  would affect performance [Ch9]
+
+# Presentation
+
+Written presentation: Should have your entire thinking in the first 30 seconds
+of reading.
+
+Reflecting pyramid hierarchy: by headings (heading levels, numbered points,
+indented display, dot-dash outlines). Standard set of headings in consulting
+proposals: [Ch 10]
+- Introduction
+- Background
+- Objectives and scope
+- Issues
+- Technical approach
+- Work plan and deliverables
+- Benefits
+- Firm qualifications and related experience
+- Timing, staffing, and fees
+
+We do all our conceptual thinking in images rather than in words (visual
+imagery).  A useful way to help yourself write lucid prose is to force yourself
+to visualize the relationships inherent in your ideas. Once you have a clear
+mental image, you can straightaway translate it into sentences. [Ch12]
+
+Screen presentation: Slides should be simple, not to serve as handouts [Ch11]
+- brevity: ≤6 lines or ≈30 words on a single line
+- text size: Distance to farthest viewer (feet) ÷ 32 = smallest legible letter size (inch)

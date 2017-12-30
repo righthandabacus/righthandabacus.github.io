@@ -1,0 +1,93 @@
+---
+layout: post
+title: Rooting Asus Transformer TF300-T
+date: 2015-10-25
+tags: system
+---
+
+From unlock to after flashing. To revitalize a old tablet.
+
+# Step 1: unlock
+
+- The system has build 10.6.1.27.5 (Android 4.2)
+- Install Unlock tool v8 from Asus
+- Delete Google account from Android as the unlock tool cannot compare the Google password anymore
+- Run unlock tool, and let it remove the device
+- During reboot, it shows message that it is being unlocked
+
+# Step 2: move to fastboot mode
+- power it down
+- hold power + vol down key to power it up again
+- It shows "RCK", android, and "wipe data" icons
+- now the device is in "fastboot" mode (as indicated by the message at top left corner)
+
+# Step 3: TWRP for recovery
+- Download from <http://forum.xda-developers.com/transformer-tf300t/development/recovery-twrp-t3046479>
+- The file `twrp_tf300t_kang_2.8.7.2.img`
+- Run these commands:
+
+```
+$ fastboot devices
+015d15b4d723ee12        fastboot
+$ fastboot -i 0x0B05 flash recovery twrp_tf300t_kang_2.8.7.2.img
+sending 'recovery' (7126 KB)...
+OKAY [  2.762s]
+writing 'recovery'...
+OKAY [  7.874s]
+finished. total time: 10.636s
+$ fastboot reboot
+rebooting...
+
+finished. total time: 0.020s
+```
+
+- Now the device has a stock ROM with custom recovery image
+
+# Step 4: Make a backup before flashing
+
+- Power down the device again and boot it up to fastboot mode once more
+- With "RCK" icon flashing, push vol up button. The device should say "Booting recovery image"
+- Then TWRP is being loaded
+- Make a backup from TWRP, backup is at sdcard/TWRP directory and only the system, no user data
+- The backup I see is 2255MB
+- After back up, select "Reboot"
+
+# Step 5: Installing a ROM
+
+- Obtain from from <http://forum.xda-developers.com/transformer-tf300t/development>
+- ROM of choice = [`KatKiss-5.1_TF300T_029.zip`](http://forum.xda-developers.com/transformer-tf300t/development/rom-t2932783)
+- Other packages to download:
+  - Gapps: `gapps-KatKiss-5.1_TF300T_20150920.zip`
+  - Latest SuperSU: ``SuperSU.zip``
+  - Sound improvements & misc : `K.A.T_V2.1.0.apk`
+- Copy KatKiss, gapps to sdcard
+- Unplug USB cable, boot into recovery mode (power+vol down, then vol up on RCK)
+- Wipe data for factory reset
+- Install, find the zip file for KatKiss, and confirm with that
+- After install, alsow wipe cache and dalvick cache partitions
+- Then install the gapps zip in similar way
+- Then reboot
+- Need to wait for some time at first boot
+- Then configuration from scratch
+
+# Post installation
+
+- KatKiss doesn't work well with external SD cards
+- Used Cyanogenmod CM12 instead
+- Install apk failed in CM12, then needed to turn on developer mode, run adb shell, then:
+
+```
+su # to get root
+pm set-install-location 1 # to install to internal instead of auto
+chmod 777 /data/local
+chmod 777 /data/loca/tmp  # fix permission problem
+pm install /storage/sdcard1/path.to.apk  # do the install
+exit # leave root
+```
+
+- Install by `pm install` must be in `/storage/sdcard1` instead of `/mnt/media_rw/sdcard1` because only the former is readable by non-root (the user of pm)
+
+# Resource
+- <http://www.transformerforums.com/forum/transformer-pad-300-development/41508-guide-how-root-install-roms-tf300-jelly-bean-kitkat-lollipop-roms.html>
+- <http://forum.xda-developers.com/transformer-tf300t/development>
+

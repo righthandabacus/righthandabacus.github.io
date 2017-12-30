@@ -59,7 +59,7 @@ gems:
 # Navigation bar config
 
 # Square image to show in the navigation bar (optional)
-avatar: "/img/avatar.png"
+avatar: "/img/avatar.jpg"
 
 # List of links in the navigation bar
 navbar:
