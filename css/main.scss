@@ -32,7 +32,7 @@ $colour1: #00192C; // body text black, variation: lighten
 $colour2: #7F919E; // disqus bluish-gray, variation: darken or lighten
 
 /* colour roles */
-$colour_bg_main: $colour0;
+$colour_bg_main: darken($colour0,5%);
 $colour_bg_aux: darken($colour_bg_main,10%);
 $colour_bg_hover: darken($colour_bg_main,15%);
 $colour_bg_menuhover: darken($colour_bg_aux,10%);
@@ -505,8 +505,8 @@ hr.small {
 
   .page-heading, .post-heading {
     padding: 100px 0;
-    color: $colour_bg_main;
-    text-shadow: 1px 1px 3px lighten($colour_text_main,80%);
+    color: rgba($colour_bg_main,0.5);
+    text-shadow: 1px 1px 3px rgba(lighten($colour_text_main,80%),0.5);
   }
 
   .page-heading {

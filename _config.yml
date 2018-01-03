@@ -30,7 +30,7 @@ paginate_path: '/page/:num'
 kramdown:
   input: GFM
 
-gems:
+plugins:
   - jekyll-feed
   - jekyll-paginate
   - jekyll-sitemap
