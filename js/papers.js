@@ -1,5 +1,5 @@
 $(document).ready(function(){
-    var numcols = $('#fordatatable thead tr').length;
+    var numcols = $('#fordatatable th').length;
     $('#fordatatable').DataTable({
         order: [[numcols-1,'desc']],
         pageLength: 10,
