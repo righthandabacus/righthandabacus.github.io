@@ -2,7 +2,7 @@
 layout: post
 title: "Skills for a Higher Productivity"
 date: 2006-09-24 03:59:07 +0800
-tags: business
+tags: work
 category: blog
 ---
 Things can help productivity:

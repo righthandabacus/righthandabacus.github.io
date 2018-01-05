@@ -2,7 +2,7 @@
 layout: post
 title: "How to use MAMSolver"
 date: 2004-11-02 22:20:19 +0800
-tags: code business
+tags: code work
 ---
 # How to use MAMSolver
 

@@ -2,7 +2,7 @@
 layout: post
 title: "Papers related to TCP research"
 date: 2011-07-06 12:41:06 -0400
-tags: business
+tags: work
 ---
 
 Some of the TCP papers I read in recent years, with short notes.

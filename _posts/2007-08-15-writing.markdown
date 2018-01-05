@@ -2,7 +2,7 @@
 layout: post
 title: "Writing (in English)"
 date: 2007-08-15 05:14:22 +0800
-tags: business
+tags: work
 ---
 
 Objectives of writing: Correctness, clarity and grace.

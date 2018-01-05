@@ -2,7 +2,7 @@
 layout: post
 title: "Filters for photography"
 date: 2007-05-22 05:37:02 +0800
-tags: business
+tags: work
 ---
 
 ## Colored filters

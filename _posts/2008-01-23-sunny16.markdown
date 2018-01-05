@@ -2,7 +2,7 @@
 layout: post
 title: "Sunny 16 Rule"
 date: 2008-01-23 15:10:41 -0500
-tags: business
+tags: work
 ---
 
 Sunny 16 rule says that in a sunny day, shooting shall set the shutter to the same ISO as the film and the aperture to f/16 to maintain the correct amount of light to come through. Setting shutter at the double of speed of ISO shall open the aperture to double in size as well, i.e. f/8.

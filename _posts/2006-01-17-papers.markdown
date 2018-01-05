@@ -2,7 +2,7 @@
 layout: post
 title: "Papers skimmed for my MPhil"
 date: 2006-01-17 12:00:00 +0800
-tags: business
+tags: work
 ---
 
 Some of the TCP papers I read during my M.Phil study, with short notes.

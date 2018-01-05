@@ -2,7 +2,7 @@
 layout: post
 title: "Depth of Field"
 date: 2007-05-22 04:59:16 +0800
-tags: business
+tags: work
 ---
 
 To make a deeper [DOF](http://en.wikipedia.org/wiki/Depth_of_field), we can use:

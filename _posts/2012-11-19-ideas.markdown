@@ -2,7 +2,7 @@
 layout: post
 title: "Start-up ideas"
 date: 2012-11-19 11:48:35 -0500
-tags: business
+tags: work
 category: blog
 ---
 Ways to think of ideas for a start-up: From Wesley Tansey's [blog post](http://wesleytansey.com/how-to-find-startup-ideas/)

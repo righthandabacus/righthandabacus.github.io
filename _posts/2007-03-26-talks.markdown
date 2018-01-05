@@ -3,7 +3,7 @@ layout: post
 title: "My Presentations and Talks"
 date: 2007-03-26 08:42:05 +0800
 lastedit: 2012-01-27 20:14:06 -0500
-tags: business
+tags: work
 ---
 
 People asked me to give presentations and talks often. Below are some of my materials.

@@ -2,7 +2,7 @@
 layout: post
 title: "Unmaintainable code"
 date: 2005-11-22 00:13:15 +0800
-tags: code business
+tags: code work
 ---
 
 This is a very funny, nice piece of article for [writing unmaintainable code](http://thc.org/root/phun/unmaintain.html).

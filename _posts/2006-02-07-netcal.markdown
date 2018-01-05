@@ -2,7 +2,7 @@
 layout: post
 title: "Network Calculus"
 date: 2006-02-07 11:27:42 +0800
-tags: business
+tags: work
 ---
 
 After my thesis-writing exercise, I returned to research.

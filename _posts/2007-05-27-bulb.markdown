@@ -2,7 +2,7 @@
 layout: post
 title: "Bulb mode and Time mode"
 date: 2007-05-27 23:22:56 +0800
-tags: business
+tags: work
 ---
 
 My D70 camera actually supports mirror lock-up for shotting in a limited sense.

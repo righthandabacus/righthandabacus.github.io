@@ -2,7 +2,7 @@
 layout: post
 title: "Dairy on the Implementation of AC in NS2"
 date: 2006-02-21 14:16:35 +0800
-tags: code business
+tags: code work
 ---
 I have the experience on coding NS2, but I put it aside for a year already. Now I think I must implement the AC code into NS2 so that we can do some "experiments". The next step after the NS2 coding would be a Linux kernel hack.
 

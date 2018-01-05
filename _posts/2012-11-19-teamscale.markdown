@@ -2,7 +2,7 @@
 layout: post
 title: "Scaling a Development Team"
 date: 2012-11-19 11:01:41 -0500
-tags: business
+tags: work
 category: blog
 ---
 # Scaling a Development Team

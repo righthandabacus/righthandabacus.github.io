@@ -1,7 +1,7 @@
 ---
 title: "Math Courses and Tutorials"
 date: 2007-03-26 08:45:15 +0800
-tags: business math
+tags: work math
 ---
 Below are the materials derived from my courses or tutorials. Hope that somebody will find it useful.
 

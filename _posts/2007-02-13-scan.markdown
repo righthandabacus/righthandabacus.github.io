@@ -2,7 +2,7 @@
 layout: post
 title: "Image Scanning Tips"
 date: 2007-02-13 07:04:24 +0800
-tags: business
+tags: work
 ---
 
 According to "dscans", about smoothing skins:

@@ -2,7 +2,7 @@
 layout: post
 title: "Chinese Language Processing"
 date: 2007-03-28 13:40:40 +0800
-tags: code business
+tags: code work
 ---
 
 This is part of CUPIDE (http://cupide.cse.cuhk.edu.hk).

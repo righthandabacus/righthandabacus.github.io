@@ -1,7 +1,7 @@
 ---
 title: "My HKALE Notes"
 date: 2007-03-27 16:07:25
-tags: business
+tags: work
 ---
 These are really really old stuff.
 

@@ -2,7 +2,7 @@
 layout: post
 title: "GRE Computer Science Study"
 date: 2006-10-29 03:00:25 +0800
-tags: business
+tags: work
 ---
 
 ## Recursion

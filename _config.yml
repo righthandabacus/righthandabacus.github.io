@@ -66,6 +66,7 @@ navbar:
   Collections:
     - Papers: "papers"
     - Books: "books"
+    - Tagged posts: "tag"
   About: "about"
 
 
