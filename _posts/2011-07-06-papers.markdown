@@ -1,0 +1,115 @@
+---
+layout: post
+title: "Papers related to TCP research"
+date: 2011-07-06 12:41:06 -0400
+tags: business
+---
+
+Some of the TCP papers I read in recent years, with short notes.
+
+## Miscellaneous
+
+[Downey (2007) TCP Self-Clocking and Bandwidth Sharing (ComNet)](../2009-10-19-d07-selfclock/):\\
+When cwnd $>$ BDP, TCP undergoes self-clocking. That is, the sending rate is limited by the bottleneck bandwidth, but not the cwnd.
+
+[Dukkipati et al (2010) An Argument for Increasing TCP’s Initial Congestion Window (CCR)](../2011-05-09-drcchajs10-cwnd/):\\
+According to Google's statistics on the web, most web page fits in 10MSS. So if we increase the initial window size to 10MSS or more, the web page can be returned in a burst without the need for acknowledgement, hence the response time can be faster.
+
+[Malhotra et al (2005) Modeling the interaction of IEEE 802.3x hop-by-hop flow control and TCP end-to-end flow control (NGI)](../2009-10-01-mhmn05-8023x/):
+
+[Pathak et al (2010) Measuring and Optimizing TCP Splitting for Cloud Services (PAM)](../2010-06-04-pwhghlr08-splittcp/):
+
+[Sarolahti, Allman and Floyd (2007) Determining an appropriate sending rate over an underutilized network path (ComNet 51(7))](../2009-01-10-sarolathi-determining/):
+
+[ACM SIGCOMM CCR 35:2 2005 Invited Editorials: Making Router Buffers Much Smaller](../2009-10-05-sigcomm05-smallbuffer/):
+
+[Sarolahti and Kuznetsov (2002) Congestion Control in TCP (Usenix)](../2010-06-04-sk02-tcp/):
+
+[Shor et al (2000) Application of control theory to modeling and analysis of computer systems (RESCCE)](../2009-10-05-slwsp00-control/):\\
+Use control theory to model TCP
+
+## Incast
+
+[Krevat et al (2007) On Application-level Approaches to Avoiding TCP Throughput Collapse in Cluster-based Storage Systems (SC)](../2011-07-20-kvpaggs07-incast/):\\
+Describes the application-layer approach to solve incast, aimed at preventing a massive parallel synchronized read to happen.
+
+[Phanishayee et al (2008) Measurement and Analysis of TCP Throughput Collapse in Cluster-based Storage Systems (FAST)](../2011-07-20-pkvaggs08-incast/):\\
+Describes the incast problem in storage networks, by experimenting with three different models of switches. According to the result, something can be done to mitigate incast: (1) better TCP, e.g. NewReno to catch losses better without resolving to RTO; (2) playing with dupacks or limited transmit to make TCP easier to retransmit rather than waiting for RTO; (3) disable slow-start for short flows to make it less aggressive to occupy buffer, so that when there is loss, it would be less severe; (4) cutting the RTO to microsecond granularity.
+
+[Vasudevan et al (2009) A (In)Cast of Thousands: Scaling Datacenter TCP to Kiloservers and Gigabits (CMU TR)](../2011-07-08-vpskagg09-incast/):\\
+The tech report to study incast in data center, but still takes storage network as an example. It proposes the following to alleviate incast: (1) smaller RTO; (2) disable delayed ACK; (3) randomize RTO value to desynchronize the retransmissions.
+
+[Chen et al (2009) Understanding TCP Incast Throughput Collapse in Datacenter Networks (WREN)](../2011-07-20-cglkj09-incast/):\\
+Analysis of incast in data center environment (i.e. running MapReduce). It found that, goodput vs number of servers has a U-shape curve, i.e. initially decreasing, then increasing, then decreasing again. Ideally the goodput should be linearly increasing with number of servers, as each server is sending a fixed amount of data. The initial decrease is due to more severe RTO. The increase is due to the retransmission after RTO being paced out, due to the ACKs sending back goes through a single output buffer. The final decrease is a result of retransmission interferes with transmission as the number of servers increased.
+
+[Devkota & Reddy (2010) Performance of Quantized Congestion Notification in TCP Incast Scenarios of Data Centers (MASCOTS)](../2011-07-20-dr10-incast/):\\
+Simulation-based study of 802.1Qau to solve incast problem. It shows that, 802.1Qau cannot help mitigating incast and sometimes worsen the case. To make it helpful, we need to sample every packet instead of randomly.
+
+[Alizadeh et al (2010) Data Center TCP (DCTCP) (SIGCOMM)](../2012-01-28-agmpppss10-dctcp/):\\
+Paper from MSR Seattle to proposed DCTCP, a solution using ECN to prevent long-lasting flow to eat up all the buffers so that the loss would not be so severe when a burst (e.g. incast) comes.
+
+[Wu et al (2010) ICTCP: Incast Congestion Control for TCP in Data Center Networks (CoNEXT)](../2011-07-20-wfgz10-ictcp/):\\
+A paper from MSRA to propose ICTCP. Instead of adjusting cwnd, it adjusts the rwnd at the receiver side (i.e. the client of the incast) to throttle the flow rate.
+
+[Shpiner & Keslassy (2010) A Switch-Based Approach to Throughput Collapse and Starvation in Data Centers (IWQoS)](../2011-07-20-sk10-incast/):\\
+Solving incast using a switch: Use two queues, one for high priority and one for low priority, to send traffics. The high priority queue is for those flow who are underserved, i.e. new flows or small flows. Then packet drop is biased against big flows, and the bandwidth used by concurrent flows can be more fair. The incast problem can be solved accordingly (if it is not very severe) as it favours the small flows.
+
+[Zhang et al (2011) Shrinking MTU to Mitigate TCP Incast Throughput Collapse in Data Center Networks (ICCMC)](../2011-07-20-zwc11-mtu/):\\
+Proposed to use a smaller MTU in order to accomodate more packets in the switch buffer. This also means the TCP window can be larger in terms of number of packets. A larger TCP window is easier to capture packet loss by duplicated acknowledgement, and hence less susceptible to time out.
+
+[Podlesny & Williamson (2011) An Application-Level Solution for the TCP-incast Problem in Data Center Networks (IWQoS)](../2011-07-20-pw11-incast/):\\
+Gives a formula for application to send parallel transfer requests in batches, so that incast will not occur. As we know, incast occur only if "massive" fan-in, by limiting the number of parallel flows, it can avoid incast.
+
+[Zhang et al (2011) Modeling and Understanding TCP Incast in Data Center Networks (INFOCOM)](../2011-07-20-zrl11-incast/):\\
+Analytic paper on the detail of incast. It claims that two reasons for incast: BTTO and BHTO. The latter is due to packets from the whole window are dropped, the former is having packet drop from the last few packet of a connection so that not enough packets to initiate duplicated ACK. It finds from the analytical model that when number of concurrent connections are small, BTTO dominates; when the number is large, BHTO dominates.
+
+[Zhang & Ansari (2011) On Mitigating TCP Incast in Data Center Networks (INFOCOM)](../2011-07-20-za11-incast/):\\
+Proposes fair QCN as an extension to IEEE 802.1Qau QCN so that when rate shall be cut, all concurrent flows are aligned to the same sending rate instead of having one flow to bear all the bandwidth decrease. This is from the observation that, when incast happens, the slowest flow determines the goodput. By making all flows send at same speed, we decrease the throughput disparity between slow flow and fast flow, thus improve overall link utilization.
+
+[Kulkarni & Agrawal (2011) A Probabilistic Approach to Address TCP Incast in Data Center Networks (ICDCS)](../2011-08-09-ka11-incast/):\\
+Propose to proactively retransmit the last unacknowledged segments in a probability. Such retransmission is not due to any confirmation from the receiver but entirely random. Therefore, it can help triggering the fast retransmit without having to resolve to retransmission timeout.
+
+## Reordering
+
+[Ludwig and Katz (2000) The Eifel Algorithm: Making TCP Robust Against Spurious Retransmissions (CCR)](../2009-10-15-lk00-eifel/):\\
+A proposal to exploit the timestamp option of TCP to detect spurious retransmissions. If spurious retransmission is detected, we can restore the decreased window as that was a mistaken congestion signal.
+
+[Zhang et al (2002) RR-TCP: A Reordering-Robust TCP with DSACK (ICSI Tech Report)](../2009-10-15-zkfp02-dsack/):\\
+Proposes the DSACK option in TCP to report duplicated packets to the sender. This is to capture the false fast retransmit and notify the sender to undo the corresponding window decrease. The sender can prevent spurious retransmit by increasing `dupthresh` using the DSACK data. It holds a scoreboard to remember the size of fast retransmit. By keeping the statistics, a TCP socket can learn from history on the best value for `dupthresh` to prevent spurious retransmission.
+
+[Blanton and Allman (2002) On Making TCP More Robust to Packet Reordering (CCR)](../2009-10-14-ba02-tcprobust/):\\
+Studies the effect of spurious retransmission. It suggested to undo the window decrease by remembering the previous window size before the decrease and if spurious retransmission is detected, restore its value. Several solutions are proposed for handling or detecting spurious retransmission, namely, Eifel algorithm, DSACK, ACK returned in shorter than min observed RTT. This paper also studies increasing `dupthresh` dynamically by learning the spurious retransmission characteristics of the network. Also proposed is to set a retransmit timer to hold back the retransmission a bit to see if the missing packet will arrive.
+
+[Lee et al (2002) Improving TCP Performance in Multipath Packet Forwarding Networks (JCN)](../2009-10-16-lpc02-multipathtcp/):\\
+Assumes TCP on a multipath network so that reordering occurs. To avoid spurious retransmission, both sender and receiver are involved. The sender increases `dupthresh` and receiver delays the ACK for out-of-order arrivals.
+
+[Bhandarkar and Reddy (2004) TCP-DCR: Making TCP Robust to Non-Congestion Events (IFIP Networking)](../2009-10-16-br04-tcpdcr/):\\
+During congestion avoidance phase, the `cwnd` operates as usual, i.e. MD for duplicated ACKs. However, fast retransmit is not done until after a delay (e.g. one SRTT). For each ACK received in the meantime, new packets are sent to maintain the self-clocking. Once the delay timer expires, packets are retransmitted, and the TCP carry out fast recovery.
+
+[Ma and Leung (2004) Improving TCP Reordering Robustness in Multipath Networks (LCN)](../2009-10-15-ml04-tcpreorder/):\\
+Propose to use DSACK to help adjusting `dupthresh` to avoid spurious retransmission. The adjustment is to set `dupthresh` to the mean+one mean deviation of the size of spurious retransmission. But if retransmission timeout, `dupthresh` is decreased multiplicatively.
+
+[Sathiaseelan and Radzik (2004) Improving the Performance of TCP in the Case of Packet Reordering (HSNMC)](../2009-10-16-sr04-rntcp/):\\
+It proposes "RN-TCP" which asks the routers to notify about the packet drops. Then, spurious retransmission can be avoided because the dupacks with no notification from any router is probably just due to reordered packets.
+
+[Bohacek et al (2006) A New TCP for Persistent Packet Reordering (TON)](../2009-10-15-bhllo06-tcppr/):\\
+It proposes "TCP-PR" for persistent reordering networks, such as multipath networks, reordering is a normal behaviour due to delay differences. It helps TCP to differentiate packet drop and reordering by holding an expected time for ACK arrival for each packet. If ACK for that packet is not arrived, it is believed to be dropped and to be retransmitted. This way, a dupack does not necessarily generate retransmission.
+
+[Komattireddy and Vokkarane (2007) Source-Ordering for Improved TCP Performance over Load-Balanced Optical Burst-Switched (OBS) Networks (BROADNETS)](../2009-10-13-kv07-srcorder/):\\
+On a network with precise knowledge on delay differentials between different paths, we reorder the packet at the source to make the arrival in order.
+
+[Leung et al (2007) An Overview of Packet Reordering in TCP: Problems, Solutions, and Challenges (Tran. Parallel & Dist Sys)](../2009-10-16-lly07-tcpsurvey/):\\
+Survey paper on different approaches to handle TCP packet reordering. It separate the solutions into ordinal approach and temporal approach. The former is to adjust the TCP algorithm, and the latter takes time into account to help.
+
+## TCP-Friendliness
+[Feng and Xu (2008) TCP-Friendly CBR-Like Rate Control (ICNP)](../2008-10-29-feng-tcpcbr/):
+
+## High BDP networks
+[Popa et al (2010) CloudPolice: Taking Access Control out of the Network (HotNets)](../2010-10-07-pykrs10-cloudpolice/):
+
+[Katabi et al (2002) Congestion Control for High Bandwidth-Delay Product Networks (SIGCOMM)](../2009-10-07-khr02-xcp/):\\
+(introducing XCP)
+
+[Jin et al (2003) FAST TCP: Motivation, Architecture, Algorithms, Performance (Caltech CS TR)](../2009-10-02-jwl03-fasttcp/):
+
+[Wu et al (2009) Sync-TCP: A New Approach to High Speed Congestion Control (ICNP)](../2009-10-06-wcag09-synctcp/):
