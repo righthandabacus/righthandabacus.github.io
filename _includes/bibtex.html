@@ -1,6 +1,6 @@
 {% if page.bibtex %}
 <h2>Bibliographic data</h2>
-<pre><code class="Java">@{{ page.bibtex.type }}{
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@{{ page.bibtex.type }}{
 {% for tuple in page.bibtex %}{% unless tuple[0] == 'type' %}   {{ tuple[0] }} = "{{ tuple[1] }}",
-{% endunless %}{% endfor %}}</code></pre>
+{% endunless %}{% endfor %}}</code></pre></div></div>
 {% endif %}

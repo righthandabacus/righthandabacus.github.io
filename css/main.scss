@@ -2,7 +2,7 @@
 ---
 $font_title: 'CjkTitleFont','Open Sans Condensed','Open Sans','Noto Sans','Helvetica','Helvetica Neue','Neue Helvetica','Arial',sans-serif;
 $font_fancy: 'CjkFancyFont','Cormorant Upright','Times','Times New Roman',cursive;
-$font_body: 'CjkBodyFont','Cormorant','Times','Times New Roman','Noto Serif',serif;
+$font_body: 'CjkBodyFont','EB Garamond','Times','Times New Roman','Noto Serif',serif;
 
 @font-face {
   font-family: "CjkTitleFont";
@@ -623,8 +623,9 @@ hr.small {
   }
   .post-read-more {
     font-style: italic;
-    font-weight: 700;
+    font-weight: 400;
     color: $colour_text_more;
+    float: right;
   }
 }
 .post-preview:last-child {
