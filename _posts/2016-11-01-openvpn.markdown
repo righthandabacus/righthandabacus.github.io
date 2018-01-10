@@ -1,0 +1,61 @@
+---
+layout: post
+title: OpenVPN setup in Debian Jessie
+date: 2016-11-01 12:23 -0400
+category: system
+---
+
+Environment: Debian Jessie
+
+Kernel 3.16.0-4-amd64 #1 SMP Debian 3.16.36-1+deb8u1 (2016-09-03) x86_64 GNU/Linux
+
+Debian package `openvpn`: OpenVPN 2.3.4-5+deb8u1
+
+Config file (install to `/etc/openvpn/myname.conf`):
+
+```
+client
+dev tun
+
+# OpenVPN host - default node
+remote vpn-endpoint.example.com
+# backups
+remote vpn-endpoint-1.example.com
+remote vpn-endpoint-2.example.com
+
+port 11944
+
+# Cert/Key
+ca /path/to/ca_cert.crt
+cert /path/to/user_cert.crt
+
+# Prevent MITM by requiring key-usage to be 'server'
+ns-cert-type server
+
+key /path/to/user_key.key
+
+# Beware, Google central config can not provision clients with this directive
+# comp-lzo
+
+max-routes 250 
+explicit-exit-notify
+
+# Run resolv.conf to fix DNS, requires script-security 2
+up /etc/openvpn/update-resolv-conf
+down /etc/openvpn/update-resolv-conf
+script-security 2
+```
+
+Install:
+
+    $ apt-get install openvpn
+
+Manual bring up VPN tunnel (e.g., for testing):
+
+    openvpn --config /etc/openvpn/myname.conf
+
+# Notes
+
+- The `systemd` script requires that the OpenVPN client config file `/etc/openvpn/myname.conf` to bear suffix `.conf` in order to run at boot time.
+- In the config file, certs and keys must use full path
+- Specify in the config file to call script `/etc/openvpn/update-resolv-conf` at tunnel up/down to add tunneled DNS (remember to `chmod a+x`)

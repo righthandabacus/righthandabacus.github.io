@@ -1,0 +1,1034 @@
+---
+
+layout: post
+title: Collateral Loan Obligations and others
+date: 2017-09-15 12:01 -0400
+categories: work
+published: true
+
+---
+
+Various thing about CLOs or other structured fixed income product.
+
+# Overview, terms
+
+Collateralised loan obligations: generally between ﹩300M to ﹩1B in size and own loans issued by 80--300 borrowers
+  - CLOs are companies with very limited purpose and no staff of their own
+  - Special purpose vehicles (SPV, aka issuer or depositor) with a manager company
+     - usually based in jurisdictions that pay no corporation tax
+     - issue notes to raise fund to buy the loans in the pool
+  - CLO has a predetermined life span
+     - a final maturity date which it will be unwound (notes issued are retired)
+     - in practice, investors will get their money back long before then
+  - CLO has limited redemption
+     - investor's money is locked away longer and more tightly than in most funds
+     - CLO can only be redeemed if its equity investors vote to wind it up
+  - CLOs can borrow money to increase equity return
+     - debt is committed for the lifetime of the CLO, a.k.a. term funding
+     - other funds' debt can demand repayment if funds' investment falls below
+       a certain level, a.k.a. market value-based funding
+     - debt in CLOs: note
+  - securitisation: backed by a pool of loans
+     - loans in most securitisation are either static or replaced only then they are repaid
+     - CLO manager makes decisions about which loans to buy and sell in the market
+     - CLO is a hybrid between a fund and a conventional securitisation
+
+Tranche: French word for a slice
+- different tranche, different level of credit production or risk exposure
+- some tranche absort early repayments (i.e., other has more predictible cash flow)
+- two waterfall may exists on loans and mortgages as it is easy to differentiate
+  the principal repayment and interest
+  - interest waterfall, principal waterfall
+     - order to allocate payments: make some note more senior than others
+  - corporate bonds: principal is paid in one lump sum at maturity
+- Tranche warfare: 
+  upon default, different tranches have conflicting goals, e.g., foreclose on a
+  defaulted mortgage or modify the mortgage.
+  - in the past, the fiduciary can exercise their judgement for their interest.
+    Now, no such fiduciary exists.
+
+Overcollateralization (OC): pooling assets of principal amount greater than the security issued
+- usually by 10--20%
+- e.g. MBS with principal amount issued of ﹩100MM while the underlying mortgage worth ﹩120MM
+
+Indenture: Legal document governing the CLO
+
+# Loans, bonds
+
+Bonds vs Loans
+  - both:
+     - carry a rate of interest on principal
+     - can be traded
+  - loans typically have security whereas bonds are usually unsecured
+     - loan holders have the right to seize the assets of the company in a liquidation
+     - even if the company is not liquidated, secured credit typically lose less upon default
+        - i.e., loans has a higher recovery rate on average (70--80% in US) than bonds (40--50%)
+  - loan investors usually have more control over what a borrower can and cannot do
+     - these restrictions are referred to as "covenants"
+     - typically restricts the borrower from taking on more than a certain
+       amount of leverage or limit the amount of capital expenditure
+  - bonds usually pay interest at a fixed rate, whereas loans usually pay a floating rate
+     - floating rate in terms of a margin on top of Libor
+  - bonds usually repay all their principal at maturity (a.k.a. bullet maturity), whereas loans often amortise
+     - loans most frequently found in CLOs have either bullet maturity or repay
+       only a small portion of principal before maturity
+  - bonds can only be called at certain times, whereas loan borrowers can repay (or call)
+    a loan any time without penalty
+     - bond holders have call protection
+  - loan traded in secondary market take much longer to settle
+  - bonds are sold by investment bank (or arranger) to hundreds of different
+    investors, loans are made by banks before distributing them to other investors
+
+Type of loans:
+  - revolving loans: act like a bank overdraft
+  - term loans: borrowers received all the money at the outset
+  - borrowers of leveraged loan:
+     - a revolver as the shortest maturity loans, and an accompanying term loan (term loan A)
+        - a.k.a. "pro-rata loans"
+     - equal seniority but longer maturity term loan B, C, D and so on
+  - revolver and term loan A are usually bought by banks, not common in CLO portfolios
+  - term loans B, C, D are solve to institutional investors, make up majority of most CLO portfolios
+  - covenant-lite (cov-lite) loans: those that lack certain covenants
+     - usually includes incurrence covenants but not maintenance covenants
+       - incurrence covenants: tested only when borrower takes certain actions, e.g. issuing new debt
+       - maintenance covenants: tested on a regular basis, e.g. every 6 months
+     - constraints, for example, debt must not rise above certain levels
+
+Loan in CLO: usually leveraged loans a.k.a. high yield loans
+- often the same companies that borrow using high yield bonds a.k.a. junk bonds
+- often companies that have gone through a leveraged buyout (LBO)
+- high yield companies are statistically more likely to default than investment grade borrowers
+  - average annual default rate around 4--5%
+  - investment grade companies estimate to <1%
+- high yield company's debt has a yield around 2.5% higher than investment grade company
+- some high yield borrowers increased their debts to:
+  - fund acquisitions or capital expenditure
+  - buy back shares
+  - gone through a downturn in business (i.e., fallen angels)
+
+Some biggest high yield borrowers in 2013:
+- First Data: US payment processing company taken private in a 2007 buyout
+- Community Health Systems: publicly traded hospital operator which has grown by acquiring rivals
+- Delta Air Lines: emerged from bankruptcy in 2007
+
+In 2014, issued high yield bonds or loans
+  - 1347 US companies
+  - 357 European companies
+
+EBITA: Earnings before interest, tax and debt amortisation
+  - debt amortisation = repayment of debt principal
+  - leverage ratio defined as debt amount divided by EBITA
+
+
+# Cashflow and tests
+
+CLO note and equity:
+  - note investor provide leverage to equity investors
+     - leverage is locked in place for several years, note investor has no
+       right to demand additional equity or seize assets
+     - free of mark-to-market constraints
+  - note investor are paid ahead
+
+Loans
+  - valued at par (principal amount), because that's the amount it will repay at maturity
+  - CLOs measure the performance of investments in terms of par value
+     - par value of CLO = sum of par of each of its loans
+     - buying loans below par will increase the par value of CLO: par-building
+  - floating rate coupons: loans are traded at par much of the time
+     - below par if there is a shortage of buyer or the issuer is in trouble
+     - rarely trade at more than 101% of par because issuers can prepay
+
+Building par
+  - par erosion: selling asset at loss below par and buy asset at par with the proceed
+  - par building: buying below par
+  - par-building received a lot of bad publicity in the early history of CLOs
+      - early 2000s, debt investors accused managers taking on unnecessary risk to boost par value
+      - rating agencies encouraged market participants to introduce new rules to penalise excessive par building
+	 - discount purchase rules: assets bought <85% of par should be valued
+	   at its purchase price for the purpose of calculating OC ratios
+         - other CLOs define discounted purchases by reference to an index, e.g. S&P/LSTA Leveraged Loan index
+      - swapped discount purchase obligation: allows manager to treat a
+        discounted asset at par if it replaces another asset which is sold for
+        a similar price, up to a set percentage of the CLO portfolio
+
+## Cashflow
+
+Cashflow waterfalls or priority of payments
+  - payment from CLO only if there is enough cash left over after more senior payment in the waterfall
+  - interest waterfall:
+      1. tax due (conventionally), trustee's fee, senior management fee
+      2. interest payment to notes
+      3. junior management fee
+      4. equity
+	  - once equity investors have reached a predefined hurdle for their
+	    returns, manager starts to receive its performance fee
+  - pari passu: equal footing in seniority
+     - cashflow will split equally between them
+  - usually interest received by CLO's loan is to pay interest on CLO's notes
+     - test fail may use the interest proceed to pay principal on CLO notes
+  - principal cashflow: from loans reached maturity, amortisation, or prepayments
+     - amortisation: scheduled pay-down of loans as they approach maturity
+     - amortisation is uncommon in CLO loans
+  - principal waterfall
+     1. payments to note holder that had been due in interest waterfall but were not made
+     2. reinvestment if still in reinvestment period
+     3. pay down principal of the CLO notes in descending order of seniority,
+	if CLO has been called or reached maturity
+
+Accounts of CLO:
+  - collection account: pays all the proceeds (principal & interest) from the collateral it owns
+  - payment account: fund transfer from collection account a few days ahead of each payment date
+     - to make all payment under cashflow waterfall
+
+## Tests
+
+Tests: carried out at each payment date, starting at the effective date
+  - CLO's rules remain unchanged if the test passes
+  - if failed, rules changed to the benefit of debt investors and at the expenses of equity investors
+
+Two types of tests:
+  - failure results in early paydown of some liabilities
+  - failure results in manager prevented from carrying out some actions (maintain-or-improve tests)
+
+Overcollateralisation (OC) test
+  - pass if the relevant OC ratio for each class of notes is above its original pre-determined level
+     - pass level (i.e., required ratio) are set such that the most junior OC test will fail first
+     - if failed, interest proceeds cannot pay equity distributions or interest
+       on all liabilities junior to that particular tranche
+     - may start to paydown principal of most senior class of outstanding notes
+        - a.k.a. diversion of interest
+        - paydown improves OC ratio by reducing the denominator
+     - if OC test fails, principal payments must be used to pay down debt instead of buy new assets
+  - par value of CLO's collateral divided by the outstanding amount of that
+    particular class of notes and notes senior to it
+  - for OC test purpose, par value of poorly performing or defaulted assets may adjusted with haircut
+     - CLO will fail one of its OC tests if too many defaults
+     - typically defaulted loans are worth their market value or an assumed
+       rating agency recovery rate, whichever is lower
+  - post-crisis CLOs
+     - a few CLOs that include single B tranche: no OC test for this class
+     - combined OC test for the two most senior notes (AAA and AA)
+        - no way to skip payment
+
+Interst diversion test
+  - triggers earlier than any of the OC tests
+  - failure = distribution to equity investors are suspended
+     - diverted interest to invest in new assets
+     - boosts the OC ratio by increasing the numerator
+
+Various definition of loan default
+  - failing to pay interest or principal on actual loan owned by the CLO
+  - failing to pay interest or principal on debt that is pari passu or senior to the loan owned by the CLO
+  - bankruptcy of the borrower
+  - downgrade to D or similar of the loan owned by the CLO
+
+CCC bucket
+  - assets rated CCC or below (Caa1 from Moody's or CCC+ from Fitch or S&P)
+     - some deals will include ratings one notch above (B3 or B-) if rating
+       agency put that credit rating on watch for a potential downgrade
+  - portfolio administrator is required each month to add up the par amount of assets in CCC bucket
+  - if par amount is greater than a predefined threshold (e.g. 7.5%), the
+    portfolio is adjusted by the difference between par and market value of
+    those assets which are in excess of the threshold
+
+Interest coverage (IC) test
+  - can cause CLOs to pay back liabilities early with principal and interest proceeds
+  - assessed each month by calculating a ratio and compare to a predefined level
+  - usually available for notes from AA to BBB
+  - ratio = interest proceeds available at that point in the waterfall divided
+    by interest payment due on the next debt tranche
+  - protect debt investors in the event of insufficient income to pay the interest
+
+Common maintain-or-improve tests:
+  - weighted average rating factor (WARF) test: measure the quality of a CLO's portfolio in rating terms
+     - only Fitch and Moody's has WARF to convert rating into a numerical score
+  - weighted average spread (WAS) or coupon tests: ensure CLO does not invest in too many low-yielding assets
+  - Moody's diversity test: Mesuring the industry diversity of a portfolio
+     - Moody's diversity score: a number to address teh correlation within the portfolio
+     - prevent correlation of default risk of each borrowers
+  - S&P industry concentration limits: S&P's approach to measure diversity,
+    setting limit on concentrations to any particular industry
+  - minimum assumed recovery rate tests: ensure CLO is not over-exposed to loans with low recovery prospects
+  - weighted average life test: measure the expected life (based on legal
+    maturity) of assets to ensure the portfolio is not significantly longer
+    than the CLO liabilities
+  - concentration limits: different tests to ensure they stick to promised
+    limits for exposure to different type of investments
+      - second-lien loans
+      - convenant-lite loans
+      - exposure to individual loan or borrower
+
+
+# Structure and Equity
+
+CLO structure: 80% debt tranche, 20% equity
+
+## Tranche structure and ratings
+
+CLO notes are almost always rated
+  - CLO default is an event with low probability: history has no loss
+  - rating agencies disclused their methodology but not the specific mathematical rules
+  - Fitch and S&P: likelihood of suffering any kind of loss (first-dollar-of-loss approach)
+  - Moody's: magnitude of loss during its life (expected loss)
+  - Rating fee: 0.07% of the size of the tranche upfront
+     - higher when there are shadow ratings
+
+Rating corporate bonds or loans:
+  - look at company's level of indebtedness, cashflows, its access to finance,
+    and the dynamics affecting its industry
+  - shadow rating (a.k.a. credit estimate): private rating on a loan that has no rating at all
+      - not disclose publicly, not paid by the loan borrower but by the CLO on annual basis
+      - fee for providing shadow rating is less than a full rating
+      - based on more limited information provided by the CLO manager instead of the company
+
+Rating methodology:
+  - Moody's
+     - CLO's portfolio + cashflow rules → calculate for expected loss for each tranche under different scenarios
+     - compare expected loss, e.g. Aaa rating needs expected loss <0.0055% for 10 yrs
+     - stress factors (i.e., additional haircut) may be imposed to take account of other risks
+  - Fitch and S&P
+     - Monte Carlo modelling under different scenraios, e.g., different levels
+       and patterns of default, interest rate projections, timings of defaults
+     - calculate how many defaults it would take for each tranche to suffer a loss
+     - S&P: compare to break-even default rate for each tranche
+     - Fitch: compare to target default probabilities
+     - Different ratings have a number of defaults a given tranche should be able to sustain
+  - Rating surveillance: Rating agency to monitor rating after the deal is complete
+
+Reports
+  - CLO reports are very detailed, compare to hedge funds
+  - Trustee reports, prepared by the portfolio administrator, is received by all classes of investors
+     - number based
+  - monthly report: from manager, list the CLO's current assets
+     - with size, price of all purchases and slaes in the month
+     - details cash balances
+     - reports compliance of various performance tests
+  - note valuation report: from manager, show how much cash the CLO has received and all payments in that period
+     - at each payment date, to investors
+     - shows how the CLO's interest waterfall and principal waterfall are working in practice
+     - shows how much money is left to equity
+  - notices: tell investors of rating change, or minor change to the terms, or
+    invitation to vote on proposed change
+  - report usually lacks market value of loans that hte CLO own
+
+Refinancing and repricing
+  - after crisis: equity investors are easier to refinance the CLO debt
+      - before: must call the CLO in its entirety and issue a whole new CLO
+      - after crisis: refinance on a tranche-by-tranche basis
+  - refinance: to take advantage of falling spreads on certain tranches
+  - repricing: equity investors to reset the coupons on individual tranches at prevailing market rate
+      - debt investors are required to sell their note to a new holder if not accepting repricing
+      - not a standard feature in CLO market
+
+Kinds of CLO debt:
+  - almost all debt is in the form of bonds
+  - some case of CLO liabilities issued in the form of loans
+      - e.g. 2013 & 2014, a Japanese bank bought the entire AAA tranche of some
+        CLOs, and prefer them to issue as loan
+  - notes are generally issued to allow investors to switch between 144A and Regulation S (Reg S)
+      - US investors buy 144A, non-US investors buy Reg S
+      - 144A is a private placement, the issuer is exempt from onerous market stipulations of US securities laws
+         - cleared through the US DTCC (a securities depository)
+         - carry a CUSIP
+      - Reg S bonds cleared through either Clearstream or Euroclear, with an ISIN
+      - format of the note can be changed by a clearing house
+
+Payment
+  - minority of CLO notes carry a fixed rate of interest, majority are floating rate CLOs
+  - floating rate notes because loans are mostly floating rate instruments
+  - usually only the most senior tranche is AAA, but some CLOs has the second most senior tranche also in AAA
+      - created by slicing from the bottom of the AAA portion
+      - junior AAA to create greater subordination (i.e., larger cushion) for the senior AAA tranche
+  - class X tranche: to indicate a tranche which dos not form a conventional part of the capital structure
+      - post-crisis: for a very short-dated tranche which sits at the top of the capital structure
+      - created to provide CLO with a small cushion of extra cash during its
+        first few weeks (when deal has to pay some one-off fees)
+  - a few CLO tranches include a coupon step-up feature
+      - in the life, the coupon increases to a new predefined level
+      - created to make it more likely to be called at the step-up date, for a
+        greater certainty over the expected life of the investment
+  - combination notes: rare after crisis, but common in the market around 2005-2006
+      - commonly combines a CLO equity tranche with a senior tranche (usually AAA)
+      - investor receives cashflows form the two in the specified ratio
+      - appeals to insurance companies: better yield and high probability of full return of principal
+
+## Equity
+
+CLO equity holders receive distributions only if debt and other obligations are honoured
+  - receives the lion's ahre of profits if things go well
+  - CLO equity is unlike corporate equity that CLO operates by pre-set rules
+      - no borrowing to pay dividends
+      - cannot change strategy
+  - prospects assessed by the default probability and recovery of the loans
+  - has right to sack the manager
+  - has right to call the deal
+      - non-call period usually 2 years from closing date for deals issued between 2009 and 2014
+      - right timing to call can boost equity return: equity distributions will
+        dwindle rapidly if CLO pays down its senior debt
+      - some older CLOs are uncallable because the equity is widely dispersed,
+        making it impossible to organise a vote
+      - post-crisis: most deals issued since 2009 have majority of equity tranche owned by a single institution
+
+Majority investor = control investor
+  - not the controlling class
+  - majority equity investor will usually be heavily involved in planning the CLO
+  - some case, manager = majority equity investor
+  - majority equity investor will provide capital for the CLO during the warehouse phase
+
+Timing and equity return
+  - better: deal launched when loan arbitrate is favourable (loan return is high relative to funding cost)
+  - better: CLOs launched ahead of a period of low defaults
+  - average annualised distribution of equity in first 4 years: 10% (2008
+    vintage) to 24% (2002, 2011 vintage) in US CLOs
+  - final IRR of equity may not be known for years
+      - CLOs usually end up owning a few assets that are illiquid and hard to sell
+      - e.g. equity received following a debt restructuring
+
+
+# Risk, default, and analytics
+
+Risk of CLOs:
+  - historically never loss on most senior tranches
+  - investment grade: AAA to BBB; high yield: BB and below
+  - most loans in CLO portfolio: mid to high single B rating
+  - junior tranche of a typical CLO: BB
+  - CDO backed by mortgage has similar structure as CLO, but ratings turned out
+    to be a poor guide to the riskiness following the subprime mortgage crash
+    of 2007
+  - equity tranche has an annualised return as high as 30% if things go well
+
+## default rate
+
+Constant default rate (CDR): Annualized rate of default on a pool of loans.
+Default rate on loans depends on: age of loan, seasonality, burnout levels,
+FICO, LTV, income, etc.
+
+Loss severity: Percentage of lost principal when a loan has defaulted
+
+Single monthly mortality rate (SMM): In case of CPR (constant prepayment rate),
+that the principal prepayment
+
+Formulae:
+
+$$\begin{aligned}
+    \textrm{PP}  &= ( 1 - (1-\textrm{CPR})^{1/12} ) \times (P_0 - P_t) \\
+    \textrm{SMM} &= ( 1 - (1-\textrm{CDR})^{1/12} ) \times (P_0 - P_t - \textrm{PP}) \\
+    \textrm{LS}  &= \textrm{SMM} \times S
+\end{aligned}$$
+
+where:
+
+  * PP = CPR Principal Prepayment, as SMM for CPR
+  * $P_0$ = Starting principal balance
+  * $P_t$ = Principal portion of scheduled loan payment (unpaid principal)
+  * SMM = Single monthly mortality rate (principal loss in a month)
+  * LS = Loss Severity
+  * $S$ = Loss Severity Percent
+
+Cashflow = Scheduled payment + Prepayment + Defaults $-$ Loss Severity $-$ Servicing Fee
+
+  * If the pool was original owned by the originator, there will be no servicing fee
+  * Defaults added because they include loss severity and recovery. This assumes
+    the recoverable part are prepayment and happen at the same time as loss.
+  * (Defaults $-$ Loss Severity) = Recoverable loans
+
+Flat rate: Interest rate calculated without considering amortisation. For
+example, 12% annual flat rate of ﹩1200 loan for 1 year repaid monthly, the
+monthly principal payment is ﹩100 and the monthly interest is ﹩1200 $\times$ 1% = ﹩12,
+thus the monthly payment is ﹩112. This yields a effective interest rate of 144%
+p.a. at the last payment. Or equivalently, a 23.68% APR compounded monthly for
+the overall payment (calculated using XIRR).
+
+XIRR calculation: Assume payment is $P_j$ at time $j$ (sign identifies the
+direction), $d_j$ is the date of payment $P_j$, and $d_0$ is the 0th payment. XIRR
+finds the rate $r$ that solves the equation:
+
+$$ 0 = \sum_{j=0}^N \frac{P_j}{ (1+r)^{(d_j-d_0)/365} } $$
+
+To find XIRR by XNPV: Set $P_0=0$ instead of principal in the above summation and
+find the rate r until XNPV equals to the principal.
+
+Converting CPR, SMM, and APS:
+
+$$\begin{aligned}
+   \textrm{CPR} &= 1 - (1-\textrm{SMM})^{12} \\
+   \textrm{SMM} &= 1 - (1-\textrm{CPR})^{1/12} \\
+   \textrm{APS} &= \frac{\textrm{SMM}}{1+\textrm{SMM}\times(\textrm{Loan Age} - 1)}
+\end{aligned}$$
+
+APS = Absolute prepayment speed.
+
+
+## prepayment risk
+
+Math of monthly constant prepayment rate (CPR):
+
+$$ \textrm{CPR}_{\textrm{monthly}} = 1 - (1-\textrm{CPR})^{1/12} $$
+
+where:
+ - CPR is the percentage probability of prepayment within a year
+ - $(1-\textrm{CPR})^{1/12}$ is the probability of non-prepayment in a month
+
+which is converting an annual interest rate into equivalent monthly interest rate
+
+In mortgage, servicing fee is based on remaining principal. Thus the servicing
+fee is:
+
+$$ \textrm{Monthly servicing fee} = \frac{s}{12} P_r $$
+
+where
+ - $P_r$ is the remaining principal
+ - $s$ is the annual rate of servicing fee
+
+And $P_r$ is decrease monthly by the principal paydown as scheduled and the
+prepayment of amount $\textrm{CPR}_{\textrm{monthly}}\times P_r$
+
+
+## Macaulay duration
+
+Frederick Macaulay (1938), measure the term of an option-free fixed income security
+
+Time to receive each cash flow weighted by the PV of the cash flow, the
+resulting weighted average time period would be more realistic measurement of
+term then maturity
+
+Alternative calculation: Assume market price of bond is an approximation of sum
+of PV of the cashflow, then Macaulay duration should be:
+
+$$
+\frac{\sum (\textrm{PV of cashflow} \times \textrm{Time to cashflow})}{\textrm{market price of bond}}
+$$
+
+
+## modified duration
+
+Intended as an approximation of price volatility, not time. It measures the
+change in value in response to change in interest rates (interest goes up will
+drive price go down).
+
+Formula:
+
+$$ \textrm{moddur} = \frac{1}{100}\frac{\textrm{macaulay}}{1+r/n} $$
+
+where
+  * macaulay = Macaulay duration, fraction in years
+  * $r$ = yield per annum
+  * $n$ = number of payments per year
+  * 1/100 = express moddur in percentage
+
+moddur proportional to macaulay duration because bonds with longer duration have
+greater price volatility.
+
+Effective duration: a more accurate measurement of price volatility for loans and MBS
+
+$$\begin{aligned}
+\textrm{Effective duration %} &= \frac{1}{2}
+    (\textrm{change of price in % when yields fall} + \textrm{change of price in % when yields rise})
+\\
+\textrm{Convexity adjustments} &= \frac{\textrm{change of price in % when yields fall}
+                                        + \textrm{change of price in % when yields rise}
+                                        - 2 \times \textrm{init price}
+                                      }{2 \times \textrm{init price}}
+\\
+\textrm{Convexity} &= \frac{2 \times \textrm{Convexity adjustments}}
+                           {100 \times (\textrm{change in yield})^2}
+\end{aligned}$$
+
+## discount margin
+
+DM: spread over Libor discount curve
+  - expressed in basis points
+
+DM comes from the solution to
+
+$$c_0 = \sum_{i=1}^n c_i d_i$$
+
+where $c_0$ is the initial purchase outflow, $c_i$ and $d_i$ are the cashflows and discount factor at time $i$
+and the forward discount factor DM satisfies
+
+$$ \frac{d_i}{1 + d_i} = \frac{1}{1 + [\textrm{forward Libor from time }i\textrm{ to }i+1] + \textrm{DM}} $$
+
+  - DM of a bond priced at par is the spread on that bond
+  - DM is used to compare prices across bonds, as it adjusts for maturity and coupon differences
+
+back-of-envelope calculation: price-yield-duration formula
+
+$$ \textrm{change in price in %} = \textrm{duration} \times -(\textrm{change in yield in %}) $$
+
+applied when impairment or write-down is a remote risk, which change in yield is same as change in DM in %
+  - duration: the modified duration
+  - for zero coupon bonds, duration = average life
+  - for coupon bonds, the duration < weighted average life (WAL)
+    - WAL can be an approximation for duration: $\textrm{Duration} = \textrm{WAL} \times \textrm{adjustment}$
+    - adjustment < 1, e.g., 0.9 for AAA tranche
+  - change in yield/DM is absolute change: $\Delta = \textrm{new DM} - \textrm{old DM}$
+  - change in price is relative percentage: $\Delta = \frac{\textrm{new}-\textrm{old}}{\textrm{old}}$
+
+
+## other valuation metrics
+
+WAP: weighted average price of the deal collateral
+
+Tranche attachment point: static measure that roughly corresponds to
+what percentage of the collateral has to be lost before the tranche starts
+taking losses
+
+Tranche detachment point: like attach, but measures how much has to be
+lost before the tranche is wiped out
+
+FCDR (flat CDR break): what constant default rate needs to be assumed in order
+for the tranche to start taking losses; this is cashflow based in contrast to
+the above
+
+DM (discount margin): constant spread over the appropriate floating rate that's
+needed to discount the cashflows to recover the given price
+
+
+# Interest rates
+
+1% = 100 basis point (100 bps)
+
+APR: annual percentage rate. Simple interest rate, may be compounded in practice.
+
+APY: annual percentage yield. Compounded interest rate, taking the number of
+periods in a year into account and compare the end-of-year value against the
+present value.
+
+APY > APR because of compounding.
+
+## Interest rate rules
+
+Rule of 72: time it takes to double, e.g.
+- 1% rate = 72 periods
+- 2% rate = (72/2)=36 periods
+- etc.
+
+Rule of 78, aka sum-of-the-digits method:
+assume total interest of whole period to be ﹩$N$
+and the total period to be $n$ months
+then the monthly payment ﹩$P$ on month $k$ will include the interest portion of
+$N \times k/S_n$ where $S_n = 1+2+...+n$
+  
+ - Using rule of 78 need to find the total financial cost ﹩$N$ before hand
+ - The interest payment is front-loaded: interest payment is higher than simple interest
+    - not beneficial to prepayment: there is more principal remain to be paid off
+
+
+# Life cycle of a CLO
+
+ramp up: manager start to buy the loans that form the collateral for the CLO
+  - start the ramp-up early at times when assets are particularly hard to find
+  - "warehouse phase", the period during which the manager is building the CLO
+    portfolio before the CLO notes are sold
+     - after planning, found the bank that interested to buy the entire AAA
+       notes and the fund manager that would be interested in taking equity
+     - usually 3 months after planning, and 3 months before closing
+  - seed capital provided by manager or control equity investor
+  - fund leveraged by borrowing from arranger or another bank
+  - warehouse lending facility provides less leverage than the CLO will have once it has closed
+     - arrangers see warehouse lending as a way for CLO arranging business rather than a source of profit
+
+going to market
+  - manager buying loans for the future CLO's portfolio
+  - arranger organise a roadshow, taking key individuals from the management firm to meet potential investors
+     - arranger will prepare pitch book (marketing document), termsheet (proposed terms of different notes),
+       draft prospectus or offering memorandum
+     - marketing process takes 2-3 weeks from launch to pricing
+  - arranger builds an order book for the securities
+     - sell the less popular tranches
+     - choose which investors should receive good allocations to popular tranches (syndication)
+     - tweak the tranche structure in response to investor demand
+  - sources and uses: table showing what money will come into the CLO on the first day and what money will go out
+     - outgoing: one-off fees including arranger fee, and note discounts
+     - equity investors will demand to see it, but not routinely disclosed to note investors
+
+pricing and closing
+  - pricing date: order size and prices for each security are confirmed to
+    investors, and investors commit to buying them
+     - prospectus is finalised on pricing date
+     - US securities laws: final prospectus only comes into existence once it has ceased to serve
+       its intended purpose of informing investors about what they are buying
+  - 1 month in future: CLO will come into effect when investors will make payment for their securities
+     - closing date or settlement date
+     - manager begins to earn fees and interest starts to accrue
+  - CLO payment: mostly each quarter, some European deals pay once every six months
+     - portfolio administrator assesses the deal for compliance with its various tests on payment date,
+       and calculates how much should pay in interest, fees, and equity distributions
+     - first payment is usually a few months longer than subsequent payment periods to give the manager time
+       to ramp up the deal
+     - large first payment distribution to equity may be a good indication that ramp-up has gone well
+       and the manager has amassed a high yielding portfolio
+  - effective date: the point at which the CLO is fully ramped up, and various tests start to take effect
+     - US deals: 4 months after closing, longer in European CLOs
+     - manager needs to get the rating agencies to confirm the rating of the notes
+     - manager will declare the CLO effective, if failed to do so by the
+       cut-off date, it may be force to paying down the CLO notes
+  - reinvestment period: manager is able to trade the portfolio and reinvest
+    the proceeds of loan amortisation and repayments
+     - manager usually cannot buy new assets, proceeds will be used to pay down the CLO's liabilities
+     - some deals allow the manager to make new purchases in case of credit
+       impaired sales or credit improved sales
+     - manager and equity investor prefer longer reinvestment activity for
+       higher return, note investors prefer certainty of investment
+  - legal maturity date: official end date
+     - before legal maturity, equity investors has the right to redeem the CLO
+     - non-call period: the window from closing date during which the CLO cannot be called
+        - usually 2 years
+     - NAV (net asset value): the ratio between market value of the portfolio
+       and the repayment amount of the CLO notes
+        - a.k.a. market value OC
+     - when called, manager sell off the assets through bid list to repay the
+       notes and make final distribution to equity investors
+     - when CLO unwind, it may hold a small number of illiquid assets, and
+       manager will continue to oversee the fund
+     - if CLO not called, manager may auction assets 2 years before, 1 year
+       before, or on maturity as soon as the proceeds are sufficient to repay the notes
+     - if proceeds are not enough to repay all the debt at legal maturity, the CLO will enter an event of default
+
+events of default
+  - when serious failure of performance tests or on legal maturity but unable to pay its debt
+  - senior tranche owner becomes the controlling class, take control of the CLO
+      - may decide to liquidate the CLO immediately or anytime
+  - liquidation: pay down notes in order of seniority
+
+Supplemental indentures = changing rules
+  - to clarify some ambiguity in original indenture
+  - to accomodate some change in rating agency methodologies
+  - significant changes need to be approved by a majority of each class of investors
+  - some minor change to correct an error can be made without an investor vote
+  - other minor change only need rating agency confirmation that change does not affect ratings of the CLO notes
+
+Changing players:
+  - for cause removal of manager: e.g. key personnel clause
+  - without cause removal: if sufficient investors vote for the change
+
+
+# Participants of CLO
+
+SPV: Created for bankruptcy remoteness
+  - for CLO investors are not regarded as creditors of the originator bank
+  - otherwise most senior tranche of CLO cannot have rating higher than the originator bank
+  - criteria of bankruptcy remoteness:
+     - legal separateness of SPV
+     - true sale of assets from originator to SPV
+     - absence of dependence of SPV on the originator for operational functions
+     - absence of control of the originator over the activities of the SPV
+
+Arranger, a.k.a. underwriter of a CLO
+  - an investment bank whose role is to structure the deal and sell the notes
+  - receives a one-off fee, typically 80--120 basis points (0.8--1.2%) of total deal size
+  - provide warehouse funding when it is in the ramp-up stage
+  - as initial purchaser on closing date (legal formality only, most of the
+    notes are sold within the same day to investors)
+  - arranger may retain some notes to make a secondary market
+     - arranger has best knowledge of who the original investors were, thus
+       able to find securities for secondary buyers
+  - top arrangers: Citi, Morgan Stanley, BAML, Credit Suisse, Barclays, JP Morgan, Goldman Sachs, Deutsche Bank
+
+Trustees and portfolio administrators
+  - indenture: contract between the issuer and trustee (usually a large commercial bank)
+  - trustee: represent the noteholders
+     - in case of manager wants to change the terms of a CLO and requires a
+       noteholder vote, trustee is responsible for contacting investors and arranging the vote
+     - in case of disagreement between parties, trustee needs to decide which
+       course of action is consistent with the indenture
+     - will request a legal opinion from independent law firm to give it direction on a specific question
+  - portfolio administrator: runs practical and accounting functions of the CLO
+     - books and settles trades following the manager's instructions
+     - calculates tests each month
+     - makes payments and issues reports to investors
+     - portfolio administrator takes direction from controlling class of investor in case of default
+  - fee for trustee and portfolio administrator is around 1 b.p. (0.01%) of CLO's total size a year
+  - top trustees: US Bank, BNY Mellon, Deutsche Bank, Citibank, StateSTreet
+
+Law firms
+  - Arranger, manager, trustee will each employ a separate firm to negotiate and create documents
+  - documents of CLO:
+     - indenture: contract between the issuer and the trustee
+     - collateral management agreement: contract between manager and the issuer
+     - offering memorandum/prospectus: terms of the notes for prospective buyers
+     - interest rate hedge agreement: interest rate swap between issuer and swap counterparty
+  - top CLO arranger counsels: Ashurst, Cadwalader, Allen & Overy, White & Case, Milbank
+  - advisor to the arranger can expect as much as $400k in a deal
+  - advisor to manager might get 1/3 of that amount
+  - advisor to trustee or individual investor might get $40k to $50k
+  - advisor to issuer (for setting up the SPV in Cayman Is) would typically get $50k
+
+Rating agencies
+  - all tranches except equity are rated
+  - investors such as insurance companies and banks require the bonds they buy to be rated
+  - rating agenciies monitor the deals' performance through its life and upgrading/downgrading the various notes
+  - arrangers usually discuss a planned CLO with officials from agencies to
+    ensure that it will gain their desired ratings
+  - after crisis: rated by 1 or 2 agencies instead of 3 because more CLOs are
+    sold to investors who do not require multiple ratings
+  - fee for agency:
+     - initial: 3 to 10 b.p. (0.03% to 0.1%) of the amount of notes to rated
+     - on-going surveillance fee: 0.5 to 1 b.p. a year
+
+Investors
+  - most senior CLO tranches (AAA): banks, insurance companies, pension funds
+  - equity tranche: most post-crisis CLOs have single investor that owns a majority or all equity
+  - BBB/BB tranches: insurance companies and mutual funds
+  - most tranches below single A (mezzanine notes) are bought by specialist funds such as hedge funds
+
+
+# Manager of CLO
+
+Manager: standalone firms, insurance companies, loan managers, or hedge fund managers
+  - a core team of portfolio managers (2-3 people)
+  - supported by a handful of research analysts, compliance specialists, marketing staff
+  - roles:
+     - choosing and buying the initial assets
+     - deciding when to sell assets due to price appreciation or likelihood of default
+     - monitoring the credit quality and market value of the loans
+     - finding new assets to buy with the proceeds of a sale or prepayment
+  - in early 2015, CLO manager had an average of 7 deals under management
+  - biggest managers: GSO, Carlyle, Credit Suisse Asset Management, Apollo, Ares, CIFC, Alcentra
+  - manager may co-invest in a CLO, usually only the equity tranches
+     - manager co-investment can help CLO to be compliant with risk retention rules
+
+Ramping the deal
+  - putting in place the best initial portfolio for the CLO
+  - ramp-up: stage of CLO's life between warehousing phase or closing date and effective date
+  - once the deal has closed, the CLO starts to accrue interest on all its notes
+     - negative carry: if interest coming into the deal < interest paid out
+     - manager has an incentive to build the portfolio as quickly as possible
+
+Styles of management
+  - style:
+     - some make frequent purchases and sales
+     - some specialise in finding obscure loans
+     - some stick to widely held and relatively liquid loans
+     - some buy loans exclusively in the primary market
+  - large manager will need to buy more assets across its various funds and CLOs: greater buying power
+  - sourcing: ability to get hold of the assets it wants to buy
+  - execution: ability to buy and sell at attractive prices
+
+Key personnel provision
+  - give investors the right to sack the manager if key individuals quit the firm
+
+Fee for managing a CLO:
+  - senior fee/base fee: manager will receive regardless the performance
+    - paid out ahead of most other payment
+    - around 20 b.p. (0.2%) a year of total assets
+    - to ensure manager receive enough money to be able to carry out its duties
+  - junior fee/subordinated fee
+    - paid only if there is enough money for the CLO to pay its coupon on all the CLO notes
+    - usually bigger than the senior fee: 30 b.p. a year
+    - ensures a healthy stream of income for the manager that is performing at
+      least well enough to meet all its commitment
+  - performance fee
+    - linked directly to the returns received by equity investors
+    - after CLO reaches a certain hurdle rate of return for its equity
+    - equity distribution are split with the manager: manager keeping 20% while equity investor receive 80%
+    - the largest part of a manager's income from a CLO
+
+Sub-advisor: when original manager sold its right to manage a CLO
+  - cannot get investor approval to transfer its management contract
+  - the acquiring manager taking on the sub-advisory role and receives the greater part of the management fees
+
+Manager removal:
+  - managers are free to resign
+  - right to choose a successor may be held by equity investors or require all calsses of investors to approve
+  - deemed consent: investors who do not exercise their right to vote are deemed to have approved the proposal
+  - for cause removal: the controlling class of investor can vote to remove the manager for cause
+    - happen only in narrowly defined circumstances, e.g.,
+       - bankruptcy of the manager
+       - breach of management agreement
+       - manager commits fraud
+  - removal without cause: requires a high proportion of each class of note holder to vote
+
+
+# Pricing and secondary market
+
+## Pricing and call
+Pricing factors
+  - cashflow discount rate
+  - likelihood of default and its recovery rate for loans
+  - CLO note's coupon
+  - CLO note's size of final principal payment
+  - weighted average life of a CLO note
+      - WAL = average amount of time until the principal is repaid
+      - CLO winding down because it has reached the end of reinvestment period, failing coverage tests, or called
+  - when the CLO equity investors choose to exercise their call option
+
+Cashflow projection
+  - looks at the rules, e.g. the waterfalls and trigger levels of OC and IC tests
+  - early days: using spreadsheets
+  - now: software tools, e.g. Codean, Intex, Moody's Analytics, SCDM
+  - CLO modelling is path dependent
+     - a default, a test failure, or a test coming back into compliance all has knock-on effects
+
+Defaults
+  - concern about: number and severity of defaults
+  - flat assumption of default: Same level of default every year
+      - traditional modelling: flat 2%
+
+Prepayments
+  - loans do not continue until their maturity
+      - borrowers pay back early with little or no penalty
+      - refinance
+      - avoid forced to borrow at punitive rate at maturity date
+  - revolver loans (A loans): receive some principal back well ahead of maturity
+      - a.k.a. pro-rata tranches
+  - CLOs: B and C loans
+      - longer maturity profile but same seniority as pro-rata tranches
+      - do not amortise until close to legal maturity
+  - forecast prepayment level: projecting today's rate of repayments forward or look at average historical rates
+      - model use flat rate for the life of the deal
+  - reinvestment: common assumption is that manager will be able to reinvest
+    all prepayment proceeds while reinvestment period and 50% of them after reinvestment end date
+
+Libor floor
+  - feature of many loans in US since 2008
+  - Libor fell to below 1% in early 2009
+  - States that Libor part of calculation = max(libor floor, real libor rate)
+
+Modelling variations
+  - default projection: remain low for long periods of time and then jump higher during recessions
+      - low flat curve with spikes
+  - prepayment rates and prevailing loan spread will fall and rise with the economic cycle
+  - post-reinvestment trading
+      - need to read the indenture
+      - guess how aggressively the CLO manager will choose to interpret the rules of the deal
+      - make a big different to the WAL of a CLO tranche
+
+Timing the call
+  - in reality equity investor will choose to call the deal before the most junior notes start to amortise
+  - significantly affects the CLO note's WAL
+  - rational: equity investor will call at the point that they could raise a new CLO with cheaper funding
+     - need to model the performance of current CLO and spread of future CLO
+  - not rational: when equity is held by a large number of different investors
+     - difficult to trigger a call
+  - notes in primary market may price at a discount to reduce the investor's risk of CLO being called early
+
+Equity valuation
+  - find expected internal rate of return (IRR) of investment
+  - the total market value of the CLO's asset minus the total market value of debts
+      - Net Asset Value, NAV
+      - market value overcollateralisation
+      - problems: market price of CLO debt unknown, what manager will buy in the future is also unknwon
+
+
+## Secondary market
+
+Financial crisis of 2007 and 2008
+  - original buyers of CLOs decided to sell, created secondary market around 2008 and 2009
+     - fear of performance
+     - required to sell because of downgrade
+  - buyers: hedge funds
+     - trade instead of one-off investment
+     - keen to sell to lock in a gain
+     - fuelled further secondary market
+
+Secondary market: >$20bn turnover a quarter since 2008
+
+CLO trade: over the counter market
+  - no exchange which CLO trading takes place
+  - between dealer and investor or as part of a bid-wanted-in-competition (bid list or bwic)
+      - dealer: institution that buys assets and then sells them at a later date to make a profit
+      - broker: does not own the bonds at any point but simply takes a fee from seller for finding buyer
+  - investor with a chunk of CLO debt or equity to sell might call a handful of
+    dealer to see which will give it the best price
+  - dealer with inventories of CLO debt or equity regularly send list of the
+    CLOs they hold with an indication of the price they prepared to sell
+  - bwics: holder circulates to dealers and brokers a list of CLO pieces it
+    wants to sell, and sets a time and date for the end of aution
+      - the list usually start to circule 3-4 days before deadline
+      - at deadline, investor chooses the highest bid for each asset
+      - or no trade will take place if bids fall short of the expectation
+      - after deadline, by convention, seller circulates "colour" on trading to all bidders
+          - each asset traded or not, and a price level (cover bid, the second highest bid)
+
+
+# Varieties of CLOs
+
+1.0 vs 2.0:
+
+|                   | 1.0 (pre-crisis) | 2.0 (post-crisis) |
+|-------------------|------------------|-------------------|
+|reinvestment period| 7 yrs            | 4 yrs |
+|non-call period    | 2-4 yrs          | 2 yrs |
+|post reinvestment  | vague rules      | explicit language to stop almost all trading |
+|leverage           | high at debt tranches (10x the size of equity) | 4-6x in early 2.0 CLOs |
+|refinancing        | no tranche-by-tranche | permitted |
+
+Mid-market CLO: backed by loans to smaller companies
+  - majority CLO is to buy large cap loans
+  - mid-market loans: companies with earning below $50M
+  - bigger loans: broadly syndicated loan
+  - loans originated:
+      - larger company: arranged (syndicated) by investment bank, markets the debt to a large number of investor
+      - mid market: small club of lenders join forces to make the loan
+  - mid-market loans are less frequently traded than broadly syndicated loans
+      - not publicly rated, usually carry shadow rating
+  - mid-market CLOs tend to have more static portfolios
+  - around 20 mid-market CLOs were issued in 2014, compared to 200 broadly syndicated US CLOs
+
+Balance sheet CLO
+  - a bank securitises an existing portfolio of corporate loans
+     - bank retains the equity tranche
+     - act as deal's manager in limited fashion
+  - Europe: balance sheet CLO from bank vs arbitrage CLO put together by asset manager
+  - manager retaining the equity tranche can also consdiered balance sheet CLOs
+     - to be more common after risk retention rules in effect
+
+Currencies
+  - CLO divided in to deals backed by US assets and European loans conventionally
+     - distinction on currency
+  - Europe: shortage of loan borrowers
+     - some prefer to issue in GBP, CHF, or Scandinavian currencies
+     - CLO to buy multiple currencies
+  - max currency CLO: liabilites in more than one currency
+     - currency loss incurred when an asset is sold are offset by the liabilities side
+     - handful of multicurrency CLOs issued in 2007-2008
+
+
+# Regulations
+
+Basel Accord: banks are required to have a basic capital ratio >8%
+  - Basel II: revision in 2004
+  - Basel III: revision in 2010
+  - capital ratio is sum of risk-weighted exposure amounts
+     - AAA credit: 7% weight (IRB, internal ratings based approach) or 20% (standardised approach)
+     - BBB-- credit: 100% weight
+     - Below BB-- credit: 1250% weight
+
+US SFA: Supervisory formula approach
+  - for all securitisation positions
+  - find risk weight to securitisation
+  - if cannot find, 1250% risk weight must apply
+
+Risk retention:
+  - EU rule
+  - US rule: Dodd-Frank act
+
+
+# Misc
+
+## Mortgage terms
+
+underwater: home value less than amount owed on mortgage and other liens
+
+notice of default (NOD): sent out to homeowner after 90 days of no payments
+  * regulators required institution to estimate potential loss on all properties
+    after 90 days of no payments
+
+## Dutch auction
+
+US Treasury sell securities by Dutch auction. Auction price: The highest price
+that can have all shares sold. Winners pay the lowest price. If the total amount
+of securities bidded at the auction price is greater than the amount of
+securities available, the fraction is the % allocated, and applied to all
+bidders.
+
+Example: 100 units put up for sale. Bids are as follows:
+- $1.3 for 20 units
+- $1.2 for 30 units
+- $1.1 for 40 units
+- $1.0 for 60 units
+
+So the price is set at ﹩1.0 (highest price $x$ such that bids $\ge x$ meet or exceed
+100 units); and total bids are 150 units thus each bidder allocates 2/3 of the
+bid.
