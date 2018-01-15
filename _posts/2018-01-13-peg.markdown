@@ -1,0 +1,172 @@
+---
+layout: post
+title: Enhancing parsing expression grammar
+date: Sat, 13 Jan 2018 09:40:06 -0500
+tags: code
+junktext:
+  - Top-down parsing languages / Recursive descent parser / context free grammars / Earley algorithm: a CFG algorithm / LL(k) and LR(k) parsing algorithm / CYK algorithm
+  - <https://math.stackexchange.com/questions/170902/why-cant-we-use-memoization-to-parse-unambiguous-context-free-grammars-in-linea>
+  - <http://lambda-the-ultimate.org/node/3039#comment-44356>
+  - <https://tomassetti.me/guide-parsing-algorithms-terminology/>
+  - <https://stackoverflow.com/questions/47522687/how-should-i-modify-the-grammar-to-allow-optional-expression-without-backtrackin>
+---
+
+[Parsing expression grammar (PEG)](https://en.wikipedia.org/wiki/Parsing_expression_grammar)
+was introduced by Bryan Ford in 2004[^f04]. Its characteristic is its output is
+a single, non-ambiguous parse tree.
+
+The PEG grammar is $(N, \Sigma, P, e_S)$, where
+
+- $N$: a finite set nonterminal symbols
+- $\Sigma$: a finite set of terminal symbols that is disjoint from $N$
+- $P$: a finite set parsing rules
+- $e_S$: an expression termed the starting expression
+
+The parsing expression is any terminal symbol, any nonterminal symbol, the
+empty string $\epsilon$ (these three: atomic parsing expression), or any
+compound expressions:
+
+- Sequence: `e1 e2`
+- Ordered choice: `e1 / e2`
+- Zero-or-more: `e*`
+- One-or-more: `e+`
+- Optional: `e?`
+- And-predicate: `&e`
+- Not-predicate: `!e`
+
+It is quite intuitive from the simularity in structure that the PEG grammar is
+context free. Indeed, the only difference I can see between PEG and CFG is the
+ordered choice vs unordered choice, and the two predicates. This should not
+give PEG any more power than the CFG.
+
+However, because of this, it is known that PEG can't parse the indentation
+level in Python code[^so]. Indeed, many computer languages are not context free
+and not parsable by PEG. In my experiment to implement a parser for Markdown
+(CommonMark to be exact) using [neg](https://github.com/jmettraux/neg), I found
+we cannot parse the very simple structure like the following:
+
+```
+#{n} [^#]+ #{m}
+```
+
+which `m` is no less than `n` and the grammar should consume all `m` pound
+sign. This is an example of context sensitivity: we need to refer to the
+beginning of the line to check what is `n` so we can determine if this is
+valid.
+
+To solve problems like this, I extended neg to include a subparser:
+
+```ruby
+class SequenceParser < CompositeParser
+  def do_parse(i, opts)
+    results = []
+    @children.each do |c|
+      #results << c.parse(i, opts)
+      if c.respond_to? :call then
+        # semantic predicates
+        results << [ c.name.to_sym, results.last[1], c.call(results), nil, [] ]
+      else
+        # parser
+        results << c.parse(i, opts)
+      end
+
+      break unless results.last[2]
+    end
+    [ results.last[2], nil, results ]
+  end
+end
+
+# Predicate will not modify the results nor consume input but instead, return true or false to indicate whether to accept it
+class PredicateParser < SubParser
+  attr_reader :name
+  @@scoreboard = {}
+  def initialize(name='', &block)
+    @name = name
+    @predicate = block_given? ? block : nil
+  end
+  def call(results)
+    status = @predicate.call(results)
+    if @name && status
+      @@scoreboard[@name] = results # remember result if predicate is true
+    end
+    status
+  end
+  def self.scoreboard
+    @@scoreboard
+  end
+  def to_s(parent=nil)
+    "Predicate"
+  end
+end
+```
+
+The `SequenceParser` above replaced the `c.parse()` call with an `if` block to
+allow to call a function whenever it exists and the `Predicate` subparser is to
+include a function block in the middle of a parse rule. Then we can use this to
+implement the fencing in CommonMark:
+
+```
+fence_block_closed == \
+    fence + Predicate('fence'){true} + \
+    info_string + nl + \
+    (code_line + Predicate(){|x|
+        ofence = PredicateParser.scoreboard['fence'].first[3].strip
+        thisline = x.first[3]
+        indent = thisline[/\A */].size
+        unindented = thisline[indent,thisline.length]
+        (indent > 3 || !unindented.start_with?(ofence)) # closing fence should be at least as long as opening
+    }) * 0 + \
+    fence + space * 0 + eol
+```
+
+The `Predicate` rule in the example above make use of the scoreboard feature to
+remember states, which empowered the CFG to learn some context.
+
+Indeed, this is an example of using *external state* in PEG. People argue
+that this can be dangerous if used not carefully, as PEG is backtracking: when
+PEG backtracks, the external state does not rollback and hence it could be out
+of sync with the parsing system. In [parsimonious](https://github.com/erikrose/parsimonious),
+such shortcoming of PEG drove the implementation of `TokenGrammar`, but for a
+different approach: instead of producing a parse tree in one shot, it first
+parse input into tokens and use a second set of grammar to parse the result.
+Below is an example from <https://github.com/erikrose/parsimonious/issues/67>:
+
+```
+>>> from parsimonious.utils import Token
+>>> from parsimonious import TokenGrammar
+>>> grammar = TokenGrammar("""
+... bold_text = bold_open text bold_close
+... text = "TEXT"
+... bold_open = "BOLD_OPEN"
+... bold_close = "BOLD_CLOSE"
+... """)
+>>> tl = []
+>>> tl.append(Token(type='BOLD_OPEN'))
+>>> tl.append(Token(type='TEXT'))
+>>> tl.append(Token(type='BOLD_CLOSE'))
+>>> print(grammar.parse(tl))
+<Node called "bold_text" matching "[<Token "BOLD_OPEN">, <Token "TEXT">, <Token "BOLD_CLOSE">]">
+    <Node called "bold_open" matching "[<Token "BOLD_OPEN">]">
+    <Node called "text" matching "[<Token "TEXT">]">
+    <Node called "bold_close" matching "[<Token "BOLD_CLOSE">]">
+```
+
+Considering the two parser that I looked at, the neg and parsimonious, I see
+that the parse tree are generated progressively with one node per rule (with
+children nodes created in the sub-rules of grammar). I believe the right way is
+to extend the sequence construct and create a "look behind" predicate such that:
+
+- the "look behind" only works in sequence and fails everywhere else to make
+  the implementation simple
+- the predicate is not a grammar rule but a small, immutable function defined
+  elsewhere with no side effects
+- when used in the middle of a sequence, it gives what is parsed so far (i.e. a
+  node with arbitrary number of children) to the function and the function will
+  determine if the node passed in is acceptable or not
+
+Using the fencing example above, this predicate can look for children in the
+node that matches the opening and closing fence and verify the string length
+matches the rule of $m\ge n$.
+
+[^f04]:  Bryan Ford (2004). "Parsing Expression Grammars: A Recognition Based Syntactic Foundation". Proceedings of the 31st ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages. ACM.
+[^so]: StackOverflow - [Parse indentation level with peg.js](https://stackoverflow.com/questions/11659095/parse-indentation-level-with-peg-js/11700527)
