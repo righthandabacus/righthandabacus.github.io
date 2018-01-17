@@ -1,0 +1,73 @@
+---
+layout: post
+title: Simplifying surds
+date: Tue, 16 Jan 2018 23:43:16 -0500
+tags: math
+---
+
+Recently I am investigating some geometric construction (i.e., compass and
+ruler constructions) and encounter into the issue of finding sine for some
+angles. I remember most whole number degree angles could be expressed in surd
+forms, only it is less pretty than the standard angles of 30°, 45°, 60°. Mostly
+I would start from the standard angles and break down to the degree I am
+interested by half angle formula or angle sum and difference formula. But some
+angle could result in surd under surd, for example:
+
+$$ \sqrt{2 - \sqrt{3}} $$
+
+Whether we can simplify this or express it in another format is the issue.
+
+Let us start with the example. First consider if we want to factor it out into
+a product. Obviously it is not possible to be a product of two surd forms, so
+let us assume
+
+$$ \sqrt{2 - \sqrt{3}} = \sqrt{a}(\sqrt{b}-c). $$
+
+We use $\sqrt{b}-c$ instead of $\sqrt{b}+c$ because we observed the negative
+sign in $-\sqrt{3}$. We may also try with
+$\sqrt{2 - \sqrt{3}} = \sqrt{a}(c-\sqrt{b})$ but we will know in the following
+if this is actually the case. Move the bracket term to under the surd gives:
+
+$$\begin{aligned}
+\sqrt{2 - \sqrt{3}} &= \sqrt{a}(\sqrt{b}-c) \\
+&= \sqrt{a (b-2c\sqrt{b}+c^2)} \\
+&= \sqrt{ab+ac^2-2ac\sqrt{b}}
+\end{aligned}$$
+
+Therefore,
+
+$$\begin{aligned}
+ab+ac^2 &=2\\
+2ac &= 1\\
+b &= 3.
+\end{aligned}$$
+
+Expressing $c$ in terms of $a$ gives the quadratic equation $12a^2-8a+1=0$ and
+solving this gives $(a,b,c)=(\frac{1}{2},3,1)$ or $(a,b,c)=(\frac{1}{6},3,3)$.
+These two, indeed, corresponds to
+
+$$ \sqrt{2 - \sqrt{3}} = \sqrt{\frac{1}{2}}(\sqrt{3}-1) = \sqrt{\frac{1}{6}}(3-\sqrt{3}) $$
+
+which are the same (and explains why we assume the form $\sqrt{a}(\sqrt{b}-c)$
+is enough).
+
+Another approach[^ta] is not to factor it out but express into sum of two surds:
+
+$$ \sqrt{2 - \sqrt{3}} = \sqrt{a} - \sqrt{b}. $$
+
+Again, we take $\sqrt{a}-\sqrt{b}$ instead of $\sqrt{a}+\sqrt{b}$ because we
+observed the negative sign of $-\sqrt{3}$. This time, we squared both side and
+found that $2 - \sqrt{3} = a + b - 2\sqrt{ab}$. By solving $a+b=2$ and $4ab=3$,
+we have $(a,b)=(\frac{1}{2},\frac{3}{2})$ or $(a,b)=(\frac{3}{2},\frac{1}{2})$.
+Because we take only positive values for the surd, comparing the expression for
+correct polarity we found that the solution should be
+
+$$ \sqrt{2 - \sqrt{3}} = \sqrt{\frac{3}{2}} - \sqrt{\frac{1}{2}}. $$
+
+It turns out, simplifying surds directly does not seems possible but we can
+easily do it if we first assume the form we want to obtain.
+[Here](https://www.intmath.com/blog/mathematics/how-do-you-find-exact-values-for-the-sine-of-all-angles-6212)
+contains a list of sine values for all integer angles from 0° to 90°, but the
+surd forms are ugly. Probably we can simplify them using this approach.
+
+[^ta]: This form is described in Tutorial Algebra Volume 1
