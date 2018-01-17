@@ -74,4 +74,3 @@ a box element in multiple columns
 - Mozilla doc for [`display` element](https://developer.mozilla.org/en-US/docs/Web/CSS/display),
   [`box-sizing` - element](https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing)
 - [Clearfix solutions (stackoverflow)](https://stackoverflow.com/questions/211383/what-methods-of-clearfix-can-i-use)
-- 

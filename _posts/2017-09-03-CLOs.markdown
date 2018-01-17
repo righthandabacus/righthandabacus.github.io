@@ -994,15 +994,17 @@ Basel Accord: banks are required to have a basic capital ratio >8%
      - AAA credit: 7% weight (IRB, internal ratings based approach) or 20% (standardised approach)
      - BBB-- credit: 100% weight
      - Below BB-- credit: 1250% weight
+  - Volker rule (US): what a bank can hold
 
 US SFA: Supervisory formula approach
   - for all securitisation positions
   - find risk weight to securitisation
   - if cannot find, 1250% risk weight must apply
 
+
 Risk retention:
-  - EU rule
-  - US rule: Dodd-Frank act
+  - EU rule (effect 2014): manager retain 5%, vertical or horizontal
+  - US rule (effect 2016): Dodd-Frank act
 
 
 # Misc
