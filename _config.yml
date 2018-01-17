@@ -11,14 +11,14 @@
 
 title:       "∫ntegrabℓε ∂ifferentiαℓs"
 description: "unorganised memo, notes, code, data, and writings of random topics"
-url_pretty:  "https://righthandabacus.github.io"
+url_pretty:  "http://www.adrian.idv.hk"
 
 
 #############################
 # Build settings
 
 # Exclude these from production
-exclude: ["Gemfile","Gemfile.lock","LICENSE","README.md","CNAME","*.bak","NOTES.md",".gitignore",".git","_draft/"]
+exclude: ["Gemfile","Gemfile.lock","LICENSE","README.md","CNAME","*.bak","NOTES.md",".gitignore",".git","_draft"]
 
 timezone:      "America/New_York"
 markdown:      kramdown
@@ -74,7 +74,7 @@ navbar:
 # Footer options
 
 author:
-  name: "Right-handed Abacus"
+  name: "Adrian S. Tam"
   email: "righthandabacus@users.github.com"
   facebook: "codeposer"
   github: "righthandabacus"
