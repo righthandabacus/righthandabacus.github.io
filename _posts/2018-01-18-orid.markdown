@@ -1,0 +1,140 @@
+---
+layout: post
+title: O-R-I-D focused conversation
+date: Thu, 18 Jan 2018 01:33:11 -0500
+tags: work
+---
+
+Recently I found the ORID conversation method a hot topic in Taiwan. I can even
+see Audrey Tang (of Perl 6) have a video explaining how she use it in her job
+in the government. Below are some notes and examples, and all the web resources
+from which I learned are listed at the end.
+
+ORID is an interrogative conversation method, with different names: guided
+conversation 引導式討論, basic conversation methods 基礎討論方法, and focused
+conversation 焦點討論法. There is a
+[book](http://www.books.com.tw/products/0010463047) about it as well:
+
+Brian Stanfield (2005), "The Art of Focused Conversation. 100 Ways to Access
+Group Wisdom in the Workplace"
+
+ORID is a "focused" conversation, that is, asking questions strategically.
+用對的順序，問對的問題，來節省至少 1/3 的溝通時間。ORID is an acronym:
+
+| Focused Conversation | 倡議 Advocacy               | 探詢 Inquiry                   |
+|----------------------|-----------------------------|--------------------------------|
+| 客觀性 Objective     | 宣告事實 Declare facts      | 釐清事實 Clarify facts         |
+| 反應性 Reflective    | 釐清感覺 Clarify feelings   | 揭示情緒 Reveal emotion        |
+| 詮釋性 Interpretive  | 分享假設 Share assumptions  | 辨別假設 Discern assumptions   |
+| 決定性 Decisional    | 陳述含意 State implications | 發現含意 Discover implications |
+
+ORID has four steps 四個層次, and should be used in this order:
+
+1. Objective：觀察外在客觀事實
+  - 你看到了甚麼？記得甚麼？
+  - 有哪些人物？發生了甚麼事？
+2. Reflective：重視內在感受、反應
+  - 有甚麼地方讓你很感動/驚訝/沮喪/難過/有趣/開心？
+  - 有甚麼令你印象深刻的地方？
+  - 甚麼是比較困難/容易的？
+3. Interpretive：詮釋反應的意義、價值、經驗
+  - 為甚麼你會有這些感覺？關鍵點在哪？
+  - 引發你想到了甚麼？有甚麼重要的領悟嗎？
+  - 對你而言，重要的意義是甚麼？對我而言又是甚麼？
+4. Decisional：找出決定、行動
+  - 有甚麼我們可以改變的地方？
+  - 接下來的行動/計劃會是甚麼？
+  - 還需要甚麼資源或支持才能完成目標？
+  - 未來要如何？對不在場的人要如何？
+
+After questions for objective facts, every question is based on the response of
+previous question. Gradually find out the connection to previous experience and
+the consensus for the future. 焦點討論法是引導參與者分享對事實、感受、想法與行動的看法。
+
+# Examples
+
+## Self-reflection or day-dreaming
+
+- O: List out everything you saw, heard, came across
+- R: Write down personal thoughts and feelings, interesting or funny or weird ideas
+- I: Raise questions for thinking, look for point of view
+- D: One sentence for what to do as the conclusion
+
+## Scheduling
+
+- O: What tasks shall be done today?
+- R: Which one has higher priority?
+- I: How much time and energy for each task?
+- D: Make up the schedule for today
+
+## Project management:
+
+- Objective：觀察現況的客觀層次
+  - 我們目前在這個專案已完成了甚麼？還有甚麼沒完成的？
+  - 現在讓我們請各部門代表發言，談談你們對這個專案的看法？從你的觀點來看這個專案，問題是甚麼？解決的方法包括哪些層面？
+- Reflective：說出感覺的反應層次
+  - 當你聽到另一個部門對現在的情況提出的看法時，讓你感到驚訝的是甚麼？
+  - 對這個情況，你最感到惱怒或是挑戰的是甚麼？
+- Interpretive：找出意義的詮釋層次
+  - 討論至今，就我們目前面臨的問題，出現了哪些啟發？
+  - 關於問題的成因，有哪些洞見開始浮現？對於整件事，有哪些心得正要浮現出來？
+- Decisional：採取行動的決定層次
+  - 有甚麼事需要發生？我們做些甚麼、能事半功倍地把我們團隊與這個專案帶到一個新的階段？
+  - 接下來，我們要採取甚麼行動，才能讓我們自己以及這個專案繼續推進？
+
+## 讀書會
+
+- O: 在這本書上，你看到了甚麼？還記得哪些段落？
+- R: 書中有哪些部份是讓你印象深刻的嗎？讀了這本書的感受是甚麼？
+- I: 為甚麼書中的這些部份讓你印象深刻？為甚麼會帶給你這樣的感受(感動/驚訝/難過/開心)？引發你想到了甚麼經驗？重要的意義是甚麼？ 
+- D: 這本書有帶給我們可以改變或應用的地方嗎？看完書後，接下來你的行動/計劃會是甚麼？
+
+## 網絡意見及應答
+
+如果有一群陌生的，甚至有敵意的人，要討論一個大家都不是很清楚的問題，最後竟然要有共識並做出決定，那要怎麼做？
+- 討論有兩種人：接近（期望的、友善的）、迴避（情緒化與人身攻擊，讓其他人看到就不想要加入）
+- ORID讓迴避組轉為接近組
+  - formation of ideology is due to asymmetric information and different point
+    of view. 「我就是狂熱地相信，不管其他人怎麼想，反正我就是這樣想就是了。」
+
+ORID: usually only ORI but no D, 網路上是很難做決定的
+  - network usually full of I (subjective idea), and need to guided for O and R
+
+Example of classifying a comment: 我認為「超商販售酒品」已「相當便利」，「不需要在網路開放」販售酒品。
+  - 「超上販售酒品」→ 事實（O）
+  - 「相當便利」→ 感受（R）
+  - 「不需要在網路開放」→ 他的主觀想法（I）
+
+Using ORID to respond to online comments or moderating an open forum:
+
+1. Objective: Clarity facts 澄清
+   - 告知討論的目標與規則、提供相關資訊。
+   - 如發現資訊不對稱，就要說明事實
+   - 不要否定對方感受，反而也揭露自己的感受
+2. Reflective: Redirect 導正
+   - 提醒大家有效評論的重點、帶跑錯的人到對的地方、用安全環境防止人身攻擊。
+   - 不去直接否定對方的感受，而是藉著對方的感受將話題導正。
+     - 酸民的心態就是得不到足夠多的擁抱與人際關係，為了要填補空虛，而去留下情緒化與人身攻擊的言論
+   - 導正：「除非你能提供建設性的建議，否則得不到注意力。」
+   - 「用感受回覆感受；用事實回覆事實」
+3. Interpretive: Focus 聚焦
+   - 請離題的朋友回到議題、提示想要聽到哪些回應、鼓勵考慮其他人的評論
+   - 先澄清事實，讓彼此資訊對等後認同感受
+   - 提出自己的主觀做法給予參考，並提出自己在意的方向（如何…是很重要的事）
+   - 先謝謝對方感受、對於事實的肯定，提出自己關心的議題，聚焦對方討論的方向與提供的想法。
+     - 對方的感受不用正面回應，更不用否定
+   - 在聚焦討論在「這次要討論的議題上」，最後徵詢對方請提出想法 (interpretive)
+
+Discussion will become smooth if we have a consensus on knowledge of facts
+(objective) and feeling (reflective). [sli.do](https://www.sli.do) is a tool for
+gathering audience opinion in realtime.
+
+# Reference
+
+- 侯智薰: [唐鳳擅長的焦點討論法，網路留言回應，應答技巧的典範](https://medium.com/y-pointer/orid-a40f32fca3d7)
+- Chuang Shu-Ting: [ORID焦點討論法 - 白話入門篇](https://www.slideshare.net/shutingchuang940/orid-43587601)
+- [Service Design Facilitate - double diamond - 服務設計 - 第一個菱形引導心得分享](https://www.slideshare.net/shutingchuang940/ss-42801640)
+- [O-R-I-D有效讓對話流動，簡單又實用的提問架構](http://twhrmgr.pixnet.net/blog/post/101638263-o-r-i-d有效讓對話流動，簡單又實用的提問架)
+- 楊琮熙: [問一個好問題，比得到答案本身還重要：善用「ORID」討論法為你的議題聚焦](http://www.cheers.com.tw/article/article.action?id=5087579), 2018-01
+- 楊凱琳: [有效激發團隊智慧，從「問對問題」開始！鍛鍊職場高效提問力](https://www.managertoday.com.tw/articles/view/55109), 2017-10-05
+- [帶領團隊討論與思考，從學「問」開始](https://www.slideshare.net/steven.hy.tseng/ss-63842066)
