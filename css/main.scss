@@ -111,12 +111,20 @@ h1,h2,h3,h4,h5,h6 {
   font-weight: 700;
 }
 a {
-  text-decoration: underline;
+  text-decoration: none;
   color: $colour_text_link;
 }
 a:hover, a:focus {
-  text-decoration: none;
   color: $colour_text_hover;
+}
+main {
+  a {
+    box-shadow: inset 0px -8px 0 lighten($colour_text_link,57%);
+  }
+  a:hover, a:focus {
+    text-decoration: none;
+    box-shadow: none;
+  }
 }
 div.related a {
   text-decoration: none; // no underline for "related" at bottom
