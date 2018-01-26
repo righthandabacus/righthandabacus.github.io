@@ -1,9 +1,8 @@
 ---
-
 layout: post
 title: Collateral Loan Obligations and others
 date: 2017-09-15 12:01 -0400
-categories: work
+tags: work
 published: true
 
 ---

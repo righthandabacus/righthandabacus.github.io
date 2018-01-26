@@ -2,10 +2,15 @@
 layout: post
 title: Downsampling algorithms
 date: Wed, 24 Jan 2018 14:55:45 -0500
+lastedit: Fri, 26 Jan 2018 13:22:32 -0500
 tags: code
 ---
 This is from a master thesis that try to downsample a line chart (time
-series) but retain all visual characteristics.
+series) but retain all visual characteristics. What I know about downsampling is
+to assume the input is a signal and pass it through a low-pass filter, as we
+have learned in the undergraduate signal & system course. But we can't guarantee
+the visual characteristics will not be distorted (Gibbs effect!), especially we
+can't sure the maxima and minima are retained.
 
 The intuitive way to do downsampling is to split the $x$ domain of the line
 chart into some equal segments, and pick one point from each segment. Each

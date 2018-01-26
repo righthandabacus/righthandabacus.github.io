@@ -2,7 +2,7 @@
 layout: post
 title: OpenVPN setup in Debian Jessie
 date: 2016-11-01 12:23 -0400
-category: system
+tags: system
 ---
 
 Environment: Debian Jessie
