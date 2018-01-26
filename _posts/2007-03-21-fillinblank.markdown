@@ -2,6 +2,7 @@
 layout: post
 title: "LaTeX Package: Fill in Blanks"
 date: 2007-03-21 21:34:58 +0800
+lastedit: Fri, 26 Jan 2018 20:40:21 -0500
 tags: code
 ---
 
@@ -58,3 +59,6 @@ The package provides the following commands:
   * `\fillinblank{}`: If currently we are in math mode, do `\fillinspace`, otherwise, do `\fillinunderline`
   * `\fillinblank*{}`: If currently we are in math mode, do `\fillinunderline`, otherwise, do `\fillinspace`
   * `\answerspace{}`: The item in the brace is a paragraph element, which means it is a block or a box. Provide a space for this block and fill the item in.
+
+Edit (2018/1/26): There is an `exam` document class that serve a similar
+purpose, see <http://www-math.mit.edu/~psh/exam/examdoc.pdf>

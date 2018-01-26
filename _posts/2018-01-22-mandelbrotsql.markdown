@@ -61,13 +61,13 @@ How is it done?
 
 A Mandelbrot set is defined on the complex plane with the function
 $f_c(z)=z^2+c$ such that it is the set of all points
-$\\\{c\in\mathbb{C}: |f_c^{(n)}(0)| < \infty,\; \forall n\in\mathbb{N}\\\}$
+$$ \{c\in\mathbb{C}: |f_c^{(n)}(0)| < \infty,\; \forall n\in\mathbb{N}\} $$
 with the notation $f_c^{(n)}(z)$ defined as compound function,
 $f_c^{(1)}(z) = f_c(z)$, $f_c^{(n+1)}(z) = f_c(f_c^{(n)}(z))$.
 Finding the infinite sequence of compound function is impractical, which we
 usually approximate the Mandelbrot set for:
 
-$$\{c\in\mathbb{C}: |f_c^{(n)}(0)| < R, \; n=1,...,N\}$$
+$$ \{c\in\mathbb{C}: |f_c^{(n)}(0)| < R, \; n=1,...,N\} $$
 
 with some predefined large $N$ and $R$.
 

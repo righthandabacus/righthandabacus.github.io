@@ -28,7 +28,7 @@ function can be and nine different variations enumerated.
 
 Percentile, or any quantile, is a rank statistic. Assume we have a set of
 measurements $X_1,\cdots,X_n$ and the version in ascending order of magnitude
-$\mathbf{X}=\{X_{(1)}, X_{(2)}, \cdots, X_{(n)}\}$. Roughly speaking, the
+$$\mathbf{X}=\{X_{(1)}, X_{(2)}, \cdots, X_{(n)}\}$$. Roughly speaking, the
 quantile function $Q(p)$, defined over $p\in[0,1]$, gives some value
 $X_{(k)}\in\mathbf{X}$ such that the number of measurements is fraction $p$ of
 $|\mathbf{X}|$:

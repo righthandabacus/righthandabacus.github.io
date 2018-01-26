@@ -550,6 +550,14 @@ $$ \frac{d_i}{1 + d_i} = \frac{1}{1 + [\textrm{forward Libor from time }i\textrm
   - DM of a bond priced at par is the spread on that bond
   - DM is used to compare prices across bonds, as it adjusts for maturity and coupon differences
 
+DM in terms of present value (current price):
+
+$$ \textrm{PV} = c_0 = \sum_{i=1}^n \frac{c_i}{\prod_{j=1}^i \left(1+(r_j+\textrm{DM})(t_{j}-t_{j-1})\right)} $$
+
+In case of fixed rate, we express PV in yield instead of DM:
+
+$$ \textrm{PV} = c_0 = \sum_{i=1}^n \frac{c_i}{(1+\textrm{yield})^{t_i}} $$
+
 back-of-envelope calculation: price-yield-duration formula
 
 $$ \textrm{change in price in %} = \textrm{duration} \times -(\textrm{change in yield in %}) $$
@@ -993,7 +1001,10 @@ Basel Accord: banks are required to have a basic capital ratio >8%
      - AAA credit: 7% weight (IRB, internal ratings based approach) or 20% (standardised approach)
      - BBB-- credit: 100% weight
      - Below BB-- credit: 1250% weight
-  - Volker rule (US): what a bank can hold
+  - Volker rule (US, mid 2016): what a bank cannot hold (covered funds)
+     - CLOs are not covered fund only if it satisfies any of these: (1) 100%
+       loans, (2) no right to remove manager, (3) 3a7-compliant structure in EUR
+       deals
 
 US SFA: Supervisory formula approach
   - for all securitisation positions
@@ -1003,8 +1014,8 @@ US SFA: Supervisory formula approach
 
 Risk retention:
   - EU rule (effect 2014): manager retain 5%, vertical or horizontal
-  - US rule (effect 2016): Dodd-Frank act
-
+  - US rule (effect 2016): Dodd-Frank act, affects deals closed on or after 1 Jan 2017
+     - possibly, manager holds equity tranche
 
 # Misc
 
