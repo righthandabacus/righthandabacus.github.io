@@ -1,0 +1,28 @@
+---
+layout: post
+title: 深思快想 瞬間看透事物本質的豐田思考術
+subtitle: 稻垣公夫 / 2017
+date: 04 Feb 2018
+categories: book
+bibtex:
+  type: book
+  title: 深思快想
+  subtitle: 瞬間看透事物本質的豐田思考術
+  author: 稻垣公夫 
+  year: 2017
+  address: 新北市
+  publisher: 遠足文化
+  isbn: 978-986-95006-5-4
+---
+
+Toyota 對管理學的貢獻包括看板、改善和 Lean management 這些觀念，最近還有A3報告書。但如何把意念濃縮成 A3 卻不容易，這是思考方法之範籌，Toyota稱之為Zoom in zoom out，即是從具體至抽象之間來回。
+
+事物複雜，人腦不擅抽象化，又宥於常識藩籬，難以看穿背後的因果關係。此時所需的是有創造性的深層思考，而思考的深度與專業知識無關。多練習深層思考會增加事物抽象化的經驗，日後能借助經驗以直覺進行快速跳躍式思考。而練習是一種 PDCA (Plan-Do-Check-Act) cycle 協助思考更精準快速。
+
+事物深層結構大致可以樹狀圖或網狀圖表示，樹狀圖是以邏輯拆解，用 MECE 式分析結構，網狀圖是列出各 variable 之間的因果關係或 correlation。因果關係圖是思考的首步，例如讀文章時，可將四散的因果關係畫出多條因果鏈，再從多條因果關係鏈中找出相同 keyword 將鏈接成網。有時可能從網中找到箭咀迴圈，此則是為系統的 feedback loop。另，有時 variable 之間並不是 causation 而是 correlation (消長關係)，故因果連接用箭咀，消長關係用(+)和(-)於連接線上標示兩者之間是 positive 或 negative correlation。同時，可以在 dependent variables 標出期望值是大是小，從而帶出各 variable 間的 trade-off。
+
+抽象化方法就是將第一次畫出的網狀圖中的各 variable 從因果關係化為消長關係，從而抽象化減少 variable 數量，再將消長關係圖化為更高層次的因果關係圖，再一次減少 variable 數量。
+
+在多種不同的思考圖之間，可能找到相關性，例如形狀似或有共同 keyword，若將不同的思考圖結合，則是以歸納整理提高層次，即是書中提出的類比思考。
+
+書中後半部分有多種不同商業經營例子，將文章化為網圖。
