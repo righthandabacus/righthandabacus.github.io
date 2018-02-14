@@ -12,7 +12,6 @@ bibtex:
   year: 2016
   publisher: Blackstone Publishing
   isbn: 978-1-4417-0053-7
-published: false
 ---
 
 Interviewer (hiring manager) have unconscious questions to be answered by each candidate

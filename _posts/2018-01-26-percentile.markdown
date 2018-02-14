@@ -3,7 +3,6 @@ layout: post
 title: How to calculate percentile
 date: Fri, 26 Jan 2018 09:23:03 -0500
 tags: math
-published: true
 bibtex:
   type: article
   title: Sample Quantiles in Statistical Packages

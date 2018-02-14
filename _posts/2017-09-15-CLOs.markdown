@@ -3,8 +3,6 @@ layout: post
 title: Collateral Loan Obligations and others
 date: 2017-09-15 12:01 -0400
 tags: work
-published: true
-
 ---
 
 Various thing about CLOs or other structured fixed income product.
