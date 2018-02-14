@@ -13,3 +13,6 @@ In case you're interested:
 - my IWQoS 2006 paper, [A Case for TCP-Friendly Admission Control](https://drive.google.com/open?id=19hs78MeBpHHX-RVTHy1LNXA9BmdMxubj)
 - my IWQos 2012 paper, [Preventing TCP Incase Throughput Collapse at the Initiation, Continuation, and Termination](https://drive.google.com/open?id=1xFfZivf3oqsqeod7TuUS1hwuQKO3NLxY)
 - a journal paper, [Fairness of traffic controls for inelastic flows in the Internet](https://drive.google.com/open?id=1CpDChMvmQgJ2sg9vImEa3bU-fvL1wkHp), and ask me about the boats that I missed
+
+Also check out my repositories at [github](https://github.com/righthandabacus)
+and [bitbucket](https://bitbucket.org/adrianswtam/).

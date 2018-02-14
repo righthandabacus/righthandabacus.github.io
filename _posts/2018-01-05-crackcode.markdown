@@ -3,7 +3,7 @@ layout: post
 title: Cracking the Code to a Successful Interview
 subtitle: Evan Pellett / 2016
 date: Fri, 05 Jan 2018 01:52:18 -0500
-categories: book
+category: book
 bibtex:
   type: book
   title: "Cracking the Code to a Successful Interview"

@@ -4,7 +4,7 @@ title: Linux Shell Scripting with Bash
 subtitle: Ken O. Burtch / 2004
 date: 2004-11-01
 tags: reference
-categories: book
+category: book
 bibtex:
   type: book
   title: Linux Shell Scripting with Bash

@@ -3,7 +3,7 @@ layout: post
 title: "說話的力量 (TED Talks: The official TED guide to public speaking)"
 subtitle: "Chris Anderson 李芳齡譯 / 2016"
 date: 2017-12-23 22:29 -0500
-categories: book
+category: book
 bibtex:
   type: book
   title: "說話的力量 TED Talks: The official TED guide to public speaking"

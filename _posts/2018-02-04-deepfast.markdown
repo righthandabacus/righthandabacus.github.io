@@ -3,7 +3,7 @@ layout: post
 title: 深思快想 瞬間看透事物本質的豐田思考術
 subtitle: 稻垣公夫 / 2017
 date: 04 Feb 2018
-categories: book
+category: book
 bibtex:
   type: book
   title: 深思快想

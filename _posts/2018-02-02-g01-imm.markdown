@@ -2,7 +2,7 @@
 layout: post
 title: Genovese (2001) Interacting Multiple Model Algorithm for Accurate State Estimation of Maneuvering Targets
 date: Fri, 02 Feb 2018 10:47:02 -0500
-categories: paper
+category: paper
 bibtex:
   type: article
   title: Interacting Multiple Model Algorithm for Accurate State Estimation of Maneuvering Targets
