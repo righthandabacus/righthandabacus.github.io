@@ -27,6 +27,9 @@ remember:
 - Similar to Javascript, we should use *a lot* of callbacks to get the job done
 - There is a function call `MessageLoop()` that must be run or otherwise the
   Chromium browser will be stuck. And this is *blocking* until the browser quits
+  and you must run this in the main thread
+  - running `MessageLoop()` in a child thread will have it terminated
+    immediately and the browser will be frozen
 - We can bind Python functions as Javascript functions
 - We can also execute Javascript functions from Python, but such execution is
   asynchronous, thus always return nothing
