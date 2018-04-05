@@ -2,6 +2,7 @@
 layout: post
 title: Beta distribution
 date: 2018-03-28 16:54:00 -0400
+lastedit: Thu, 05 Apr 2018 10:51:45 -0400
 tags: math code
 ---
 
@@ -60,7 +61,10 @@ Curves on plot in red, orange, violet, and blue are respectively using $p$ of
 3. Law of diminishing return observed: rapid drop of entropy at beginning and
    slowed down afterwards
 4. $p=0.9$ has lower entropy level than $p=0.5$ but that barely means $p=0.9$ is
-   much less interesting
+   much less interesting, and thus making the pdf of beta distribution narrower
+   (higher kurtosis), as shown in the following:
+
+![](/img/beta_pdf.png)
 
 It seems that, no matter what $p$ actually be, we need only around 30 Bernoulli
 trials to get a fairly good (and cost-effective) estimate. This can be easier
