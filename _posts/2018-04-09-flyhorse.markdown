@@ -1,0 +1,85 @@
+---
+layout: post
+title: How to fly a horse
+subtitle: Kevin Ashton / 2015
+date: Mon, 09 Apr 2018 21:46:06 -0400
+category: book
+bibtex:
+  type: book
+  title: How to fly a horse
+  subtitle: The secret history of creation, invention, and discovery
+  author: Kevin Ashton
+  year: 2015
+  publisher: Doubleday
+  isbn: 978-0-385-53859-6
+---
+
+Book about human creativity.
+
+Creativity is ordinary, not heroic. Creativity is an act of problem solving
+(Allen Newell, "The Processes of Creativity Thinking", 1959). And creativity is
+an incremental build on top of existing idea. Because of the incremental nature,
+creativity is hard work.
+
+Karl Duncker, "On Problem Solving", 1935. All man's mind works the same way,
+unaffected by subject or thinker, but old idea obstructs new ones. The candle
+and box of tacks problem: At one point, people stop seeing the box as a thing
+for holding the tacks but a thing for holding the candle; that shift is an
+insight.
+
+Brain storming: deferring criticism added only bad ideas.
+
+Vast majority of teachers say creativity is important but when tested, they
+always favor less creative children: Because people who are more creative also
+tend to be more playful, unconventional, and unpredictable. All these makes them
+harder to control.
+
+Newism: Prejudice against new things. People always do. Therefore, whether a
+creative idea can success depends on how we react to the adverse condition of
+newism.
+
+Inattentional blindness: The bacterium Helicobacter pylori. "People's natural
+predisposition not to see anything they don't want to, weren't expecting or
+can't explain". Experts tend to have selective attention. Solution to the
+inattentional blindness: shoshin, seeing what is there instead of seeing what we
+think.
+
+Thomas Kuhn, "The structure of scientific revolutions", 1962. Science proceeded
+in a series of revolutions where ways of thinking (paradigms) changed
+completely. Paradigms are a form of selective attention.
+
+Eight motivations for creating (R. A. Ochse): desire for mastery, immortality,
+money, recognition, self-esteem, the desire to create beauty, to prove oneself,
+and to discover underlying order.
+
+Stanford art collage experiment behind one-way mirror by Teresa Amabile: The
+evaluated groups reported more anxiety than the nonevaluated groups. The more
+anxious they were, the less creative they were. That is the reason Woody Allen
+avoiding the Oscars so as to avoid potential destruction of external influence.
+
+Another experiment by Amabile: choice and reward. In creative work, choice
+transforms the role of reward. Members of the no choice-reward group reported
+feeling the most pressure. Most creative work is by choice-reward group, second
+my no reward groups. Passion is the most extreme state of choice without reward,
+or reward on its own.
+
+Ken McGraw hypotheses: Tasks involving discovery were disrupted by rewards, but
+tasks that had one right answer, like math problems, were improved by them.
+
+Writer's block: Loss of creativity by writer. A writer suffering from the
+believe that they cannot write something they think is good. Cure: write
+something you think is bad.
+
+Kelly Johnson from Lockheed: He discovered that a small, isolated, highly
+motived group is the best kind of team for creation. Story of Johnson and
+Hall Hibbard: Intellectually secure people do not need to show anyone how smart
+they are. They are empirical and seek truth. Intellectually insecure people need
+to show everyone how smart they are. They are egotistical and seek triumph.
+Truth-tellers are often eccentric and difficult to manage. They speak a strange
+language, one that isn't focused on incremental change and polite
+business-speak.
+
+Vygotsky's research on children: The connection between language and creating
+has an important consequence. Once children can solve problems by talking about
+what they are doing, they have the basic skills they need to create with others.
+
