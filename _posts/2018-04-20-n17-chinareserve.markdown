@@ -168,5 +168,9 @@ Defer a decision and continue to sell off reserves
   - effect of a sale probably much smaller than QE: Chinese sale of 
     U.S. assets cannot signal market participants about future Federal Reserve policy
 
+Diagram summarizing dynamics between different components (roughly):
+
+![](/img/chinareserve.png)
+
 -----
 
