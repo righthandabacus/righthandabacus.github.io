@@ -10,9 +10,19 @@ In case you're interested:
 
 - my Ph.D dissertation, [Robustness in Data Center Networks](https://drive.google.com/open?id=1drer2itABK4lB8vjG5zpp8xub1jIVet0)
 - my M.Phil thesis, [A Study of the Coexistence of Heterogeneous Flows on Data Networks](https://drive.google.com/open?id=0B6DoI_vm0OLfNmVjeE9yMkNjeEU)
-- my IWQoS 2006 paper, [A Case for TCP-Friendly Admission Control](https://drive.google.com/open?id=19hs78MeBpHHX-RVTHy1LNXA9BmdMxubj)
-- my IWQos 2012 paper, [Preventing TCP Incase Throughput Collapse at the Initiation, Continuation, and Termination](https://drive.google.com/open?id=1xFfZivf3oqsqeod7TuUS1hwuQKO3NLxY)
-- a journal paper, [Fairness of traffic controls for inelastic flows in the Internet](https://drive.google.com/open?id=1CpDChMvmQgJ2sg9vImEa3bU-fvL1wkHp), and ask me about the boats that I missed
+
+Selected publications:
+
+- [TCP PLATO: Packet Labelling to Alleviate Time-Out](https://ieeexplore.ieee.org/document/6689484/), *IEEE J. Sel. Area of Comm.*, 32(1):65--76, with Shikhar Shukla, Shingau Chan, Abhishek Gupta, Yang Xu, and H. Jonathan Chao (Jan 2014)
+- [Preventing TCP Incast Throughput Collapse at the Initiation, Continuation, and Termination](https://drive.google.com/open?id=1xFfZivf3oqsqeod7TuUS1hwuQKO3NLxY), In *Proceedings of 20th IWQoS*, with Kang Xi, Yang Xu, H. Jonathan Chao (June 2012)
+- Resilience Control Plane for Data Center Networks, In *Proc. Workshop on High-Speed Network Research* (Feburary 2012)
+- [Scalability and Resilience in Data Center Networks: Dynamic Flow Reroute as an Example](https://ieeexplore.ieee.org/abstract/document/6134068/), In *Proceedings of IEEE GLOBECOM*, with Kang Xi, H. Jonathan Chao (December 2011)
+- [Use of Devolved Controllers in Data Center Networks](https://arxiv.org/pdf/1103.5586.pdf), In *Proceedings of INFOCOM Workshops*, with Kang Xi, H. Jonathan Chao (April 2011)
+- [Leveraging Performance of Multiroot Data Center Networks by Reactive Reroute](https://ieeexplore.ieee.org/document/5577314/), In *Proc of IEEE Sym on Hot Interconnects*, with Kang Xi, H.  Jonathan Chao (August 2010)
+- [A Fast Reroute Scheme for IP Multicast Network](https://ieeexplore.ieee.org/document/5426171/), In *Proceedings of IEEE GLOBECOM*, with Kang Xi, H. Jonathan Chao (December 2009)
+- [Fairness of Traffic Controls for Inelastic Flows in the Internet](https://drive.google.com/open?id=1CpDChMvmQgJ2sg9vImEa3bU-fvL1wkHp), *Computer Networks*, 51(11):2938--2957, with Dah Ming Chiu (August 2007)
+- [A Case for TCP-Friendly Admission Control](https://drive.google.com/open?id=19hs78MeBpHHX-RVTHy1LNXA9BmdMxubj), In *Proceedings of 14th IWQoS*, with Dah Ming Chiu, John C. S. Lui, and Y. C. Tay (June 2006)
+- [Network Fairness for Heterogeneous Applications](https://drive.google.com/open?id=1sCbZ1mAi4c_hgaAR3dGftT2EhizUHn9i), In *Proceedings of SIGCOMM Asia Workshop*, with Dah Ming Chiu (April 2005)
 
 Also check out my repositories at [github](https://github.com/righthandabacus)
 and [bitbucket](https://bitbucket.org/adrianswtam/).
