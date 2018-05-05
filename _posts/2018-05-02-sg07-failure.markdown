@@ -1,0 +1,76 @@
+---
+layout: post
+title: "Schroeder & Gibson (2007) Disk failures in the real world"
+date: Wed, 02 May 2018 18:34:18 -0400
+category: paper
+bibtex:
+  type: inproceedings
+  title: "Disk failures in the real world: What does an MTTF of 1,000,000 hours mean to you?"
+  author: Bianca Schroeder and Garth A. Gibson
+  booktitle: "Proceedings of FAST'07: 5th USENIX Conference on File and Storage Technologies"
+  year: 2007
+---
+
+Hard disk datasheet: MTTF of 1M to 1.5M hours, suggesting nominal failure rate
+of 0.58 to 0.88%. But annual disk replacement rate observed >1%, usually 2-4%
+and up to 13% in some system.
+
+Time between replacement as proxy for time between failure:
+- Many sites follow "better safe than sorry" policy in replacing disks
+  - Manufacturer may see a disk as healthy while consumer declare it faulty
+  - Mean time to replacement > mean time to failure
+- not well modeled by exponential distribution, with significant levels of
+  autocorrelation and long range dependency
+
+Presumed lifecycle failure pattern for hard drives [^33]
+  - high early failure (infant mortality) in first year
+  - steady failure rate in years 2-5
+  - higher failure due to wear-out in years 5-7
+
+Observation findings:
+- wear-out may start much earlier than expected
+  - does not agree with the common assumption that after the first year of operation, failure rates reach a steady state for a few years
+- Chi-square test does not suggest disk replacement per month follows a Poisson distribution
+  - due to failure rates are not steady over the lifetime
+- Time between failure distribution: Agree with Weibull or gamma distribution, with Chi-square test at significant level of 0.05
+  - Distribution of time between replacements exhibits decresing hazard rate
+- Correlation is significant for lags in the rage of up to 30 weeks
+  - Autocorrelation function (ACF): measures the correlaton of a random variable with itself at different time lags $\ell$
+    - number of failrues in one day is correlated with the number of failures observed $\ell$ days later
+- Squared coefficient of variation: Variance divided by mean $C^2 = \sigma^2 / \mu$
+  - exponential distribution: $C^2 = 1$
+  - observation: $C^2 = 2.4$
+- Long-range dependence: how quickly the autocorrelation coefficient decays with growing lags
+  - strength quantified by Hurst exponent $H$, LRD if $0.5 < H < 1$
+  - observation: Hurst exponent between 0.6 to 0.8 at weekly granularity
+  
+[^33]: J. Yang and F.-B. Sun. A comprehensive review of hard-disk drive reliability. In Proc. of the Annual Reliability and Maintainability Symposium, 1999
+
+# Notes
+
+[Annualized failure rate](https://en.wikipedia.org/wiki/Annualized_failure_rate) (AFR) 
+is used to characterize the reliability of hard disk drives:
+
+$$ \textrm{AFR} = 1 - \exp(-\frac{8766}{\textrm{MTTF}}) $$
+
+where $8766 = 365.25 \times 24$ is number of hours in a year, MTTF is mean time
+between failure.  $1-\textrm{AFR}$ is the fraction of devices or components that will
+show no failure over a year.  If AFR is small, this can be approximated by:
+
+$$ \textrm{AFR} \approx \frac{8766}{\textrm{MTTF}} $$
+
+Example: 1 million hours as MTTF, and exponential arrival model for failure. Then
+failure model is:
+
+$$ h(t) = \Pr[\textrm{failed in } t] = 1-e^{-\lambda t} $$
+
+where $\lambda^{-1} = 10^6$ and $t$ is in hours. Taking annualized failure rate, it is
+
+$$ h(8766) = 1 - \exp(-8766\times 10^{-6}) = 0.87\% $$
+
+AFR data from backblaze (2018 Q1):
+<https://www.backblaze.com/blog/hard-drive-stats-for-q1-2018/>. But the AFR is
+expressed in probability estimate. However, the accuracy of estimate, especially
+in the case of failure is relatively rare, depends on number of samples.
+[Beta distribution](/2018-03-28-betadistro/) should be a good way to estimate
+the accuracy of the probability estimate.
