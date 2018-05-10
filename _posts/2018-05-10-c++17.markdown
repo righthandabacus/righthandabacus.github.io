@@ -1,0 +1,427 @@
+---
+layout: post
+title: Using C++17
+date: Thu, 10 May 2018 16:51:00 -0400
+tags: code
+---
+
+Watched on YouTube the video of [How to Adopt Modern C++17 into Your C++
+Code](https://www.youtube.com/watch?v=UsrHQAzSXkA) and below are the notes.
+
+## Idiomic modern C++
+
+In C++98, code is written as following with a lot of pointer operations:
+
+```cpp
+circle* p = new circle(42);
+vector<shape*> v = load_shapes();
+for (vector<shape*>::iterator i = v.begin(); i != v.end(); ++i) {
+    if (*i && **i == *p)
+		cout << **i << " is a match\n";
+}
+// ... later
+for (vector<shape*>::iterator i = v.begin(); i != v.end(); ++i) {
+	delete *i;
+}
+delete p;
+```
+
+And the equivalent in modern C++, using smart pointers and `auto`:
+
+```cpp
+auto p = make_shared<circle>(42);
+auto v = load_shapes();
+for (auto& s: v) {
+	if (s && *s == *p)
+		cout << *s << " is a match\n";
+}
+```
+
+In Python, we write the arithmetic mean function in one of the following ways:
+
+```python
+def mean(seq):
+	n = 0.0
+	for x in seq:
+		n += x
+	return n / len(seq)
+
+def mean(seq):
+	return sum(seq) / len(seq)
+
+mean = lambda seq: sum(seq)/len(seq)
+```
+
+And below are the line-by-line translation in C++17:
+
+```cpp
+auto mean(const Sequence& seq)
+{
+	auto n = 0.0;
+	for (auto x : seq)
+		n += x;
+	return n/seq.size();
+}
+
+auto mean(const Sequence& seq)
+{
+	return reduce(begin(seq), end(seq))/seq.size();
+}
+
+auto mean = [](const Sequence& seq)
+	{ return reduce(begin(seq), end(seq))/seq.size(); }
+```
+
+The STL function `reduce()` can even be made to run parallel if we add `par_unseq` to it:
+
+```cpp
+auto mean(const Sequence& seq)
+{
+	return reduce(par_unseq, begin(seq), end(seq))/seq.size();
+}
+
+auto mean = [](const Sequence& seq)
+	{ return reduce(par_unseq, begin(seq), end(seq))/seq.size(); }
+```
+
+
+## Value types & move efficiency
+
+In C++98, we return pointer in a function instead of the object because copying
+object can be expensive, especially if it is huge.
+
+```cpp
+set<widget>* load_huge_data() {
+  set<widget>* ret = new set<widget>();
+  // .. load data and populate *ret
+  return ret
+}
+widgets = load_huge_data();
+use(*widgets);
+```
+
+In modern C++, no deep copy if it is unnecessary because of move operation.
+This makes the code cleaner and improved efficiency:
+
+```cpp
+set<widget> load_huge_data() {
+  set<widget> ret;
+  // .. load data and populate ret
+  return ret
+}
+widgets = load_huge_data(); // no deep copy here
+use(widgets);
+```
+
+## Key new std:: vocabulary types in C++17
+
+`string_view`:
+  - non-owning const view of any contiguous sequence of chars
+     - not null-terminated
+  - variations for different char types (e.g. wide then `wstring_view`)
+  - if defined function argument in string view, it works for all kinds of
+    string types. If the string type is null-terminated and convertable to
+    `std::string`, it is used as-is. Otherwise, it should be used with a length hint. Example:
+
+```cpp
+void f(wstring_view s);
+
+std::wstring s;
+f(s);
+
+wchar_t* s; size_t len;
+f({s, len});
+
+CStringW s;
+f((LPCSTR)s);
+
+_bstr_t s;
+f({s, s.length()});
+
+UNICODE_STRING s;
+f({s.Buffer, s.Length});
+```
+
+`optional<T>`:
+  - contains a `T` value or empty, example:
+
+```cpp
+std::optional<std::string> create() {
+  if (something) return "xyzzyx";
+  else           return {};
+}
+
+int main() {
+	auto result = create();
+
+	if (result) {
+		std::cout << *result << "\n";
+	};
+
+	try {
+		cout << *result; // may throw
+	} catch (const bad_optional_access& e) {
+		/* ... */
+	};
+
+	cout << result.value_or("empty") << "\n"; // prints "empty" if empty, otherwise "xyzzyx"
+}
+```
+
+`variant<Ts...>`
+  - contains one value of a fixed set of types
+  - like a union but safe against misuse of type, example:
+
+```cpp
+auto v = variant<int, double>(42);	// holds an int here
+cout << get<int>(v);				// prints "42"
+try {
+	cout << get<double>(v);			// throws error
+} catch 9const bad_variant_access& e) {
+	cout << e.what();
+}
+v = 3.14159;						// v switched to hold a double
+cout << get<double>(v);				// prints "3.14159"
+```
+
+`any()`
+  - contains one value of any type
+  - like a variant but for fully dynamic type, example:
+
+```cpp
+auto v = any(42);					// holds an int here
+cout << any_cast<int>(v);			// prints "42"
+try {
+	cout << any_cast<string>(v);	// throws error
+} catch 9const bad_any_access& e) {
+	cout << e.what();
+}
+v = "xyzzyx"s;						// v switched to hold a string
+cout << any_cast<string>(v);		// prints "xyzzyx"
+```
+
+## RAII
+
+For idiomatic C++. RAII = resources always owned by objects. Example:
+
+```cpp
+void f()
+{
+	auto p = make_unique<widget>(...);
+	my_class x(OpenFile());
+	// ...
+} // auto destruction and deallocation, auto exception safety
+```
+
+If you want `new`, use `make_unique` instead: If resources are created by `new`
+in the function, there is a risk that we forget to `delete` it upon return. But
+if we use `make_unique<widget>` instead of `new widget`, the unique pointer
+created will have a destructor to relinquish the resource created.  RAII
+guarantees the unique pointer's destructor to be called.
+
+RAII can be leveraged for scoped lifetime, for example:
+
+```cpp
+class widget {
+	private:
+		gadget g;
+	public:
+		void draw();
+}
+
+void f()
+{
+	widget w; // lifetime limited to function scope
+	// ...
+	w.draw();
+	// ...
+} // auto destruction of widget w and gadget w.g
+```
+
+The member `g` of `gadget` type will be implicitly destroyed when widget is destroyed
+due to RAII. If `g` is declared as pointer to `gadget`, we may forget to destory and
+have memory leak. If widget `w` is declared inside a scope, e.g. a function, it will
+be destroyed automatically when it is out of scope, and the destruction cascades into
+member objects.
+
+## Error and exceptions
+
+C API usually use error code and C++ prefers exceptions. Both are for reporting errors
+when functions can't do what it advertised.
+
+Reasons for exceptions:
+- Error codes are ignored by default
+- Error codes have to manually propagated by intermediate code
+- Error codes don't work well for errors in constructors and operators
+- Error codes interleave "normal" and "error handling" code
+
+Reason for error codes: For interfacing with non-C++ code
+
+Exceptions are for recoverable errors
+- not recoverable error = precondition violation
+   - the program is not able to do anything sensible
+   - if function is ever called with precondition violation, it is a logic bug, and the program is corrupted
+   - don't use exceptions, use contracts (not yet in C++)
+
+## Pointers
+
+Most differentiated part between classic and modern C++. In C++98, we do this:
+
+```cpp
+widget* factory();
+void caller()
+{
+	widget* w = factory();
+	gadget* g = new gadget();
+	use(*w, *g);
+	delete g;
+	delete w;
+}
+```
+
+In modern C++, we should avoid owning `type_t*`, `new`, `delete` except encapsulated
+inside implementation of low-level data structures. Modern C++ should be this:
+
+```cpp
+unique_ptr<widget> factory();
+void caller()
+{
+	auto w = factory();
+	auto g = make_unique<gadget>();
+	use(*w, *g);
+}
+```
+
+- `new`: use `make_unique`, or `make_shared`
+- `delete`: don't write, smart pointer handles that
+
+Non-owning `*` and `&` are still OK, such as using as function parameters and return values. Example:
+
+```cpp
+void f(widget& w) // required a widget
+{
+	use(w)
+}
+void g(widget* w) // widget optional, can be NULL
+{
+	if(w) use(*w);
+}
+
+auto upw = make_unique<widget>();
+f(*upw);
+auto spw = make_shared<widget>();
+g(spw.get()); // .get() may return NULL pointer
+```
+
+Use smart pointers as function parameters if you need to, example:
+
+```cpp
+// derived-to-base conversion
+void f(const shared_ptr<Base>&);
+f(make_shared<Derived>());
+
+// non-const-to-const conversion
+void f(const shared_ptr<const Node>&);
+f(make_shared<Node>());
+
+// Aliasing constructor
+struct Node{Data data};
+shared_ptr<Data> get_data(const shared_ptr<Node>& pn)
+{
+	return {pn, &(pn->Data)};
+}
+```
+
+The last example, aliasing constructor, is to make pointer to `Data` and pointer
+to `Node` share the same reference count. This is as if the pointer to `Data` is an
+alias to pointer to `Node`.
+
+There are some antipattern in manipulating pointers:
+
+Any of these makes smart pointer usage slow:
+
+```cpp
+// refcnt_ptr can be any ref counted pointer
+void f(refcnt_ptr<widget>& w)	// smart pointer used unnecessarily
+{
+	use(*w);
+}
+
+void f(refcnt_ptr<widget> w)	// even worse, copy of smart pointer make it slow by ref counting
+{
+	use(*w);
+}
+
+refcnt_ptr<wdget> w = ...;
+for (auto& e : baz) {
+	auto w2 = w;				// do not copy smart pointer in a loop
+	use(w2, *w, whatever)
+}
+```
+
+Examples:
+- Facebook RocksDB in late 2013 pass smart pointer by value in function calls.
+  Change it to pass-by-reference or even pass raw pointer/raw reference make
+  400% performance improvement.
+- C++/WinRT factory cache found more than 50% time spend on ref counting of
+  returned object.
+
+Correctness pitfall: reentrancy. For example below:
+
+```cpp
+shared_ptr<widget> other_p; // global
+
+void f(widget& w) {
+	g();
+	use(w);			// w already vanished
+}
+
+void g() {
+	other_p = ...;  // de-refcount, destroyed old other_p
+}
+
+void my_code() {
+	f(*other_p);	// passing nonlocal
+	other_p->foo(); // oops
+}
+```
+
+The way to spot this error is to figure out use of *non-local* copy of `shared_ptr`. The fix is:
+
+```cpp
+void my_code() {
+	auto pin = other_p;	// "pin" a copy to local, ref count + 1
+	f(*pin);			// passing local
+	pin->foo()			// use local again
+}
+```
+
+Pin only do once in the call tree, cost of ref counting is amortized for
+multiple use in the scope and sub-scope.
+
+Patterns of passing smart pointers
+
+```cpp
+unique_ptr<widget> factory();				// source: produces widget
+void sink(unique_ptr<widget>);				// consumed: transfering ptr to function
+void reseat(unique_ptr<widget>&);			// "will" or "might" reseat ptr
+void thinko(const unique_ptr<widget>&);		// alert, usually not what you want
+
+shared_ptr<widget> factory();				// source+shared ownership
+void sink(shared_ptr<widget>);				// "will" retain refcount
+void reseat(shared_ptr<widget>&);			// "might" reseat ptr
+void may_share(const shared_ptr<widget>&);	// "might" retain refcount
+```
+
+Summary of do it right:
+- never pass smart pointers (by value or by reference) unless you actually want to manipulate the pointer
+  - manipulate = store, change, let go of a reference
+  - instead, prefer passing object by `*` or `&` as usual
+  - pass object by `f(*other_p)` should make unaliased+local copy of `other_p` at top of call tree
+- express ownership using `unique_ptr` wherever possible, e.g., you don't know
+  whether the object will actually ever be shared
+  - free: exactly the cost of a raw pointer by design
+  - safe: exception-safe, better than a raw pointer
+  - declarative: intended uniqueness and source/sink semantics
+  - removes many objects out of refcount population
+- otherwise, the object will be shared, use `make_shared` up front wherever possible
