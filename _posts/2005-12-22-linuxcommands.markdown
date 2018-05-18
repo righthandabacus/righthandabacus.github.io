@@ -2,7 +2,7 @@
 layout: post
 title: "Off-the-shelf GNU/Linux (or Debian) Commands"
 date: 2005-12-22 00:07:08 +0800
-lastedit: Thu, 07 Sep 2017 15:04:00 -0400
+lastedit: Fri, 18 May 2018 16:42:53 -0400
 tags: system reference
 category: blog
 ---
@@ -150,3 +150,18 @@ awk 'NR>=1234&&NR<=1357' input.txt
 `sed` option `-n` prohibits implicit output, the `p` command prints the lines,
 `q` command quit the stream upon a particular line.
 (Source: [stackoverflow question](https://stackoverflow.com/questions/83329/how-can-i-extract-a-predetermined-range-of-lines-from-a-text-file-on-unix#comment20465347_83347))
+
+# "Open with" associations in GUI
+
+Right click "open with" menu is populated from a combination of `mimeinfo.cache`
+and `mimeapps.list` files in the system. The file `mimeinfo.cache` is generated
+automatically from a bunch of `defaults.list`. The location of these files are
+(in precedence order):
+
+1. `~/.local/share/applications/mimeapps.list`
+2. `~/.local/share/applications/defaults.list`
+3. `/usr/local/share/applications/defaults.list`
+4. `/usr/share/applications/defaults.list`
+5. `/usr/share/applications/mimeinfo.cache`
+
+([Source](https://lkubaski.wordpress.com/2012/10/29/understanding-file-associations-in-lxde-and-pcmanfm/))

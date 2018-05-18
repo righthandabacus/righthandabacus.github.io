@@ -24,5 +24,6 @@ Selected publications:
 - [A Case for TCP-Friendly Admission Control](https://drive.google.com/open?id=19hs78MeBpHHX-RVTHy1LNXA9BmdMxubj), In *Proceedings of 14th IWQoS*, with Dah Ming Chiu, John C. S. Lui, and Y. C. Tay (June 2006)
 - [Network Fairness for Heterogeneous Applications](https://drive.google.com/open?id=1sCbZ1mAi4c_hgaAR3dGftT2EhizUHn9i), In *Proceedings of SIGCOMM Asia Workshop*, with Dah Ming Chiu (April 2005)
 
-Also check out my repositories at [github](https://github.com/righthandabacus)
-and [bitbucket](https://bitbucket.org/adrianswtam/).
+Also check out my repositories at [github](https://github.com/righthandabacus),
+[bitbucket](https://bitbucket.org/adrianswtam/), and
+[gist](https://gist.github.com/righthandabacus).
