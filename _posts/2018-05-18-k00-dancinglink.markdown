@@ -2,6 +2,7 @@
 layout: post
 title: Knuth (2000) Dancing Link
 date: Fri, 18 May 2018 17:21:53 -0400
+lastedit: Fri, 25 May 2018 21:59:13 -0400
 tags: code
 category: paper
 bibtex:
@@ -249,6 +250,14 @@ int main()
 	return 0;
 };
 ```
+
+Extension: Knuth's web site has his implementation in CWEB. Compare to what he
+described in this paper, his CWEB implementation classify columns into two
+groups, namely primary and secondary. The rule is to have all primary columns
+covered but coverage for secondary columns is optional. In the code above,
+instead of checking for `if (c == root)` in the beginning of `solvegrid()`, we
+check if the linked list of `c` contains only secondary columns. Such extension
+is necessary to solve polyomino problems.
 
 Something learned:
 

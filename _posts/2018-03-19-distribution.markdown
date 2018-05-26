@@ -200,15 +200,26 @@ $$ f(x; k) = \frac{x^{k/2-1} e^{-x/2}}{2^{k/2}\Gamma(k/2)} $$
 
 F-distribution
 
-- Distribution of a random variable defined as the ratio of two independent $\chi^2$-distributed random variables
+- Distribution of a random variable defined as the ratio of two independent
+  $\chi^2$-distributed random variables, with degrees of freedom $d_1$ and $d_2$
+  respectively
 - Commonly used in ANOVA
 - PDF, with degrees of freedom $d_1$ and $d_2$, involves beta function $B(\alpha,\beta)$:
 
-$$ f(x; d_1, d_2) = \left[x B(\frac{d_1}{2},\frac{d_2}{2})\right]^{-1} \sqrt{\frac{(d_1 x)^{d_1} d_2^{d_2}}{(d_1 x+d_2)^{d_1+d_2}}} $$
+$$\begin{align}
+f(x; d_1, d_2) &= \left[x B(\frac{d_1}{2},\frac{d_2}{2})\right]^{-1} \sqrt{\frac{(d_1 x)^{d_1} d_2^{d_2}}{(d_1 x+d_2)^{d_1+d_2}}} \\
+\textrm{and if}\qquad
+z_1 &\sim \chi^2(d_1) \\
+z_2 &\sim \chi^2(d_2) \\
+\textrm{then}\qquad
+x = \frac{z_1/d_1}{z_2/d_2} &\sim f(x, d_1, d_2)
+\end{align}$$
 
 Student's t distribution
 
-- Distribution of normalized sample mean of $n=k+1$ observations from a normal distribution, $\frac{\bar{X}-\mu}{S/\sqrt{n}}$
+- Distribution of *normalized* sample mean of $n=k+1$ observations from a normal distribution, $\frac{\bar{X}-\mu}{S/\sqrt{n}}$
+- Equivalently, this is the distribution of $\frac{x}{\sqrt{y/r}}$ for $x$ is standard normal and $y$ is chi-square with $r$ degrees of freedom
+- t distribution with $n=1$ is Cauchy distribution
 - PDF with degree of freedom $k$:
 
 $$ f(x, k) = \frac{\Gamma(\frac{k+1}{2})}{\sqrt{k\pi}\Gamma(k/2)} \left(1+\frac{x^2}{k}\right)^{-(k+1)/2} $$
