@@ -16,7 +16,7 @@ bibtex:
 ---
 A paper to illustrate the concept of cointegration, a concept with a wide use in econometrics.
 
-Consider a random walk $x_t$, which the step is guided by a stationary white-noise
+Consider a random walk $$x_t$$, which the step is guided by a stationary white-noise
 
 $$
 x_t - x_{t-1} = w_t
@@ -29,17 +29,17 @@ x_t - x_{t-1} = w_t  \\
 y_t - y_{t-1} = u_t
 $$
 
-Such random walks are non-stationary as $\lim_{t\to\infty} x_t$ is hard to determine. Now consider the case that there is a correction between the drunk and the dog such that $\lvert x_t - y_t\rvert$, while random, shall not be too large. Then the walks $x_t$ and $y_t$ are said to be cointegrated.
+Such random walks are non-stationary as $$\lim_{t\to\infty} x_t$$ is hard to determine. Now consider the case that there is a correction between the drunk and the dog such that $$\lvert x_t - y_t\rvert$$, while random, shall not be too large. Then the walks $$x_t$$ and $$y_t$$ are said to be cointegrated.
 
-If a non-stationary series would become stationary if it is differentiated for $n$ times, then the series is said to be "integrated of order $n$". Hence a stationary series is by definition integrated of order zero. The series above are integrated of order one, since
+If a non-stationary series would become stationary if it is differentiated for $$n$$ times, then the series is said to be "integrated of order $$n$$". Hence a stationary series is by definition integrated of order zero. The series above are integrated of order one, since
 
 $$
 x'_t = w_t
 $$
 
-and the white-noise term $w_t$ has zero mean.
+and the white-noise term $$w_t$$ has zero mean.
 
-For a set of series, if there is a linear combination of them with non-zero weights that, the linear combination is integrated of order $n$, then the set of series is said to be "cointegrated of order $n$". Obviously, a set of series which each of them is integrated of order $n$ will be cointegrated of order less than $n$.
+For a set of series, if there is a linear combination of them with non-zero weights that, the linear combination is integrated of order $$n$$, then the set of series is said to be "cointegrated of order $$n$$". Obviously, a set of series which each of them is integrated of order $$n$$ will be cointegrated of order less than $$n$$.
 
 Consider the random walks above, it is better to be modelled as
 
@@ -48,4 +48,4 @@ x_t - x_{t-1} = w_t - c(x_{t-1} - y_{t-1})  \\
 y_t - y_{t-1} = u_t + d(x_{t-1} - y_{t-1})
 $$
 
-Where the second term on the right is the error-correcting term. If the error-correcting term is non-stationary, the series are non-stationary too (consider that a stationary series must be integrated of order zero). But if $c$ and $d$ above are positive constants, however small are they, $x_t-y_t$ will stablise around zero.
+Where the second term on the right is the error-correcting term. If the error-correcting term is non-stationary, the series are non-stationary too (consider that a stationary series must be integrated of order zero). But if $$c$$ and $$d$$ above are positive constants, however small are they, $$x_t-y_t$$ will stablise around zero.

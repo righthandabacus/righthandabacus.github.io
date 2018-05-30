@@ -13,7 +13,7 @@ In <http://blog.smola.org/post/987977550/log-probabilities-semirings-and-floatin
 
 $$ \log \sum_i x_i = \log\xi + \log\left[\sum_i \exp(\log x_i-\log\xi)\right] $$
 
-where $\xi = \max\{ x_i \}$. The prove is as follows:
+where $$\xi = \max\{ x_i \}$$. The prove is as follows:
 
 $$
 \begin{aligned}

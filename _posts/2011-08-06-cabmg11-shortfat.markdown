@@ -21,7 +21,7 @@ of ms. The 802.1Qbb PFC divides traffic into 8 priorities according to the IEEE
 802.1p class of service field and perform 802.1x PAUSE flow control. It has
 potential for deadlock in certain topologies, and exposure to saturation tree
 congestion. Its configuration involves the max and min thresholds,
-$Q_{\textrm{max-th}}$ and $Q_{\textrm{min-th}}$.
+$$Q_{\textrm{max-th}}$$ and $$Q_{\textrm{min-th}}$$.
 
 Datacenter communications is predominantly TCP with some RDMA, SCTP, and UDP.
 

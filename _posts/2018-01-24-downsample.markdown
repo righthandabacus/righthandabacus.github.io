@@ -12,12 +12,12 @@ have learned in the undergraduate signal & system course. But we can't guarantee
 the visual characteristics will not be distorted (Gibbs effect!), especially we
 can't sure the maxima and minima are retained.
 
-The intuitive way to do downsampling is to split the $x$ domain of the line
+The intuitive way to do downsampling is to split the $$x$$ domain of the line
 chart into some equal segments, and pick one point from each segment. Each
 segment is named a *bucket* in the thesis. We can pick the points by taking the
-mean, mode, median, min, or max of the $y$ values in each bucket.  Strictly
+mean, mode, median, min, or max of the $$y$$ values in each bucket.  Strictly
 speaking, data points after downsample should be subset of input. If this rule
-applies, we cannot use mean as the method of selection (nor distorting the $x$
+applies, we cannot use mean as the method of selection (nor distorting the $$x$$
 value of the selected data point). But each of these simple selection rule will
 have certain weakness, for example,
 
@@ -31,8 +31,8 @@ rule) is named "mode-median-bucket" in the thesis.
 An improved method is named "longest line bucket" (LLB). Similar bucketing is
 applied but with the leftmost and rightmost data point in their own bucket. And
 an edge is connecting every point pairs across the bucket boundary, for
-example, if bucket $i$ and bucket $i+1$ has $N_i$ and $N_{i+1}$ points
-respectively, there will be $N_iN_{i+1}$ edges created. Such edges are directed
+example, if bucket $$i$$ and bucket $$i+1$$ has $$N_i$$ and $$N_{i+1}$$ points
+respectively, there will be $$N_iN_{i+1}$$ edges created. Such edges are directed
 from left to right, hence the whole thing becomes a DAG. Each edge carries a
 weight, defined as the Euclidean distance between the points. The downsampling
 is to find the path from first to last data point on the DAG that maximize the
@@ -158,28 +158,28 @@ colinear with adjacent points.
 
 Improving the LTOB method is to change the effective area definition to be not
 the adjacent points of a point, but any point in adjacent bucket. Assume we
-have $N_{i-1}$, $N$, $N_{i+1}$ points respectively in adjacent buckets $i-1$,
-$i$, $i+1$. For each point in bucket $i$, we have $N_{i-1}N_{i+1}$ possible
+have $$N_{i-1}$$, $$N$$, $$N_{i+1}$$ points respectively in adjacent buckets $$i-1$$,
+$$i$$, $$i+1$$. For each point in bucket $$i$$, we have $$N_{i-1}N_{i+1}$$ possible
 triangle formation and we assign the maximum of them as the weight to such
 point. However, assuming we are scanning the line chart from left to right, and
 we have the first and last data point in its own bucket, we always have a
-point selected in bucket $i-1$ when we are working on bucket $i$. Therefore, we
-only need to find the max effective area among $N_{i+1}$ options and the
-complexity for selecting a point in each bucket is $O(N^2)$ only. A way to
-further improve this to $O(N)$ complexity is to use a fixed imaginary point in
-bucket $i+1$ for the effective area calculation for points in bucket $i$.
+point selected in bucket $$i-1$$ when we are working on bucket $$i$$. Therefore, we
+only need to find the max effective area among $$N_{i+1}$$ options and the
+complexity for selecting a point in each bucket is $$O(N^2)$$ only. A way to
+further improve this to $$O(N)$$ complexity is to use a fixed imaginary point in
+bucket $$i+1$$ for the effective area calculation for points in bucket $$i$$.
 The imaginary point is defined as the mean of all points in that bucket. Since
 we are working on three buckets each time, it is largest-triangle-three-bucket
 (LTTB) method.
 
-Above assumed we divide the buckets into equal size of interval on $x$-axis.
+Above assumed we divide the buckets into equal size of interval on $$x$$-axis.
 Dynamic bucketing can be applied: We start with equal interval bucketing. Next,
-consider the sum of squared error (SSE) of the $y$-value of all points in a
+consider the sum of squared error (SSE) of the $$y$$-value of all points in a
 bucket to their mean, we split the bucket into two if this is too large and
 merge with neighboring bucket if this is too low. By running certain iterations
 on this splitting/merging of buckets, the bucketing should be more frequent in
 region of high fluctuations. Number of iterations to run is suggested as
-$10 \times \frac{\textrm{size of input sample}}{\textrm{size of downsample}}$
+$$10 \times \frac{\textrm{size of input sample}}{\textrm{size of downsample}}$$
 in the thesis.
 
 Reference

@@ -14,7 +14,7 @@ bibtex:
   year: 2009
   address: "New Orleans, LA"
 ---
-The subject of study in this paper is a generalized fat tree. It has n levels of switch and each switch can have different number of downstream and upstreams. A regular fat tree, $k$-ary $n$-tree, has each switch connects to $k$ downstreams.
+The subject of study in this paper is a generalized fat tree. It has n levels of switch and each switch can have different number of downstream and upstreams. A regular fat tree, $$k$$-ary $$n$$-tree, has each switch connects to $$k$$ downstreams.
 
 Route a communication in fat tree is equivalent to choosing one of the nearest common ancestor (NCA) in the fat tree. Three different routing schemes are evaluated, they are namely, random, S-mod-k and D-mod-k. Random is to choose the NCA randomly. S-mod-k and D-mod-k choose the NCA by taking modulus on the source and destination address.
 

@@ -18,7 +18,7 @@ Explanation of the twelve:
 6. Factorial(3) = 6
 7. 0.99999 = 1
 8. Binary 0b1000
-9. Base-4 number 21 = 2 $\times$ 4 + 1 = 9
+9. Base-4 number 21 = 2 $$\times$$ 4 + 1 = 9
 10. Combination 5C2 = 10
 11. Hex number 0xB = 11
 12. Cubic root of 1728 = 12

@@ -58,9 +58,9 @@ Another issue with DSA is the implementation allows only 1024-bit key for the
 compliance to NIST FIPS 186-2, which is insufficient today. RSA allows 2048-bit
 alternative, but not DSA in recent version's OpenSSH.
 
-Both DSA and ECDSA assumes a good RNG. The cipher has a parameter $k$ that
+Both DSA and ECDSA assumes a good RNG. The cipher has a parameter $$k$$ that
 required to be random, secure, and unique. If the machine has a poor RNG, the
-algorithm may fail. For example, same $k$ used twice can help figure out
+algorithm may fail. For example, same $$k$$ used twice can help figure out
 private key.
 
 Therefore, the accepted cipher are only `ed25519` and `rsa`.

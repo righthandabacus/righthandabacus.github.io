@@ -15,7 +15,7 @@ bibtex:
 
 This paper describes SPAIN, a method to build data center networks (load balanced networks) from commodity ethernet switches and specialized hosts.
 
-The hosts are required with no special hardware but a specialized driver so that all the packets sending out are in a VLAN and all the hosts are capable of doing some kind of signalling to other hosts. The idea is, for all hosts to any other hosts, we find $k$ paths, preferably disjoin but not required, and combine them into a small number of VLAN spanning trees. Then the switches are configured with those VLANs with hand-coded forwarding tables. The host is then send packets with a per-flow random VLAN so that the traffic can be balanced. The merit of this paper is in the algorithm to combine paths into VLANs.
+The hosts are required with no special hardware but a specialized driver so that all the packets sending out are in a VLAN and all the hosts are capable of doing some kind of signalling to other hosts. The idea is, for all hosts to any other hosts, we find $$k$$ paths, preferably disjoin but not required, and combine them into a small number of VLAN spanning trees. Then the switches are configured with those VLANs with hand-coded forwarding tables. The host is then send packets with a per-flow random VLAN so that the traffic can be balanced. The merit of this paper is in the algorithm to combine paths into VLANs.
 
 # Summary
 

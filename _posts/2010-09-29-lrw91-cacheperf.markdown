@@ -33,7 +33,7 @@ This code is performing good for several reasons:
 And if the matrices are small, `B` can store entirely in the cache, then the
 code can be fast. If the matrices are large, so that the cache cannot even hold
 a row of data (`C`), the cache is never reused. In this case (worst case), there
-would be $2N^3+N^2$ elements read in $N^3$ iterations.
+would be $$2N^3+N^2$$ elements read in $$N^3$$ iterations.
 
 The blocked code is like the following:
 
@@ -49,8 +49,8 @@ for kk := 1 to N step b do        {* N/b blocks *}
 
 This code would be efficient if the block of `B` of size bxb can reside inside the
 cache, so that it can be reused throughout the loop on `i`. Then the memory read
-would be $2N^3/b+N^2$, reduced by a factor of $b$ at most. The optimal value (by
-Hong & Kung, 1981) of blocking factor $b$ is roughly square root of $c$, where $c$ is
+would be $$2N^3/b+N^2$$, reduced by a factor of $$b$$ at most. The optimal value (by
+Hong & Kung, 1981) of blocking factor $$b$$ is roughly square root of $$c$$, where $$c$$ is
 the size of the cache.
 
 In practice of running these algorithms, the performance is not as good as
@@ -62,7 +62,7 @@ there could be *cross interference* when two different variables conflicts each
 other in cache, or *self interference* when elements of the same array variable
 conflicts with itself in cache.
 
-The paper elaborated that, the intrinsic cache miss is $N^3(2/b+4b/c)$, which is
+The paper elaborated that, the intrinsic cache miss is $$N^3(2/b+4b/c)$$, which is
 the best performance that can be achieved. So minimizing this yields blocking
-factor of $b=\sqrt{c/2}$. In case of a-way set associative cache is used, the
-optimal block size would be (heuristic) $b=\sqrt{c(a-1)/2a}$
+factor of $$b=\sqrt{c/2}$$. In case of a-way set associative cache is used, the
+optimal block size would be (heuristic) $$b=\sqrt{c(a-1)/2a}$$

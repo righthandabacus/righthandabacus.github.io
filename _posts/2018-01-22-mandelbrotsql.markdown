@@ -60,24 +60,24 @@ and the output is
 How is it done?
 
 A Mandelbrot set is defined on the complex plane with the function
-$f_c(z)=z^2+c$ such that it is the set of all points
+$$f_c(z)=z^2+c$$ such that it is the set of all points
 $$ \{c\in\mathbb{C}: |f_c^{(n)}(0)| < \infty,\; \forall n\in\mathbb{N}\} $$
-with the notation $f_c^{(n)}(z)$ defined as compound function,
-$f_c^{(1)}(z) = f_c(z)$, $f_c^{(n+1)}(z) = f_c(f_c^{(n)}(z))$.
+with the notation $$f_c^{(n)}(z)$$ defined as compound function,
+$$f_c^{(1)}(z) = f_c(z)$$, $$f_c^{(n+1)}(z) = f_c(f_c^{(n)}(z))$$.
 Finding the infinite sequence of compound function is impractical, which we
 usually approximate the Mandelbrot set for:
 
 $$ \{c\in\mathbb{C}: |f_c^{(n)}(0)| < R, \; n=1,...,N\} $$
 
-with some predefined large $N$ and $R$.
+with some predefined large $$N$$ and $$R$$.
 
 This is how we can understand the above SQL: From top to bottom, the table
-`xaxis` and `yaxis` are values of axis. Because of the text mode screen, $y$
-(i.e. imaginary axis) is coarser than $x$ (the real axis). This is a recursive
+`xaxis` and `yaxis` are values of axis. Because of the text mode screen, $$y$$
+(i.e. imaginary axis) is coarser than $$x$$ (the real axis). This is a recursive
 CTE that starts with values --1.0 and --2.0 respectively and increments the
 value recursively until the upperbound is met.
 
-Next is table `m`, which starts with a Cartesian join with $x$- and $y$-axes
+Next is table `m`, which starts with a Cartesian join with $$x$$- and $$y$$-axes
 and assign it as iteration 0. This is a lot of data points. Then we do for
 iteration 1 to 27, and in each iteration, we compute:
 
@@ -88,22 +88,22 @@ f_c(z) &= z^2 + c \\
        &= (x^2 - y^2 + c_x) + (2xy + c_y) \mathrm{i}
 \end{aligned}$$
 
-and we remember the result of $|f_c(z)| < 4$ only in each iteration. This is
-assuming if $f_c(z)$ moved to outside the circle of $R=4$, it is diverging and
+and we remember the result of $$|f_c(z)| < 4$$ only in each iteration. This is
+assuming if $$f_c(z)$$ moved to outside the circle of $$R=4$$, it is diverging and
 if it does not so for the first 27 iterations, it never.
 
 The tables `xaxis`, `yaxis`, and `m` are built recursively using `UNION ALL`.
 While it may contain redundant data it is an optimization to defer the
 repetition removal until later, in table `m2`.
 
-Table `m2` records the maximum iteration ever found in table `m` for each $c$.
-We imposed the bound $R=4$, hence it is the iteration that $c$ is determined
+Table `m2` records the maximum iteration ever found in table `m` for each $$c$$.
+We imposed the bound $$R=4$$, hence it is the iteration that $$c$$ is determined
 diverging. Also note that `m2` is built with `GROUP BY` on `cx, cy`, therefore
 it is implicitly sorted by such as well.
 
 Then table `a` is drawing the Mandelbrot set by scanning for each constant
-value of imaginary part of $c$. With `m2` implicitly sorted, the `group_concat()`
-function is collating values of real part of $c$ in ascending order. We use
+value of imaginary part of $$c$$. With `m2` implicitly sorted, the `group_concat()`
+function is collating values of real part of $$c$$ in ascending order. We use
 characters space, `.`, `+`, `*`, and `#` for iteration count 0, 1, 2, 3, and 4
 and above respectively. The selection is achieved by `substr()` call, a neater
 alternative to `CASE` statement.

@@ -14,8 +14,8 @@ bibtex:
 This paper presents several findings on the problem of optimal routing.
 
 Consider the problem of routing traffic on a topology. The traffic pattern is
-described by a demand matrix for which each element $(s,t)$ describes the demand
-from $s$ to $t$. Each arc in the network has a specified capacity. The load on
+described by a demand matrix for which each element $$(s,t)$$ describes the demand
+from $$s$$ to $$t$$. Each arc in the network has a specified capacity. The load on
 an arc, however, depends on the routing. The paper models the problem as an
 optimization on the sum of costs amid satisfying the traffic demand. The cost is
 defined as the sum of all link costs, which is a function of the load and

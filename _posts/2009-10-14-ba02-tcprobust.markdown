@@ -35,7 +35,7 @@ The paper studies the impact of reordering. It found that, the throughput decrea
 Furthermore, we can avoid making spurious retransmission by adjusting the threshold for duplicated acknowledgement reaction (`dupthresh`). Instead of the default of 3, this value can be varying. Retransmission occurs only when the total duplicated ACK equals to dupthresh. There are several ways to adjust `dupthresh`:
 
   - Constant increase by 1 for every spurious retx
-  - Constant increase by $N$, the number of packets reordered, for every spurious retx
+  - Constant increase by $$N$$, the number of packets reordered, for every spurious retx
   - Set `dupthresh` to a EWMA of number of packets reordered
   - Delay the retx by a timer, if packets arrived before timer fires, do no retx
 

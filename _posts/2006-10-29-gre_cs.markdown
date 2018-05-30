@@ -45,15 +45,15 @@ int factorial(int n, int a) {
 
 Some situation wherein common complexities occur:
 
-| Complexity   | Example |
-|--------------|---------|
-| $O(1)$       | Fetching the first element from a set of data |
-| $O(\log n)$  | Splitting a set of data in half repeatly |
-| $O(n)$       | Traversing a set of data |
-| $O(n\log n)$ | Splitting a set of data in half repeatly and traversing each half |
-| $O(n^2)$     | Traversing a set once for each member of another set of equal size |
-| $O(2^n)$     | Generating all possible subsets of a set of data |
-| $O(n!)$      | Generating all possible permutations of a set of data |
+| Complexity     | Example |
+|----------------|---------|
+| $$O(1)$$       | Fetching the first element from a set of data |
+| $$O(\log n)$$  | Splitting a set of data in half repeatly |
+| $$O(n)$$       | Traversing a set of data |
+| $$O(n\log n)$$ | Splitting a set of data in half repeatly and traversing each half |
+| $$O(n^2)$$     | Traversing a set once for each member of another set of equal size |
+| $$O(2^n)$$     | Generating all possible subsets of a set of data |
+| $$O(n!)$$      | Generating all possible permutations of a set of data |
 
 ## Automata
 
@@ -70,12 +70,12 @@ Regular language: Some NFA recognizes it
 Non-regular language: No finite automata can recognize it
 
   * Non-regular language can be verified by pumping lemma
-  * Pumping lemma: $A$ is a regular language if and only if:
-    * $A$ is a language
-    * $s \in A$ such that $\vert s\vert  \ge p$ and $s=xyz$, and
-      1. $xy^iz \in A \quad \forall i \ge 0$; and
-      2. $\vert y\vert  > 0$; and
-      3. $\vert xy\vert  \le p$
+  * Pumping lemma: $$A$$ is a regular language if and only if:
+    * $$A$$ is a language
+    * $$s \in A$$ such that $$\vert s\vert  \ge p$$ and $$s=xyz$$, and
+      1. $$xy^iz \in A \quad \forall i \ge 0$$; and
+      2. $$\vert y\vert  > 0$$; and
+      3. $$\vert xy\vert  \le p$$
 
 Context-free language: Described by Context-Free gammar, i.e. substitution rules
 
@@ -87,12 +87,12 @@ Context-free language: Described by Context-Free gammar, i.e. substitution rules
 Push-down automata (PDA): A finite automata with a stack
 
   * CFG is equivalent to PDA
-  * Pumping lemma for CFL: $A$ is a CFL if and only if:
-    * $A$ is a language
-    * $s \in A$ such that $\vert s\vert \ge p$ and $s=uvxyz$, and
-      1. $uv^ixy^iz \in A \quad \forall i \ge 0$; and
-      2. $\vert vy\vert > 0$; and
-      3. $\vert vxy\vert \le p$
+  * Pumping lemma for CFL: $$A$$ is a CFL if and only if:
+    * $$A$$ is a language
+    * $$s \in A$$ such that $$\vert s\vert \ge p$$ and $$s=uvxyz$$, and
+      1. $$uv^ixy^iz \in A \quad \forall i \ge 0$$; and
+      2. $$\vert vy\vert > 0$$; and
+      3. $$\vert vxy\vert \le p$$
 
 Turing machine: A finite automata with a tape of infinite size for read/write
 
@@ -100,10 +100,10 @@ Turing machine: A finite automata with a tape of infinite size for read/write
   * Decidable: Some Turing decider accepts it
       * Decider either accepts or rejects an input, but never loops indefinitely
 
-Oracle: An external device capable of reporting whether any string $w \in B$
+Oracle: An external device capable of reporting whether any string $$w \in B$$
 
 Relation of languages:\\
-Regular $\subset$ Context-free $\subset$ Decidable $\subset$ Turing-recognizable
+Regular $$\subset$$ Context-free $$\subset$$ Decidable $$\subset$$ Turing-recognizable
 
 ## Complexities
 
@@ -119,17 +119,17 @@ NP-Complete: A set of problems for which if a polynomial time algorithm exists f
 Examples of NP-complete problems:
 
   - Satisfiability problem
-    * For a boolean expression, such as $\phi = (\bar x \wedge y) \vee (x \wedge \bar z)$, it is satisfiable if $\phi = 1$ for some assignment to its variables.
-    * Satisfiability problem: Provided some boolean expression $\phi$, determine whether $\phi$ is satisfiable
+    * For a boolean expression, such as $$\phi = (\bar x \wedge y) \vee (x \wedge \bar z)$$, it is satisfiable if $$\phi = 1$$ for some assignment to its variables.
+    * Satisfiability problem: Provided some boolean expression $$\phi$$, determine whether $$\phi$$ is satisfiable
   - 3SAT problem
     * A satisfiability problem of 3-conjunctive normal form, i.e. 3 ORed-triples joined by ANDs
-  - $k$-Clique: Determine if a graph has a $k$-clique
+  - $$k$$-Clique: Determine if a graph has a $$k$$-clique
     * Reducible from 3SAT problem
   - Vertex-cover problem:
     * Vertex-cover is a subset of nodes of a graph G which every edge of G touches one of those nodes
-    * For a graph $G$, determine if a $k$-node vertex-cover exists
+    * For a graph $$G$$, determine if a $$k$$-node vertex-cover exists
   - Hamiltonian path problem
-    * For a graph $G$, determine if a path exists that traverses every node
+    * For a graph $$G$$, determine if a path exists that traverses every node
   - Subset sums problem
     * Given a collection of numbers, determine if a subset of them adds to have a certain sum
 
@@ -143,8 +143,8 @@ P=\begin{bmatrix}Q & C\\
   \end{bmatrix}
 $$
 
-where $Q$ is a $(n-1)\times(n-1)$ sub-stochastic matrix (i.e. the one with row
-sum less than 1). Hence the $k$-th power of transition matrix is:
+where $$Q$$ is a $$(n-1)\times(n-1)$$ sub-stochastic matrix (i.e. the one with row
+sum less than 1). Hence the $$k$$-th power of transition matrix is:
 
 $$
 P^k=\begin{bmatrix}Q^k & C'\\
@@ -158,8 +158,8 @@ $$
 M=(I-Q)^{-1}=I+Q+Q^2+\cdots=\sum_{k=0}^{\infty} Q^k
 $$
 
-and the $ij$-th entry in $M$ denotes the *expected number of visit* to state $j$
-before the absorbing state, given we start with state $i$.
+and the $$ij$$-th entry in $$M$$ denotes the *expected number of visit* to state $$j$$
+before the absorbing state, given we start with state $$i$$.
 
 ## Computer Architecture
 

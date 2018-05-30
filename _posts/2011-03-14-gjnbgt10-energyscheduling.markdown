@@ -19,8 +19,8 @@ real hardware strategically. But consolidation may incur overhead. In this
 paper, a cost value is proposed comprising different aspects of a "cost", which
 includes possibility of doing a consolidation without violating requirements
 (cost is infinity or zero), power efficiency (cost is a range), and others. Then
-the costs of moving a VM ($N$ numbers in total) to a machine ($M$ numbers in total)
-is enumerated. The costs are presented as a matrix of $N$-by-$(M+1)$ which a
+the costs of moving a VM ($$N$$ numbers in total) to a machine ($$M$$ numbers in total)
+is enumerated. The costs are presented as a matrix of $$N$$-by-$$(M+1)$$ which a
 "virtual machine" is included as idling jobs.
 
 Given the matrix, a VM is moved to a machine by a uphill searching process. The

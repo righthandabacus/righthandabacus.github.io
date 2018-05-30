@@ -18,31 +18,31 @@ Also as "ARC: A Self-Tuning, Low Overhead Replacement Cache" by the same authors
 
 This is the paper that proposed Adaptive Replacement Cache (ARC) as a caching algorithm.
 
-ARC implements with two LRU (lease recently used) queues $L_1$ and $L_2$. Where
-$L_1$ is storing objects that seen only once and $L_2$ is storing objects that
+ARC implements with two LRU (lease recently used) queues $$L_1$$ and $$L_2$$. Where
+$$L_1$$ is storing objects that seen only once and $$L_2$$ is storing objects that
 referenced at least twice. Supposedly, the union of these two LRU queues, which
-each holds at most $c$ items, can provide a better cache than a single LRU
+each holds at most $$c$$ items, can provide a better cache than a single LRU
 queue because it solves the temporal locality problem. But then the total amount
-of memory is $2c$.
+of memory is $$2c$$.
 
-ARC therefore assumes $L_1=T_1+B_1$ and $L_2=T_2+B_2$ which the union of  $L_1$
-and $L_2$ is called the directory (with size limit of $2c$ and $L_1$ is no
-bigger than $c$) and the union of $T_1$ and $T_2$ is the cache (with size limit
-of $c$). Only the items in cache is stored in memory. Directory indexes the ID
-of the objects only. The maximum size of the caches $T_1$ and $T_2$ are $p$ and
-$c-p$ respectively, where $p$ is adaptive.
+ARC therefore assumes $$L_1=T_1+B_1$$ and $$L_2=T_2+B_2$$ which the union of  $$L_1$$
+and $$L_2$$ is called the directory (with size limit of $$2c$$ and $$L_1$$ is no
+bigger than $$c$$) and the union of $$T_1$$ and $$T_2$$ is the cache (with size limit
+of $$c$$). Only the items in cache is stored in memory. Directory indexes the ID
+of the objects only. The maximum size of the caches $$T_1$$ and $$T_2$$ are $$p$$ and
+$$c-p$$ respectively, where $$p$$ is adaptive.
 
 When an object is referenced, it is put into the cache, using the following algorithm:
 
-  - If cache hit in $T_1+T_2$: Move the item to MRU position of $T_2$
-  - If directory hit in $B_1$, then *p* is too small. So load the object into MRU position of
-    $T_2$ and set $p=\min(c, p+\max(\lvert B_2\rvert/\lvert B_1\rvert),1))$
-  - If directory hit in $B_2$, then *p* is too big. So load the object into MRU position of
-    $T_2$ and set $p=\min(c, p-\max(\lvert B_1\rvert/\lvert B_2\rvert),1))$
+  - If cache hit in $$T_1+T_2$$: Move the item to MRU position of $$T_2$$
+  - If directory hit in $$B_1$$, then *p* is too small. So load the object into MRU position of
+    $$T_2$$ and set $$p=\min(c, p+\max(\lvert B_2\rvert/\lvert B_1\rvert),1))$$
+  - If directory hit in $$B_2$$, then *p* is too big. So load the object into MRU position of
+    $$T_2$$ and set $$p=\min(c, p-\max(\lvert B_1\rvert/\lvert B_2\rvert),1))$$
   - If directory miss, do not adjust *p* but replace items in the directory/cache as follows
-    - If $\lvert L_1\rvert=c$, delete the LRU of $L_1$ (which is also the LRU of $B_1$)
-    - If $\lvert L_1\rvert<c$, delete the LRU of $L_2$ (which is also the LRU of $B_2$)
-    - Then load the item into the MRU position of $T_1$
+    - If $$\lvert L_1\rvert=c$$, delete the LRU of $$L_1$$ (which is also the LRU of $$B_1$$)
+    - If $$\lvert L_1\rvert<c$$, delete the LRU of $$L_2$$ (which is also the LRU of $$B_2$$)
+    - Then load the item into the MRU position of $$T_1$$
 
-In the above algorithm, we will move an item from $T$ to $B$ if necessary so
-that the size constraint imposed by the parameter $p$ is honoured.
+In the above algorithm, we will move an item from $$T$$ to $$B$$ if necessary so
+that the size constraint imposed by the parameter $$p$$ is honoured.

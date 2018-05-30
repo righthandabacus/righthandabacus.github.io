@@ -15,15 +15,15 @@ junktext:
 was introduced by Bryan Ford in 2004[^f04]. Its characteristic is its output is
 a single, non-ambiguous parse tree.
 
-The PEG grammar is $(N, \Sigma, P, e_S)$, where
+The PEG grammar is $$(N, \Sigma, P, e_S)$$, where
 
-- $N$: a finite set nonterminal symbols
-- $\Sigma$: a finite set of terminal symbols that is disjoint from $N$
-- $P$: a finite set parsing rules
-- $e_S$: an expression termed the starting expression
+- $$N$$: a finite set nonterminal symbols
+- $$\Sigma$$: a finite set of terminal symbols that is disjoint from $$N$$
+- $$P$$: a finite set parsing rules
+- $$e_S$$: an expression termed the starting expression
 
 The parsing expression is any terminal symbol, any nonterminal symbol, the
-empty string $\epsilon$ (these three: atomic parsing expression), or any
+empty string $$\epsilon$$ (these three: atomic parsing expression), or any
 compound expressions:
 
 - Sequence: `e1 e2`
@@ -166,7 +166,7 @@ to extend the sequence construct and create a "look behind" predicate such that:
 
 Using the fencing example above, this predicate can look for children in the
 node that matches the opening and closing fence and verify the string length
-matches the rule of $m\ge n$.
+matches the rule of $$m\ge n$$.
 
 [^f04]:  Bryan Ford (2004). "Parsing Expression Grammars: A Recognition Based Syntactic Foundation". Proceedings of the 31st ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages. ACM.
 [^so]: StackOverflow - [Parse indentation level with peg.js](https://stackoverflow.com/questions/11659095/parse-indentation-level-with-peg-js/11700527)

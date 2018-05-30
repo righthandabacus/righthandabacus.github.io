@@ -19,11 +19,11 @@ Similar paper:
         year: "2007"
     }
 
-In a network $G(V,E)$, assume a link $(u,v)$ failed. To find an alternative path joining $u$ to $v$ efficiently as a detour.
+In a network $$G(V,E)$$, assume a link $$(u,v)$$ failed. To find an alternative path joining $$u$$ to $$v$$ efficiently as a detour.
 
-Upon failure of link $(u,v)$, consider the sink tree rooted at $v$ in the network, which is the result of routing on $G$. Color the subtree under $u$ (i.e. portion of the sink tree rooted at $u$) in black, and the rest of the sink tree in white. In this tree, only the white portion is unaffected by the failure. An algorithm is proposed to find fast reroute paths for the black portion and, gradually, re-color the black portion into white.
+Upon failure of link $$(u,v)$$, consider the sink tree rooted at $$v$$ in the network, which is the result of routing on $$G$$. Color the subtree under $$u$$ (i.e. portion of the sink tree rooted at $$u$$) in black, and the rest of the sink tree in white. In this tree, only the white portion is unaffected by the failure. An algorithm is proposed to find fast reroute paths for the black portion and, gradually, re-color the black portion into white.
 
-Firstly, find the black node $w$ closest to $u$ that has a bridge to a white node, call it the exit node and the bridge the exit link. The following the reversed path on the tree from $u$ to $w$, then follow the exit link to the exit node, is a backup path. Then color those traversed black nodes into white, as they should install the backup port and use it shall the primary port failed. Also color all the nodes under the subtree rooted at $w$ into white, as normal forwarding will be protected from the failure of $(u,v)$ once the traffic reached $w$. Subsequently, repeat this process until all nodes are colored white. The last node re-colored white shall be $u$, only after all its children are re-colored.
+Firstly, find the black node $$w$$ closest to $$u$$ that has a bridge to a white node, call it the exit node and the bridge the exit link. The following the reversed path on the tree from $$u$$ to $$w$$, then follow the exit link to the exit node, is a backup path. Then color those traversed black nodes into white, as they should install the backup port and use it shall the primary port failed. Also color all the nodes under the subtree rooted at $$w$$ into white, as normal forwarding will be protected from the failure of $$(u,v)$$ once the traffic reached $$w$$. Subsequently, repeat this process until all nodes are colored white. The last node re-colored white shall be $$u$$, only after all its children are re-colored.
 
 After this procedure, each node shall carry a forwarding table in the format of:
 

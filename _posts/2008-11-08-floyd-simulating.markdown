@@ -18,6 +18,6 @@ Invariants of internet:
   - Self-similarity of packet arrivals
   - Poisson session arrivals: Session means high-level human activities
   - Log-normal connection sizes (size in bytes/duration in seconds of connection)
-  - Heavy-tailed distributions: Pareto distribution with shape $\alpha<2$
+  - Heavy-tailed distributions: Pareto distribution with shape $$\alpha<2$$
      - Not clear how log-normal and heavy-tail are related
   - For telnet-like session, the packet distribution is Pareto

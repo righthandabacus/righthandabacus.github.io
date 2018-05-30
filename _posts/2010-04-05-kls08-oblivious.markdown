@@ -30,13 +30,13 @@ in traffic-sensitive scheme to that of a oblivious scheme. But the computation, 
 paper, involves linear programming of exponentially many constraints.
 
 To make the problem more tractable, a hose model is proposed. It is to restrict the total ingress
-traffic and egress traffic at any node $i$ to be no more than $R_i$ and $C_i$ respectively. Therefore,
-for a matrix $T$, $\sum_j t_{ij} \le R_i$ and $\sum_j t_{ij} \le C_i$.
+traffic and egress traffic at any node $$i$$ to be no more than $$R_i$$ and $$C_i$$ respectively. Therefore,
+for a matrix $$T$$, $$\sum_j t_{ij} \le R_i$$ and $$\sum_j t_{ij} \le C_i$$.
 
-Two phase routing is to make every node $i$ send $\alpha_j$ amount of every flow to
-node $j$ and let node $j$ to redirect the traffic to the destination. Thus every flow is routed
+Two phase routing is to make every node $$i$$ send $$\alpha_j$$ amount of every flow to
+node $$j$$ and let node $$j$$ to redirect the traffic to the destination. Thus every flow is routed
 in two steps and therefore the name. In two-phase routing with hose model, the total traffic
-between any two nodes $i$ and $j$ is $\alpha_jR_i + \alpha_iC_j$. Therefore,
+between any two nodes $$i$$ and $$j$$ is $$\alpha_jR_i + \alpha_iC_j$$. Therefore,
 it is insensitive to individual entries in the traffic matrix, and hence oblivious.
 
 The paper says the performance of two-phase routing of hose model is at least 1/2 of the optimal, and

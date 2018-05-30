@@ -61,11 +61,11 @@ that it is actually the case:
 IEEE 754 [binary64 format](https://en.wikipedia.org/wiki/Double-precision_floating-point_format):
 - sign bit: 1 bit (bit 0)
 - exponent: 11 bits (bit 1 to bit 11)
-   - biased (0 to 2047 for representing $e+1023$) or unbiased ($-1024$ to $1023$ in two's complement)
-   - exponent of $-1023$ and $+1024$ are reserved
+   - biased (0 to 2047 for representing $$e+1023$$) or unbiased ($$-1024$$ to $$1023$$ in two's complement)
+   - exponent of $$-1023$$ and $$+1024$$ are reserved
 - mantissa: 53 bits with 52 bits explicitly stored (bit 12 to bit 63)
    - with implicit integer bit of value 1 except for special values
-   - guaranteed precision of 15 significant decimal digits ($53\log_{10}2 = 15.95$)
+   - guaranteed precision of 15 significant decimal digits ($$53\log_{10}2 = 15.95$$)
 
 Reversing for big-endian order, 0.61 becomes
 ```
@@ -73,7 +73,7 @@ Reversing for big-endian order, 0.61 becomes
 ```
 - sign bit: `0`
 - exponent: `0x3FE` (`=011 1111 1110`)
-  - 1022 in decimal, biased representation of $1022-1023 = -1$
+  - 1022 in decimal, biased representation of $$1022-1023 = -1$$
 - mantissa: `0x3851EB851EB85` (`=0011 1000 0101 0001 1110 1011 1000 0101 0001 1110 1011 1000 0101`)
 
 Converting to binary, it is:

@@ -5,13 +5,13 @@ date: 2005-02-21 07:20:00 +0800
 tags: code math
 ---
 
-We may need to calculate factorials $n!$ from time to time. But we will easily get
-into a very large number as $n$ increases. We all know Stirling's formula for
+We may need to calculate factorials $$n!$$ from time to time. But we will easily get
+into a very large number as $$n$$ increases. We all know Stirling's formula for
 calculating factorials:
 
     str[n_]:=n^n E^(-n) Sqrt[2 Pi n]
 
-or $n! \approx n^n e^{-n} \sqrt{2\pi n}$
+or $$n! \approx n^n e^{-n} \sqrt{2\pi n}$$
 
 ## Error in Stirling's formula
 But how close is the Stirling's formula? I did this in mathematica:
@@ -122,13 +122,14 @@ and the result is:
   99 1.00084
 ```
 So you can see,
+
 | When      | `n!/str[n]-1` |
 |-----------|---------------|
-| `n >= 9`  | $< 1\%$ |
-| `n >= 17` | $< 0.5\%$ |
-| `n >= 28` | $< 0.3\%$ |
-| `n >= 42` | $< 0.2\%$ |
-| `n >= 84` | $< 0.1\%$ |
+| `n >= 9`  | $$< 1\%$$     |
+| `n >= 17` | $$< 0.5\%$$   |
+| `n >= 28` | $$< 0.3\%$$   |
+| `n >= 42` | $$< 0.2\%$$   |
+| `n >= 84` | $$< 0.1\%$$   |
 
 ## C-implementation
 But actually, we can do more precise. According to MathWorld, we can have the inequality
@@ -212,7 +213,7 @@ different approximations and compare it to the correct value of factorial. We ca
 shown by this program that, the long double precision in C can only hold up to factorial of 1546.
 
 Below are the output of the C program up to factorial of 100. The number is the relative difference
-between approximation and actual value, i.e. approx/actual$-1$:
+between approximation and actual value, i.e. approx/actual$$-1$$:
 
 ```
     n        Stirling     Stirling LB     Stirling UB          Gosper

@@ -46,10 +46,10 @@ This paper proposes the following problem setup:
 The global optimal proportioning problem is the following:
 
 Assume all nodes know the network topology and the offered load between every source-destination pair.
-Then we define $\hat c_\ell >0$ to be the capacity of (unidirectional) link $\ell$ and $\sigma = (s,d)$ to
-be a source-destination pair. Given the arrival rate and holding time of this pair to be $\lambda_\sigma$
-and $\mu_\sigma$ respectively, its offered load is $\nu_\sigma = \lambda_\sigma/\mu_\sigma$. Assume that
-the set of all feasible path for routing σ to be $\hat{R}_\sigma$.
+Then we define $$\hat c_\ell >0$$ to be the capacity of (unidirectional) link $$\ell$$ and $$\sigma = (s,d)$$ to
+be a source-destination pair. Given the arrival rate and holding time of this pair to be $$\lambda_\sigma$$
+and $$\mu_\sigma$$ respectively, its offered load is $$\nu_\sigma = \lambda_\sigma/\mu_\sigma$$. Assume that
+the set of all feasible path for routing σ to be $$\hat{R}_\sigma$$.
 
 The global optimal proportioning problem is therefore, to find
 $$ \{\alpha_r^\ast, r\in\hat{R}_\sigma\} $$
@@ -57,18 +57,18 @@ such that
 $$ \sum_{r\in\hat{R}_\sigma} \alpha_r^\ast = 1 $$
 and
 $$ W=\sum_\sigma\sum_{r\in\hat{R}_\sigma}\alpha_r\nu_\sigma(1-b_r) $$
-is maximized, where $b_r$ is the blocking probability on path $r$, which could be derived from Erlang's
-formula using capacity of $\hat{c}$, and M/M/1 arrival-departure pattern of offered load $\nu$.
+is maximized, where $$b_r$$ is the blocking probability on path $$r$$, which could be derived from Erlang's
+formula using capacity of $$\hat{c}$$, and M/M/1 arrival-departure pattern of offered load $$\nu$$.
 
-Usually, we use only a subset of paths $R_\sigma \subset \hat R_\sigma$ such that for some small $\epsilon$, $R_\sigma = \{r: r\in\hat{R}_\sigma, \alpha_r^\ast>\epsilon\}$.
+Usually, we use only a subset of paths $$R_\sigma \subset \hat R_\sigma$$ such that for some small $$\epsilon$$, $$R_\sigma = \{r: r\in\hat{R}_\sigma, \alpha_r^\ast>\epsilon\}$$.
 
 Solving the global optimal proportioning problem requires the global knowledge on the offered load. Therefore localized strategies exists to achieve the near-optimal solution. Two strategies are mentioned in the paper, they are:
 
-  - equalizing blocking probabilities (ebp): To make $b_{r_1} = b_{r_2} = \cdots = b_{r_k}$
-     on one source-destination pair and their $k$ paths
-  - equalizing blocking rate (ebr): To make $\alpha_{r_1}b_{r_1} = \alpha_{r_2}b_{r_2} = \cdots = \alpha_{r_k}b_{r_k}$
+  - equalizing blocking probabilities (ebp): To make $$b_{r_1} = b_{r_2} = \cdots = b_{r_k}$$
+     on one source-destination pair and their $$k$$ paths
+  - equalizing blocking rate (ebr): To make $$\alpha_{r_1}b_{r_1} = \alpha_{r_2}b_{r_2} = \cdots = \alpha_{r_k}b_{r_k}$$
 
-In the paper, ebp is used, with an approximation. Instead of calculating the adjustments directly, the fractions $\alpha_{r_i}$ are adjusted adaptively at a frequency $\theta$. It is first find the average blocking probability $\bar{b} = \sum_i\alpha_{r_i}b_{r_i}$, and increase $\alpha_{r_i}$ if $b_{r_i} < \bar{b}$ or decrease otherwise. The amount of adjustment is depended on $\lvert b_{r_i} - \bar{b}\rvert$.
+In the paper, ebp is used, with an approximation. Instead of calculating the adjustments directly, the fractions $$\alpha_{r_i}$$ are adjusted adaptively at a frequency $$\theta$$. It is first find the average blocking probability $$\bar{b} = \sum_i\alpha_{r_i}b_{r_i}$$, and increase $$\alpha_{r_i}$$ if $$b_{r_i} < \bar{b}$$ or decrease otherwise. The amount of adjustment is depended on $$\lvert b_{r_i} - \bar{b}\rvert$$.
 
 ## Minimizing the number of candidate paths
 
@@ -76,29 +76,29 @@ The set of paths for a particular source-destination pair is determined by "wide
 
 The width of a path is the residual bandwidth on its bottleneck link, i.e.
 $$ w_r = \min_{\ell\in r} c_\ell $$
-where $c_\ell = \hat c_\ell - \nu_\ell$ is the average residual bandwidth on link $\ell$. Usually, we compute the residual bandwidth on a link by using the utilization $u_\ell$ as reported by the link state update, i.e.
+where $$c_\ell = \hat c_\ell - \nu_\ell$$ is the average residual bandwidth on link $$\ell$$. Usually, we compute the residual bandwidth on a link by using the utilization $$u_\ell$$ as reported by the link state update, i.e.
 $$ c_\ell = (1-u_\ell)\hat{c}_\ell $$.
-The distance of a path is defined as $\sum_{\ell\in r} 1/c_\ell$.
+The distance of a path is defined as $$\sum_{\ell\in r} 1/c_\ell$$.
 
-The width of a set of paths $R$ is computed as follows,
+The width of a set of paths $$R$$ is computed as follows,
 
-  - First pick the path $r^\ast$ with the largest width.
+  - First pick the path $$r^\ast$$ with the largest width.
     If multiple such paths exist, choose the one with shortest distance.
-  - Then decrease the residual bandwidth on all links of $r^\ast$ by $w_{r^\ast}$, this essentially remove $r^\ast$ from next selection
-  - Repeat this process until we exhaust $R$
-  - The sum of all widths of paths is the width of $R$
-  - The last path selected in this computation is denoted by $\textrm{NARROWEST}(R)$
+  - Then decrease the residual bandwidth on all links of $$r^\ast$$ by $$w_{r^\ast}$$, this essentially remove $$r^\ast$$ from next selection
+  - Repeat this process until we exhaust $$R$$
+  - The sum of all widths of paths is the width of $$R$$
+  - The last path selected in this computation is denoted by $$\textrm{NARROWEST}(R)$$
 
-To select η paths from the set $\hat{R}_\sigma$, the idea of the algorithm is as follows
+To select η paths from the set $$\hat{R}_\sigma$$, the idea of the algorithm is as follows
 
-  - Include a new path $r\in\hat R_\sigma$ to $R_\sigma$
-    if it contributes to the largest resulting width to $R_\sigma$ and
-    $\lvert R_\sigma\rvert<\eta$
-  - If $\lvert R_\sigma\rvert = \eta$, a new path has to be added and an old path has to be removed,
+  - Include a new path $$r\in\hat R_\sigma$$ to $$R_\sigma$$
+    if it contributes to the largest resulting width to $$R_\sigma$$ and
+    $$\lvert R_\sigma\rvert<\eta$$
+  - If $$\lvert R_\sigma\rvert = \eta$$, a new path has to be added and an old path has to be removed,
     so that the resulting width is maximized
-  - Such addition or addition/removal results in a new width of $R_\sigma$, it is accepted
-    only if the new width is larger than the old width by a fraction of $\psi$
-  - If no addition is made to $R_\sigma$, remove a path from it if this does not
+  - Such addition or addition/removal results in a new width of $$R_\sigma$$, it is accepted
+    only if the new width is larger than the old width by a fraction of $$\psi$$
+  - If no addition is made to $$R_\sigma$$, remove a path from it if this does not
     result in decreasing its width.
 
 Property of this algorithm is to select a set of candidate paths that are mutually disjoint with respect to bottleneck links. This path selection procedure and the proportioning procedure are run together as a heuristic, to "trade-off slight increase in blocking for significant decrease in the number of candidate paths".

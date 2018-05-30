@@ -14,4 +14,4 @@ bibtex:
   month: June
   year: 2002
 ---
-This paper deals with TCP over multipath networks. It suggest to modify TCP to enhance its performance over multipath, namely, increase the dupthresh to $D(1+\lfloor\log_2N\rfloor)$ where $D$ is the number (=3) of dup ACKs to trigger fast retransmission by default. Furthermore, the receiver delay ACK the packets out-of-order by ACK only every two segments or after a timer expiration but ACK immediately for every retransmitted packets.
+This paper deals with TCP over multipath networks. It suggest to modify TCP to enhance its performance over multipath, namely, increase the dupthresh to $$D(1+\lfloor\log_2N\rfloor)$$ where $$D$$ is the number (=3) of dup ACKs to trigger fast retransmission by default. Furthermore, the receiver delay ACK the packets out-of-order by ACK only every two segments or after a timer expiration but ACK immediately for every retransmitted packets.

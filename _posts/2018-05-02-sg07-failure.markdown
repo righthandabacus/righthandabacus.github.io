@@ -35,13 +35,13 @@ Observation findings:
 - Time between failure distribution: Agree with Weibull or gamma distribution, with Chi-square test at significant level of 0.05
   - Distribution of time between replacements exhibits decresing hazard rate
 - Correlation is significant for lags in the rage of up to 30 weeks
-  - Autocorrelation function (ACF): measures the correlaton of a random variable with itself at different time lags $\ell$
-    - number of failrues in one day is correlated with the number of failures observed $\ell$ days later
-- Squared coefficient of variation: Variance divided by mean $C^2 = \sigma^2 / \mu$
-  - exponential distribution: $C^2 = 1$
-  - observation: $C^2 = 2.4$
+  - Autocorrelation function (ACF): measures the correlaton of a random variable with itself at different time lags $$\ell$$
+    - number of failrues in one day is correlated with the number of failures observed $$\ell$$ days later
+- Squared coefficient of variation: Variance divided by mean $$C^2 = \sigma^2 / \mu$$
+  - exponential distribution: $$C^2 = 1$$
+  - observation: $$C^2 = 2.4$$
 - Long-range dependence: how quickly the autocorrelation coefficient decays with growing lags
-  - strength quantified by Hurst exponent $H$, LRD if $0.5 < H < 1$
+  - strength quantified by Hurst exponent $$H$$, LRD if $$0.5 < H < 1$$
   - observation: Hurst exponent between 0.6 to 0.8 at weekly granularity
   
 [^33]: J. Yang and F.-B. Sun. A comprehensive review of hard-disk drive reliability. In Proc. of the Annual Reliability and Maintainability Symposium, 1999
@@ -53,8 +53,8 @@ is used to characterize the reliability of hard disk drives:
 
 $$ \textrm{AFR} = 1 - \exp(-\frac{8766}{\textrm{MTTF}}) $$
 
-where $8766 = 365.25 \times 24$ is number of hours in a year, MTTF is mean time
-between failure.  $1-\textrm{AFR}$ is the fraction of devices or components that will
+where $$8766 = 365.25 \times 24$$ is number of hours in a year, MTTF is mean time
+between failure.  $$1-\textrm{AFR}$$ is the fraction of devices or components that will
 show no failure over a year.  If AFR is small, this can be approximated by:
 
 $$ \textrm{AFR} \approx \frac{8766}{\textrm{MTTF}} $$
@@ -64,7 +64,7 @@ failure model is:
 
 $$ h(t) = \Pr[\textrm{failed in } t] = 1-e^{-\lambda t} $$
 
-where $\lambda^{-1} = 10^6$ and $t$ is in hours. Taking annualized failure rate, it is
+where $$\lambda^{-1} = 10^6$$ and $$t$$ is in hours. Taking annualized failure rate, it is
 
 $$ h(8766) = 1 - \exp(-8766\times 10^{-6}) = 0.87\% $$
 

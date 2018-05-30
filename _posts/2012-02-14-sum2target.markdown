@@ -6,7 +6,7 @@ tags: code
 ---
 
 An interesting problem that I encountered recently: Given an array of numbers,
-find the 4 elements that sum up to a particular $S$.
+find the 4 elements that sum up to a particular $$S$$.
 
 Easy enough, the way to solve it would be:
 
@@ -21,7 +21,7 @@ result = [(h,i,j,k) for h,ah in enumerate(a)
                     if ah+ai+aj+ak == 8+23+59+70 and h<i<j<k]
 print result
 ```
-Obviously, it works. But this is a $O(n^4)$ algorithm.
+Obviously, it works. But this is a $$O(n^4)$$ algorithm.
 
 So how to improve this? There could be two approach to solve this problem: One
 is to attack it directly like the above; another is to devise a dynamic
@@ -29,17 +29,17 @@ programming algorithm. Due to the time constraint, I did the former. But
 actually the latter would be the better approach, as explained below.
 
 ## Binary search
-Given an array of $N$ elements, find the $k$ elements that sum up to $S$. If the array
-is sorted, and $k=1$, the problem reduced to a binary search algorithm.
+Given an array of $$N$$ elements, find the $$k$$ elements that sum up to $$S$$. If the array
+is sorted, and $$k=1$$, the problem reduced to a binary search algorithm.
 
-If $k=2$, still assuming the array is sorted, trying to mimic the binary search,
+If $$k=2$$, still assuming the array is sorted, trying to mimic the binary search,
 we start with the cursor (marked below) at the middle of the array.
 
     [ ][ ][ ][ ][ ][x][y][ ][ ][ ][ ][ ]
 
-Then, if the sum of the two elements is greater than $S$, we must move some cursor
+Then, if the sum of the two elements is greater than $$S$$, we must move some cursor
 to the left side; otherwise, to the right side. But since we can enforce the
-ordering that cursor `x` must at the left side of cursor $y$, only cursor $x$ can move
+ordering that cursor `x` must at the left side of cursor $$y$$, only cursor $$x$$ can move
 to the left side and only cursor `y` can move to the right side. Assume `a[x]+a[y] > S`,
 we move the cursor `x` to the midway as follows:
 
@@ -160,7 +160,7 @@ int cursorSearch(int* a, int begin, int end, int* cursor, int k, int target)
 }
 ```
 
-If the code works, it is a $O((log N)^k)$ algorithm to find a solution. But I
+If the code works, it is a $$O((log N)^k)$$ algorithm to find a solution. But I
 found it failed some of the unit tests. The problem is, if the solution is
 
     [ ][ ][ ][ ][x][ ][ ][y][ ][ ][ ][ ]
@@ -175,11 +175,11 @@ combinations to find a solution.
 The pitfall is due to the fact that, while I am assuming a binary search, it is
 not indeed! When I fix cursor `x` and look for the position of cursor `y` to find a
 solution, the different possibilities of `y` can lead to a solution larger or
-smaller than $S$. If different `y` always yield to a value larger than $S$, we know we
+smaller than $$S$$. If different `y` always yield to a value larger than $$S$$, we know we
 must lower `x`. But if it is sometimes larger and sometimes smaller, we have no
 clue on where to move `x`! So the only way to explore all the possibility is to do
 binary search only on one cursor, but for all the other cursors, we have to
-exhaust the list. This makes the algorithm $O(N^{k-1}\log N)$.
+exhaust the list. This makes the algorithm $$O(N^{k-1}\log N)$$.
 
 ## Combined binary & linear search
 
@@ -187,29 +187,29 @@ In fact, binary search fails because binary search expects something is found
 exactly. Indeed, we can carry out the binary search in a different way to have
 the solutions found.
 
-Let's begin with $k=2$ again, but with all the cursors at the front of the array:
+Let's begin with $$k=2$$ again, but with all the cursors at the front of the array:
 
     [x][y][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
 
 This combination is the smallest sum of two distinct elements in the array. If
-this smallest sum is still greater than $S$, there would be no solution. Taking
+this smallest sum is still greater than $$S$$, there would be no solution. Taking
 this fact, we can say the combination
 
     [x][ ][ ][ ][ ][ ][ ][ ][y][ ][ ][ ]
 
-If this combination is greater than $S$, we must move `y` to a lower position or
-otherwise we cannot lower the sum of cursors to $S$. But if this combination is
-smaller than $S$, we can either raise `y` or raise `x`.
+If this combination is greater than $$S$$, we must move `y` to a lower position or
+otherwise we cannot lower the sum of cursors to $$S$$. But if this combination is
+smaller than $$S$$, we can either raise `y` or raise `x`.
 
 Therefore, we have another algorithm:
 
   - move cursor `y`, from its initial position of the front of the array, to the middle
     of the array in a binary search fashion, to look for the position that it yields a
-    sum that is just smaller than $S$
+    sum that is just smaller than $$S$$
   - Then, from that position, move `y` backward until its original location
   - In each step of the move, recursively find the solution of the subproblem that
     involves a partial array up to the position of `y`, and the cursors up to `y`, for the
-    sum of $S$ minus the element that `y` pointing to
+    sum of $$S$$ minus the element that `y` pointing to
 
 Well said. The code for this is as follows:
 
@@ -323,16 +323,16 @@ int recurSearch(int* a, int n, int* cursor, int k, int target)
 This code works. The full source that includes unit testing is [here](/img/sum2target.c).
 
 Now consider its efficiency, assuming the sorted array is free. The binary
-search on a cursor takes $O(\log h)$ time, then it takes another $O(m)$ time for
-linear search, where $h$ is the length of the subarray trimmed by its following
-cursor and $m$ is the length of the subarray as found by the binary search.
+search on a cursor takes $$O(\log h)$$ time, then it takes another $$O(m)$$ time for
+linear search, where $$h$$ is the length of the subarray trimmed by its following
+cursor and $$m$$ is the length of the subarray as found by the binary search.
 Although we did not scan through the whole array for each cursor, we are close
-to doing that. The average complexity would be $O(N^{k-1}\log N/k!)$.
+to doing that. The average complexity would be $$O(N^{k-1}\log N/k!)$$.
 
 ## Unsorted array
 
 If the array is unsorted, and never to be sorted. Here is a method to find the
-solution using hash table. Since we are looking for 4 elements that make up $S$,
+solution using hash table. Since we are looking for 4 elements that make up $$S$$,
 we can do 2+2 elements, like this
 
 ```python
@@ -348,7 +348,7 @@ result = [hash[k]+hash[S-k] for k in hash.keys()
 print result
 ```
 
-The hash is computed in $O(N^2)$ time and the result is done by scanning the
-hash once, also $O(N^2)$ time due to its size. So this is an $O(N^2)$ algorithm
-to find the 4 elements in an unsorted array. Trivially, we can find the $k$
-elements that add up to S in $O(N^{k/2})$ time using this method.
+The hash is computed in $$O(N^2)$$ time and the result is done by scanning the
+hash once, also $$O(N^2)$$ time due to its size. So this is an $$O(N^2)$$ algorithm
+to find the 4 elements in an unsorted array. Trivially, we can find the $$k$$
+elements that add up to S in $$O(N^{k/2})$$ time using this method.

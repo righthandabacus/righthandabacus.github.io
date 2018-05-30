@@ -43,8 +43,8 @@ C234567890
 Fortran has the following types of variables: `integer`, `real`, `double precision`, `complex`, `logical`, `character`.
   * `integer`: 32-bit signed integer
   * `real`: 32-bit floating point, can be expressed as `1.0`, `-0.5`, or `1.23E-4`
-  * `double precision`: 64-bit floating point, expression is same as `real` and additionally `1.23D-4` to mean $1.23\times 10^{-4}$ in double precision
-  * `complex`: Complex numbers, using an ordered pair of *real* number such as `(1.2,3.4)` to mean $1.2+j3.4$. There is no double precision complex number.
+  * `double precision`: 64-bit floating point, expression is same as `real` and additionally `1.23D-4` to mean $$1.23\times 10^{-4}$$ in double precision
+  * `complex`: Complex numbers, using an ordered pair of *real* number such as `(1.2,3.4)` to mean $$1.2+j3.4$$. There is no double precision complex number.
   * `logical`: Either `.TRUE.` or `.FALSE.`, the two dots are required
   * `character`: Trival. Strings are expressed as array of characters, e.g. `'asdfgh'`
 
@@ -206,7 +206,7 @@ Fortran's built-in functions are generic, i.e. they accepts any sensible type as
 | `nint()` | convert to integer by rounding off to the nearest integer |
 | `mod(,)` | the remainder of dividing integers arg1 by arg 2 |
 | `sign(,)` | setting arg1 the same sign as arg2 |
-| `dim(,)` | if arg1 $>$ arg2, return arg1 $-$ arg2, or zero otherwise |
+| `dim(,)` | if arg1 $$>$$ arg2, return arg1 $$-$$ arg2, or zero otherwise |
 | `dprod(,)` | return the double precision produce of two reals |
 | `real()` | converts a number into real, of return the real part of a complex number |
 | `aimag()` | returns the imaginary part of a complex number |

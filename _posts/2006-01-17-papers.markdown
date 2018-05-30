@@ -58,7 +58,7 @@ necessary to moderate traffic. It is measurement-based because this can avoid a
 priori description of how the do admission control. This can also equalize the
 blocking probabilities for all streaming flows.
 
-In doing the MBAC, it has the lower limit $R_s$ which is the upper bound of the
+In doing the MBAC, it has the lower limit $$R_s$$ which is the upper bound of the
 peak rate of streaming applications, and an upper limit to ensure high
 utilization.
 
@@ -96,23 +96,23 @@ Sec 1 describes the works of F. Kelly, M. Mathis and J. Padhye that the TCP band
 
 $$ x = c/(T \sqrt{q})$$
 
-where $c$ is some proportionality constant, $T$ is the RTT and $q$ is the
+where $$c$$ is some proportionality constant, $$T$$ is the RTT and $$q$$ is the
 fraction of packets dropped. But in terms of fairness, we usually use the
 max-min fairness or proportional fairness.
 
 Sec 2 describes that, F. Kelly's proportional fairness is the solution to the
 optimization problem of total social benefit with logarithmic utility function.
-And having the property that if $x$ is the fairness (optimal) solution vector:
+And having the property that if $$x$$ is the fairness (optimal) solution vector:
 
 $$ \sum_i \frac{y_i-x_i}{x_i}\le 0 $$
 
-for all non-optimial vector $y$.
+for all non-optimial vector $$y$$.
 
 Using an example, in page 3, n one-hop flow and one n-hop flow will have the
-max-min fairness of all equally share $1/2$ of each hop's capacity. But in
+max-min fairness of all equally share $$1/2$$ of each hop's capacity. But in
 proportional fairness, the bandwidth allocation is inversely proportional to
-the length of the flow, i.e. those one-hop flows each shares $n/(n+1)$ and the
-$n$-hop flow shares $1/(n+1)$. However, as said in page 5, if the network has a
+the length of the flow, i.e. those one-hop flows each shares $$n/(n+1)$$ and the
+$$n$$-hop flow shares $$1/(n+1)$$. However, as said in page 5, if the network has a
 single bottleneck, the prop fairness is same as max-min fairness. An example is
 have one one-hop flow and one n-hop flow only in the whole system.
 
@@ -155,18 +155,18 @@ In sec.2, it shows the roadmap of the whole paper: divide the problem into
 static case and dynamic case. Static case means the bandwidth threshold is a
 fixed value but dynamic case means the bandwidth is something varying.
 
-Sec 2.1 describes the cost function: it is the opportunity cost $u-x$ if you
-sending at $x\le u$; but overshoting penalty $\alpha(x-u)$ or $u$ if you
-sending at $x\ge u$ --- depends on whether you are using the fast-retransmit
+Sec 2.1 describes the cost function: it is the opportunity cost $$u-x$$ if you
+sending at $$x\le u$$; but overshoting penalty $$\alpha(x-u)$$ or $$u$$ if you
+sending at $$x\ge u$$ --- depends on whether you are using the fast-retransmit
 TCP or timeout-based TCP, i.e. whether you can detect about the congestion in a
 short time.
 
-Sec 2.2 says that the threshold $u$ can change, but assume that $u_{t+1}$ is
-somehow in the neighborhood of $u_t$.  The paper suggested that we should study
+Sec 2.2 says that the threshold $$u$$ can change, but assume that $$u_{t+1}$$ is
+somehow in the neighborhood of $$u_t$$.  The paper suggested that we should study
 the gain function, which defined as u-cost, rather than the cost function in
 dynamic case.
 
-Sec 3 evaluates the cost of searching for $u$ in static case. It gives out
+Sec 3 evaluates the cost of searching for $$u$$ in static case. It gives out
 different algorithms for the search and the cost is defined to be the sum of
 the cost incurred (using the cost function in sec 2.1) until you successfully
 found u and stick to it. In this section, the paper finds the worst case cost
@@ -197,8 +197,8 @@ size is in pareto distribution.
 Sec 5 of the paper studies the case that admission control is imposed on the
 elastic flows. By admission control, it means to limit the number of flows
 using a link to a certain maximum number. In that case, it has little use if
-$\rho<1$ because the number of flows using the link is usually quite small. But
-in the case that $\rho\ge 1$, the number of user using the link tends to infty
+$$\rho<1$$ because the number of flows using the link is usually quite small. But
+in the case that $$\rho\ge 1$$, the number of user using the link tends to infty
 and the use of admission control can solve that case that everybody stay in the
 system with tiny amount of throughput, by making some users having zero and
 keep the number of users in a low number.
@@ -222,7 +222,7 @@ In that section, it concludes that in the case of mixed traffic, we cannot get
 the sensitive bounds or close form solutions for the scenario. However, we can
 have the insensitive bounds, which is described in detail in the appendix A of
 the paper. Furthermore, it also shown that, the upper and lower bound of the
-probability of having $x_e$ elastic and $x_s$ streaming flows can be easily
+probability of having $$x_e$$ elastic and $$x_s$$ streaming flows can be easily
 obtained in a product form.
 
 The rest of the paper are describing explicitly the probability calculation as
@@ -335,20 +335,20 @@ has many nodes. Hence the system state is described by a vector n which
 describes how many elastic users at each route of the network, where each route
 is a subset of links of the network.
 
-For each route, the paper constructs a function $N_r(t)$ to describe the
+For each route, the paper constructs a function $$N_r(t)$$ to describe the
 population at time t and the arrival/departure are in Markovian process. The
 paper describes (A) Max-min fair, (B) weighted max-min fair, (C) proportionally
 fair bandwidth allocation schemes, which describes how much bandwidth will each
 users in a route share with other users in the network.
 
 In sec.3, the paper talk about the stability of a stochastic network. They
-construct a continuous-time markov chain about the system state vector $n$ and
-define the generator matrix as $Q$. If we have a vector function $V(n)$ as a
-function of $n$, then $QV(n)$ is the expected drift which can serve as similar
+construct a continuous-time markov chain about the system state vector $$n$$ and
+define the generator matrix as $$Q$$. If we have a vector function $$V(n)$$ as a
+function of $$n$$, then $$QV(n)$$ is the expected drift which can serve as similar
 purpose as first derivative. In sec 3.A, which talks about the stability in
-max-min fair allocation, the authors construct the function $V(n)$ as the max
+max-min fair allocation, the authors construct the function $$V(n)$$ as the max
 time to finish off the work load on any link in the network and use it as a
-Lyapunov function. They proved that $V(n)$ is suitable to be a Lyapunov function
+Lyapunov function. They proved that $$V(n)$$ is suitable to be a Lyapunov function
 and it is used to show the stability criteria.
 
 
@@ -360,7 +360,7 @@ This paper is to address for the problem of what is fair, when the internet
 gets mixed traffics.
 
 Sec.2 of the paper gives the big picture of what they mean by fairness: as an
-optimization problem using $\alpha$-fairness. Precisely, it is (from paper eq.1
+optimization problem using $$\alpha$$-fairness. Precisely, it is (from paper eq.1
 to eq.3):
 
 $$
@@ -371,15 +371,15 @@ $$
 \end{align*}
 $$
 
-and over there, the solution of $x_r$ using Lagrange multiplier technique is:
+and over there, the solution of $$x_r$$ using Lagrange multiplier technique is:
 
 $$ x_r = \left(\dfrac{w_r}{\sum_j p_j A_{jr}}\right)^{1/\alpha} $$
 
-where $p_j$ is the Lagrange multiplier and $\alpha$ is the parameter for
-$\alpha$-fairness, where $\alpha=0$ is the optimization for max throughput;
-$\alpha=1$ is for proportionally fair; $\alpha=2$ correspond to the inverse-sq.
-root law; and $\alpha=\infty$; is the max-min fair. The result of
-optimization of the vector $x=(x_r: r\in R)$.
+where $$p_j$$ is the Lagrange multiplier and $$\alpha$$ is the parameter for
+$$\alpha$$-fairness, where $$\alpha=0$$ is the optimization for max throughput;
+$$\alpha=1$$ is for proportionally fair; $$\alpha=2$$ correspond to the inverse-sq.
+root law; and $$\alpha=\infty$$; is the max-min fair. The result of
+optimization of the vector $$x=(x_r: r\in R)$$.
 
 Sec.3 gives a Markov model for the transition of (n,m) where n and m are
 respectively vectors of number of elastic/streaming users in different routes.
@@ -413,15 +413,15 @@ $$
 \textrm{over } & \lambda_r, \gamma_r\ge 0, r\in R
 \end{align*}$$
 
-where $\lambda_r=n_r x_r$ and $\gamma_r$ are the total bandwidth consumed by
-elastic and streaming flows on route $r$ respectively.
+where $$\lambda_r=n_r x_r$$ and $$\gamma_r$$ are the total bandwidth consumed by
+elastic and streaming flows on route $$r$$ respectively.
 
 Sec.5.2 further modifies the model to include admission control. Their
 admission control model are as follows: the streaming flow will try to behave
-as elastic flow. If, for some time, the rate achieved is $\lambda_r$ and is
-greater then its target rate $\pi_r$, then it will proceed at target rate
-$\pi_r$.  Otherwise, it will proceed, still in target rate $\pi_r$, with a
-probability $\lambda_r/\pi_r$. Once the flow is admitted, no more adaptation
+as elastic flow. If, for some time, the rate achieved is $$\lambda_r$$ and is
+greater then its target rate $$\pi_r$$, then it will proceed at target rate
+$$\pi_r$$.  Otherwise, it will proceed, still in target rate $$\pi_r$$, with a
+probability $$\lambda_r/\pi_r$$. Once the flow is admitted, no more adaptation
 will be done. Their model is definitely going to extract most out of the
 capacity. But probably overshoot. However, my claim is yet to be proved.
 
@@ -482,8 +482,8 @@ packet informations to/from an outside relay node. The result is that,
 
 To study the correlation, the paper proposed a formula to describe the
 correlation (range from 0 to 1). It is found that the relayed flows have the
-maximum cross correlation of at least $0.37$ and $85%$ of the flows will have more
-than $0.9$.
+maximum cross correlation of at least $$0.37$$ and $$85%$$ of the flows will have more
+than $$0.9$$.
 
 Similar experiment is did to control a relay node and let the Skype users relay
 using the controlled node. The study shows a similar result.
@@ -491,8 +491,8 @@ using the controlled node. The study shows a similar result.
 The second part of the paper is to identify the Skype flows from a network's
 packet capture. Using the result above, one can identify the relays by checking
 whether the "bursts" fulfil certain criteria. They includes the start time
-difference ($<11$s), end time difference ($<13$s), burst size ratio ($<1.33$), and
-cross correlation ($>0.38$).
+difference ($$<11$$s), end time difference ($$<13$$s), burst size ratio ($$<1.33$$), and
+cross correlation ($$>0.38$$).
 
 The techniques of thinking "flows" as a series of "bursts" in an ON-OFF mannar
 can be applied to other relay-using applications such as Gnutella.  The key

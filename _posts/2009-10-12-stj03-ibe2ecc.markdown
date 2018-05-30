@@ -36,18 +36,18 @@ criteria for the design of rate change functions:
 
   - Avoid congestion: The rate of a flow is expected to oscillate, i.e. increased and
     decreased successively. In that case, we should make
-    $f_{\textrm{inc}}(f_{\textrm{dec}}(r))\le r$ to prevent congestion blow up
-  - Promote fairness: The recovery time (i.e. time between a decrease from rate $r$ to
-    return to rate $r$ of a lower rate should be faster than a higher rate.
+    $$f_{\textrm{inc}}(f_{\textrm{dec}}(r))\le r$$ to prevent congestion blow up
+  - Promote fairness: The recovery time (i.e. time between a decrease from rate $$r$$ to
+    return to rate $$r$$ of a lower rate should be faster than a higher rate.
   - Maximizing bandwidth utilization: Reclaim link bandwidth as fast as possible,
     i.e. recovery time shall equals to the inter-packet delay at minimum possible rate
-    $R_{\min}$
+    $$R_{\min}$$
 
-The paper derived increment and decrement functions for any rate $r$. The Fast
+The paper derived increment and decrement functions for any rate $$r$$. The Fast
 Increase Multiplicative Decrease (FIMD) functions are using MD for decrease and
 expoential for increase. The Linear Inter-Packet Delay functions are using
-function $f_{\mathrm{dec}}(r)=R_{\max}/(\frac{R_{\max}}{r}+1)$ as decrease
+function $$f_{\mathrm{dec}}(r)=R_{\max}/(\frac{R_{\max}}{r}+1)$$ as decrease
 function (so that inter-packet delay is linear to rate) and the corresponding
-increase function is $f_{\mathrm{inc}}(r)=r/(1-\frac{R_{\min}}{R_{\max}})$.
+increase function is $$f_{\mathrm{inc}}(r)=r/(1-\frac{R_{\min}}{R_{\max}})$$.
 
 The paper compares FIMD, LIPD, and AIMD control for different traffic pattern. It is found that LIPD can give highest utilization but FIMD can adapt to changes faster.

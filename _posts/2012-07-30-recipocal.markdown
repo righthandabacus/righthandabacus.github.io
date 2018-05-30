@@ -18,8 +18,8 @@ $$
 \frac{1}{n-1} &= \sum_{k=1}^{\infty} \frac{1}{n^k}
 \end{aligned}$$
 
-This fact is useful in performing integer division. We can compute $m$ divided
-by $n$ by recursion (note the summation sign above). Consider $m/(n-1)$, we have
+This fact is useful in performing integer division. We can compute $$m$$ divided
+by $$n$$ by recursion (note the summation sign above). Consider $$m/(n-1)$$, we have
 
 $$
 \begin{aligned}
@@ -27,7 +27,7 @@ m &= nA + B & \exists A,B\in\mathbb{N},\; 0\le B< n
 \textrm{therefore, }\frac{m}{n-1} &= A + \frac{A+B}{n-1}.
 \end{aligned}$$
 
-Since $A = m \textrm{ div } n$, $B = m \textrm{ mod } n$, if $n$ is a power of
+Since $$A = m \textrm{ div } n$$, $$B = m \textrm{ mod } n$$, if $$n$$ is a power of
 2, we can perform the div and mod operations by bit shift.
 
 ```python

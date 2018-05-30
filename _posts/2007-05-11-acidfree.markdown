@@ -7,4 +7,4 @@ tags: random
 
 Often I read from the covers of a book that claim it was printed on *acid-free paper*. I thought it was some environmental protection issue, but actually it was not.
 
-Acid-free paper is made of a basic (pH $\ge 7$) pulp which means it is acid-free. This kind of paper will not degrade in air or heat and hence it is preserved longer.
+Acid-free paper is made of a basic (pH $$\ge 7$$) pulp which means it is acid-free. This kind of paper will not degrade in air or heat and hence it is preserved longer.

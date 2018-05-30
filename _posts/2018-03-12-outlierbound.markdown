@@ -10,32 +10,32 @@ to "smooth out" outliers. Smoothing out means that we want to retain most
 characteristics of a curve if it falls within proximity of the mean (for
 whatever definition of proximity and mean) and for the part that the curve is
 distorted, it should not depends on explicit parameters. Thus, for example, cap
-the curve $y=f(x)$ into $y=\min(f(x),M)$ is less favorible because the cap $M$
-has to be dependent to $f(x)$ to be useful.
+the curve $$y=f(x)$$ into $$y=\min(f(x),M)$$ is less favorible because the cap $$M$$
+has to be dependent to $$f(x)$$ to be useful.
 
 Recall that Lipschutz continuity means:
 
 $$ ||f(x_1)-f(x_2)||_2 \le k ||x_1-x_2||_2 $$
 
-Roughly speaking, the slope of $f(x)$ is bounded (by $k$), for slope is defined
-as if $(x,f(x))$ is connected. Now consider a simplified function to make the
-problem tractable, namely, $f(x)$ is monotonically increasing and defined only
-on $x\in X=[0,1]$. Then the outlier is either at the proximity of 0 or 1, and
-the derivative $f'(x)\ge 0$ due to monotonicity.
+Roughly speaking, the slope of $$f(x)$$ is bounded (by $$k$$), for slope is defined
+as if $$(x,f(x))$$ is connected. Now consider a simplified function to make the
+problem tractable, namely, $$f(x)$$ is monotonically increasing and defined only
+on $$x\in X=[0,1]$$. Then the outlier is either at the proximity of 0 or 1, and
+the derivative $$f'(x)\ge 0$$ due to monotonicity.
 
-If we define a *modified* derivative, $g(x) = \min(f'(x), k)$ for some $k>0$,
-then we have an approximate of $f(x)$ as
+If we define a *modified* derivative, $$g(x) = \min(f'(x), k)$$ for some $$k>0$$,
+then we have an approximate of $$f(x)$$ as
 
 $$ \hat{f}(x) = \int_{x_0}^x g(x) dx + f(x_0) \quad \exists x_0 \in X $$
 
-Consider the case $x_0$ is roughly at the middle portion $X'$ of $X=[0,1]$ and
-$k$ is defined as
+Consider the case $$x_0$$ is roughly at the middle portion $$X'$$ of $$X=[0,1]$$ and
+$$k$$ is defined as
 
 $$ k = \alpha \max_{x\in X'} f'(x) \quad \alpha\ge 1, X'\subset X $$
 
-Then $\hat{f}(x)$ will be exactly the same as $f(x)$ for $x\in X'$, and it will
-be distorted from $f(x)$ at $x\notin X'$ iff $f'(x)$ too large (gauged by
-$\alpha$).
+Then $$\hat{f}(x)$$ will be exactly the same as $$f(x)$$ for $$x\in X'$$, and it will
+be distorted from $$f(x)$$ at $$x\notin X'$$ iff $$f'(x)$$ too large (gauged by
+$$\alpha$$).
 
 Let's look at an example (code in Julia):
 
@@ -95,20 +95,20 @@ plot(x,value,x,distorted)
 ```
 
 The function `outlier_distort` expects input of monotonically increasing
-values, and finds $k$ from the 20% to 80%-ile, with $\alpha=1$. The plot of the
+values, and finds $$k$$ from the 20% to 80%-ile, with $$\alpha=1$$. The plot of the
 above code:
 
 ![](/img/outlierbound-1.png)
 
-The orange line is the distorted curve $y=\hat{f}(x)$ and the blue curve is
-$y=f(x)$. We can notice that at above 0.95, that bit of flat curve looks alike
+The orange line is the distorted curve $$y=\hat{f}(x)$$ and the blue curve is
+$$y=f(x)$$. We can notice that at above 0.95, that bit of flat curve looks alike
 in both colors albeit at different altitude. And the part that quickly ramps up
 in the blue curve is moderated in the orange curve such that it is less
-disruptive. A larger jump would be allowed if $\alpha$ is larger.
+disruptive. A larger jump would be allowed if $$\alpha$$ is larger.
 
-The code above is suitable for $f(x)$ a percentile function. For general $f(x)$,
+The code above is suitable for $$f(x)$$ a percentile function. For general $$f(x)$$,
 we can use similar technique with a "translate" function that converts any
-value $f(x)$ into $\hat{f}(x)$. Such as the following:
+value $$f(x)$$ into $$\hat{f}(x)$$. Such as the following:
 
 ```julia
 function interpolate(invector, outvector, val)

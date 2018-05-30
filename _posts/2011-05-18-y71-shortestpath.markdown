@@ -15,7 +15,7 @@ bibtex:
   month: Jul
   year: 1971
 ---
-This paper gives a survey on the previous algorithms to find $k$ shortest loopless paths in a network and proposed a new one.
+This paper gives a survey on the previous algorithms to find $$k$$ shortest loopless paths in a network and proposed a new one.
 
 # Survey
 
@@ -41,8 +41,8 @@ from these the K paths that have the shortest lengths.
         year = 1961,
     }
 
-This finds the $K$-th shortest path by first obtaining the $K-1$ shortest paths.
-Then the distance of each arc in each of the 1st, 2nd, ..., $(K-1)$st shortest
+This finds the $$K$$-th shortest path by first obtaining the $$K-1$$ shortest paths.
+Then the distance of each arc in each of the 1st, 2nd, ..., $$(K-1)$$st shortest
 paths is set, in turn, to infinity. The shortest-path problem is solved   for
 each such case. The best of these resulting shortest paths is the desired K-th
 shortest path.
@@ -58,7 +58,7 @@ shortest path.
         year = 1963,
     }
 
-This finds the shortest path first, then finds the $K$ shortest path from all
+This finds the shortest path first, then finds the $$K$$ shortest path from all
 paths that branch out from the shortest path.
 
     @techreport{s,
@@ -70,7 +70,7 @@ paths that branch out from the shortest path.
         year = 1966,
     }
 
-This finds $H>K$ shortest paths that may contain loops, then the $H$ paths are scanned for the $K$ shortest paths that contain no loops.
+This finds $$H>K$$ shortest paths that may contain loops, then the $$H$$ paths are scanned for the $$K$$ shortest paths that contain no loops.
 
 # Algorithm
 

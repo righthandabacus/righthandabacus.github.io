@@ -11,7 +11,7 @@ Pretty-printing is [not trivial][1].
 
 Pretty-printing a piece of code probably can be defined as follows:
 
-1. Line width defined as finite $N$
+1. Line width defined as finite $$N$$
 2. Unless some item is mandatory to begin at new line, a segment of code should
    be in one line if it will fit
 3. If a segment of code cannot fit in one line, it should be broken down into
@@ -27,8 +27,8 @@ equivalently, [group logically contiguous tokens into same fragment][2].
    within, or (3) a space between token the size of the space plus length of
    next token. Scan function need to lookahead
 2. a buffer stream (FIFO) to store tokens seen. when scan function computed the
-   length $\ell$ for token $x$ at the left end of the buffer, it prints and
-   removes $x$
+   length $$\ell$$ for token $$x$$ at the left end of the buffer, it prints and
+   removes $$x$$
 3. print function decides how to print a token using the length information:
    (1) string is printed immediately, or (2) beginning of a group prints nothing
    but pushes the current indentation on a stack, or (3) end of a group pops the

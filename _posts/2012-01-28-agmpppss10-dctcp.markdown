@@ -21,7 +21,7 @@ In data center, according to the measurement of the paper, there are three types
   - Time-sensitive short messages, of 100KB to 1MB in size
   - Throughput-sensitive long flows, of 1MB to 100Mb in size
 
-The structure of the DCN is as follows: There are 6000 servers in a cluster, with 44 servers in a rack and 150 racks. In each rack, there is a ToR switch of 1 Gbps $\times$ 48 ports and two 10 Gbps ports for uplink. Switch buffer is 4MB, shared amongst all the ports. The application is a *soft-realtime application*, such as a web search. The application frameworks is a "partition-aggregate" type. When a query arrives, it is expected to respond in 230-300 ms, which is known as the all-up SLA. The query may create many sub-queries, typically in 1-4 iterations but may up to 20 iterations. The worker server are expected to complete the sub-query in 10-100 ms. Late responses are discarded. Therefore, to maintain response quality, 99.9% of workers are required to meet the deadline. The query comes from external, arrives at the cluster-wide high-level aggregator (HLA). The HLA partition the query and send to rack-wide mid-level aggregators (MLA). The MLA is then send to the other 43 servers in the rack. Each query from MLA is around 1.6KB in size and the response from servers to the MLA is around 1.6KB to 2KB in size.
+The structure of the DCN is as follows: There are 6000 servers in a cluster, with 44 servers in a rack and 150 racks. In each rack, there is a ToR switch of 1 Gbps $$\times$$ 48 ports and two 10 Gbps ports for uplink. Switch buffer is 4MB, shared amongst all the ports. The application is a *soft-realtime application*, such as a web search. The application frameworks is a "partition-aggregate" type. When a query arrives, it is expected to respond in 230-300 ms, which is known as the all-up SLA. The query may create many sub-queries, typically in 1-4 iterations but may up to 20 iterations. The worker server are expected to complete the sub-query in 10-100 ms. Late responses are discarded. Therefore, to maintain response quality, 99.9% of workers are required to meet the deadline. The query comes from external, arrives at the cluster-wide high-level aggregator (HLA). The HLA partition the query and send to rack-wide mid-level aggregators (MLA). The MLA is then send to the other 43 servers in the rack. Each query from MLA is around 1.6KB in size and the response from servers to the MLA is around 1.6KB to 2KB in size.
 
 Besides the query traffic, there are two background traffic: The update flow to copy data between worker servers. Each flow is between 5KB to 50MB in size. Also the control message to track worker states, in size of 50KB to 1MB. This control message is time-sensitive. The query traffic is approximately Poisson but the background traffic is heavy-tailed with high variance. The background traffic also occurs periodically, as the workers periodically poll for file updates.
 
@@ -69,7 +69,7 @@ $$
 Q(t)=NW(t)-C×RTT. \textrm{[Should W(t) be the time integral?]}
 $$
 
-Consider a flow whose window increases by one MSS per RTT. The number of MSS it sent when its window increased from $W_1$ to $W_2$ is given by
+Consider a flow whose window increases by one MSS per RTT. The number of MSS it sent when its window increased from $$W_1$$ to $$W_2$$ is given by
 
 $$
 S(W_1,W_2)=(W_2-W_1)\frac{W_1+W_2}{2}=\frac{W_2^2-W_1^2}{2}. 
@@ -81,7 +81,7 @@ $$
 W^{\ast} = (C×RTT+K)/N.
 $$
 
-As the window size becomes $W^{\ast}+1$, packets are being marked and the window will be decreased. Therefore, considering the whole cycle of window increase and decrease, we have the EWMA value
+As the window size becomes $$W^{\ast}+1$$, packets are being marked and the window will be decreased. Therefore, considering the whole cycle of window increase and decrease, we have the EWMA value
 
 $$
 \begin{aligned}
@@ -92,7 +92,7 @@ $$
 \end{aligned} 
 $$
 
-For $W^{\ast} \gg 1$, we have $\alpha^2(1-\alpha/4)\approx 2/W^{\ast} $. For $\alpha\approx 0$, we have $\alpha^2\approx 2/W^{\ast} $ or $\alpha\approx\sqrt{2/W^{\ast}}$.
+For $$W^{\ast} \gg 1$$, we have $$\alpha^2(1-\alpha/4)\approx 2/W^{\ast} $$. For $$\alpha\approx 0$$, we have $$\alpha^2\approx 2/W^{\ast} $$ or $$\alpha\approx\sqrt{2/W^{\ast}}$$.
 
 The amplitude of oscillation of a single flow's window is therefore
 
@@ -120,7 +120,7 @@ T_C &= D \approx \frac{\alpha}{2}W^{\ast} \approx \frac{1}{2}\sqrt{2W^{\ast}}  \
 $$
 
 
-Because the max window size is $W^{\ast}+1$, the max queue length is
+Because the max window size is $$W^{\ast}+1$$, the max queue length is
 
 $$
 Q_\max = NW(t)-C×RTT = N(W^{\ast}+1)-C×RTT = K+N
@@ -135,7 +135,7 @@ Q_{\min} &= Q_{\max} - A  \\
 \end{align}
 $$
 
-To find the marking threshold, we minimize $Q_\min$ over all N. By differentiation we have
+To find the marking threshold, we minimize $$Q_\min$$ over all N. By differentiation we have
 
 $$
 \begin{align}

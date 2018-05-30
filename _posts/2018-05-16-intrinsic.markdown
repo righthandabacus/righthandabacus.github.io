@@ -28,8 +28,8 @@ int main() {
 
 The SIMD instructions are for *fine-grain parallelism* which in the ideal we
 shouldn't care because the complier should be smart enough to use it as part of
-code optimization. But if we do, we are dealing with a pack of $n$ primitive
-data types (e.g.  float, ouble, int) into $k$ bits. For example, in SSE3 we
+code optimization. But if we do, we are dealing with a pack of $$n$$ primitive
+data types (e.g.  float, ouble, int) into $$k$$ bits. For example, in SSE3 we
 have registers of 128 bits (AVX has 256 bits) that holds the following:
 ```cpp
 __m128  f; /* = 4 float, SSE */

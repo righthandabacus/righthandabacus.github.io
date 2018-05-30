@@ -12,6 +12,6 @@ bibtex:
   address: Tokyo  
 ---
 
-This paper proposed a neural network model to estimate packet inter-arrival time. The neural network model is to take past $n$ inter-arrival time into account to estimate the next arrival. Different model is proposed (such as linear or sigmod functions) and the parameters of the function is determined by machine learning.
+This paper proposed a neural network model to estimate packet inter-arrival time. The neural network model is to take past $$n$$ inter-arrival time into account to estimate the next arrival. Different model is proposed (such as linear or sigmod functions) and the parameters of the function is determined by machine learning.
 
 The evaluation shows that, such model applied on real traffic yields error of 10% (spanning tree protocol) to 100% (general IP) and it can provide a significantly better result than EWMA when it is CDP (cisco discovery protocol) or ARP traffic. However, it will be worse then EWMA if we consider general IP.

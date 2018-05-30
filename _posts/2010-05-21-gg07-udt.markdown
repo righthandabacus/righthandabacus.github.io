@@ -23,12 +23,12 @@ Congestion in UDT is DAIMD, i.e. AIMD with decreasing increments. The increase s
 
 $$ \alpha(x)=10^{\lceil\log(L-C(x))\rceil-\tau}\dfrac{1500}{S}\dfrac{1}{\textrm{SYN}} $$
 
-to be the increment size at rate $x$. Where $S$ is the packet size, SYN is the rate control interval, $L$ is the estimated link speed in bps, $C(x)$ is the current rate in bps. The paper claims that this is stable and fair.
+to be the increment size at rate $$x$$. Where $$S$$ is the packet size, SYN is the rate control interval, $$L$$ is the estimated link speed in bps, $$C(x)$$ is the current rate in bps. The paper claims that this is stable and fair.
 
-Loss in UDT is handled in different cases. Basically loss triggers rate cut. But to prevent aggressive rate reduction due to synchronization, a randomization method is used: First, the decrease factor is random; Second, rate decrease is done on some NAK only. Namely, when NAK seqno > seqno at the time of last rate cut, or the NAK received is the $k$-th one. Another reason for a rate decrease to be too aggressive is that the loss is not due to congestion but due to corruption. This is handled by forgetting the first NAK in a congestion event. This also solves the problem of packet out of order.
+Loss in UDT is handled in different cases. Basically loss triggers rate cut. But to prevent aggressive rate reduction due to synchronization, a randomization method is used: First, the decrease factor is random; Second, rate decrease is done on some NAK only. Namely, when NAK seqno > seqno at the time of last rate cut, or the NAK received is the $$k$$-th one. Another reason for a rate decrease to be too aggressive is that the loss is not due to congestion but due to corruption. This is handled by forgetting the first NAK in a congestion event. This also solves the problem of packet out of order.
 
 This paper did simulation to find the throughput, fairness and stability. The stability formula is the one proposed by the FAST-TCP paper in INFOCOM 2004, i.e.
 
 $$ S=\dfrac{1}{n}\sum_{i=1}^n\big(\dfrac{1}{\bar{x}_i}\sqrt{\frac{1}{m-1}\sum_{k=1}^m(x_i(k)-\bar{x}_i)^2}\big) $$
 
-where $n$ is the number of concurrent flows; $m$ is the number of throughput samples, $x(k)$ is the samples.
+where $$n$$ is the number of concurrent flows; $$m$$ is the number of throughput samples, $$x(k)$$ is the samples.

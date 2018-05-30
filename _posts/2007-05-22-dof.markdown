@@ -13,9 +13,9 @@ To make a deeper [DOF](http://en.wikipedia.org/wiki/Depth_of_field), we can use:
 
 Actually, the depth-of-field is determined by the three factors:
 
-- the focal length of the lens ($f$)
-- the f-number of the lens opening ($N$), i.e. the aperture
-- the camera-to-subject distance ($s$), i.e. the object distance in optics terminology
+- the focal length of the lens ($$f$$)
+- the f-number of the lens opening ($$N$$), i.e. the aperture
+- the camera-to-subject distance ($$s$$), i.e. the object distance in optics terminology
 
 The DOF formula is expressed as:
 

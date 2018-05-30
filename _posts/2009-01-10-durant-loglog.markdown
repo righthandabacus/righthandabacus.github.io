@@ -14,12 +14,12 @@ bibtex:
   howpublished: "ESA'03"
   year: 2003
 ---
-Assume we have a multiset (a set which each item can have multiplicity $> 1$) of
+Assume we have a multiset (a set which each item can have multiplicity $$> 1$$) of
 elements from a universe of infinite size. The number of elements in the
 multiset is finite and we define the cardinality of the multiset to be the
 number of distinct elements in it.
 
 Because the multiset is large, it is not feasible to count the cardinality by
 reducing a multiset into a set and find its cardinality instead. The paper
-proposed a probabilitic algorithm that use $O(\log\log n)$ amount of memory to
+proposed a probabilitic algorithm that use $$O(\log\log n)$$ amount of memory to
 find the cardinality with certain error probability.

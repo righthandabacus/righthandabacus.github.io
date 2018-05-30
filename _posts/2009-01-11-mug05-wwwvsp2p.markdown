@@ -30,9 +30,9 @@ Power spectral density is also obtained. The PSD is defined as
 
 $$ I(f)=\dfrac{1}{2\pi N}\sum_{k=1}^N T_\delta(k)e^{jkf/2}, $$
 
-where $T_\delta(k)$ are the flow interarrival times. The PSD plot shows that, in
-WWW traffic, $I(f)$ has a decrease tendency with $f$ but P2P traffic remains flat
-with $f$. This means WWW traffic has long range dependency but P2P does not have
+where $$T_\delta(k)$$ are the flow interarrival times. The PSD plot shows that, in
+WWW traffic, $$I(f)$$ has a decrease tendency with $$f$$ but P2P traffic remains flat
+with $$f$$. This means WWW traffic has long range dependency but P2P does not have
 time correlation.
 
 Considering the flow size distributions (number of bytes), the cummulative
@@ -40,13 +40,13 @@ percentage-flow size plot is linear in the log-log scale when we consider the
 size of 10K to 100M. This means the flow size distribution can be modelled by
 Pareto distribution. The small flow size region increases slowly and the large
 flow size region increases rapidly in the cummulative percentage The Pareto
-parameter $\alpha$ is measured to be 1.11 in the WWW traffic and 0.38 in the P2P
-traffic. Since $\alpha<1$ in P2P, it is highly heavy-tailed. But the WWW traffic
+parameter $$\alpha$$ is measured to be 1.11 in the WWW traffic and 0.38 in the P2P
+traffic. Since $$\alpha<1$$ in P2P, it is highly heavy-tailed. But the WWW traffic
 has finite mean in flow size.
 
 The flow duration distribution of both WWW and P2P shows a non-linear behaviour
 in the log-log plot of cummulative fraction against duration. The nonlinearity
-suggests log-normal distribution, i.e. duration $\log D \sim N(\mu,\sigma^2)$,
+suggests log-normal distribution, i.e. duration $$\log D \sim N(\mu,\sigma^2)$$,
 which is found to be a very good approximate in the middle ranges. The
 log-normal distribution is also found in the flow rate (flow size divided by
 duration).

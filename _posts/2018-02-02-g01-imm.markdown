@@ -16,7 +16,7 @@ bibtex:
 
 A very short publication introducing the IMM filter. It describes a system with
 multiple models, and in each model, there is a state. The model transition is a
-ergodic Markov chain with probability matrix $\Pi$, and state transition in each
+ergodic Markov chain with probability matrix $$\Pi$$, and state transition in each
 mode is a linear dynamic system. The state transition and model transition are
 independent.
 
@@ -26,15 +26,15 @@ Discrete-time state representation of a linear system:
 
 $$ X_{k+1} = \Phi_k X_k + w_k $$
 
-where $X_k$ is the state estimate; $\Phi_k$ is a state transition matrix from
-$k$ to $k+1$; $w_k$ is process noise, assumed to be white Gaussian. Observations
+where $$X_k$$ is the state estimate; $$\Phi_k$$ is a state transition matrix from
+$$k$$ to $$k+1$$; $$w_k$$ is process noise, assumed to be white Gaussian. Observations
 are assumed to be linear w.r.t. state estimate:
 
 $$ y_k = H_k X_k + v_k $$
 
-where $H_k$ is the matrix relating the state to observation; $v_k$ the
+where $$H_k$$ is the matrix relating the state to observation; $$v_k$$ the
 observation noise, assumed to be white Gaussian as well, and not correlated with
-$w_k$. Kalman filter is the iterative provess that provides the minimum mean
+$$w_k$$. Kalman filter is the iterative provess that provides the minimum mean
 squared error solution:
 
 $$\begin{aligned}
@@ -47,31 +47,31 @@ $$\begin{aligned}
 
 where
 
-- $\tilde{X}, \hat{X}$: predicted and filtered quantities respectively
-- $X$: state estimate
-- $P$: covariance matrix (of error of $X$)
-- $\Phi$: discrete time transition matrix
-- $Q$: process noise covariance matrix
-- $R$: observation noise covariance matrix
-- $K$: Kalman gain
-- $I$: identity matrix
-- $y_k$: observation used to update the state estimate
+- $$\tilde{X}, \hat{X}$$: predicted and filtered quantities respectively
+- $$X$$: state estimate
+- $$P$$: covariance matrix (of error of $$X$$)
+- $$\Phi$$: discrete time transition matrix
+- $$Q$$: process noise covariance matrix
+- $$R$$: observation noise covariance matrix
+- $$K$$: Kalman gain
+- $$I$$: identity matrix
+- $$y_k$$: observation used to update the state estimate
 
 # Multiple filter model
 Interacting multiple model (IMM) algorithm: Combining state hypotheses from
 multiple filter models to get a better state estimate of targets with changing
 dynamics.
 
-Example using two models: State estimate of each model, $\tilde{X}^1,
-\tilde{X}^2$, and model probability $\tilde{\mu}$ are input to state update.
-The state update gives out $\hat{X}^1$ and $\hat{X}^2$ together and they
-are separately corrected to $\tilde{X}^1$ and $\tilde{X}^2$ for next
+Example using two models: State estimate of each model, $$\tilde{X}^1,
+\tilde{X}^2$$, and model probability $$\tilde{\mu}$$ are input to state update.
+The state update gives out $$\hat{X}^1$$ and $$\hat{X}^2$$ together and they
+are separately corrected to $$\tilde{X}^1$$ and $$\tilde{X}^2$$ for next
 step. At the same time, the likelihood of each model are used to update the
-model probability $\tilde{\mu}$.
+model probability $$\tilde{\mu}$$.
 
 ## IMM Algorithm:
 
-Model state estimates and covariances for model $j$ at time $k$:
+Model state estimates and covariances for model $$j$$ at time $$k$$:
 
 $$\begin{gather}
 \hat{X}^{0j} = \sum_{i=1}^N \hat{X}^i \tilde{\mu}^{i|j}
@@ -91,25 +91,25 @@ $$\begin{align}
 \bar{\psi}^j &= \sum_{i=1}^N p^{ij} \mu^i_{}
 \end{align}$$
 
-Here, $\mu^i$ is the probability that the system is in model $i$; $p^{ij}$ is
-the a priori probability for switching from model $i$ to model $j$;
-$\bar{\psi}^j$ a normalization constant;
-$\hat{X}^{0j}$ and $\hat{P}^{0j}$ are mixed state estimate and covariance for
+Here, $$\mu^i$$ is the probability that the system is in model $$i$$; $$p^{ij}$$ is
+the a priori probability for switching from model $$i$$ to model $$j$$;
+$$\bar{\psi}^j$$ a normalization constant;
+$$\hat{X}^{0j}$$ and $$\hat{P}^{0j}$$ are mixed state estimate and covariance for
 each filter model.
 
-Assume $m_0$ is a vector of observation for the current update and $\tilde{m}^j$
+Assume $$m_0$$ is a vector of observation for the current update and $$\tilde{m}^j$$
 is the predicted observation computed from predicted tract state for filter
-model $j$. Then $Z^j = m_0 - \tilde{m}^j$ is the *innovation*. The covariance
-matrix of $Z^j$ is $\tilde{S}^j = H^j\tilde{P}^{0j}(H^j)^T+R$. The probability
-that the system is in model $j$ is given by
+model $$j$$. Then $$Z^j = m_0 - \tilde{m}^j$$ is the *innovation*. The covariance
+matrix of $$Z^j$$ is $$\tilde{S}^j = H^j\tilde{P}^{0j}(H^j)^T+R$$. The probability
+that the system is in model $$j$$ is given by
 
 $$ \Lambda^j =
 \frac{1}{\sqrt{|2\pi\hat{S}^j|}}\exp\left(-\frac{1}{2}(Z^j)^T(\tilde{S}^j)^{-1}(Z^j)\right)
 $$
 
-The model probabilities after update are $\hat{\mu}^j = \frac{1}{c}\Lambda^j\bar{c}^j$
-with $\bar{c}^j$ a normalization vector to maintain total probability of 1 and
-$c$ a normalization constant.
+The model probabilities after update are $$\hat{\mu}^j = \frac{1}{c}\Lambda^j\bar{c}^j$$
+with $$\bar{c}^j$$ a normalization vector to maintain total probability of 1 and
+$$c$$ a normalization constant.
 
 Finally, combine the state estimates:
 
@@ -125,8 +125,8 @@ $$\begin{aligned}
 A Swedish [lecture note](http://www.control.isy.liu.se/student/graduate/TargetTracking/IMMderivation.pdf)
 describes the above using fewer matrix notation:
 
-Assume the Markov system has $N_r$ models, and the current model of the system
-is denoted by $r_k\in{1,2,\cdots,N_r}$. The Markov transition probability matrix is
+Assume the Markov system has $$N_r$$ models, and the current model of the system
+is denoted by $$r_k\in{1,2,\cdots,N_r}$$. The Markov transition probability matrix is
 
 $$ \Pi = [\pi_{ij} \stackrel{\Delta}{=} \Pr(r_k = j | r_{k-1}=i)] $$
 
@@ -137,8 +137,8 @@ x_k &= A(r_k)x_{k-1} + B(r_k)w_k \\
 y_k &= C(r_k)x_{k} + D(r_k)v_k
 \end{align}$$
 
-Given measurements $y_{0:k}$, we can find the posterior distribution of base state
-$x_k$, and the posterior model probabilities $\mu_k^i$:
+Given measurements $$y_{0:k}$$, we can find the posterior distribution of base state
+$$x_k$$, and the posterior model probabilities $$\mu_k^i$$:
 
 $$\begin{align}
 p(x_k | y_{0:k}) &\approx \sum_{i=1}^{N_r} \mu_k^i N(x_k;\hat{x}_k^i, \sigma_{k|k}^i) \\
@@ -148,7 +148,7 @@ p(x_k | y_{0:k}) &\approx \sum_{i=1}^{N_r} \mu_k^i N(x_k;\hat{x}_k^i, \sigma_{k|
 The IMM algorithm is as follows:
 
 Suppose we have the statistics of historical state estimates, covariance matrix
-of estimates, and model probability for each state, up to time $k-1$:
+of estimates, and model probability for each state, up to time $$k-1$$:
 
 $$ \{ x_{k-1|k-1}^j, \sigma_{k-1|k-1}^j, \mu_{k-1}^j\}_{j=1}^{N_r} $$
 
@@ -169,7 +169,7 @@ $$\begin{align}
     \right] \\
 \end{align}$$
 
-Then the model-matched prediction update. For each model $i$, calculate the
+Then the model-matched prediction update. For each model $$i$$, calculate the
 predicted state estimate and covariance from the mixed estimates:
 
 $$\begin{align}
@@ -177,7 +177,7 @@ $$\begin{align}
 \sigma_{k-1|k-1}^{0i} &= A(i) \sigma_{k-1|k-1}^{0i} A(i)^T + B(i)QB(i)^T
 \end{align}$$
 
-Afterwards, the model-matched measurement update. For each model $i$, calculate
+Afterwards, the model-matched measurement update. For each model $$i$$, calculate
 the Kalman gain and updated estimate and covariance:
 
 $$\begin{align}
@@ -198,7 +198,7 @@ $$ \mu_k^i = \frac{
 }$$
 
 Finally we can find the overall output estimate. This is not used in the
-iterative process but as an estimate for the final system state after time $k$:
+iterative process but as an estimate for the final system state after time $$k$$:
 
 $$\begin{align}
 \hat{x}_{k|k} &= \sum_{i=1}^{N_r} \mu_k^i \hat{x}_{k|k}^i \\
@@ -208,6 +208,6 @@ $$\begin{align}
     \right]
 \end{align}$$
 
-So now we proceeded a single step to have historical estimates up to time $k$:
+So now we proceeded a single step to have historical estimates up to time $$k$$:
 
 $$ \{ x_{k|k}^j, \sigma_{k|k}^j, \mu_{k}^j\}_{j=1}^{N_r} $$

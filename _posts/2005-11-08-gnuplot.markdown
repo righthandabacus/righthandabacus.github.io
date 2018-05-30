@@ -17,7 +17,7 @@ terminal is the only flexible terminal for plotting.
 In the ps_guide, it said `@` means to align the superscripts and subscripts,
 however, it is wrong! The `@` symbol actually means to place the next symbol (or
 block of symbols) without allocating spaces. Hence the forthcoming symbols will
-occupy the same place with this one. Take bar-n (i.e. $\bar{n}$) as an example,
+occupy the same place with this one. Take bar-n (i.e. $$\bar{n}$$) as an example,
 the "bar" bears the code 305 (octal) in Times font, so this command will put
 bar-n as the y-axis label:
 
@@ -43,7 +43,7 @@ following way. Firstly, declare parametric plot (`set parametric`). Secondly,
 define a complex function. The imaginary number is written as `{0,1}`. Thirdly,
 plot the complex function by obtaining argument and magnitude via arg() and
 abs() functions. The following is an example for plotting
-$g(\omega)=\frac{k}{j\omega(-\omega^2+j\omega+4)}$ with different values of $k$,
+$$g(\omega)=\frac{k}{j\omega(-\omega^2+j\omega+4)}$$ with different values of $$k$$,
 
 ```
 unset border

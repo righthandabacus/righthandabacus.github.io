@@ -21,10 +21,10 @@ bibtex:
 ---
 Data access techniques to optimize code in modern processor:
 
-  - Loop interchange: Do stride-1 access rather than stride-$N$ to leverage spatial locality
+  - Loop interchange: Do stride-1 access rather than stride-$$N$$ to leverage spatial locality
   - Loop fusion: Merge adjacent loop with same iteration space, a.k.a. loop jamming. Increases
      instruction-level parallelism and reduces loop overhead
-  - Loop blocking: Transform a $(n+1)$-level nested loop into $(2n)$-level nested loop to improve data
+  - Loop blocking: Transform a $$(n+1)$$-level nested loop into $$(2n)$$-level nested loop to improve data
     locality. An example is blocked algorithm for matrix multiply. Also known as loop tiling.
   - Prefetching: Some processor provide instructions to prefetch data into cache (without passing the
     data to CPU)

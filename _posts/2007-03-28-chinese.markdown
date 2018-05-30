@@ -49,40 +49,45 @@ Actually, there are four more rules in case the last two rules:
 Tsai implemented Chen and Liu's algorithm in his MMSEG. However, only the first two rules are implemented because the word frequency are not included in his lexicon.
 
 ### Add-one smoothing
-Also known as *Laplace's Law*, is to give every entry of the *language model* (i.e. corpus data) a base count of one and then add the counted frequency from training data. The data is then normalized to give the probability. In other words, the probability $p$ of word $w$, with $c$ counted occurrences in the training data of size $N$, is given by $p=(c+1)/(N+V)$, where $V$ is the total number of distinct words in the model. Hence every unknown word has probability of $1/(N+V)$.
+Also known as *Laplace's Law*, is to give every entry of the *language model* (i.e. corpus data) a base count of one and then add the counted frequency from training data. The data is then normalized to give the probability. In other words, the probability $$p$$ of word $$w$$, with $$c$$ counted occurrences in the training data of size $$N$$, is given by $$p=(c+1)/(N+V)$$, where $$V$$ is the total number of distinct words in the model. Hence every unknown word has probability of $$1/(N+V)$$.
 
-Add-one smoothing does not provide good result because of the sparse nature of the language model, i.e. $V$ is very large. Hence the probability is distorted a lot for frequent terms because of the normalization.
+Add-one smoothing does not provide good result because of the sparse nature of the language model, i.e. $$V$$ is very large. Hence the probability is distorted a lot for frequent terms because of the normalization.
 
 ### Good-Turing discounting
 Use the items that we saw once to estimate the probability of unseen terms. The items that occurred once is called a *singleton* or *hapax legomenon*.
 
-We define the frequency of frequency $k$ to be $N_k = \displaystyle\sum_{w:\textrm{count}(w)=k} 1$, i.e. the number of entries with frequency $k$. Then the *adjusted* count is defined by $c^\ast = (c+1)\frac{N_{c+1}}{N_c}$. It turns out that the probability of a term that occurred $c$ times in the training data is $p=c^{\ast}/N$.
+We define the frequency of frequency $$k$$ to be $$N_k = \displaystyle\sum_{w:\textrm{count}(w)=k} 1$$, i.e. the number of entries with frequency $$k$$. Then the *adjusted* count is defined by $$c^\ast = (c+1)\frac{N_{c+1}}{N_c}$$. It turns out that the probability of a term that occurred $$c$$ times in the training data is $$p=c^{\ast}/N$$.
 
-The high frequency counts are assumed to be reliable, hence adjusted count is not applied to the high frequency terms. Katz (1987) suggested that for $c$ greater than $k=5$, we use $c^{\ast}=c$. Katz (1987) also suggested to use a finer adjustment for $c^{\ast}$ when $1\le c\le k$:
+The high frequency counts are assumed to be reliable, hence adjusted count is not applied to the high frequency terms. Katz (1987) suggested that for $$c$$ greater than $$k=5$$, we use $$c^{\ast}=c$$. Katz (1987) also suggested to use a finer adjustment for $$c^{\ast}$$ when $$1\le c\le k$$:
 
 $$
-c^\ast=
+c^{\ast}=
 \frac{(c+1)\frac{N_{c+1}}{N_c}-c\frac{(k+1)N_{k+1}}{N_1}}{1-\frac{(k+1)N_{k+1}}{N_1}}
 $$
 
 Good-Turing discounting will give probability of zero occurrence terms similar to that of a singleton.
 
 ### Katz Backoff
-Backoff is to make use of lower-order $n$-gram to compute the probability of higher-order $n$-gram. For example, we use the information of unigram to compute the probability of bigram.
+Backoff is to make use of lower-order $$n$$-gram to compute the probability of higher-order $$n$$-gram. For example, we use the information of unigram to compute the probability of bigram.
 
-Assume we have a $n$-gram of the form $w_{n-k}...w_{n-2}w_{n-1}w_{n}$
-which is denoted by $w_{n-k}^{n}$ and its probability is defined as $P(w_{n-k}^{n})$. Then the probability of a word given the previous $(N-1)$-gram is:  
+Assume we have a $$n$$-gram of the form $$w_{n-k}...w_{n-2}w_{n-1}w_{n}$$
+which is denoted by $$w_{n-k}^{n}$$ and its probability is defined as $$P(w_{n-k}^{n})$$. Then the probability of a word given the previous $$(N-1)$$-gram is:  
+
 $$
 P_K(w_n|w_{n-N+1}^{n-1})=\begin{cases}
-    P^\ast(w_n|w_{n-N+1}^{n-1})&\textrm{if }C(w_{n-N+1)^{n-1})>0  
-    \alpha(w_{n-N+1}^{n-1})P_K(w_n|w_{n-N+2}^{n-1})&\textrm{otherwise}
+    P^{\ast}(w_n|w_{n-N+1}^{n-1}) & \textrm{if }C(w_{n-N+1}^{n-1})>0 \\
+    \alpha(w_{n-N+1}^{n-1})P_K(w_n|w_{n-N+2}^{n-1}) & \textrm{otherwise}
 \end{cases}
 $$
-where the discounted probability $P^{\ast}$ is computed based on the discounted count $c^{\ast}$
+
+where the discounted probability $$P^{\ast}$$ is computed based on the discounted count $$c^{\ast}$$
+
 $$
 P^\ast(w_n|w_{n-N+1}^{n-1})=\frac{c^\ast(w_{n-N+1}^{n})}{c(w_{n-N+1}^{n-1})}
 $$
-and $\alpha$ is the normalizing factor, which is
+
+and $$\alpha$$ is the normalizing factor, which is
+
 $$
 \alpha(w_{n-N+1}^{n-1})=
   \frac{1-\displaystyle\sum_{w_n:C(w_{n-N+1}^n)>0}P^\ast(w_n|w_{n-N+1}^{n-1})}
@@ -90,7 +95,7 @@ $$
 $$
 
 ### Interpolation
-Computing the probability of any $n$-gram by the weighted sum of the measured probability of associated $n$-gram, $(n-1)$-gram, $(n-2)$-gram, etc.
+Computing the probability of any $$n$$-gram by the weighted sum of the measured probability of associated $$n$$-gram, $$(n-1)$$-gram, $$(n-2)$$-gram, etc.
 
 ## Part-of-Speech
 POS tagging helps language processing. In English, following part-of-speech categorization is commonly used:
@@ -144,11 +149,11 @@ In Low et al (2005), it proposed the use of maximum entropy to perform segmentat
 
 It is a learning algorithm, such that the corpus teaches how the words shall be tagged. The corpus not only tells about the correct tagging, but also the other "features" that assists the tagging. All these kind of information is then feed into a *maximum entropy* model which uses the *EM algorithm* to deduce the optimal parameters. This is called the training process. The trained model is then used for the subsequent segmentation.
 
-However, there are four problems with this approach: (1) The features extracted may affect (lead or mislead) the model; (2) The corpus has to be very large and hundred percent correct to make a perfect model; (3) Training takes a long time; (4) There could be strange results: it is not necessarily know L->M->R is a fixed sequence and R->M->L is not allowed, because the tagging is character by character based on context clues only.
+However, there are four problems with this approach: (1) The features extracted may affect (lead or mislead) the model; (2) The corpus has to be very large and hundred percent correct to make a perfect model; (3) Training takes a long time; (4) There could be strange results: it is not necessarily know L→M→R is a fixed sequence and R→M→L is not allowed, because the tagging is character by character based on context clues only.
 
 Lau and King (2005) proposes a two-stage training to avoid a very large corpus: Train the model with just half of the corpus and use this trained model to tag the second half of the corpus. Mistakes are expected but we compare the mistaken tagging with the correct one and train the model again with the tagged result as additional features. The double-trained model can produce results more accurately.
 
-I think it is OK for problems (1)-(3) exist. However, problem (4) means the system is not tagging correctly (in the sense that it is illogical to have such tagging result). Any solution for this? May be we should build a Markov chain to tell that R->M is impossible.
+I think it is OK for problems (1)-(3) exist. However, problem (4) means the system is not tagging correctly (in the sense that it is illogical to have such tagging result). Any solution for this? May be we should build a Markov chain to tell that R→M is impossible.
 
 ```bibtex
 @INPROCEEDINGS{lng05,
@@ -178,9 +183,9 @@ I think it is OK for problems (1)-(3) exist. However, problem (4) means the syst
 
 ## Segmentation by n-gram
 
-Google's research blog has an entry in last summer mentioning they [uses $n$-gram to do text processing](http://googleresearch.blogspot.com/2006/08/all-our-n-gram-are-belong-to-you.html)
+Google's research blog has an entry in last summer mentioning they [uses $$n$$-gram to do text processing](http://googleresearch.blogspot.com/2006/08/all-our-n-gram-are-belong-to-you.html)
 
-Actually, $n$-gram can help doing Chinese segmentation, for example, an algorithm is described in [a blog entry](http://b6s.blogspot.com/2006/07/bi-gram-c.html)
+Actually, $$n$$-gram can help doing Chinese segmentation, for example, an algorithm is described in [a blog entry](http://b6s.blogspot.com/2006/07/bi-gram-c.html)
 
 ![](/img/zhseg-bigram.jpg)
 
@@ -247,18 +252,18 @@ end while
 output bestTrial[]
 ```
 
-The above code employs a *smoothing algorithm* for estimating the probability of unknown $n$-gram. The most popular one is the Katz's algorithm.
+The above code employs a *smoothing algorithm* for estimating the probability of unknown $$n$$-gram. The most popular one is the Katz's algorithm.
 
 The author suggested that the probability used in the above code should be log-probability, hence the total score is actually the log-probability of a sentence.
 
-My comment: The $n$-gram model is actually a union of the unigram, bigram, trigram, quadrigram, pentagram, etc. Hence the probability should not be comparable between. I wonder whether the above algorithm favors single-character segmentation, because of the smaller cardinal size of unigram than other $n$-gram.
+My comment: The $$n$$-gram model is actually a union of the unigram, bigram, trigram, quadrigram, pentagram, etc. Hence the probability should not be comparable between. I wonder whether the above algorithm favors single-character segmentation, because of the smaller cardinal size of unigram than other $$n$$-gram.
 
-Put it simple, assume two characters $C_1$ and $C_2$ are both very common in the unigram. And $C_1C_2$ is a valid phrase and therefore, $C_1C_2$ is also common in the bigram. Can one tell if the probability of $C_1$ in unigram is less than that of $C_1C_2$ in bigram?
+Put it simple, assume two characters $$C_1$$ and $$C_2$$ are both very common in the unigram. And $$C_1C_2$$ is a valid phrase and therefore, $$C_1C_2$$ is also common in the bigram. Can one tell if the probability of $$C_1$$ in unigram is less than that of $$C_1C_2$$ in bigram?
 
 
 
 ## Smoothing in n-gram
-Smoothing $n$-gram means to fill-in the probabilities of unseen entries besides those evaluated from the training data.
+Smoothing $$n$$-gram means to fill-in the probabilities of unseen entries besides those evaluated from the training data.
 
 References:
 ```bibtex

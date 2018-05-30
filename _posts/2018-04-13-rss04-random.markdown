@@ -17,43 +17,43 @@ bibtex:
 
 An article on boosting the power of chi-squared test for checking randomness.
 
-Alphabet $A = \{a_1, \ldots, a_k\}$ with $k$ in the order of $2^{10}$ or
-greater. In chi-squared test, $k$ is the number of categories (i.e., $k-1$ is
+Alphabet $$A = \{a_1, \ldots, a_k\}$$ with $$k$$ in the order of $$2^{10}$$ or
+greater. In chi-squared test, $$k$$ is the number of categories (i.e., $$k-1$$ is
 the degree of freedom) and if we apply the test to a random number generator
-over alphabet $A$, we need a very large sample size.
+over alphabet $$A$$, we need a very large sample size.
 
 Chi-square test:
 
 $$ x^2 = \sum_{i=1}^k \frac{(n_i - Np_i)^2}{Np_i} $$
 
-where $N$ is the sample size, $n_i$ is the count of samples in category $i$, and
-$p_i$ is the probability of category $i$ according to the hypothesis. Then $x^2$
-follows chi-square distribution of $k-1$ degree of freedom asymptotically,
-namely, the less $x^2$ the more probable the sample fits the distribution $p_i$.
-This is a good approximation if $Np_i \ge 5$ for all $i$. Therefore, the
-necessary (but not sufficient) condition for a good approximation is $N\ge 5k$,
+where $$N$$ is the sample size, $$n_i$$ is the count of samples in category $$i$$, and
+$$p_i$$ is the probability of category $$i$$ according to the hypothesis. Then $$x^2$$
+follows chi-square distribution of $$k-1$$ degree of freedom asymptotically,
+namely, the less $$x^2$$ the more probable the sample fits the distribution $$p_i$$.
+This is a good approximation if $$Np_i \ge 5$$ for all $$i$$. Therefore, the
+necessary (but not sufficient) condition for a good approximation is $$N\ge 5k$$,
 depends on the number of categories.
 
-The paper proposes "adaptive chi-squared test" that partition alphabet $A$ into
-subsets $A_1,\ldots,A_s$ which $2 \le s\ll k$. Therefore, the number of
+The paper proposes "adaptive chi-squared test" that partition alphabet $$A$$ into
+subsets $$A_1,\ldots,A_s$$ which $$2 \le s\ll k$$. Therefore, the number of
 categories are vastly reduced. And we apply chi-squared test on the partition
-with $s$ categories instead of $k$.
+with $$s$$ categories instead of $$k$$.
 
-The partition of $A$ into $s$ subsets $A_i$ are as follows: We divide the
-samples $x_1,\ldots,x_N$ into training samples $x_1,\ldots,x_m$ and testing
-samples $x_{m+1},\ldots,x_N$. Then based on training samples, we make alphabets
-$a_i$ and $a_j$ into the same subset $A_h$ iff the frequency of $a_i$ and $a_j$
-are close. In the example of the paper, $A$ is partitioned into $A_0,A_1,A_2$
+The partition of $$A$$ into $$s$$ subsets $$A_i$$ are as follows: We divide the
+samples $$x_1,\ldots,x_N$$ into training samples $$x_1,\ldots,x_m$$ and testing
+samples $$x_{m+1},\ldots,x_N$$. Then based on training samples, we make alphabets
+$$a_i$$ and $$a_j$$ into the same subset $$A_h$$ iff the frequency of $$a_i$$ and $$a_j$$
+are close. In the example of the paper, $$A$$ is partitioned into $$A_0,A_1,A_2$$
 for alphabets that have zero, one, and more than one occurrences in the training
 samples, respectively. After the partition, we assign probabilities to subsets
-$A_h$ according to its constitutient alphabets. In case of the hypothesis of
-uniform distribution in $A$, then
-$\Pr[A_h] = |A_h|/k = \sum_{i:a_i\in A_h} \frac{1}{k}$. Such probabilities of
-the subsets is the null hypothesis $H_0$ in the chi-squared test and we test it
+$$A_h$$ according to its constitutient alphabets. In case of the hypothesis of
+uniform distribution in $$A$$, then
+$$\Pr[A_h] = |A_h|/k = \sum_{i:a_i\in A_h} \frac{1}{k}$$. Such probabilities of
+the subsets is the null hypothesis $$H_0$$ in the chi-squared test and we test it
 using the frequency count in training sample.
 
 Because we combined the categories to make the number of categories reduce from
-$k$ to $s$, we increases the power.
+$$k$$ to $$s$$, we increases the power.
 
 The paper tested the proposal with entropy of encrypted text: Try to
 distinguished encrypted plain text against random bytes. It assume alphabets to

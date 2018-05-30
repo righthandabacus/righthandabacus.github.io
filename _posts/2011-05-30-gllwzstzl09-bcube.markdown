@@ -15,8 +15,8 @@ bibtex:
 ---
 BCube is a recursive structure so that:
 
-  - BCube($0$) is a $n$-port switch connects $n$ servers
-  - BCube($k$) consists of $n$ units of BCube($k-1$) and $n^k$ units of $n$-port switch,
-    in total $n^{k+1}$ servers and $(k+1)n^k$ switches
+  - BCube($$0$$) is a $$n$$-port switch connects $$n$$ servers
+  - BCube($$k$$) consists of $$n$$ units of BCube($$k-1$$) and $$n^k$$ units of $$n$$-port switch,
+    in total $$n^{k+1}$$ servers and $$(k+1)n^k$$ switches
 
-Building BCube($k$) from BCube($k-1$) are as follows: We number the BCube($k-1$) from $1$ to $n$ and in each BCube($k-1$), number the server from 1 to $n^k$. Then, considering the $n$ switches in the layer $k$, we connect the $i$-th server in $j$-th BCube($k-1$) to the $j$-th port of the $i$-th switch.
+Building BCube($$k$$) from BCube($$k-1$$) are as follows: We number the BCube($$k-1$$) from $$1$$ to $$n$$ and in each BCube($$k-1$$), number the server from 1 to $$n^k$$. Then, considering the $$n$$ switches in the layer $$k$$, we connect the $$i$$-th server in $$j$$-th BCube($$k-1$$) to the $$j$$-th port of the $$i$$-th switch.

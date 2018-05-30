@@ -5,28 +5,28 @@ date: 2012-08-09 06:37:56 -0400
 tags: math
 ---
 
-Euclid's formula says that, $(a,b,c)$ are a Pythagorean triple, i.e.,
-$a^2+b^2=c^2$ for $a,b,c$ are integers, if and only if $a=2mn$, $b=m^2-n^2$,
-$c=m^2+n^2$ for some integers $m,n$.
+Euclid's formula says that, $$(a,b,c)$$ are a Pythagorean triple, i.e.,
+$$a^2+b^2=c^2$$ for $$a,b,c$$ are integers, if and only if $$a=2mn$$, $$b=m^2-n^2$$,
+$$c=m^2+n^2$$ for some integers $$m,n$$.
 
-The proof is as follows: Since $a^2+b^2=c^2$, we have
+The proof is as follows: Since $$a^2+b^2=c^2$$, we have
 
 $$
 \big(\frac{a}{c}\big)^2 + \big(\frac{b}{c}\big)^2 = 1
 $$
 
-i.e., the point $P=(x,y)=(a/c,b/c)$ is on the unit circle. Assume $a,b,c$ are
+i.e., the point $$P=(x,y)=(a/c,b/c)$$ is on the unit circle. Assume $$a,b,c$$ are
 all non-negative. Hence P is in the first quadrant. Consider the point
-$Q=(0,-1)$ on the unit circle, we have line QP intersect with the $x$-axis on
-$R=(k,0)$, which, by section formula, we have
+$$Q=(0,-1)$$ on the unit circle, we have line QP intersect with the $$x$$-axis on
+$$R=(k,0)$$, which, by section formula, we have
 
 $$
 k = \frac{x}{1+y}.
 $$
 
-Since $x$ and $y$ are rational numbers, so does $k$. Now we assume $k=n/m$ for
-some non-negative $n,m$. Obviously, point $R$ is inside the unit circle, so
-$n\le m$. Now consider the line QR, it is given by the equation
+Since $$x$$ and $$y$$ are rational numbers, so does $$k$$. Now we assume $$k=n/m$$ for
+some non-negative $$n,m$$. Obviously, point $$R$$ is inside the unit circle, so
+$$n\le m$$. Now consider the line QR, it is given by the equation
 
 $$
 \begin{aligned}
@@ -41,7 +41,7 @@ $$
 x^2+y^2 = 1.
 $$
 
-Solving the two equations simultaneously, it gives the solution $x=0,y=-1$, i.e. point $Q$, and the other solution is
+Solving the two equations simultaneously, it gives the solution $$x=0,y=-1$$, i.e. point $$Q$$, and the other solution is
 
 $$
 \begin{aligned}
@@ -49,7 +49,7 @@ x&=\frac{2k}{1+k^2} & y&=\frac{1-k^2}{1+k^2}.
 \end{aligned}
 $$
 
-Subsititute $k=n/m$ we have
+Subsititute $$k=n/m$$ we have
 
 $$
 \begin{aligned}

@@ -51,10 +51,10 @@ packets. Also, FFR has the similar cost because it sends slower during FR
 because we can confirm it is an FFR. And the limited transmit has the cost of
 making the sender idle at the time that it can send packets. So taking these
 costs, we can adapt the FA ratio such that: (1) Upon FFR, increase the FA ratio
-by S, (2) upon RTO, decrease the FA ratio by $\dfrac{C_{TO}}{C_{FFR}}S$
-where $C_{TO}$ is the cost of RTO and $C_{FFR}$ is the cost of FFR, (3) upon limited
+by S, (2) upon RTO, decrease the FA ratio by $$\dfrac{C_{TO}}{C_{FFR}}S$$
+where $$C_{TO}$$ is the cost of RTO and $$C_{FFR}$$ is the cost of FFR, (3) upon limited
 transmit-causing idle period, decrease the FA ratio by
-$\dfrac{C_{LT}}{C_{FFR}}S$. The value of S given in the paper is 0.01.
+$$\dfrac{C_{LT}}{C_{FFR}}S$$. The value of S given in the paper is 0.01.
 This is called DSACK-TA for Timeout Avoidance.
 
 Moreover, in DSACK, as we have the timestamp reported by the sender, we can

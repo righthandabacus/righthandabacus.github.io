@@ -5,20 +5,20 @@ date: 2012-06-26 17:39:25 -0400
 tags: math
 ---
 
-If we denote the Cartesian coordinate of a $n$-dimensional Euclidean space by a
-$n$-vector $\mathbf{x}$, then a $n$-ball centered at the origin with radius $r$
+If we denote the Cartesian coordinate of a $$n$$-dimensional Euclidean space by a
+$$n$$-vector $$\mathbf{x}$$, then a $$n$$-ball centered at the origin with radius $$r$$
 is the set of points that satisfy
 
 $$
 ||\mathbf{x}||_2 \le r
 $$
 
-Taking this definition, a 1-ball is the line segment $[-r,r]$, which its
-"volume" is $2r$ and has no surface area. A 2-ball is a circle with radius $r$,
-which has the "surface" area of $2\pi r$ and "volume" of $\pi r^2$.
+Taking this definition, a 1-ball is the line segment $$[-r,r]$$, which its
+"volume" is $$2r$$ and has no surface area. A 2-ball is a circle with radius $$r$$,
+which has the "surface" area of $$2\pi r$$ and "volume" of $$\pi r^2$$.
 
-Let us denote the volume of an $n$-ball with radius $r$ by $V_n(r)$, and
-consider that $n$-ball is defined by
+Let us denote the volume of an $$n$$-ball with radius $$r$$ by $$V_n(r)$$, and
+consider that $$n$$-ball is defined by
 
 $$
 \begin{align}
@@ -34,7 +34,7 @@ $$
 -r \le x_n \le r.
 $$
 
-Therefore, we can find $V_n(r)$ recursively:
+Therefore, we can find $$V_n(r)$$ recursively:
 
 $$
 \begin{align}
@@ -45,9 +45,9 @@ V_n(r) &= \int_{-r}^r V_{n-1}(\sqrt{r^2-x_n^2})dx_n  \\
 $$
 
 ## Proportionality of Volume
-Firstly, we prove $V_n(r)$ is proportional to $r^n$ by induction:
+Firstly, we prove $$V_n(r)$$ is proportional to $$r^n$$ by induction:
 
-Consider $n=1$, $V_1(r)=2r=rV_1(1)$. If we have $V_k(r)=r^kV_k(1)$, then
+Consider $$n=1$$, $$V_1(r)=2r=rV_1(1)$$. If we have $$V_k(r)=r^kV_k(1)$$, then
 
 $$
 \begin{align}
@@ -74,7 +74,7 @@ V_n(1) &= \int_{-1}^1 V_{n-1}(\sqrt{1-u^2})du \\
 &= V_{n-1}(1)\int_{-1}^1 (\sqrt{1-u^2})^{n-1}du.
 \end{align}$$
 
-If we denote for $n>1$,
+If we denote for $$n>1$$,
 
 $$
 I_n = \int_{-1}^1 (\sqrt{1-u^2})^n du \\
@@ -95,7 +95,7 @@ $$
 V_n(r) = 2r^nI_1I_2\cdots I_{n-1},
 $$
 
-valid for $n\ge 1$ if we specially define $I_0=1$, and which
+valid for $$n\ge 1$$ if we specially define $$I_0=1$$, and which
 
 $$
 I_n = \int_{-1}^1 (\sqrt{1-u^2})^n du = \int_{-\pi/2}^{\pi/2} \cos^{n+1}t dt = \int_0^{\pi} \sin^{n+1}t dt = \frac{\Gamma(\frac{n}{2}+1)}{\Gamma(\frac{n+3}{2})}\sqrt{\pi}
@@ -107,8 +107,8 @@ $$
 \Gamma(z) = \int_0^\infty e^{-t}t^{z-1} dt,
 $$
 
-with the property that $z\Gamma(z) = \Gamma(z+1)$, and $\Gamma(n)=(n-1)!$ for
-positive integers $n$. But we can also consider $I_n$ without resolving to the
+with the property that $$z\Gamma(z) = \Gamma(z+1)$$, and $$\Gamma(n)=(n-1)!$$ for
+positive integers $$n$$. But we can also consider $$I_n$$ without resolving to the
 Gamma function. Consider that
 
 $$\begin{align}
@@ -120,7 +120,7 @@ I_n &= \int_0^{\pi} \sin^{n+1}t dt  \\
 \textrm{therefore}\quad I_n &= \frac{n}{n+1} I_{n-2}.
 \end{align}$$
 
-It is easy to see that $I_1=\pi/2$, $I_2=4/3$, $I_3=3\pi/8$, and
+It is easy to see that $$I_1=\pi/2$$, $$I_2=4/3$$, $$I_3=3\pi/8$$, and
 
 $$
 I_nI_{n-1} = \frac{n}{n+1}I_{n-2}\frac{n-1}{n}I_{n-3} = \frac{n-1}{n+1}I_{n-2}I_{n-3}
@@ -165,7 +165,7 @@ $$
 V_n(1) = \frac{\pi^{n/2}}{\Gamma(\frac{n}{2}+1)}.
 $$
 
-And the surface area of the $n$-ball is obtained by $\frac{d}{dr}V_n(r)$.
+And the surface area of the $$n$$-ball is obtained by $$\frac{d}{dr}V_n(r)$$.
 
 ## Alternative Derivation
 
@@ -182,9 +182,9 @@ $$\begin{align}
 \Gamma(\tfrac{1}{2}) &= 2\int_0^{\infty} e^{-u^2} du = \sqrt{\pi},
 \end{align}$$
 
-for the reason that $\int_{-\infty}^{\infty} \frac{1}{\sqrt{2\pi\sigma^2}}\exp(-\frac{x^2}{2\sigma^2}) du = 1$.
+for the reason that $$\int_{-\infty}^{\infty} \frac{1}{\sqrt{2\pi\sigma^2}}\exp(-\frac{x^2}{2\sigma^2}) du = 1$$.
 
-Denote the surface of $n$-ball by $\omega_{n-1}(r)$, we can write the volume as
+Denote the surface of $$n$$-ball by $$\omega_{n-1}(r)$$, we can write the volume as
 the integration of surface area as the radius expands from zero:
 
 $$
@@ -197,8 +197,8 @@ $$
 V_n(r) = \iint\cdots\int_{||\mathbf{x}||\le R} dx_1dx_2\cdots dx_n.
 $$
 
-Consider the density integration on an infinitely large $n$-ball, where the
-density at point $\mathbf{x}$ is $e^{-r^2}$ with $r$ defined by
+Consider the density integration on an infinitely large $$n$$-ball, where the
+density at point $$\mathbf{x}$$ is $$e^{-r^2}$$ with $$r$$ defined by
 
 $$
 r^2 = x_1^2 + x_2^2 + \cdots + x_n^2.
@@ -232,11 +232,11 @@ V_n = \frac{1}{n}\omega_{n-1} &= \frac{2\pi^{n/2}}{n\Gamma(\frac{n}{2})}  \\
 V_n(r) &= \frac{\pi^{n/2}r^n}{\Gamma(\frac{n}{2}+1)}.
 \end{align}$$
 
-We can also verify that $\frac{d}{dr}V_n(r) = \omega_{n-1}(r)$.
+We can also verify that $$\frac{d}{dr}V_n(r) = \omega_{n-1}(r)$$.
 
 ## Properties of n-ball
-If we consider the $n$-ball with unit diameter instead of unit radius, its
-volume is $V_n(1/2)$. We can see that, due to the exponential nature in the
+If we consider the $$n$$-ball with unit diameter instead of unit radius, its
+volume is $$V_n(1/2)$$. We can see that, due to the exponential nature in the
 denominator,
 
 $$

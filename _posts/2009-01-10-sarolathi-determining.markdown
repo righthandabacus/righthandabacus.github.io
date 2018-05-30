@@ -13,10 +13,10 @@ bibtex:
   year: 2007
 ---
 Propose to use a SYN packet in TCP (or alike) to advertise a desired sending
-rate of $X$, and let the routers respond for or against this rate, or
-counter-propose another rate $X'$. The whole idea (a.k.a. QuickStart) is to
+rate of $$X$$, and let the routers respond for or against this rate, or
+counter-propose another rate $$X'$$. The whole idea (a.k.a. QuickStart) is to
 allow a faster slow-start to catch-up the available network throughput. Once
-the router approves the rate of $X$, the sender can have a jump on the window
+the router approves the rate of $$X$$, the sender can have a jump on the window
 size upon receipt of the approval message. Router would only approves the rate
 when it is underutilized. Simulation shows that, approval of QuickStart is just
 a small fraction of the overall when it is moderately congested. Also,

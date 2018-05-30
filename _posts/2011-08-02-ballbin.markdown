@@ -4,7 +4,7 @@ title: "Balls and Bins"
 date: 2011-08-02 03:33:37 -0400
 tags: math
 ---
-Assume there are $m$ balls and $n$ bins. We denote $\eta_{i}^b$ the event that ball $i$ falls into bin $b$, and denote $\epsilon_{ij}$ the event that balls $i$ and $j$ collide.
+Assume there are $$m$$ balls and $$n$$ bins. We denote $$\eta_{i}^b$$ the event that ball $$i$$ falls into bin $$b$$, and denote $$\epsilon_{ij}$$ the event that balls $$i$$ and $$j$$ collide.
 
 ## Collision probability
 
@@ -16,7 +16,7 @@ $$\begin{aligned}
 &= \frac{1}{n}
 \end{aligned}$$
 
-Expected number of collision after tossing $m$ balls: Define indicator function $\mathbf{1}(\epsilon_{ij})$. Then the number of collisions is $\sum_{i\neq j}\mathbf{1}(\epsilon_{ij})$. The expected number of collision is therefore:
+Expected number of collision after tossing $$m$$ balls: Define indicator function $$\mathbf{1}(\epsilon_{ij})$$. Then the number of collisions is $$\sum_{i\neq j}\mathbf{1}(\epsilon_{ij})$$. The expected number of collision is therefore:
 
 $$\begin{aligned}
 E[\sum_{i\neq j}\mathbf{1}(\epsilon_{ij})] &= \sum_{i\neq j}E[\mathbf{1}(\epsilon_{ij})]  \\
@@ -31,26 +31,26 @@ $$\begin{aligned}
 &= (1-\frac{1}{n})^{\binom{m}{2}}
 \end{aligned}$$
 
-Number of balls to throw to expect a collision: Solve for $m$ in $(1-\frac{1}{n})^{\binom{m}{2}}=\frac{1}{2}$
+Number of balls to throw to expect a collision: Solve for $$m$$ in $$(1-\frac{1}{n})^{\binom{m}{2}}=\frac{1}{2}$$
 
 ## Counting
 
-Probability of a particular bin is empty: $\big(1-\frac{1}{n}\big)^{\binom{m}{2}} \approx e^{-m/n}$
+Probability of a particular bin is empty: $$\big(1-\frac{1}{n}\big)^{\binom{m}{2}} \approx e^{-m/n}$$
 
-Probability that a particular bin has exactly $k$ balls:
+Probability that a particular bin has exactly $$k$$ balls:
 
 $$
 \binom{m}{k}\big(\frac{1}{n}\big)^k\big(1-\frac{1}{n}\big)^{m-k} \le \frac{m^k}{k!}\frac{1}{n^k},
 $$
 
-which the bound is obtained by the inequality $\big(\frac{n}{r}\big)^r \le \binom{n}{r} \le \frac{n^r}{r!} \le \big(\frac{en}{r}\big)^r$.
+which the bound is obtained by the inequality $$\big(\frac{n}{r}\big)^r \le \binom{n}{r} \le \frac{n^r}{r!} \le \big(\frac{en}{r}\big)^r$$.
 
-Probability that a bin has at least $k$ balls:
+Probability that a bin has at least $$k$$ balls:
 
 $$
 \sum_{i=k}^m\binom{m}{i}\big(\frac{1}{n}\big)^i\big(1-\frac{1}{n}\big)^{m-i}
 $$
 
-By considering only $k$ balls out of $m$ and ignoring the others, we have the probability upperbounded by
+By considering only $$k$$ balls out of $$m$$ and ignoring the others, we have the probability upperbounded by
 
 $$\binom{m}{k}\frac{1}{n^k}\le \big(\frac{me}{nk}\big)^k$$

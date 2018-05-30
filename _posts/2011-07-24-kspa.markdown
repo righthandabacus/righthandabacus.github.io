@@ -5,12 +5,12 @@ date: 2011-07-24 23:40:57 -0400
 tags: code math
 ---
 
-That is, to find $k$ paths between a pair of nodes in a graph that *are* the shortest.
+That is, to find $$k$$ paths between a pair of nodes in a graph that *are* the shortest.
 
 This was asked in [StackOverflow](http://stackoverflow.com/questions/828041/suggestions-for-kspa-on-undirected-graph). And a couple different algorithms are available.
 
 ## Dijkstra's Algorithm
-Standard Dijkstra's Algorithm is to find the shortest path, in $O(\vert V\vert^2)$:
+Standard Dijkstra's Algorithm is to find the shortest path, in $$O(\vert V\vert^2)$$:
 ```python
 Graph = G(V,E)      # The graph
 tovisit = [s]       # open nodes: To examine
@@ -35,7 +35,7 @@ while len(tovisit):
 
 ## Modified Dijkstra's Algorithm
 
-A trivial way to find the $k$ shortest path is to extend the Dijkstra's algorithm. Instead of keeping the best route to a node, we keep the best $k$ routes to it, as illustrated follows:
+A trivial way to find the $$k$$ shortest path is to extend the Dijkstra's algorithm. Instead of keeping the best route to a node, we keep the best $$k$$ routes to it, as illustrated follows:
 ```python
 # Modified Dijkstra's
 Graph = G(V,E)          # The graph
@@ -71,31 +71,31 @@ while len(tovisit):
             tovisit.append(v)
     closed.append(n)
 ```
-This algorithm is in $O(k\vert V\vert^2)$
+This algorithm is in $$O(k\vert V\vert^2)$$
 
 ## Double Sweep Algorithm
 Double sweep algorithm is mentioned in the following papers:
 
-It can work on a graph with parallel edges as long as no negative circuits. Denote the $k$ paths between nodes $x$ and $y$ by $D_{xy}$ and the $k$ shortest edges between nodes $x$ and $b$ by $d_{xy}$. The idea is to find the $k$ paths between $s$ and $t$ by checking if $D_{su}+d_{ut}$ is shorter.
+It can work on a graph with parallel edges as long as no negative circuits. Denote the $$k$$ paths between nodes $$x$$ and $$y$$ by $$D_{xy}$$ and the $$k$$ shortest edges between nodes $$x$$ and $$b$$ by $$d_{xy}$$. The idea is to find the $$k$$ paths between $$s$$ and $$t$$ by checking if $$D_{su}+d_{ut}$$ is shorter.
 
-We first define for two $k$-vectors $A$ and $B$ that
-  * $A+B$ as the minimum $k$ entries of ${a+b: a \in A, b \in B}$
-  * $\min(A,B)$ as the minimum $k$ entries of the union of $A$ and $B$
+We first define for two $$k$$-vectors $$A$$ and $$B$$ that
+  * $$A+B$$ as the minimum $$k$$ entries of $${a+b: a \in A, b \in B}$$
+  * $$\min(A,B)$$ as the minimum $$k$$ entries of the union of $$A$$ and $$B$$
 
-and assume that the set of nodes $V$ is in an order so that we can establish the relationship $u\le v$ for $u,v\in V$. Then the double sweep algorithm is formulated as follows:
-  - Define $d_{u,v}$ to be a $k$-vector of shortest edges' length between $u$ and $v$.
-    If there are less than $k$ edges, set the corresponding values to infinity
-  - Initialize $D_{sv}$ for all $v\in V$ as a $k$-vector of infinities, except
-    $D_{ss} = (0,\infty,\infty,...)$ to denote the shortest path from $s$ to itself is zero.
-  - Backward sweep: For $v$ in the reverse order of $V$, compute $D_{sv}=\min(D_{su}+d_{uv}, D_{sv})$ for all $u\le v$
-  - Forward sweep: For $v$ in the forward order of $V$, compute $D_{sv}=\min(D_{su}+d_{uv}, D_{sv})$ for all $u\ge v$
+and assume that the set of nodes $$V$$ is in an order so that we can establish the relationship $$u\le v$$ for $$u,v\in V$$. Then the double sweep algorithm is formulated as follows:
+  - Define $$d_{u,v}$$ to be a $$k$$-vector of shortest edges' length between $$u$$ and $$v$$.
+    If there are less than $$k$$ edges, set the corresponding values to infinity
+  - Initialize $$D_{sv}$$ for all $$v\in V$$ as a $$k$$-vector of infinities, except
+    $$D_{ss} = (0,\infty,\infty,...)$$ to denote the shortest path from $$s$$ to itself is zero.
+  - Backward sweep: For $$v$$ in the reverse order of $$V$$, compute $$D_{sv}=\min(D_{su}+d_{uv}, D_{sv})$$ for all $$u\le v$$
+  - Forward sweep: For $$v$$ in the forward order of $$V$$, compute $$D_{sv}=\min(D_{su}+d_{uv}, D_{sv})$$ for all $$u\ge v$$
   - Repeat the backward and forward sweeps until we found no improvement is made
 
 ## Eppstein's Algorithm
 
-A neat algorithm developed by David Eppstein in [his paper](../2011-05-24-e98-shortestpath/). It assume a digraph and find a shortest path tree from any node to node $t$. Define this shortest path tree as $T$. For all the edges not in $T$ are called sidetrack edges, denote their set by $G$.
+A neat algorithm developed by David Eppstein in [his paper](../2011-05-24-e98-shortestpath/). It assume a digraph and find a shortest path tree from any node to node $$t$$. Define this shortest path tree as $$T$$. For all the edges not in $$T$$ are called sidetrack edges, denote their set by $$G$$.
 
-Then a path between nodes $s$ and $t$ can be expressed implicitly by the set of sidetrack edges used. For example, an empty set represents the shortest path according to the shortest path tree $T$. By computing the additional cost incurred by traversing a sidetracked edge, we can find the $k$ shortest paths by looking for $k$ valid subsets of $G$ of minimum total cost.
+Then a path between nodes $$s$$ and $$t$$ can be expressed implicitly by the set of sidetrack edges used. For example, an empty set represents the shortest path according to the shortest path tree $$T$$. By computing the additional cost incurred by traversing a sidetracked edge, we can find the $$k$$ shortest paths by looking for $$k$$ valid subsets of $$G$$ of minimum total cost.
 
 ```bibtex
 @article{

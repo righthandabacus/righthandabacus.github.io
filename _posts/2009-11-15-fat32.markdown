@@ -123,17 +123,17 @@ FAT32. Its structure is:
 
 Therefore, the structure of a FAT32 partition is as follows:
 
-If the number of reserved sectors (0xE) is $R$, number of FATs (0x10) is $N$ and the
-number of sectors per FAT (0x24 or 0x16) is $S$, then, counting from the beginning
-of the partition, sector 0 is the boot record, sector $R$ is the first FAT, sector
-$R+NS$ is the beginning of data area, and this is the location of the root
+If the number of reserved sectors (0xE) is $$R$$, number of FATs (0x10) is $$N$$ and the
+number of sectors per FAT (0x24 or 0x16) is $$S$$, then, counting from the beginning
+of the partition, sector 0 is the boot record, sector $$R$$ is the first FAT, sector
+$$R+NS$$ is the beginning of data area, and this is the location of the root
 directory.
 
 ## File Allocation Tables in FAT32
 
 The data area must start on a cluster boundary. The FAT is a sequence of
-numbers, each in 32-bit for FAT32 and 16-bit for FAT16. The $k$-th number ($k\ge 0$)
-is corresponding to the $k$-th cluster in the data area, which tells which is the
+numbers, each in 32-bit for FAT32 and 16-bit for FAT16. The $$k$$-th number ($$k\ge 0$$)
+is corresponding to the $$k$$-th cluster in the data area, which tells which is the
 next cluster of the data block. The first data cluster is cluster number 2. Thus
 in FAT, the value of:
 

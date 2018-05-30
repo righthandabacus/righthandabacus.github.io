@@ -5,9 +5,9 @@ date: 2012-07-15 22:25:54 -0400
 tags: math
 ---
 
-Comparing $e^{\pi}$ and $\pi^e$.
+Comparing $$e^{\pi}$$ and $$\pi^e$$.
 
-Since $e^x > 1+x$ for positive $x$ (proof: $\frac{d}{dx}e^x \ge \frac{d}{dx}(1-x)$ and $e^x = 1-x$ at $x=0$), if we set $x=\pi/e-1 > 0$,
+Since $$e^x > 1+x$$ for positive $$x$$ (proof: $$\frac{d}{dx}e^x \ge \frac{d}{dx}(1-x)$$ and $$e^x = 1-x$$ at $$x=0$$), if we set $$x=\pi/e-1 > 0$$,
 
 $$
 \begin{aligned}
@@ -17,7 +17,7 @@ e^{\pi} &> \pi^e
 \end{aligned}
 $$
 
-Generally, for real $x$, we have $e^x \ge 1+x$ with the equality holds only at $x=0$. Therefore,
+Generally, for real $$x$$, we have $$e^x \ge 1+x$$ with the equality holds only at $$x=0$$. Therefore,
 
 $$
 \begin{aligned}
@@ -27,9 +27,9 @@ e^x &\ge x^e
 \end{aligned}
 $$
 
-and the equality holds only at $x/e-1=0$ or $x=e$.
+and the equality holds only at $$x/e-1=0$$ or $$x=e$$.
 
-Alternative way to prove $e^{\pi} > \pi^e$ is to compare $e^{1/e}$ and $\pi^{1/\pi}$. Consider
+Alternative way to prove $$e^{\pi} > \pi^e$$ is to compare $$e^{1/e}$$ and $$\pi^{1/\pi}$$. Consider
 
 $$
 \begin{aligned}

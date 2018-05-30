@@ -12,29 +12,29 @@ bibtex:
   pages: "319--327"
   year: 2000
 ---
-The paper is to have a distributed routing algorithm to find, at each node $i$,
-the successor set for destination $j$ such that the routing path is loop-free at
+The paper is to have a distributed routing algorithm to find, at each node $$i$$,
+the successor set for destination $$j$$ such that the routing path is loop-free at
 every instant even the link costs are changing with time. Such algorithm turns
 out finds the multipath route with unequal length.
 
-The successor set of node $i$ has the property that the shortest distance of any
-node $k$ in the set to destination $j$ is strictly less than that of node $i$ to node
-$j$. Therefore, this avoids loops. The algorithm works as follows
+The successor set of node $$i$$ has the property that the shortest distance of any
+node $$k$$ in the set to destination $$j$$ is strictly less than that of node $$i$$ to node
+$$j$$. Therefore, this avoids loops. The algorithm works as follows
 
   - Every node knows its neighbours, thus the shortest distance from itself to the neighbour
   - Every node tells its shortest-distance knowledge to its neighbours
   - When a node receive the shortest-distance data from its neighbours, it learns more about the topology.
     thus also updating its topology knowledge
-  - When a node $i$ knows multiple ways to reach the same node $j$, it runs Dijkstra's algorithm to find the
+  - When a node $$i$$ knows multiple ways to reach the same node $$j$$, it runs Dijkstra's algorithm to find the
     shortest path
-  - Since shortest path information is updated in node $i$, it can send an updated message to its neighbours
+  - Since shortest path information is updated in node $$i$$, it can send an updated message to its neighbours
 
 In the paper, it assumes the distance may change with time. Therefore, when the
-shortest path distance at node $k$ is calculated and told node $i$, the
+shortest path distance at node $$k$$ is calculated and told node $$i$$, the
 distance may be updated and this may potentially cause loop. Thus additional
 constraints are needed.
 
-When node $i$ wants to forward packets to node $j$, it finds a successor set,
+When node $$i$$ wants to forward packets to node $$j$$, it finds a successor set,
 which is a subset of its neighbours. For any node of the successor set, its
-distance to node $j$ is strictly less than the *feasible distance* (an estimate
-of actual distance) of node $i$ to node $j$. Thus the routing is loop free.
+distance to node $$j$$ is strictly less than the *feasible distance* (an estimate
+of actual distance) of node $$i$$ to node $$j$$. Thus the routing is loop free.

@@ -16,19 +16,19 @@ is called "alternate" next hop. The alternate next hop is not necessary to be in
 the shortest path, but it has to be loop-free. This RFC defines the term,
 loop-free alternate (LFA) to represent these nodes.
 
-Considering a source $S$ and a destination $D$. Let the shortest-path distance
-between two nodes denoted by $d(X,Y)$. The neighbour of $S$, node $N$, is a
-loop-free neighbour for $S$ to $D$ if the following inequality is satisfied:
-$d(N,D) < d(N,S) + d(S,D).$
+Considering a source $$S$$ and a destination $$D$$. Let the shortest-path distance
+between two nodes denoted by $$d(X,Y)$$. The neighbour of $$S$$, node $$N$$, is a
+loop-free neighbour for $$S$$ to $$D$$ if the following inequality is satisfied:
+$$d(N,D) < d(N,S) + d(S,D).$$
 
-Moreover, if a node $N$ is a downstream of the path from $S$ to $D$, it must
-satisfy the downstream path criteron: $d(N,D) < d(S,D).$
+Moreover, if a node $$N$$ is a downstream of the path from $$S$$ to $$D$$, it must
+satisfy the downstream path criteron: $$d(N,D) < d(S,D).$$
 
 Now we found the following:
 
-  - An LFA must satisfy the loop-free condition $d(N,D) < d(N,S) + d(S,D)$
-  - An LFA node $N$ that is protecting node $E$ from failure must satisfy the node-protecting
-    criteria $d(N,D) < d(N,E)+d(E,D)$. This is to mean that node $N$ must not traverse node $E$
+  - An LFA must satisfy the loop-free condition $$d(N,D) < d(N,S) + d(S,D)$$
+  - An LFA node $$N$$ that is protecting node $$E$$ from failure must satisfy the node-protecting
+    criteria $$d(N,D) < d(N,E)+d(E,D)$$. This is to mean that node $$N$$ must not traverse node $$E$$
   - In order for a LFA to protect the failure of a non-broadcast multi-access link, we model the
     NBMA link as a pseudonode and do node-protection against it
 
@@ -37,13 +37,13 @@ protection by fast reroute. The selection is done by a router and prefers
 node-protecting over link-protecting LFAs. The algorithm is as follows. Here we
 defines
 
-  - $S$ and $D$ to be the source and destination routers
-  - $N_1$ to $N_j$ to be the neighbours of $S$
+  - $$S$$ and $$D$$ to be the source and destination routers
+  - $$N_1$$ to $$N_j$$ to be the neighbours of $$S$$
   - A next hop is defined as a 2-tuple: (outgoing-link, neighbour)
-  - $H_1$ to $H_k$ to be the candidate next hops
-  - $P_1$ to $P_p$ to be primary next hops
+  - $$H_1$$ to $$H_k$$ to be the candidate next hops
+  - $$P_1$$ to $$P_p$$ to be primary next hops
 
-and the objective is to find an LFA for $P_i$
+and the objective is to find an LFA for $$P_i$$
 
 ```
 P_i.alt_next_hops := {}

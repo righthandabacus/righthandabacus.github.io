@@ -18,4 +18,4 @@ Brief read.
 
 This paper gives algorithm on solving the "All Hops Optimal Path Problem", which is the following:
 
-Given a graph $G=(V,E)$, and a source node $s$, destination node $u$, and a maximal hop count $H$, and a link weight for each edge, find for *each* hop count value $h$ ($1\le h\le H$) an $h$-hop optimal path between $s$ and $u$, where the optimality can be additive (sum of weights of all edges) or bottleneck (max of weights of all edges) or other form of non-decreasing function.
+Given a graph $$G=(V,E)$$, and a source node $$s$$, destination node $$u$$, and a maximal hop count $$H$$, and a link weight for each edge, find for *each* hop count value $$h$$ ($$1\le h\le H$$) an $$h$$-hop optimal path between $$s$$ and $$u$$, where the optimality can be additive (sum of weights of all edges) or bottleneck (max of weights of all edges) or other form of non-decreasing function.

@@ -13,9 +13,9 @@ NiMH cells are more common than NiCd nowadays. One of the example of NiMH is
 composed of nickel oxyhyrodxide, aqueous potassium hydroxide solution, and metal
 hydride. The chemical equations are:
 
-Positive (+0.52V): $\textrm{NiO(OH)} + \textrm{H}_2\textrm{O} + \textrm{e}^- \to \textrm{Ni(OH)}_2 + \textrm{OH}^-$
+Positive (+0.52V): $$\textrm{NiO(OH)} + \textrm{H}_2\textrm{O} + \textrm{e}^- \to \textrm{Ni(OH)}_2 + \textrm{OH}^-$$
 
-Negative (-0.83V): $\textrm{MH} + \textrm{OH}^- \to \textrm{M} + \textrm{H}_2\textrm{O} + \textrm{e}^-$
+Negative (-0.83V): $$\textrm{MH} + \textrm{OH}^- \to \textrm{M} + \textrm{H}_2\textrm{O} + \textrm{e}^-$$
 
 The metal that used on the negative electrode varies (see
 [Wikipedia](http://en.wikipedia.org/wiki/Nickel_metal_hydride_battery)).
@@ -68,16 +68,16 @@ peak is attained, due to the polarization and oxygen build-up. Hence the
 *negative delta V* (NDV) is a method for termination, but only works for larger
 charge current.
 
-$dT/dt$ is the way for NiMH which does not have NDV. It measures the temperature
+$$dT/dt$$ is the way for NiMH which does not have NDV. It measures the temperature
 change per unit time and stop charging when the temperature rises too fast. NiMH
-batteries can also measure the $dV/dt$, which levels off when the batteries are
+batteries can also measure the $$dV/dt$$, which levels off when the batteries are
 full.
 
 ## Memory Effect
 
 In NiCd batteries, memory effect can occur. It means that, when a battery is
-discharged to $X$ and fully recharged, the battery refuse to further deliver power
-when it discharged to the previous level $X$ again.
+discharged to $$X$$ and fully recharged, the battery refuse to further deliver power
+when it discharged to the previous level $$X$$ again.
 
 This is due to crystalline formation at anode (cadmium hydroxide). A new battery
 shall have the crystalline of size of 1um, but when memory effect occur, the

@@ -11,7 +11,7 @@ bibtex:
   booktitle: "Proceedings of Next Generation Internet Networks"
   year: 2005  
 ---
-It models TCP flows interacting with Ethernet Pause (802.3x) in two tandem queues as a Markov process. The TCP's AIMD is modeled as a MMPP process with $N$ states with monotonically decreasing sending rate. The AIMD is modeled as a move of the state $a\to a-1$ (rate increase) or $a\to 2a$ (rate decrease). The Markove chain is modeled as a four-tuple $(i,j,k,a)$ where $i$ and $j$ are the number of packets in the two queues in tandem (with upper-bound $B_1$ and $B_2$); and $k$ is a binary value denote the "up" and "down" state of the second queue, as whether pause is in effect or not; and $a$ is the state of TCP's MMPP process.
+It models TCP flows interacting with Ethernet Pause (802.3x) in two tandem queues as a Markov process. The TCP's AIMD is modeled as a MMPP process with $$N$$ states with monotonically decreasing sending rate. The AIMD is modeled as a move of the state $$a\to a-1$$ (rate increase) or $$a\to 2a$$ (rate decrease). The Markove chain is modeled as a four-tuple $$(i,j,k,a)$$ where $$i$$ and $$j$$ are the number of packets in the two queues in tandem (with upper-bound $$B_1$$ and $$B_2$$); and $$k$$ is a binary value denote the "up" and "down" state of the second queue, as whether pause is in effect or not; and $$a$$ is the state of TCP's MMPP process.
 
 The paper assumes Poisson arrival of packets and exponential service of queues. Paper also did a simulation with NS2 and OMNeT++. It found that:
 

@@ -7,9 +7,9 @@ tags: code
 
 [Patricia tree](http://en.wikipedia.org/wiki/Patricia_tree) is a tree that implements the idea of:
 
-which is a radix tree to store strings. It operates in $O(k)$ time where $k$ is
-the length of a string. However, we can prove that $k$ is proportional to
-$\log(n)$ where $n$ is the total number of nodes in the tree. Hence it is not a
+which is a radix tree to store strings. It operates in $$O(k)$$ time where $$k$$ is
+the length of a string. However, we can prove that $$k$$ is proportional to
+$$\log(n)$$ where $$n$$ is the total number of nodes in the tree. Hence it is not a
 linear time data structure indeed.
 
 Compare to hash, Patricia tree has the advantage of lower memory consumption. It

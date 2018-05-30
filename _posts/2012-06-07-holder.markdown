@@ -5,7 +5,7 @@ date: 2012-06-07 13:19:51 -0400
 tags: math
 ---
 
-The Hölder mean with exponential $p$ is defined as
+The Hölder mean with exponential $$p$$ is defined as
 
 $$
 M_p(x_1, x_2, \cdots, x_n) = \left\{\begin{array}{ll} 
@@ -14,7 +14,7 @@ M_p(x_1, x_2, \cdots, x_n) = \left\{\begin{array}{ll}
 \end{array}\right.
 $$
 
-or a weighted version with $w=w_1+w_2+\cdots+w_n$
+or a weighted version with $$w=w_1+w_2+\cdots+w_n$$
 
 $$
 M_p(x_1, x_2, \cdots, x_n) = \left\{\begin{array}{ll} 
@@ -23,7 +23,7 @@ M_p(x_1, x_2, \cdots, x_n) = \left\{\begin{array}{ll}
 \end{array}\right.
 $$
 
-which for $p=\infty$ and $p=-\infty$, then
+which for $$p=\infty$$ and $$p=-\infty$$, then
 
 $$\begin{aligned}
 M_\infty(x_1, x_2, \cdots, x_n) &=\max(x_1, x_2, \cdots, x_n) \\
@@ -31,14 +31,14 @@ M_{-\infty}(x_1, x_2, \cdots, x_n) &=\min(x_1, x_2, \cdots, x_n)
 \end{aligned}$$
 
 Hölder mean is a generalization of means:
-  * $p=-\infty$: minimum
-  * $p=-1$: Harmonic mean
-  * $p=0$: Geometric mean (obtained by taking limit on $p\to 0$)
-  * $p=1$: Arithmetic mean
-  * $p=2$: Root-mean-square
-  * $p=\infty$: maximum
+  * $$p=-\infty$$: minimum
+  * $$p=-1$$: Harmonic mean
+  * $$p=0$$: Geometric mean (obtained by taking limit on $$p\to 0$$)
+  * $$p=1$$: Arithmetic mean
+  * $$p=2$$: Root-mean-square
+  * $$p=\infty$$: maximum
 
-The Hölder mean has the property that, $M_p \le M_q$ for $p<q$ and the equality
-holds only when $x_1=x_2=\cdots=x_n$, or, for the weighted version,
-$w_1=w_2=\cdots=w_n$ and $x_1=x_2=\cdots=x_n$. This is the generalization of the
-mean inequality of $\textrm{A.M.} \ge \textrm{G.M.} \ge \textrm{H.M.}$
+The Hölder mean has the property that, $$M_p \le M_q$$ for $$p<q$$ and the equality
+holds only when $$x_1=x_2=\cdots=x_n$$, or, for the weighted version,
+$$w_1=w_2=\cdots=w_n$$ and $$x_1=x_2=\cdots=x_n$$. This is the generalization of the
+mean inequality of $$\textrm{A.M.} \ge \textrm{G.M.} \ge \textrm{H.M.}$$

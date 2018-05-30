@@ -6,8 +6,8 @@ tags: code
 ---
 
 Koch snowflake is probably the simplest fractal graphic. The fractal idea is to
-draw a straight line segment, $x_0-x_1$, and make the trisection points
-$x_{1/3}$ and $x_{2/3}$. Then replace the segment $x_{1/3}-x_{2/3}$ with a
+draw a straight line segment, $$x_0-x_1$$, and make the trisection points
+$$x_{1/3}$$ and $$x_{2/3}$$. Then replace the segment $$x_{1/3}-x_{2/3}$$ with a
 equilateral triangle, like the image below.
 
 ![koch building block](/img/koch-1.png)
@@ -20,7 +20,7 @@ number of iterations done.
 # Coordinate geometry
 
 Consider a program to make this. Assume we have a line segment from coordinates
-$(x_0,y_0)$ to $(x_1,y_1)$, the trisections are at $(x_a,y_a)$ and $(x_b,y_b)$
+$$(x_0,y_0)$$ to $$(x_1,y_1)$$, the trisections are at $$(x_a,y_a)$$ and $$(x_b,y_b)$$
 which
 
 $$
@@ -30,10 +30,10 @@ x_b = \frac{x_0 + 2x_1}{3} & & y_b = \frac{y_0 + 2y_1}{3}
 \end{aligned}
 $$
 
-The apex of the equilateral trangle $(x_c,y_c)$ can be thought of point
-$(x_b,y_b)$ rotated for an angle of $\theta=\pi/3$ about $(x_a,y_a)$. We can
-then first translate the coordinate system to $(x_a,y_a)$ as origin and apply
-the rotation matrix to $(x_b,y_b)$, and restore the origin, i.e.,
+The apex of the equilateral trangle $$(x_c,y_c)$$ can be thought of point
+$$(x_b,y_b)$$ rotated for an angle of $$\theta=\pi/3$$ about $$(x_a,y_a)$$. We can
+then first translate the coordinate system to $$(x_a,y_a)$$ as origin and apply
+the rotation matrix to $$(x_b,y_b)$$, and restore the origin, i.e.,
 
 $$
 \begin{aligned}
@@ -49,7 +49,7 @@ $$
 \end{aligned}
 $$
 
-It is obvious that $(x_0,y_0)$ and $(x_1,y_1)$ swapped will make the triangle
+It is obvious that $$(x_0,y_0)$$ and $$(x_1,y_1)$$ swapped will make the triangle
 up side down. Hence we must be careful about the order of the coordinates in
 presentation.
 
@@ -65,7 +65,7 @@ in <100 lines!). Now consider what we need:
 We can worry about more complicated UI issues later.
 
 Let's denote a coordinate by a tuple of two floats. The above
-rotation-by-$\theta=\pi/3$ formula can be written as:
+rotation-by-$$\theta=\pi/3$$ formula can be written as:
 
 ```python
 def rotpi3(xa,ya,xb,yb):
@@ -188,7 +188,7 @@ Screenshot:
 # Further work
 
 First thing we notice is that the canvas is in an inverted coordinate such that
-the coordinate $(0,0)$ is at top left corner. We can separate the drawing
+the coordinate $$(0,0)$$ is at top left corner. We can separate the drawing
 coordinate system from the canvas coordinate system. Doing so will allow more
 intersting feature such as zooming or moving. But this also means we have to
 remember the transformation between the two, i.e., we need these functions:

@@ -10,7 +10,7 @@ bibtex:
   booktitle: "Proc. SIGCOMM"
   year: 2010
 ---
-A paper from Microsoft Research UK. The focus is on a topology named CamCube, which is a 3D torus with no switch node. All nodes in the topology is connected to 6 other nodes to form a 3D lattice. Nodes are addressed by a 3D coordinate, $(x,y,z)$. Routing is done by source routing.
+A paper from Microsoft Research UK. The focus is on a topology named CamCube, which is a 3D torus with no switch node. All nodes in the topology is connected to 6 other nodes to form a 3D lattice. Nodes are addressed by a 3D coordinate, $$(x,y,z)$$. Routing is done by source routing.
 
 There is a core routing service to help finding the route between source and destination. It handles link failures so that it can route around the failures. Its routing is non-deterministic. There are usually several shortest path from a node to the destination. A packet is forwarded to a direction with least local load. This is similar to hot-potato routing with shortest-path constraint.
 

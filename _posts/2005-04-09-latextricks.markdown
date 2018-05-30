@@ -190,7 +190,7 @@ Make two figures side-by-side, use this:
   }
   \hbox{\hspace{38mm}\hbox{(a)\hspace{83mm}(b)}}
 }
-\caption{(a) elasitc and (b) inelastic utility vs $\alpha$ with $\rho$=0.95}
+\caption{(a) elastic and (b) inelastic utility vs $\alpha$ with $\rho$=0.95}
 \end{figure}
 ```
 

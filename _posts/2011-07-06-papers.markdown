@@ -10,7 +10,7 @@ Some of the TCP papers I read in recent years, with short notes.
 ## Miscellaneous
 
 [Downey (2007) TCP Self-Clocking and Bandwidth Sharing (ComNet)](../2009-10-19-d07-selfclock/):\\
-When cwnd $>$ BDP, TCP undergoes self-clocking. That is, the sending rate is limited by the bottleneck bandwidth, but not the cwnd.
+When cwnd $$>$$ BDP, TCP undergoes self-clocking. That is, the sending rate is limited by the bottleneck bandwidth, but not the cwnd.
 
 [Dukkipati et al (2010) An Argument for Increasing TCP’s Initial Congestion Window (CCR)](../2011-05-09-drcchajs10-cwnd/):\\
 According to Google's statistics on the web, most web page fits in 10MSS. So if we increase the initial window size to 10MSS or more, the web page can be returned in a burst without the need for acknowledgement, hence the response time can be faster.

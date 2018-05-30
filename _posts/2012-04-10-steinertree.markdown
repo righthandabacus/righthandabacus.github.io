@@ -5,10 +5,10 @@ date: 2012-04-10 11:47:38 -0400
 tags: math
 ---
 
-Consider a network $G(V,E)$, with $W_0 \subset V$ is a set of focus vertices.
-Let's call $s\in W_0$ the multicast sender and the rest $W = W_0 \backslash
-\{s\}$ the multicast receivers. Given the edges of unit weight, how to find the
-multicast tree that connects $s$ to $W$ with minimum total edge weight? This is
+Consider a network $$G(V,E)$$, with $$W_0 \subset V$$ is a set of focus vertices.
+Let's call $$s\in W_0$$ the multicast sender and the rest $$W = W_0 \backslash
+\{s\}$$ the multicast receivers. Given the edges of unit weight, how to find the
+multicast tree that connects $$s$$ to $$W$$ with minimum total edge weight? This is
 a generalized minimal spanning tree problem, or a Steiner tree problem in graph.
 
 I made two attempts to solve it as a MILP, the second one is successful. First one,

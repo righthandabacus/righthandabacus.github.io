@@ -20,9 +20,9 @@ min (4*MSS, max (2*MSS, 4380 bytes))
 
 For the MTU of 1500 bytes, the MSS is 1460 bytes. Then the initial cwnd is 3 MSS. The initial cwnd setting is actually according to this table:
 
-| MSS                         | max cwnd   |
-|-----------------------------|------------|
-| MSS $\le$ 1095 bytes        | 4 MSS      |
-| 1095 $<$ MSS $<$ 2190 bytes | 4380 bytes |
-| 2190 bytes $\le$ MSS        | 2 MSS      |
+| MSS                             | max cwnd   |
+|---------------------------------|------------|
+| MSS $$\le$$ 1095 bytes          | 4 MSS      |
+| 1095 $$<$$ MSS $$<$$ 2190 bytes | 4380 bytes |
+| 2190 bytes $$\le$$ MSS          | 2 MSS      |
 

@@ -20,7 +20,7 @@ Details are given in chapter 3: Certain traffic pattern are nominal to a host, e
 
 List of attributes includes: (1) protocol, (2) packet size, (3) server port numbers, (4) src/dst IP prefixes, (5) TTL, (6) header length, (7) TCP flags, (8) IP fragmentation bit, (9) correctness of checksums; also their joint distribution.
 
-Let us assume attributes $A, B, C, ...$ are focused and we denote the joint probability mass function $P_n(A,B,C,...)$ for legitimate packets and $P_a(A,B,C,...)$ for attack packets. The $CLP(p)$ of a packet $p$ is defined as the probability that $p$ is legitimate given the attribute $A,B,C,...$
+Let us assume attributes $$A, B, C, ...$$ are focused and we denote the joint probability mass function $$P_n(A,B,C,...)$$ for legitimate packets and $$P_a(A,B,C,...)$$ for attack packets. The $$CLP(p)$$ of a packet $$p$$ is defined as the probability that $$p$$ is legitimate given the attribute $$A,B,C,...$$
 
 $$
 \begin{aligned}
@@ -29,9 +29,9 @@ CLP(p) &= \frac{N_n JP_n(a,b,c,...)}{N_n JP_n(a,b,c,...) + N_a JP_a(a,b,c,...)} 
 \end{aligned}
 $$
 
-Where the terms $N_n$, $N_a$ and $N_m$ denotes the number of legitimate, attack and their sum respectively. Note the ratio $N_n/N_m$ equals to the ratio of traffic intensity between legitimate and overall traffic. The p.m.f. $JP_n()$ is the nominal profile. Also note that, if all attributes are independent, the formula of $CLP(p)$ is closed product-form. The logarithm of $CLP(p)$ is a series of addition, which is easy to implement in hardware.
+Where the terms $$N_n$$, $$N_a$$ and $$N_m$$ denotes the number of legitimate, attack and their sum respectively. Note the ratio $$N_n/N_m$$ equals to the ratio of traffic intensity between legitimate and overall traffic. The p.m.f. $$JP_n()$$ is the nominal profile. Also note that, if all attributes are independent, the formula of $$CLP(p)$$ is closed product-form. The logarithm of $$CLP(p)$$ is a series of addition, which is easy to implement in hardware.
 
-The 3D-R routers are those residing at the perimeter and performs DDD. It manages the nominal profile for each of its egress port. It also generates 'scorebook' from sample traffic of a long enough time (compare to interarrival time of packets). The scorebook is constructed from the histogram of statistics filtered for iceberg elements. That is, small instances of attribute value is treated zero in computing $CLP(p)$.
+The 3D-R routers are those residing at the perimeter and performs DDD. It manages the nominal profile for each of its egress port. It also generates 'scorebook' from sample traffic of a long enough time (compare to interarrival time of packets). The scorebook is constructed from the histogram of statistics filtered for iceberg elements. That is, small instances of attribute value is treated zero in computing $$CLP(p)$$.
 
 After the score is computed, the 3D-R routers know about (1) the total traffic intensity to a host and (2) the score of a packet. It then finds the threshold to drop traffic to maintain the host below targetted utilization. The threshold is computed by a load-shedding algorithm that takes current and target utilization and current aggregate arrival rate as input. Afterwards, the 3D-R routers discard packets with score less than the threshold.
 

@@ -5,8 +5,8 @@ date: 2012-03-05 13:06:23 -0500
 tags: math
 ---
 L'Hôpital's rule: \\
-for functions $f$ and $g$ which are differentiable on $I \backslash\{c\}$ ,
-where $I$ is an open interval containing $c$, if
+for functions $$f$$ and $$g$$ which are differentiable on $$I \backslash\{c\}$$ ,
+where $$I$$ is an open interval containing $$c$$, if
 
 $$
 \begin{aligned}
@@ -26,7 +26,7 @@ $$
 
 Stolz-Cesàro theorem: \\
 for real-number sequences $$(a_n) _{n \ge 1}$$ and $$(b_n)_{n \ge 1}$$,
-assume $ b_n $ is stictly increasing and unbounded, and
+assume $$ b_n $$ is stictly increasing and unbounded, and
 
 $$
 \begin{aligned}

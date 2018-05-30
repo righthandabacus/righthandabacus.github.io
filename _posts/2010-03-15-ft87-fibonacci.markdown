@@ -16,4 +16,4 @@ bibtex:
 ---
 This is the paper that proposed Fibonacci Heap (aka F-heap). Detail is also found on <http://en.wikipedia.org/wiki/Fibonacci_heap> and also chapter 20 of Introduction to Algorithms 2/e.
 
-The implementation of most operation is trivial, except decrease key, which the cascade cut is required. The sole reason for cascade cut is to maintain the bound that any node with degree n has at most $2^n$ descendants. Hence we need to have cascade cut to move some nodes/subtrees to become new trees in the F-heap so that, by reducing the degree at the parents, the bound maintains.
+The implementation of most operation is trivial, except decrease key, which the cascade cut is required. The sole reason for cascade cut is to maintain the bound that any node with degree n has at most $$2^n$$ descendants. Hence we need to have cascade cut to move some nodes/subtrees to become new trees in the F-heap so that, by reducing the degree at the parents, the bound maintains.

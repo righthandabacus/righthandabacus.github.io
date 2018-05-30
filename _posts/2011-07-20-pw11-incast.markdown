@@ -13,4 +13,4 @@ bibtex:
   year: "2011"
   address: "San Jose, CA"
 ---
-A short paper on limiting the number of concurrent senders as a solution to TCP incast. The paper gives the optimal performance as a closed form solution, which the transfer time is in terms of just-fit, no-loss use of buffer at the bottleneck. To achieve this, we can send no more than $N$ flows at a time and more flows are proceeded only after these $N$ flows completed. Therefore, for a high fan-in transfer with $n$ flows, the $i$-th flow shall be sent in batch $\mod(i-1, \textrm{ceil}(n/N))$.
+A short paper on limiting the number of concurrent senders as a solution to TCP incast. The paper gives the optimal performance as a closed form solution, which the transfer time is in terms of just-fit, no-loss use of buffer at the bottleneck. To achieve this, we can send no more than $$N$$ flows at a time and more flows are proceeded only after these $$N$$ flows completed. Therefore, for a high fan-in transfer with $$n$$ flows, the $$i$$-th flow shall be sent in batch $$\mod(i-1, \textrm{ceil}(n/N))$$.

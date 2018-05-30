@@ -5,7 +5,7 @@ date: 2011-08-03 12:05:08 -0400
 tags: system
 ---
 
-A common problem in connecting NFS on OS X machines is that, they do not connect on "reserved ports" (i.e. $<$1024). Two ways to solve: On the NFS server, use "insecure" keyword in the `/etc/exports` to accept so-called insecure ports for connection. Or in OS X side, instruct to use reserved ports. Command line:
+A common problem in connecting NFS on OS X machines is that, they do not connect on "reserved ports" (i.e. $$<$$1024). Two ways to solve: On the NFS server, use "insecure" keyword in the `/etc/exports` to accept so-called insecure ports for connection. Or in OS X side, instruct to use reserved ports. Command line:
 
     mount_nfs -o resvport server:/exported/path /local/mount/point
 

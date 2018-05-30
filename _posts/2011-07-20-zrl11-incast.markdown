@@ -23,13 +23,13 @@ By developing an analytical model, it is found that BTTO is the cause for small
 number of concurrent flows to exhibit incast, and BHTO is the cause for large
 number of concurrent flows to exhibit incast.
 
-The model is formed as follows: Assuming we have $N$ flows in an incast
+The model is formed as follows: Assuming we have $$N$$ flows in an incast
 scenario. Because they are synchronized, their window increase is also
 synchronized. Then we can model the queue dynamic as
-$Q_i=\min[(NW_i-CD-\phi)^+, B]$, with $W_i$ the window size in $i$-th RTT, $C$
-is the link speed, $D$ is the propagation delay constant, and $\phi$ accounts for
+$$Q_i=\min[(NW_i-CD-\phi)^+, B]$$, with $$W_i$$ the window size in $$i$$-th RTT, $$C$$
+is the link speed, $$D$$ is the propagation delay constant, and $$\phi$$ accounts for
 the variation in queueing delay as seen by different packet, as we expect the
-queue length increase by $N$ in each RTT, the mean of $\phi$ is $N/2$. From this, we can
+queue length increase by $$N$$ in each RTT, the mean of $$\phi$$ is $$N/2$$. From this, we can
 derive the RTT dynamics, the window dynamics, and number of packets sent, as
 well as probability that a particular packet who joins the queue will see the
 queue full.

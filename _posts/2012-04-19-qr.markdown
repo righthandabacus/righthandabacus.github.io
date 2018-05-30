@@ -7,7 +7,7 @@ tags: math
 
 ## What
 
-Given a matrix $A$, its QR decomposition is to find matrices $Q$ and $R$ such that
+Given a matrix $$A$$, its QR decomposition is to find matrices $$Q$$ and $$R$$ such that
 
 $$
 \begin{aligned}
@@ -24,17 +24,17 @@ Q^TQ &= I \\
 \end{aligned}
 $$
 
-i.e., $Q$ is an orthogonal matrix and $R$ is a upper-triangular matrix.
+i.e., $$Q$$ is an orthogonal matrix and $$R$$ is a upper-triangular matrix.
 
 ## How
 
 Gramm-Schmidt orthogonalization is a method to perform QR decomposition:
-Consider matrix $A$ of $m$ columns, as denoted above. We first normalize the
-first column $x_1$ into unit length,
+Consider matrix $$A$$ of $$m$$ columns, as denoted above. We first normalize the
+first column $$x_1$$ into unit length,
 $$
 \epsilon_1 = \frac{1}{r_{11}}x_1 \textrm{, where } r_{11}=||x_1||.
 $$
-Then decompose the second column $x_2$ into components parallel and orthogonal to column vector $\epsilon_1$,
+Then decompose the second column $$x_2$$ into components parallel and orthogonal to column vector $$\epsilon_1$$,
 
 $$
 \begin{aligned}
@@ -45,13 +45,13 @@ x_2 &= r_{12}\epsilon_1 + (x_2 - r_{12}\epsilon_1) = r_{12}\epsilon_1 + r_{22}\e
 \end{aligned}
 $$
 
-$r_{12}$ is measuring the length of $x_2$ projected to the unit vector
-$\epsilon_1$. Thus $x_2 - r_{12}\epsilon_1$ is a vector orthogonal to $x_1$,
-which the unit vector of such is represented by $\epsilon_2$.
+$$r_{12}$$ is measuring the length of $$x_2$$ projected to the unit vector
+$$\epsilon_1$$. Thus $$x_2 - r_{12}\epsilon_1$$ is a vector orthogonal to $$x_1$$,
+which the unit vector of such is represented by $$\epsilon_2$$.
 
-Subsequently, we decompose column vector $x_k$ into components parallel to
-$x_1,x_2,\cdots,x_{k-1}$ and a component that is orthogonal to all of them. For
-example, on $x_3$, we have
+Subsequently, we decompose column vector $$x_k$$ into components parallel to
+$$x_1,x_2,\cdots,x_{k-1}$$ and a component that is orthogonal to all of them. For
+example, on $$x_3$$, we have
 
 $$
 \begin{aligned}
@@ -63,13 +63,13 @@ x_3 &= r_{13}\epsilon_1 + r_{23}\epsilon_2 + (x_3 - r_{13}\epsilon_1 - r_{23}\ep
 \end{aligned}
 $$
 
-Note, matrices $A$ and $Q$ are of the same dimension, and may not be a square
-shape, but matrix $R$ is always a square matrix.
+Note, matrices $$A$$ and $$Q$$ are of the same dimension, and may not be a square
+shape, but matrix $$R$$ is always a square matrix.
 
 ## Why
 
-Assume we have a system of linear equations $Ax=b$, for which $x$ is the vector
-of unknown and $b$ is a vector of constants. If we decompose $A=QR$, we
+Assume we have a system of linear equations $$Ax=b$$, for which $$x$$ is the vector
+of unknown and $$b$$ is a vector of constants. If we decompose $$A=QR$$, we
 have
 
 $$
@@ -80,4 +80,4 @@ Rx &= Q^Tb
 \end{aligned}
 $$
 
-Now since $R$ is a upper-triangular matrix, we can use Gaussian elimination to find $x$.
+Now since $$R$$ is a upper-triangular matrix, we can use Gaussian elimination to find $$x$$.

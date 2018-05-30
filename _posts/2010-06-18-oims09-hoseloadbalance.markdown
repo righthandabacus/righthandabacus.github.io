@@ -21,9 +21,9 @@ Similar paper:
 
 A previous work proposed S-OSPF (Smart OSPF) which is based on a traffic
 matrix, finds the optimal split ratio to load balance a network so that the
-network congestion ratio is minimized. The optimal split ratio, $x_{ij}^{pq}$,
-denotes the fraction of traffic that originated from node $p$ and destined at
-node $q$ should pass through link $(i,j)$. The network congestion ratio is defined
+network congestion ratio is minimized. The optimal split ratio, $$x_{ij}^{pq}$$,
+denotes the fraction of traffic that originated from node $$p$$ and destined at
+node $$q$$ should pass through link $$(i,j)$$. The network congestion ratio is defined
 as the maximum link utilization percentage. This ratio is better if lowered.
 The objective in S-OSPF is to find the optimal split ratio by linear
 programming, with a known traffic matrix.

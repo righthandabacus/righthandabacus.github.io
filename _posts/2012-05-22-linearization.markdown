@@ -26,7 +26,7 @@ $$
 \max_{i\in I} x_i
 $$
 
-it can be linearized by introducing an additional variable $x_{\max}$ and the constraints
+it can be linearized by introducing an additional variable $$x_{\max}$$ and the constraints
 
 $$
 \begin{aligned}
@@ -36,16 +36,16 @@ $$
 
 # Minimax objective
 
-Minimizing the objective function of $z = \max_k \sum_j f_k(x_j)$ can be transformed
-into minimizing the decision variable $z$ with extra constraints defining z:
+Minimizing the objective function of $$z = \max_k \sum_j f_k(x_j)$$ can be transformed
+into minimizing the decision variable $$z$$ with extra constraints defining z:
 
 $$ \sum_j f_k(x_j) \le z \quad \forall k $$
 
 ## Absolute values
 
-In case any absolute value of a free variable (i.e. $\in\mathbb{R}$) is
+In case any absolute value of a free variable (i.e. $$\in\mathbb{R}$$) is
 involved, say $$|x|$$, we may convert it by introducing additional variables
-$x^+, x^-$, and additional constraints:
+$$x^+, x^-$$, and additional constraints:
 
 $$
 \begin{aligned}
@@ -55,7 +55,7 @@ x^+, x^- &\ge 0
 \end{aligned}
 $$
 
-If we minimize the *sum* of $x^+$ and $x^-$ in objective function, one of them
+If we minimize the *sum* of $$x^+$$ and $$x^-$$ in objective function, one of them
 will be equal to zero. This will not work for maximization problem or problem
 without objective functions. For the latter, simple minimize for the sum of
 non-negative parts converted. For the former, switch the problem into
@@ -96,20 +96,20 @@ $$
 \end{aligned}
 $$
 
-In other words, we linearize the objective function by substituting for $t$, and
-convert all existing constraints by multiplying them with $t$. Finally, we
-introduce the additional constraint that $t$ multiply by the denominator of the
+In other words, we linearize the objective function by substituting for $$t$$, and
+convert all existing constraints by multiplying them with $$t$$. Finally, we
+introduce the additional constraint that $$t$$ multiply by the denominator of the
 original fraction shall equal to one.
 
-In such a converted problem, the decision variables $x_j$ are transformed into
-$y_j = x_jt$, together with the newly introduced variable $t$, we can recover
-$x_j$ after the solution is found.
+In such a converted problem, the decision variables $$x_j$$ are transformed into
+$$y_j = x_jt$$, together with the newly introduced variable $$t$$, we can recover
+$$x_j$$ after the solution is found.
 
 # Either-or constraints
 
-Either $f(x) \le 0$ or $g(x) \le 0$ but not necessarily both as constraints: We
-can find some fairly large bounds $M_i$ such that we are quite sure $f(x) < M_1$
-and $g(x) < M_2$ in the domain we concerned. Then set up:
+Either $$f(x) \le 0$$ or $$g(x) \le 0$$ but not necessarily both as constraints: We
+can find some fairly large bounds $$M_i$$ such that we are quite sure $$f(x) < M_1$$
+and $$g(x) < M_2$$ in the domain we concerned. Then set up:
 
 $$
 \begin{aligned}
@@ -118,7 +118,7 @@ g(x) &\le M_2(1-b)
 \end{aligned}
 $$
 
-for an extra binary variable $b$. Similar binary variable trick can be applied
+for an extra binary variable $$b$$. Similar binary variable trick can be applied
 to objective functions that takes different value based on some conditions. If
 the two constraints are mututally exclusive, however, we should add
 
@@ -130,7 +130,7 @@ g(x) &\ge -M_4b.
 $$
 
 The bounds with binary variable trick can help imposing constraints like
-both-or-nothing as well. Below is an example of imposing exactly $m$ out of $N$
+both-or-nothing as well. Below is an example of imposing exactly $$m$$ out of $$N$$
 constraints active:
 
 $$
@@ -145,7 +145,7 @@ $$
 Multiplication in general cannot be linearized. However, if one of the two
 multiplicands is range-bounded, their product can be converted into linear form.
 
-Let's introduce for the product $x_iy_i$:
+Let's introduce for the product $$x_iy_i$$:
 
 $$
 \begin{aligned}
@@ -164,11 +164,11 @@ v^2 -u^2 & = \frac{1}{4}(x_i^2 + 2x_iy_i + y_i^2) - \frac{1}{4}(x_i^2 - 2x_iy_i 
 \end{aligned}
 $$
 
-Then we can convert a multiplication into difference of variables $u^2$ and
-$v^2$, on the condition that their introduction can make the system remain linear.
+Then we can convert a multiplication into difference of variables $$u^2$$ and
+$$v^2$$, on the condition that their introduction can make the system remain linear.
 
-Alternatively, consider $x_iy_i$, which $y_i$ is a free variable (or lower-bounded only) but
-$m_i\le x_i\le M_i$. Then we have
+Alternatively, consider $$x_iy_i$$, which $$y_i$$ is a free variable (or lower-bounded only) but
+$$m_i\le x_i\le M_i$$. Then we have
 
 $$
 \begin{aligned}
@@ -177,7 +177,7 @@ M_iy_i \le x_iy_i &\le m_iy_i && \forall y_i \le 0
 \end{aligned}
 $$
 
-or, by realizing that $\frac{1}{2}(m_i+M_i)-\frac{1}{2}(M_i-m_i)\le x_i\le \frac{1}{2}(m_i+M_i)-\frac{1}{2}(M_i-m_i)$,
+or, by realizing that $$\frac{1}{2}(m_i+M_i)-\frac{1}{2}(M_i-m_i)\le x_i\le \frac{1}{2}(m_i+M_i)-\frac{1}{2}(M_i-m_i)$$,
 
 $$
 \begin{aligned}
@@ -186,12 +186,12 @@ x_iy_i &\ge \frac{1}{2}(m_i+M_i)y_i - \frac{1}{2}(M_i-m_i)|y_i| && \forall y_i
 \end{aligned}
 $$
 
-Thus we can replace the product $x_iy_i$ by using the RHS of the above
+Thus we can replace the product $$x_iy_i$$ by using the RHS of the above
 inequalities, optionally with some modification to the corresponding constraint
 to reflect the substitution is not exact.
 
-In the particular case of binary variables, say, the product $\delta_1\delta_2$,
-it can be replaced by a new binary variable $x$ such that:
+In the particular case of binary variables, say, the product $$\delta_1\delta_2$$,
+it can be replaced by a new binary variable $$x$$ such that:
 
 $$
 \begin{aligned}
@@ -202,8 +202,8 @@ x & \quad \textrm{binary}
 \end{aligned}
 $$
 
-In another case of a binary variable $\delta$ multiply by a bounded real number
-$m\le x\le M$, the product $\delta x$ can be replaced by a new variable $x'$
+In another case of a binary variable $$\delta$$ multiply by a bounded real number
+$$m\le x\le M$$, the product $$\delta x$$ can be replaced by a new variable $$x'$$
 such that:
 
 $$
@@ -221,8 +221,8 @@ linear functions.
 
 ## Discontinuity, Indicator Variables, and Upper-Bounds (MILP)
 
-Let the range of a decision variable $x_i$ to be either $a\le x\le b$ or $c\le
-x\le d$ which $b<c$. We may introduce an indicator variable $\delta$ to
+Let the range of a decision variable $$x_i$$ to be either $$a\le x\le b$$ or
+$$c\le x\le d$$ which $$b<c$$. We may introduce an indicator variable $$\delta$$ to
 represent this:
 
 $$
@@ -243,7 +243,7 @@ z = \left\{\begin{aligned}
   \end{aligned}\right.
 $$
 
-Then we can replace the definition of $z$ by
+Then we can replace the definition of $$z$$ by
 
 $$
 \begin{aligned}
@@ -254,7 +254,7 @@ x &\ge 0  \\
 \end{aligned}
 $$
 
-for a fairly large value $M$ to serve as the upper-bound of $x$.
+for a fairly large value $$M$$ to serve as the upper-bound of $$x$$.
 
 The introduction of an upper-bound is useful to incorporate exotic constraints
 in the linear programming. For example, either one of two constraints must be
@@ -268,7 +268,7 @@ $$
 $$
 
 where at least one of them must be satisfied. Then we can introduce an
-upper-bound $M$ and an indicator variable $\delta$ to invalidate one of them,
+upper-bound $$M$$ and an indicator variable $$\delta$$ to invalidate one of them,
 i.e.
 
 $$
@@ -279,7 +279,7 @@ $$
 \end{aligned}
 $$
 
-In general, we can mandate at least $k$ out of $n$ such constraints must be satisfied:
+In general, we can mandate at least $$k$$ out of $$n$$ such constraints must be satisfied:
 
 $$
 \begin{aligned}
@@ -289,10 +289,10 @@ $$
 \end{aligned}
 $$
 
-This provide each constraint with an independent indicator variable $\delta_j$,
+This provide each constraint with an independent indicator variable $$\delta_j$$,
 which tells if it have to be relaxed. Thus we can control the least number of
-constraints satisfied ($k$) by controlling the most number of constraints *not*
-satisfied ($n-k$).
+constraints satisfied ($$k$$) by controlling the most number of constraints *not*
+satisfied ($$n-k$$).
 
 A variation of such either-or constraints is the all-or-nothing constraints.
 Consider the two constraints case above, if it is an all-or-nothing rule, it
@@ -305,7 +305,7 @@ $$
 \end{aligned}
 $$
 
-Similarly, for the case of $n$-constraints case, the all-or-nothing rule means
+Similarly, for the case of $$n$$-constraints case, the all-or-nothing rule means
 
 $$
 \begin{aligned}

@@ -13,9 +13,9 @@ bibtex:
 Brief read.
 
 This paper is about TCP failover in a web environment. It assumes that a web
-service is provided by one frontend and $N$ backends. The backend servers are
+service is provided by one frontend and $$N$$ backends. The backend servers are
 identical and in a ring structure so that one covers each other for the
-failure. Any one of the $N$ backend alive can respond to the request. The
+failure. Any one of the $$N$$ backend alive can respond to the request. The
 frontend receives requests from the client and forward to the backends. All
 backend receives the same request but only one is really handling it as the
 frontend only allows the response packet from one of them to pass through.

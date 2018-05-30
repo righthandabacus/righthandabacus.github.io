@@ -14,20 +14,20 @@ $$
 f(x;k,\lambda) = \frac{\lambda^k x^{k-1} e^{-\lambda x}}{(k-1)!}\quad\textrm{for }x,\lambda\ge 0
 $$
 
-where $\lambda$ is the arrival rate of a Poisson process, and $k$ is the number
+where $$\lambda$$ is the arrival rate of a Poisson process, and $$k$$ is the number
 of arrival events. The Poisson distribution tells the probability of the number
-of arrivals over a given amount of time $x$. The Erlang distribution tells the
-probability of the time interval over a given number of arrivals $k$. The
+of arrivals over a given amount of time $$x$$. The Erlang distribution tells the
+probability of the time interval over a given number of arrivals $$k$$. The
 difference is that, in Erlang distribution, it is assumed to have an arrival at
-time $t=0$ (which is not counted toward $k$) and $t=x$ (which is counted toward
-$k$), respectively, whereas Poisson does not.
+time $$t=0$$ (which is not counted toward $$k$$) and $$t=x$$ (which is counted toward
+$$k$$), respectively, whereas Poisson does not.
 
 ## Derivation
 
-Poisson is derived using the law of rare events: Assume $B(n,p)$ denote the
-binomial distribution of $n$ Bernoulli events with "success" probability $p$.
-Assume the rate of occurrence of "success" is $\lambda$, then $\lambda x = np$
-where $x$ is the time to finish $n$ Bernoulli events. Define $X_n$ to be the
+Poisson is derived using the law of rare events: Assume $$B(n,p)$$ denote the
+binomial distribution of $$n$$ Bernoulli events with "success" probability $$p$$.
+Assume the rate of occurrence of "success" is $$\lambda$$, then $$\lambda x = np$$
+where $$x$$ is the time to finish $$n$$ Bernoulli events. Define $$X_n$$ to be the
 number of "success" events occurred. So
 
 $$
@@ -43,8 +43,8 @@ $$
 $$
 
 The formula for Erlang distribution is derived by induction. The case of
-$f(x;1,\lambda)$ is trivial because this is the exponential distribution, i.e.
-the time for the next arrival is $x$.
+$$f(x;1,\lambda)$$ is trivial because this is the exponential distribution, i.e.
+the time for the next arrival is $$x$$.
 
 $$
 \begin{aligned}
@@ -53,8 +53,8 @@ f(x;1,\lambda) &= \lambda e^{-\lambda x}  \\
 \end{aligned}
 $$
 
-Consider $f(x;k-1,\lambda)=\frac{\lambda^{k-1} x^{k-2} e^{-\lambda x}}{(k-2)!}$,
-then $f(x;k,\lambda)$ is defined by the convolution:
+Consider $$f(x;k-1,\lambda)=\frac{\lambda^{k-1} x^{k-2} e^{-\lambda x}}{(k-2)!}$$,
+then $$f(x;k,\lambda)$$ is defined by the convolution:
 
 $$
 \begin{align}

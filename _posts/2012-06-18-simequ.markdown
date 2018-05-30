@@ -5,15 +5,15 @@ date: 2012-06-18 11:15:25 -0400
 tags: math
 ---
 Consider this problem: A list of distinctive integers in random order is
-provided. The integer is in the range of $1$ to $N$ and there are $N-1$ integers
-provided, i.e. one integer in $[1,N]$ is not in the provided list. Find that
-number in $O(1)$ space and $O(N)$ time.
+provided. The integer is in the range of $$1$$ to $$N$$ and there are $$N-1$$ integers
+provided, i.e. one integer in $$[1,N]$$ is not in the provided list. Find that
+number in $$O(1)$$ space and $$O(N)$$ time.
 
 Simply, we sum up the numbers in the list and the difference between the sum and
-$\sum_{k=1}^N k$ is the number in concern.
+$$\sum_{k=1}^N k$$ is the number in concern.
 
 But what happen if there are two numbers missing? Obviously, we can use the same
-trick, for the list of integers be denoted by $n_k$, we find
+trick, for the list of integers be denoted by $$n_k$$, we find
 
 $$
 \begin{align}
@@ -22,7 +22,7 @@ $$
 \end{align}
 $$
 
-Then we have the two missing numbers, $x$ and $y$, to satisfy
+Then we have the two missing numbers, $$x$$ and $$y$$, to satisfy
 
 $$
 \begin{align}
@@ -31,8 +31,8 @@ xy &= p
 \end{align}
 $$
 
-This approach works but $\prod_k n_k$ can be a vastly large number. Can we have
-another simultaneous equations to find $x$ and $y$ without overflowing an
+This approach works but $$\prod_k n_k$$ can be a vastly large number. Can we have
+another simultaneous equations to find $$x$$ and $$y$$ without overflowing an
 integer variable?
 
 I have considered the following
@@ -47,15 +47,15 @@ $$
 $$
 
 and some others. However, I find one test to prove if any of these constructs
-can help you solve the two unknowns. Consider $x$ and $y$ are different at bit
-$m$, and we define $x'$ and $y'$ to be same as $x$ and $y$ except their bit $m$
+can help you solve the two unknowns. Consider $$x$$ and $$y$$ are different at bit
+$$m$$, and we define $$x'$$ and $$y'$$ to be same as $$x$$ and $$y$$ except their bit $$m$$
 are flipped. Then we should have a function that
 
 $$ f(x,y) \ne f(x',y') $$
 
-or otherwise we cannot distinguish the solution $x$, $y$ from $x'$, $y'$.
+or otherwise we cannot distinguish the solution $$x$$, $$y$$ from $$x'$$, $$y'$$.
 Obviously the list above does not pass this test. That's why we need
-multiplication involved: We can solve for $x$ and $y$ in the equations below
+multiplication involved: We can solve for $$x$$ and $$y$$ in the equations below
 
 $$
 \begin{align}
@@ -67,6 +67,6 @@ $$
 It can also be done using a non-linear injective function other than square in
 the second equation, such as logarithms. However, logarithm produce floating
 point numbers and that may introduce noise. This is not a good solution in
-implementation perspective because, $\sum_k n_k^2$ increases quicker than linear
+implementation perspective because, $$\sum_k n_k^2$$ increases quicker than linear
 and it has a chance to overflow the variable. But this is the best solution I
 get so far.

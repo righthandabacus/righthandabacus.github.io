@@ -5,20 +5,20 @@ date: 2012-08-03 13:04:14 -0400
 tags: math
 ---
 
-Stochastic process: $X(t), t\in[0,\infty)$
+Stochastic process: $$X(t), t\in[0,\infty)$$
 
-Brownian motion $B(t)$:
+Brownian motion $$B(t)$$:
   * Continuous
   * Independent increments
-  * Normal distribution of increments, i.e. $Pr[B(s+t)-B(s)\in A]=\int_A \frac{1}{\sqrt{2\pi t}}e^{-x^2/2t} dt$ for $s,t>0$
+  * Normal distribution of increments, i.e. $$Pr[B(s+t)-B(s)\in A]=\int_A \frac{1}{\sqrt{2\pi t}}e^{-x^2/2t} dt$$ for $$s,t>0$$
 
 Symmetric random walk (SRW):
-  * $X_i \in \{-1,1\}$ with probability $p$ and $q$ respectively
-  * SRW is $M_n = \sum_{i=1}^n X_i$ and $M_0 = 0$
-  * Scaled SRW: $B^{(n)}(k/n) = \frac{1}{\sqrt{n}} M_k$
-  * Limit: Let $t=k/n$, then $B(t)=\lim_{n\to\infty} B^{(n)}(k/n)$
+  * $$X_i \in \{-1,1\}$$ with probability $$p$$ and $$q$$ respectively
+  * SRW is $$M_n = \sum_{i=1}^n X_i$$ and $$M_0 = 0$$
+  * Scaled SRW: $$B^{(n)}(k/n) = \frac{1}{\sqrt{n}} M_k$$
+  * Limit: Let $$t=k/n$$, then $$B(t)=\lim_{n\to\infty} B^{(n)}(k/n)$$
 
-Covariance of BM, assumed $s<t$,
+Covariance of BM, assumed $$s<t$$,
 
 $$\begin{aligned}
 E[B_s B_t] &= E[ (B_s)(B_t-B_s+B_s) ] \\
@@ -44,11 +44,11 @@ S_t &= S_0 \exp(\sigma B_t + (\alpha-\sigma^2/2)t) \\
 \end{aligned}$$
 
 First passage time problem:
-  * Let $M_t = \max_{0<s<t} X_s$ be the *running maximum* of stochastic process $X_t$
-  * Let $T_a = \inf\{t>0: X_t = a\}$ be the first passage time
-  * $T_a < t$ is equivalent to $M_t > a$
+  * Let $$M_t = \max_{0<s<t} X_s$$ be the *running maximum* of stochastic process $$X_t$$
+  * Let $$T_a = \inf\{t>0: X_t = a\}$$ be the first passage time
+  * $$T_a < t$$ is equivalent to $$M_t > a$$
 
-Reflection principle of Brownian motion $B_t$:
+Reflection principle of Brownian motion $$B_t$$:
 
 $$\begin{aligned}
 \textrm{Let }B_s&=a\textrm{ for }s < t \\
@@ -59,20 +59,20 @@ $$\begin{aligned}
 \textrm{so we have }\Pr[B_s = a] = \Pr[T_a < t] &= 2\Pr[B_t > a].
 \end{aligned}$$
 
-To obtain the p.d.f. of $T_a$, we can consider the m.g.f. $E[\exp(uT_a)]$.
-  * Consider the trail of a Brownian motion $B_t$ that $B_0=0$, $B_s=a$, $B_t=b$ for $s<t$, $a>b$,
-    then it has the same probability as $B'_t$ that $B'_0=0$, $B'_s=a$, $B'_t=2a-b$, just as
-    the path of the B.M. reflected about $a$.
-  * $\Pr[T_a < t, u < B_t < v] = \Pr[2a-v < B_t < 2a-u]$
-  * $\Pr[T_a < t, B_t = u] = \Pr[B_t = 2a-u] = \Pr[M_t > a, B_t = u]$
-  * $\Pr[M_t = a, B_t = u] = \frac{d}{da}\Pr[M_t > a, B_t = u]$
+To obtain the p.d.f. of $$T_a$$, we can consider the m.g.f. $$E[\exp(uT_a)]$$.
+  * Consider the trail of a Brownian motion $$B_t$$ that $$B_0=0$$, $$B_s=a$$, $$B_t=b$$ for $$s<t$$, $$a>b$$,
+    then it has the same probability as $$B'_t$$ that $$B'_0=0$$, $$B'_s=a$$, $$B'_t=2a-b$$, just as
+    the path of the B.M. reflected about $$a$$.
+  * $$\Pr[T_a < t, u < B_t < v] = \Pr[2a-v < B_t < 2a-u]$$
+  * $$\Pr[T_a < t, B_t = u] = \Pr[B_t = 2a-u] = \Pr[M_t > a, B_t = u]$$
+  * $$\Pr[M_t = a, B_t = u] = \frac{d}{da}\Pr[M_t > a, B_t = u]$$
 
-Stochastic integral: $\int_s^t f(\tau,w)dX_{\tau}(w)$
+Stochastic integral: $$\int_s^t f(\tau,w)dX_{\tau}(w)$$
 
-Ito integral: $I(f) = \int_0^t f(s,w)dB_s$
-  * $f$ is a $\mathcal{F}_t$-adapted, square-integrable stochastic process
+Ito integral: $$I(f) = \int_0^t f(s,w)dB_s$$
+  * $$f$$ is a $$\mathcal{F}_t$$-adapted, square-integrable stochastic process
   * It is a martingale
-  * $E[I^2(f)] = E[\int_0^t f^2(s,w)ds]$
+  * $$E[I^2(f)] = E[\int_0^t f^2(s,w)ds]$$
 
 Ito formula:
 
@@ -81,7 +81,7 @@ f(t,B_t) &= f(0,B_0) + \int_0^t f_t(\tau,B_{\tau})d\tau + \int_0^t f_x(\tau,B_{\
 df(t,B_t) &= f_t(t,B_t)dt + f_x(t,B_t)dB_t + \frac{1}{2}f_{xx}(t,B_t)dt
 \end{aligned}$$
 
-Example: Solving $\int_0^t B_s dB_s$
+Example: Solving $$\int_0^t B_s dB_s$$
 
 $$\begin{aligned}
 \textrm{Let }f(t,x) &= \frac{1}{2} x^2 \\
@@ -97,7 +97,7 @@ $$
 df(t,X_t) = f_t dt + f_x dX_t + \frac{1}{2}f_{xx}(dX_t)^2
 $$
 
-where $dX_t = \mu dt + \nu dB_t$, and $(dX_t)^2 = \nu^2 dt$
+where $$dX_t = \mu dt + \nu dB_t$$, and $$(dX_t)^2 = \nu^2 dt$$
 
 Multidimensional version:
 

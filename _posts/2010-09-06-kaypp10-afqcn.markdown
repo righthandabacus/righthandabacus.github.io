@@ -12,10 +12,10 @@ bibtex:
 ---
 Consider a data center network using CEE (802.1Qau) with different tenants. If a tenant is running way larger number of flows, according to 802.1Qau, he can get most of the bandwidth because 802.1Qau only enforces per-flow fairness (even distribution) of bandwidth allocation. We cannot do (1) per-user even distribution and (2) weighted max-min fairness
 
-This paper proposes the use of AFD (approximate fair dropping) algorithm in CEE to achieve "approximate fairness" with minimal of resources. It measures the arrival rate of flows $r_i$ and find its fair-share rate
+This paper proposes the use of AFD (approximate fair dropping) algorithm in CEE to achieve "approximate fairness" with minimal of resources. It measures the arrival rate of flows $$r_i$$ and find its fair-share rate
 
 $$ r_i^{\textrm{fair}}=\frac{W_i}{\sum_j Wj}\sum_j r_j. $$
 
-Then there will be an "AF feedback" value by quantizing $[1-r_i^{\textrm{fair}}/r_i]^+$, which is zero when the fair-share rate is higher then current rate and more positive if the current rate exceeds more from the fair-share rate. The overall feedback value is then computed by $Fb=(1-\alpha)Fb_{\textrm{QCN}}+\alpha Fb_{\textrm{AF}}$, which is higher than 802.1Qau's feedback only when we have a large $Fb_{\textrm{AF}}$ and smaller than that otherwise.
+Then there will be an "AF feedback" value by quantizing $$[1-r_i^{\textrm{fair}}/r_i]^+$$, which is zero when the fair-share rate is higher then current rate and more positive if the current rate exceeds more from the fair-share rate. The overall feedback value is then computed by $$Fb=(1-\alpha)Fb_{\textrm{QCN}}+\alpha Fb_{\textrm{AF}}$$, which is higher than 802.1Qau's feedback only when we have a large $$Fb_{\textrm{AF}}$$ and smaller than that otherwise.
 
 This per-flow (or per-user) feedback means to let a under-privileged flow increase its rate and requests a overshooting flow to decrease its rate. By assigning different weights, we can achieve weighed max-min fairness, in a time-averaged mannar.

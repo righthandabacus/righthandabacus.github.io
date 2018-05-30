@@ -11,7 +11,7 @@ sensor at its top. Such design is a result of optimal laundry process.
 The process of laundry is put the dirty cloths into the basket, then water is
 poured in to let the cloths soaked with the water. Then press out the water from
 the cloths, and pour in water again for rinse. The rinse-press process repeats
-for $n$ times then you get some wet but clean cloths.
+for $$n$$ times then you get some wet but clean cloths.
 
 Obviously, the laundry assumes the dirt on the cloths is water-soluable (or not,
 so we need some soap to emulsify), and we should not expect laundry to remove
@@ -19,8 +19,8 @@ all dirt perfectly.
 
 This is the model of a laundry:
 
-At first soak-press cycle, water of amount $V_0=r+V_1$ is poured in to dissolve
-the dirt of mass $m_0$, and water of amount $V_1$ is pressed out. Assuming
+At first soak-press cycle, water of amount $$V_0=r+V_1$$ is poured in to dissolve
+the dirt of mass $$m_0$$, and water of amount $$V_1$$ is pressed out. Assuming
 perfect dissolve and even density of the solution, the concentration of dirt
 conserves before and after the press:
 
@@ -28,8 +28,8 @@ $$
 \frac{m_0}{V_0} = \frac{m_0}{r+V_1} = \frac{m_1}{r}
 $$
 
-where $m_1$ is the mass of dirt remain (in the water of the wet cloths, which
-holds water of volume $r$) after the press.
+where $$m_1$$ is the mass of dirt remain (in the water of the wet cloths, which
+holds water of volume $$r$$) after the press.
 
 At subsequent soak-press cycles, similar conservation law applies:
 
@@ -46,13 +46,13 @@ m_n &= \prod_{i=1}^n \frac{r}{r+V_i} m_0
 \end{align}
 $$
 
-where we define $V=V_1+V_2+\cdots+V_n$ to be the total amount of water pressed
-out (total amount of water used is therefore $V+r$); and $m_n$ is the amount of
-dirt remained in the water of the wet cloths after $n$ wash cycles; and the
-inequality above is due to $\textrm{AM}\ge\textrm{GM}$.
+where we define $$V=V_1+V_2+\cdots+V_n$$ to be the total amount of water pressed
+out (total amount of water used is therefore $$V+r$$); and $$m_n$$ is the amount of
+dirt remained in the water of the wet cloths after $$n$$ wash cycles; and the
+inequality above is due to $$\textrm{AM}\ge\textrm{GM}$$.
 
-Assume we fixed the amount of waste water $V$, and fixed the number of wash
-cycle $n$, then to minimize the remaining dirt $m_n$, we have to make each $V_i$
+Assume we fixed the amount of waste water $$V$$, and fixed the number of wash
+cycle $$n$$, then to minimize the remaining dirt $$m_n$$, we have to make each $$V_i$$
 identical so that the AM=GM and make the equality above holds. That is, the best
 way to wash is to use water
 
@@ -75,4 +75,4 @@ $$
 \end{align}
 $$
 
-To make $\lim_{n\to\infty} m_n = 0$, we need also $V=\infty$.
+To make $$\lim_{n\to\infty} m_n = 0$$, we need also $$V=\infty$$.

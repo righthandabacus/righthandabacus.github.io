@@ -23,9 +23,9 @@ Duplicated Acknowledgment is a packet that satisfies all the following criteria:
 
 IW (initial value of cwnd) must satisfy the following rule:
 
-  - If SMSS $>$ 2190 bytes, IW = 2*SMSS bytes but not more than 2 segments
-  - If 1095 $<$ SMSS $\le$ 2190 bytes, IW = 3*SMSS bytes but not more than 3 segments
-  - If SMSS $\le$ 1095 bytes, IW = 4*SMSS bytes but not more than 4 segments
+  - If SMSS $$>$$ 2190 bytes, IW = 2*SMSS bytes but not more than 2 segments
+  - If 1095 $$<$$ SMSS $$\le$$ 2190 bytes, IW = 3*SMSS bytes but not more than 3 segments
+  - If SMSS $$\le$$ 1095 bytes, IW = 4*SMSS bytes but not more than 4 segments
 
 The SYN+ACK and the ack of SYN+ACK must not increase cwnd. If SYN or SYN+ACK is lost, the initial window used by a sender after a correctly transmitted SYN must be one segment (SMSS bytes)
 

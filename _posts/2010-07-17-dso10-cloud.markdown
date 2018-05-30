@@ -10,7 +10,7 @@ bibtex:
   howpublished: "ANCS (submitted)"
   year: 2010
 ---
-Assuming there are $N$ different data centers together worked as a computation cloud. User submit job to one of the $N$ data center but the SLA upperbounded the total throughput over all $N$ data centers.
+Assuming there are $$N$$ different data centers together worked as a computation cloud. User submit job to one of the $$N$$ data center but the SLA upperbounded the total throughput over all $$N$$ data centers.
 
 From the service provider's point of view, it has to limit the throughput to not over the SLA to protect its interest. However, it is not suitable to have a fixed bound to *each* data center because it is not known beforehand how the users are using each of them. Therefore, we need a dynamic rate limiter to each of them, and by their cooperation, their aggregated rate meets the SLA.
 

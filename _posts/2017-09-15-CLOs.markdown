@@ -416,33 +416,33 @@ $$\begin{aligned}
 where:
 
   * PP = CPR Principal Prepayment, as SMM for CPR
-  * $P_0$ = Starting principal balance
-  * $P_t$ = Principal portion of scheduled loan payment (unpaid principal)
+  * $$P_0$$ = Starting principal balance
+  * $$P_t$$ = Principal portion of scheduled loan payment (unpaid principal)
   * SMM = Single monthly mortality rate (principal loss in a month)
   * LS = Loss Severity
-  * $S$ = Loss Severity Percent
+  * $$S$$ = Loss Severity Percent
 
-Cashflow = Scheduled payment + Prepayment + Defaults $-$ Loss Severity $-$ Servicing Fee
+Cashflow = Scheduled payment + Prepayment + Defaults $$-$$ Loss Severity $$-$$ Servicing Fee
 
   * If the pool was original owned by the originator, there will be no servicing fee
   * Defaults added because they include loss severity and recovery. This assumes
     the recoverable part are prepayment and happen at the same time as loss.
-  * (Defaults $-$ Loss Severity) = Recoverable loans
+  * (Defaults $$-$$ Loss Severity) = Recoverable loans
 
 Flat rate: Interest rate calculated without considering amortisation. For
 example, 12% annual flat rate of ﹩1200 loan for 1 year repaid monthly, the
-monthly principal payment is ﹩100 and the monthly interest is ﹩1200 $\times$ 1% = ﹩12,
+monthly principal payment is ﹩100 and the monthly interest is ﹩1200 $$\times$$ 1% = ﹩12,
 thus the monthly payment is ﹩112. This yields a effective interest rate of 144%
 p.a. at the last payment. Or equivalently, a 23.68% APR compounded monthly for
 the overall payment (calculated using XIRR).
 
-XIRR calculation: Assume payment is $P_j$ at time $j$ (sign identifies the
-direction), $d_j$ is the date of payment $P_j$, and $d_0$ is the 0th payment. XIRR
-finds the rate $r$ that solves the equation:
+XIRR calculation: Assume payment is $$P_j$$ at time $$j$$ (sign identifies the
+direction), $$d_j$$ is the date of payment $$P_j$$, and $$d_0$$ is the 0th payment. XIRR
+finds the rate $$r$$ that solves the equation:
 
 $$ 0 = \sum_{j=0}^N \frac{P_j}{ (1+r)^{(d_j-d_0)/365} } $$
 
-To find XIRR by XNPV: Set $P_0=0$ instead of principal in the above summation and
+To find XIRR by XNPV: Set $$P_0=0$$ instead of principal in the above summation and
 find the rate r until XNPV equals to the principal.
 
 Converting CPR, SMM, and APS:
@@ -464,7 +464,7 @@ $$ \textrm{CPR}_{\textrm{monthly}} = 1 - (1-\textrm{CPR})^{1/12} $$
 
 where:
  - CPR is the percentage probability of prepayment within a year
- - $(1-\textrm{CPR})^{1/12}$ is the probability of non-prepayment in a month
+ - $$(1-\textrm{CPR})^{1/12}$$ is the probability of non-prepayment in a month
 
 which is converting an annual interest rate into equivalent monthly interest rate
 
@@ -474,11 +474,11 @@ fee is:
 $$ \textrm{Monthly servicing fee} = \frac{s}{12} P_r $$
 
 where
- - $P_r$ is the remaining principal
- - $s$ is the annual rate of servicing fee
+ - $$P_r$$ is the remaining principal
+ - $$s$$ is the annual rate of servicing fee
 
-And $P_r$ is decrease monthly by the principal paydown as scheduled and the
-prepayment of amount $\textrm{CPR}_{\textrm{monthly}}\times P_r$
+And $$P_r$$ is decrease monthly by the principal paydown as scheduled and the
+prepayment of amount $$\textrm{CPR}_{\textrm{monthly}}\times P_r$$
 
 
 ## Macaulay duration
@@ -509,8 +509,8 @@ $$ \textrm{moddur} = \frac{1}{100}\frac{\textrm{macaulay}}{1+r/n} $$
 
 where
   * macaulay = Macaulay duration, fraction in years
-  * $r$ = yield per annum
-  * $n$ = number of payments per year
+  * $$r$$ = yield per annum
+  * $$n$$ = number of payments per year
   * 1/100 = express moddur in percentage
 
 moddur proportional to macaulay duration because bonds with longer duration have
@@ -564,10 +564,10 @@ applied when impairment or write-down is a remote risk, which change in yield is
   - duration: the modified duration
   - for zero coupon bonds, duration = average life
   - for coupon bonds, the duration < weighted average life (WAL)
-    - WAL can be an approximation for duration: $\textrm{Duration} = \textrm{WAL} \times \textrm{adjustment}$
+    - WAL can be an approximation for duration: $$\textrm{Duration} = \textrm{WAL} \times \textrm{adjustment}$$
     - adjustment < 1, e.g., 0.9 for AAA tranche
-  - change in yield/DM is absolute change: $\Delta = \textrm{new DM} - \textrm{old DM}$
-  - change in price is relative percentage: $\Delta = \frac{\textrm{new}-\textrm{old}}{\textrm{old}}$
+  - change in yield/DM is absolute change: $$\Delta = \textrm{new DM} - \textrm{old DM}$$
+  - change in price is relative percentage: $$\Delta = \frac{\textrm{new}-\textrm{old}}{\textrm{old}}$$
 
 
 ## other valuation metrics
@@ -609,12 +609,12 @@ Rule of 72: time it takes to double, e.g.
 - etc.
 
 Rule of 78, aka sum-of-the-digits method:
-assume total interest of whole period to be ﹩$N$
-and the total period to be $n$ months
-then the monthly payment ﹩$P$ on month $k$ will include the interest portion of
-$N \times k/S_n$ where $S_n = 1+2+...+n$
+assume total interest of whole period to be ﹩$$N$$
+and the total period to be $$n$$ months
+then the monthly payment ﹩$$P$$ on month $$k$$ will include the interest portion of
+$$N \times k/S_n$$ where $$S_n = 1+2+...+n$$
   
- - Using rule of 78 need to find the total financial cost ﹩$N$ before hand
+ - Using rule of 78 need to find the total financial cost ﹩$$N$$ before hand
  - The interest payment is front-loaded: interest payment is higher than simple interest
     - not beneficial to prepayment: there is more principal remain to be paid off
 
@@ -1039,6 +1039,6 @@ Example: 100 units put up for sale. Bids are as follows:
 - $1.1 for 40 units
 - $1.0 for 60 units
 
-So the price is set at ﹩1.0 (highest price $x$ such that bids $\ge x$ meet or exceed
+So the price is set at ﹩1.0 (highest price $$x$$ such that bids $$\ge x$$ meet or exceed
 100 units); and total bids are 150 units thus each bidder allocates 2/3 of the
 bid.

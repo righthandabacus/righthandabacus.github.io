@@ -2,6 +2,7 @@
 layout: post
 title: "Rolfe (2002) One-Time Binary Search Tree Balancing (SIGCSE Bulletin)"
 date: Fri, 27 Oct 2017 17:19:20 -0400
+lastedit: Tue, 29 May 2018 10:06:33 -0400
 category: paper
 bibtex:
   type: article
@@ -17,7 +18,7 @@ bibtex:
 
 [PDF](https://drive.google.com/open?id=0B6DoI_vm0OLfeVRST3pSaFRSMlk)
 
-The paper describe about DSW algorithm, a $O(N)$ time and $O(1)$ space
+The paper describe about DSW algorithm, a $$O(N)$$ time and $$O(1)$$ space
 transformation of binary search tree to rebalance it.
 
 ## Day's algorithm
@@ -198,3 +199,8 @@ void DSW::vine_to_tree ( BasePtr root, int size )
 		compression ( root, size / 2 );
 }
 ```
+
+## Reference
+
+The original Stout and Warren (1986) paper:
+[Tree Rebalancing in Optimal Time and Space](https://drive.google.com/open?id=1cUTk2omXd0Fnt_E3ztYe-dNlawyUtU7L)

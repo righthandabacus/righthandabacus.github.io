@@ -45,7 +45,7 @@ def with_maybe():
     )
 ```
 
-The `with_maybe` above make use of closure in Python to compute $\frac{2.0}{2.0} \left/ \frac{3.0}{0.0} \right.$
+The `with_maybe` above make use of closure in Python to compute $$\frac{2.0}{2.0} \left/ \frac{3.0}{0.0} \right.$$
 and the operator `>>` is a short cut of bind:
 
 ```python

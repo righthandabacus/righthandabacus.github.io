@@ -28,28 +28,28 @@ desynchronized flows.
 
 The paper "Buffer Sizing for Congested Internet Links" in INFOCOM 2005 gives
 the formula that, when the TCP flows are synchronized and the flows are in
-different RTTs, then the buffer size needed to prevent link idle is $C$ times
-the harmonic mean of those RTTs, where $C$ is the link speed. This paper
+different RTTs, then the buffer size needed to prevent link idle is $$C$$ times
+the harmonic mean of those RTTs, where $$C$$ is the link speed. This paper
 claims that, when the flows are desynchronized, the total window sizes of the
 flows can be approximated by a normal distribution
-$W\sim\mathrm{Normal}(Nw,N\sigma^2_w)$, where $N$ is the number of
-flow, $w$ is the average window size of a flow, and $\sigma^2_w$
-is its variance. It turns out that, $w$ varies between 2/3 to 4/3 of its means
-and its variance is $\sigma^2_w=\frac{(4w/3-2w/3)^2}{12}=\alpha w$
-and $\alpha\approx 0.192$. Since window size over RTT, $\tau$, is the data rate, assume the
+$$W\sim\mathrm{Normal}(Nw,N\sigma^2_w)$$, where $$N$$ is the number of
+flow, $$w$$ is the average window size of a flow, and $$\sigma^2_w$$
+is its variance. It turns out that, $$w$$ varies between 2/3 to 4/3 of its means
+and its variance is $$\sigma^2_w=\frac{(4w/3-2w/3)^2}{12}=\alpha w$$
+and $$\alpha\approx 0.192$$. Since window size over RTT, $$\tau$$, is the data rate, assume the
 aggregate traffic sends at line speed, we have
-$\sigma^2_W=N\sigma^2_w=(\alpha C \tau)^2/N$, and the 99.9% CI for
-$W$ is $C\tau\pm 3.3\alpha\frac{C\tau}{\sqrt{N}}$. This means to
+$$\sigma^2_W=N\sigma^2_w=(\alpha C \tau)^2/N$$, and the 99.9% CI for
+$$W$$ is $$C\tau\pm 3.3\alpha\frac{C\tau}{\sqrt{N}}$$. This means to
 accommodate 0.1% loss rate, the buffer needed is
-$3.3\alpha\frac{C\tau}{\sqrt{N}}$, if the TCP flows are desynchronized.
+$$3.3\alpha\frac{C\tau}{\sqrt{N}}$$, if the TCP flows are desynchronized.
 We can further reduce the buffer size if we allow the aggregate traffic send at
 a rate below line speed, i.e. lower the utilization.
 
 If the TCP flows are desynchronized, and providing a large buffer, then each
 flow will have a large RTT due to queueing delay and decreases the throughput
 and keep the loss probability low. This is because the TCP sending rate
-satisfies $x = \frac{h}{\tau\sqrt{p}}$ and the aggregate rate satisfies
-$(1-p)\sum x = C$. While this works, the large RTT can cause damage to
+satisfies $$x = \frac{h}{\tau\sqrt{p}}$$ and the aggregate rate satisfies
+$$(1-p)\sum x = C$$. While this works, the large RTT can cause damage to
 real time traffic.
 
 ## Raina, Towsley and Wischik (2005) Control Theory for Buffer Sizing (CCR 35:2 pp.79-82)
@@ -60,9 +60,9 @@ It points out that, stability of TCP flow actually means desynchronization. If
 TCP flows are desynchronized, the fluctuation is not drastic and thus the
 dynamic behaviour is stable. Using a control theory approach, it first models
 the TCP window size w(t) as a differential equation:  
-$\dfrac{dw(t)}{dt}=\dfrac{1}{\tau}-\frac{w(t)}{2}[x(t-\tau)p(t-\tau)]$  
+$$\dfrac{dw(t)}{dt}=\dfrac{1}{\tau}-\frac{w(t)}{2}[x(t-\tau)p(t-\tau)]$$  
 Then, in case of large buffer with AQM, the loss probability is modeled as a
-function of queue length $L_{AQM}(q)$ and the total rate of packet arrival at
+function of queue length $$L_{AQM}(q)$$ and the total rate of packet arrival at
 queue is modeled as y(t). The following equation is derived:  
 
 $$
@@ -72,8 +72,8 @@ p(t) &= L_{AQM}(q(t))
 \end{aligned}
 $$
 
-In case of small buffer of size $B$ with droptail service, the loss probability
-is $p(t)=L_B(y(t))$ and $L_B(y) \approx (1-C/y)^+$. In other words, the queue
+In case of small buffer of size $$B$$ with droptail service, the loss probability
+is $$p(t)=L_B(y(t))$$ and $$L_B(y) \approx (1-C/y)^+$$. In other words, the queue
 size fluctuates quickly and TCP cannot control its size, but TCP can control
 its distribution. Given we have the equations, we can solve them numerically or
 analytically with initial conditions specified. Detail derivation is in a

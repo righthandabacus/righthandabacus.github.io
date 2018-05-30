@@ -18,13 +18,13 @@ While TCP incast usually is about synchronized short flows, this paper also desc
 
 The algorithm proposed, Hashed Credits Fair (HCF) in as follows:
 
-The switch holds two queues, the high-priority (HP) and low-priority (LP) queues, each of size $B/2$, making up the total buffer size of $B$. The HP queue holds packets of flows that have recently been under-served; and the LP queue are for all other packets. The switch also has an array of $K$ counters, one counter for one "bin".
+The switch holds two queues, the high-priority (HP) and low-priority (LP) queues, each of size $$B/2$$, making up the total buffer size of $$B$$. The HP queue holds packets of flows that have recently been under-served; and the LP queue are for all other packets. The switch also has an array of $$K$$ counters, one counter for one "bin".
 
 When a flow arrives to the switch, the flow is hashed into one of the K bins. The hash function is updated regularly to avoid persistent hash collision between flows. The hash function is changed for each priority period. A priority period is defined as the time from the HP queue just emptied until the HP queue contains some packet and emptied again.
 
-Initially, at the beginning of a priority period, besides picking a new hash function $f$, the $K$ counters are initialized with $c(k)=c_0$ credits. Then upon the arrival of packet $p$, the bin correspond to the packet is computed by $k=f(p)$. Then if the bin has credits, i.e. $c(k)>0$, and the HP queue is not full, packet $p$ joins the HP queue and the credit in $c(k)$ is deduced. Otherwise, the packet join LP queue or dropped if it is full. Packets departure is always in HP queue; unless HP queue is empty, then the head of line packet in LP queue is dispatched.
+Initially, at the beginning of a priority period, besides picking a new hash function $$f$$, the $$K$$ counters are initialized with $$c(k)=c_0$$ credits. Then upon the arrival of packet $$p$$, the bin correspond to the packet is computed by $$k=f(p)$$. Then if the bin has credits, i.e. $$c(k)>0$$, and the HP queue is not full, packet $$p$$ joins the HP queue and the credit in $$c(k)$$ is deduced. Otherwise, the packet join LP queue or dropped if it is full. Packets departure is always in HP queue; unless HP queue is empty, then the head of line packet in LP queue is dispatched.
 
-To guarantee in-order transmission of the packet in the same flow, upon transiting to a new priority period, the LP queue and HP queue are exchanged, so that the packet arrived in the previous priority period is always transmitted first. The HCF algorithm has a complexity of $O(1)$
+To guarantee in-order transmission of the packet in the same flow, upon transiting to a new priority period, the LP queue and HP queue are exchanged, so that the packet arrived in the previous priority period is always transmitted first. The HCF algorithm has a complexity of $$O(1)$$
 
 This paper found that, with HCF, the incast scenario is mitigated. It has a higher goodput then FIFO switches during incast. [But why the goodput decreases as the number of servers increases but the goodput increases again when we have even more servers?] The paper also found that, HCF achieved a better fairness in terms of more even throughput distribution between concurrent flows.
 

@@ -8,7 +8,7 @@ A problem I solved yesterday during my 10-minute subway ride.
 
 Given a line segment of unit length, we put two points into it randomly so that it is divided into three segments. What is the probability that these three segments can form a triangle?
 
-Let the two points be $x$ and $y$, and assume them to be uniformly distributed on [0:1]. If the three segments can form a triangle, it must satisfy the triangle inequality, i.e. no one side is longer than 0.5. Assume $x>y$, then we must have $y<0.5$ and $0.5<x<0.5+y$. The probability of such is
+Let the two points be $$x$$ and $$y$$, and assume them to be uniformly distributed on [0:1]. If the three segments can form a triangle, it must satisfy the triangle inequality, i.e. no one side is longer than 0.5. Assume $$x>y$$, then we must have $$y<0.5$$ and $$0.5<x<0.5+y$$. The probability of such is
 
 $$
 \begin{aligned}
@@ -19,7 +19,7 @@ $$
 \end{aligned}
 $$
 
-Similarly for the case $y>x$, we must have $x<0.5$ and $0.5<y<0.5+x$, and the probability is also $\frac{1}{8}$. So the total probability is $\frac{1}{4}$.
+Similarly for the case $$y>x$$, we must have $$x<0.5$$ and $$0.5<y<0.5+x$$, and the probability is also $$\frac{1}{8}$$. So the total probability is $$\frac{1}{4}$$.
 
 To verify the result, below is the Python code:
 

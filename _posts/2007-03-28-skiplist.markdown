@@ -25,8 +25,8 @@ balancing is a cost. Skip list, however, does not enforce balancing but make the
 Actually, it is not a tree, but a list. The nodes in the list has random number
 of connections to decendent nodes. For example, node 1 may has three connections
 and it is pointing to node 2, node 10 and node 15, node 2 has only one
-connection and it is pointing to node 3. In general, node $n$ must point to node
-$n+1$ but there may be some other connections to node $n+k$.
+connection and it is pointing to node 3. In general, node $$n$$ must point to node
+$$n+1$$ but there may be some other connections to node $$n+k$$.
 
 The more *levels of connections* you have, the faster you can search. Details
 are mentioned in the following paper:

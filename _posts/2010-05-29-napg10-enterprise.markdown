@@ -21,7 +21,7 @@ What learned are:
   - The intra- and inter-subnet traffic are 56% and 44% respectively. Thus using a central point for
     measurement is not accurate because this only captures the inter-subnet
   - Most applications are either sending a lot of bytes or creating a lot of connections, but not both.
-  - Media transfer size is $<$ 2KB, but a few connections are extremely large ($>$ 5GB)
+  - Media transfer size is $$<$$ 2KB, but a few connections are extremely large ($$>$$ 5GB)
   - nearly 60% connections have the responder sending more data than the originator (up to 1.2M times more)
   - over 30% connections have the originator send more than the responder (up to 1.2B times more)
   - Heavytail: Top 15 flows send 57% of bytes. Top 160 connections send 90% of traffic, amongst 532K

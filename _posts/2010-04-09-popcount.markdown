@@ -113,13 +113,13 @@ unsigned popcount(unsigned v)
  }
 ```
 
-The idea is as follows: If we write a 32-bit integer as `n`$=b_{31}2^{31}+b_{30}2^{30}+...+b_12+b_0$,
-we also notice that $b2^k-b2^{k-1}\equiv b2^{k-1}$,
-then we have `n-(n>>1)`$=(b_{31}+b_{30})2^{30}+(b_{30}+b_{29}2^{29}+...+(b_1+b_0)$, so for
+The idea is as follows: If we write a 32-bit integer as `n`$$=b_{31}2^{31}+b_{30}2^{30}+...+b_12+b_0$$,
+we also notice that $$b2^k-b2^{k-1}\equiv b2^{k-1}$$,
+then we have `n-(n>>1)`$$=(b_{31}+b_{30})2^{30}+(b_{30}+b_{29}2^{29}+...+(b_1+b_0)$$, so for
 
     n - (n>>1) - (n>>2) - (n>>3) - ... - (n>>31)
 
-it is equals to exactly $b_{31}+b_{30}+...+b_1+b_0$, which is the popcount. Now
+it is equals to exactly $$b_{31}+b_{30}+...+b_1+b_0$$, which is the popcount. Now
 consider only three bits `v`, the popcount will be `v-(v>>1)-(v>>2)`. When `v`
 is 32-bit, the shift operation is on 3-bit unit, thus the AND-mask in the above
 segment. Next, the 32-bit popcount is the addition of every 3-bits in `u`,
@@ -127,10 +127,10 @@ firstly, make it into every-6-bit counts, the number is put into 6-bit slots:
 
     (u + (u>>3)) & 030707070707
 
-which you can view as $c_5 (2^6)^{5} + ... + c_1 2^6 + c_0$, by remainder
-theorem, the polynomial in $2^6$ divide by $2^6-1$ (=63), the remainder is the
-polynomial with all $2^6$ substitute by 1, which is exactly the sum
-$c_5+c_4+...+c_1+c_0$.
+which you can view as $$c_5 (2^6)^{5} + ... + c_1 2^6 + c_0$$, by remainder
+theorem, the polynomial in $$2^6$$ divide by $$2^6-1$$ (=63), the remainder is the
+polynomial with all $$2^6$$ substitute by 1, which is exactly the sum
+$$c_5+c_4+...+c_1+c_0$$.
 
 Now move on to 64-bit. The modulus-63 operation is more then enough for 32-bit,
 but at least modulus-65 is required for 64-bit, or otherwise we can never have

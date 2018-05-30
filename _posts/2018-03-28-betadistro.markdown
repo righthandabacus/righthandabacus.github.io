@@ -12,28 +12,28 @@ certain confidence that the coin is fair or not. That is how beta distribution
 comes to play.
 
 Let us model the coin to have two sides, head and tail, and when we flip it,
-it will land on either side. We are interested in the probability $p$ of, say, it
+it will land on either side. We are interested in the probability $$p$$ of, say, it
 lands on head. This implicitly defines the probability of it lands on tail to be
-$1-p$. If we have no knowledge about the coin at all, we either:
+$$1-p$$. If we have no knowledge about the coin at all, we either:
 
-1. assume any $p\in[0,1]$ is equally possible; or
+1. assume any $$p\in[0,1]$$ is equally possible; or
 2. saw the coin has head but not even sure the flip side is tail
 
 Or anything even weirder. Beta distribution, has the density function
 
 $$ f(x;\alpha,\beta) = \frac{\Gamma(\alpha+\beta)}{\Gamma(\alpha)\Gamma(\beta)} x^{\alpha-1}(1-x)^{\beta-1} $$
 
-As the prior, if $\alpha=\beta=1$, we have a horizontal curve that correspond to
-the first case. If $\alpha=\beta=0$, the gamma functions are undefined and may
+As the prior, if $$\alpha=\beta=1$$, we have a horizontal curve that correspond to
+the first case. If $$\alpha=\beta=0$$, the gamma functions are undefined and may
 be this reflects the case of absolutely no knowledge about the coin. What beta
-distribution models is the probability of the value of $p$ (i.e., probability of
+distribution models is the probability of the value of $$p$$ (i.e., probability of
 a probability): if we carry out a Bernoulli trial with the coin, and it turns
-out to have $n$ heads and $N-n$ tails, then the probability of the actual value
-of $p$ follows the density of beta distribution with $\alpha=n+\alpha_0$ and
-$\beta=N-n+\beta_0$, which $\alpha_0$ and $\beta_0$ are the prior.
+out to have $$n$$ heads and $$N-n$$ tails, then the probability of the actual value
+of $$p$$ follows the density of beta distribution with $$\alpha=n+\alpha_0$$ and
+$$\beta=N-n+\beta_0$$, which $$\alpha_0$$ and $$\beta_0$$ are the prior.
 
 These are the standard usage of beta distribution, but the interesting part is
-how many Bernoulli trials needed to give us confidence to the value of $p$. Of
+how many Bernoulli trials needed to give us confidence to the value of $$p$$. Of
 course, one way to measure this is the variance of the distribution, namely,
 
 $$ \sigma^2_{\alpha,\beta} = \frac{\alpha\beta}{(\alpha+\beta)^2(\alpha+\beta+1)} $$
@@ -42,14 +42,14 @@ but we can also use the Shannon entropy
 
 $$ H(X) = \log B(\alpha,\beta) - (\alpha-1)\chi(\alpha) - (\beta-1)\chi(\beta) + (\alpha+\beta-2)\chi(\alpha+\beta) $$
 
-which $B(\alpha,\beta)$ is the beta function and $\chi(x)$ is the digamma
-function. Simulating a Bernoulli trial with different actual value of $p$, 
+which $$B(\alpha,\beta)$$ is the beta function and $$\chi(x)$$ is the digamma
+function. Simulating a Bernoulli trial with different actual value of $$p$$, 
 derive the corresponding beta distribution function, and plotting the entropy
 against trial count gives the following:
 
 ![](/img/beta_entropy.png)
 
-Curves on plot in red, orange, violet, and blue are respectively using $p$ of
+Curves on plot in red, orange, violet, and blue are respectively using $$p$$ of
 0.5, 0.6, 0.75, and 0.9. We see the following:
 
 1. Shannon entropy is negative as expected, because the distribution is
@@ -57,16 +57,16 @@ Curves on plot in red, orange, violet, and blue are respectively using $p$ of
    (which is provided by differential entropy), but rather, a relative scale of
    information
 2. As the trial goes on, the entropy is decreasing. Theoretically, once we know
-   the exact value of $p$ from experiment, we reach the entropy level of zero
+   the exact value of $$p$$ from experiment, we reach the entropy level of zero
 3. Law of diminishing return observed: rapid drop of entropy at beginning and
    slowed down afterwards
-4. $p=0.9$ has lower entropy level than $p=0.5$ but that barely means $p=0.9$ is
+4. $$p=0.9$$ has lower entropy level than $$p=0.5$$ but that barely means $$p=0.9$$ is
    much less interesting, and thus making the pdf of beta distribution narrower
    (higher kurtosis), as shown in the following:
 
 ![](/img/beta_pdf.png)
 
-It seems that, no matter what $p$ actually be, we need only around 30 Bernoulli
+It seems that, no matter what $$p$$ actually be, we need only around 30 Bernoulli
 trials to get a fairly good (and cost-effective) estimate. This can be easier
 seen using K-L divergence metric of the distributions between successive trial:
 
@@ -137,8 +137,8 @@ distribution, whose density function is
 
 $$ f(\vec{x};\vec{\alpha}) = B(\vec{\alpha})^{-1} \prod_{i=1}^k x_i^{\alpha_i-1}, \quad \textrm{where }B(\vec{\alpha})=\frac{\prod_{i=1}^k \Gamma(\alpha_i)}{\Gamma(\sum_{i=1}^k \alpha_i)} $$
 
-which defined for $\sum_{i=1}^k x_i=1,\ x_i\in(0,1)$ and $\alpha_i>0$. A
-sequence of trial of dice roll updates $\vec{\alpha}$ as above. The Dirichlet
+which defined for $$\sum_{i=1}^k x_i=1,\ x_i\in(0,1)$$ and $$\alpha_i>0$$. A
+sequence of trial of dice roll updates $$\vec{\alpha}$$ as above. The Dirichlet
 distribution gives the probability estimation of *each face* of dice. The distribution
 can be computed as follows, using beta distribution recursively:
 

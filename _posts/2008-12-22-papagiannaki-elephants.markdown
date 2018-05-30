@@ -25,17 +25,17 @@ than the threshold is said to be elephant. The threshold can be determined
 initially in two ways:
 
 1. AEST methodology, which assumes flow bandwidth is Pareto,
-   $P[X>x] \sim cx^{-\alpha}$, and therefore set the threshold
-   $\hat x = \min_x(\dfrac{d\log F(x)}{d\log x} - \alpha)$.
-2. Constant load, set the threshold to $\hat x$ such that
-   $\int_{\hat x}^\infty xf(x)dx=R\%$. The threshold is determined continuously
+   $$P[X>x] \sim cx^{-\alpha}$$, and therefore set the threshold
+   $$\hat x = \min_x(\dfrac{d\log F(x)}{d\log x} - \alpha)$$.
+2. Constant load, set the threshold to $$\hat x$$ such that
+   $$\int_{\hat x}^\infty xf(x)dx=R\%$$. The threshold is determined continuously
    and we run an auto-regressive filter on
-   $\hat x$: $v(n) = (1-\beta)v(n)+\beta\hat x(n)$, and decided a flow of
-   bandwidth $x(n)$ is elephant if $x(n)>v(n)$.
+   $$\hat x$$: $$v(n) = (1-\beta)v(n)+\beta\hat x(n)$$, and decided a flow of
+   bandwidth $$x(n)$$ is elephant if $$x(n)>v(n)$$.
 
 However, because flows are bursty, the decision can be improved by introducing
-*latent heat*, which defined as: $L(n)=\sum_{t=n-k}^{n} x(t)-v(t)$. The new
-decision rule is that $L(n)>0$ for elephant. This improvement is to avoid
+*latent heat*, which defined as: $$L(n)=\sum_{t=n-k}^{n} x(t)-v(t)$$. The new
+decision rule is that $$L(n)>0$$ for elephant. This improvement is to avoid
 reclassification for short-term fluctuations and let the membership of
 elephants change less frequently.
 
