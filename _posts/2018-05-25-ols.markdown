@@ -21,7 +21,7 @@ $$x_{ji}$$, we can define the linear regression model as
 $$\begin{align}
 \mathbf{y} &= \mathbf{X}\mathbf{b} + \mathbf{e} \\
 \textrm{where}\qquad \mathbf{y} &= \begin{bmatrix}y_1 & y_2 & \cdots & y_n\end{bmatrix}^T \\
-\mathbf{X} &= \begin{bmatrix}\mathbf{x}_1 & \mathbf{x}_2 & \vdots & \mathbf{x}_n\end{bmatrix}
+\mathbf{X} &= \begin{bmatrix}\mathbf{x}_1 \\ \mathbf{x}_2 \\ \vdots \\ \mathbf{x}_n\end{bmatrix}
             = \begin{bmatrix}
                 1 & x_{11} & \cdots & x_{1p} \\
                 1 & x_{21} & \cdots & x_{2p} \\
@@ -47,7 +47,7 @@ $$\begin{align}
 
 which is obtained by evaluating the derivative of the above norm term equals to zero.
 
-The variance estimator is proportional to variance of $\epsilon$
+The variance estimator is proportional to variance of $$\epsilon$$
 
 $$\mathrm{Var}(\hat{\mathbf{b}}) = \sigma^2 (\mathbf{X}^T\mathbf{X})^{-1}$$
 
@@ -68,19 +68,19 @@ $$\begin{align}
    \begin{bmatrix}\sum_i x_i^2 & -n\bar{x} \\ -n\bar{x} & n \end{bmatrix}
    \begin{bmatrix}n\bar{y} \\ \sum_i x_i y_i \end{bmatrix} \\
 &= \begin{bmatrix}
-    \frac{\bar{y}\sum_i x_i^2 + \bar{x}\sum_i x_i y_i}{\sum_i x_i^2 - n\bar{x}^2} \\
-    \frac{\sum_i x_i y_i - n \bar{x}\bar{y}}{\sum_i x_i^2 - n \bar{x}^2}
+    \dfrac{\bar{y}\sum_i x_i^2 - \bar{x}\sum_i x_i y_i}{\sum_i x_i^2 - n\bar{x}^2} \\
+    \dfrac{\sum_i x_i y_i - n \bar{x}\bar{y}}{\sum_i x_i^2 - n \bar{x}^2}
    \end{bmatrix}
  = \begin{bmatrix}
-    \frac{\bar{y}\sum_i x_i^2 + \bar{x}\sum_i x_i y_i}{\sum_i (x_i - \bar{x})^2} \\
-    \frac{\sum_i (x_i-\bar{x})(y_i-\bar{y})}{\sum_i (x_i - \bar{x})^2}
+    \dfrac{\bar{y}\sum_i x_i^2 - \bar{x}\sum_i x_i y_i}{\sum_i (x_i - \bar{x})^2} \\
+    \dfrac{\sum_i (x_i-\bar{x})(y_i-\bar{y})}{\sum_i (x_i - \bar{x})^2}
    \end{bmatrix}
 \end{align}$$
 
-Such solution is in the sense that provides the BLUE -- best linear unbiased
+Such solution is in the sense that provides the BLUE --- best linear unbiased
 estimator of the form $$y=\beta_0 + \beta_1 x.$$ We consider only this type of
 linear regression model below, with the notation
-$$\hat{y}_i = \hat{\beta}_0 + \hat{\beta}_1 x_i$$.
+$$\hat{y}_i = \hat{\beta}_0 + \hat{\beta}_1 x_i$$
 
 Now the question is how well this estimator is given a particular set of input.
 It turns out there are different ways to answer this.
@@ -95,7 +95,7 @@ $$\begin{align}
 T &= \frac{\hat{\beta}_1 - \beta_1^{\ast}}{SE(\hat{\beta}_1)} \\
 \textrm{where}\qquad
 SE(\hat{\beta}_1) &= \sqrt{\frac{1}{n-2}\frac{\sum_i (y_i - \hat{y}_i)^2}{\sum_i (x_i-\bar{x})^2}}
-                   = \sqrt{\frac{1}{n-2}\frac{\sum_i \epsilon_i^2}{\sum_i (x_i-\bar{x})^2}}
+                   = \sqrt{\frac{1}{n-2}\frac{\sum_i \hat{\epsilon}_i^2}{\sum_i (x_i-\bar{x})^2}}
 \end{align}$$
 
 which $$T$$ should follow t-distribution with $$n-2$$ df under the null
@@ -104,16 +104,16 @@ between $$\pm t_{\alpha/2,n-2}$$.
 
 (2) Is the intercept $$\beta_0$$ significant?
 
-Similarly, we can use the t test with statitics
+Similarly, we can use the t test with statitics[^reg]
 
 $$\begin{align}
 T &= \frac{\hat{\beta}_0 - \beta_0^{\ast}}{SE(\hat{\beta}_0)} \\
 \textrm{where}\qquad
-SE(\hat{\beta}_0) &= \sqrt{\frac{1}{n-2}\sum_i\epsilon_i^2\left(\frac{1}{n}+\frac{\bar{x}^2}{\sum_i (x_i-\bar{x})^2}\right)}
+SE(\hat{\beta}_0) &= \sqrt{\frac{1}{n(n-2)}\sum_i\hat{\epsilon}_i^2\frac{\sum_i x_i^2}{\sum_i (x_i-\bar{x})^2}}
 \end{align}$$
 
-A side note: Given the confidence level $\alpha$ and SE of $\hat{\beta}_0$ and
-$\hat{\beta}_1$, we can use t-distribution to derive the confidence interval of
+A side note: Given the confidence level $$\alpha$$ and SE of $$\hat{\beta}_0$$ and
+$$\hat{\beta}_1$$, we can use t-distribution to derive the confidence interval of
 each coefficient and model output
 
 $$\begin{align}
@@ -121,9 +121,10 @@ $$\begin{align}
 \hat{\beta}_1 & \pm t_{\alpha/2,n-2} SE(\hat{\beta}_1) \\
 \hat{y}_i & \pm t_{\alpha/2,n-2} \sqrt{
     \hat{\sigma}^2\left(
-        \frac{1}{n}+\frac{(x_i-\bar{x})^2}{\sum_i(x_i-\bar{x})^2}
+        \frac{1}{n}+\frac{(x_i-\bar{x})^2}{\sum_j(x_j-\bar{x})^2}
     \right)
-}
+} \\
+& \textrm{where}\ \hat{\sigma}^2 = \frac{1}{n-2}\sum_i\hat{\epsilon}_i^2
 \end{align}$$
 
 (3) How accurate is the regression fit the data?
@@ -135,17 +136,17 @@ describes. To check if a model fits data, we use ANOVA. We define
 - Regression sum of square: $$RSS = \sum_i (\hat{y}_i - \bar{y})^2$$
 - Error sum of square: $$ESS = \sum_i (y_i - \hat{y}_i)^2$$
 
-and then $$TSS = RSS + ESS$$. The RSS, with df of 1, explains the variability of
-$$\hat{y}_i$$ due to variability of input $$x_i$$. ESS, with df of $$n-2$$ is the
-remaining variability not explained by the regression model, which
-$\hat{\sigma}^2 = ESS/(n-2)$ is the estimator for the variation of $\epsilon$. The total variability TSS has
-a df of $$n-1$$.
+and then $$TSS = RSS + ESS$$. The RSS, with df of 1, explains the variability
+of $$\hat{y}_i$$ due to variability of input $$x_i$$. ESS, with df of $$n-2$$
+is the remaining variability not explained by the regression model, which
+$$\hat{\sigma}^2 = ESS/(n-2)$$ is the estimator for the variation of
+$$\epsilon$$. The total variability TSS has a df of $$n-1$$.
 
 We can then use the F-test[^ftest] with statistic
 
 $$F' = \frac{RSS/1}{ESS/(n-2)} = \frac{RSS}{\hat{\sigma}^2}$$
 
-against the F-distribution with df $(1,n-2)$. The linear model is a good fit if
+against the F-distribution with df $$(1,n-2)$$. The linear model is a good fit if
 $$F' < F_{\alpha, 1, n-2}$$ or equivalently the $$p$$-value of the linear model
 is given by
 
@@ -160,4 +161,85 @@ which accounts for the proportion of variability in data explained by the
 regression model. A good fit if $$R^2\to 1$$.
 
 [^ttest]: Wikipedia article on [Student's t-test](https://en.wikipedia.org/wiki/Student%27s_t-test)
+[^reg]: Wikipedia article on [simple linear regression](https://en.wikipedia.org/wiki/Simple_linear_regression)
 [^ftest]: F-test accounts for the ratio between two chi-distributions
+
+## Interpreting Julia's GLM package
+
+As an example, we will see the abovementioned metrics from any statistical
+packages, such as GLM in Julia.
+
+Consider the [Phillips curve](https://en.wikipedia.org/wiki/Phillips_curve),
+namely, the empirical model that unemployment and inflation are correlated
+(Milton Friedman's interpretation). To show how accurate is this hypothesis,
+we check the linear regression model between
+[inflation rate](https://tradingeconomics.com/hong-kong/inflation-cpi) (based on CPI, YoY)
+and [unemployment rate](https://tradingeconomics.com/hong-kong/unemployment-rate).
+Trading Economics has these data since 1981.
+
+After downloading the data in CSV format, we can read them into data frame,
+join them and plot:
+
+```julia
+using CSV
+using DataFrames
+using Gadfly
+
+cpi = CSV.read("hkcpiy.csv", header=["Date","Inf"], footerskip=2, datarow=2, allowmissing=:none)
+ue = CSV.read("hkuerate.csv", header=["Date","UE"], footerskip=2, datarow=2, allowmissing=:none)
+phillips = join(cpi, ue, on=:Date, kind=:inner)
+plot(phillips, x=:UE, y=:Inf, Geom.point,
+     Guide.XLabel("Unemployment"), Guide.YLabel("Inflation"),
+     Guide.Title("Inflation vs Unemployment from "
+                 * string(minimum(cpi[:Date])) * " to " * string(maximum(cpi[:Date])))
+    )
+```
+
+![scatter plot](/img/Phillips_HK_Scatter.png)
+
+Perform linear regression (ordinary least square method) against the data, and
+plot the regression result:
+
+```julia
+using GLM
+ols = lm(@formula(Inf ~ UE), phillips)
+intercept = coef(ols)[1]
+slope = coef(ols)[2]
+xx = collect(0:0.1:10)
+yy = intercept + xx*slope
+plot(layer(phillips, x=:UE, y=:Inf, Geom.point),
+     layer(x=xx, y=yy, Geom.line),
+     Guide.XLabel("Unemployment"), Guide.YLabel("Inflation"),
+     Guide.Title("Inflation vs Unemployment"))
+```
+
+![linear regression](/img/Phillips_HK_OLS.png)
+
+The function call `lm()` will print the following into the console:
+
+```
+Formula: Inf ~ 1 + UE
+
+Coefficients:
+             Estimate Std.Error  t value Pr(>|t|)
+(Intercept)    11.961  0.332921  35.9274   <1e-99
+UE           -2.05903 0.0822117 -25.0454   <1e-85
+```
+
+The estimate column above are coefficients of the constant term and the
+unemployment rate variable (i.e., $$\hat{\beta}_0, \hat{\beta}_1$$). It
+suggests that the inflation $$I$$ and unemployment $$U$$ are related as
+$$I=11.961-2.05903U$$. The std error column is the numerical values of
+$$SE(\hat{\beta}_0),SE(\hat{\beta}_1)$$. The t value column is for
+$$\beta_0^{\ast}=\beta_1^{\ast}=0$$ and represents the test statistic
+$$T=\hat{\beta}_i/SE(\hat{\beta}_i)$$. Finally, the probability column shows
+the confidence level $$\alpha$$ corresponding to the t value. Such value
+suggests that there is very strong correlation between the two.
+
+$$R^2$$ is given by `r2(ols)`, which gives the result 0.5893907142373523. From
+this we see there is quite significant *noise* that is not covered by the model.
+
+In this exercise, we are using 439 data points. If we limit the data to, say,
+last 10 years, the GLM result will give a much weaker $$R^2$$, greater std
+error, smaller t value, and lower confidence level, even though the correlation
+is still established.

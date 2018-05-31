@@ -1,0 +1,134 @@
+---
+layout: post
+title: Jacobian matrix, Hessian matrix, and applications
+date: Wed, 30 May 2018 16:44:58 -0400
+tags: math
+---
+
+Engineering math course in the first year of undergraduate would cover vector calculus.
+Jacobian and Hessian matrices are naturally covered. Jacobian matrix of a vector-valued
+function $$\mathbf{f}:\mathbb{R}^n\to\mathbb{R}^m$$ is
+
+$$J_{\mathbf{f}}
+= \begin{bmatrix}
+\dfrac{\partial\mathbf{f}}{\partial x_1} & \cdots & \dfrac{\partial\mathbf{f}}{\partial x_n}
+\end{bmatrix}
+= \begin{bmatrix}
+\dfrac{\partial f_1}{\partial x_1} & \cdots & \dfrac{\partial f_1}{\partial x_n} \\
+\vdots & \ddots & \vdots \\
+\dfrac{\partial f_1}{\partial x_1} & \cdots & \dfrac{\partial f_1}{\partial x_n}
+\end{bmatrix}$$
+
+A use of the Jacobian is when $$n=m$$, the matrix is square and its determinant is used
+for transformation of coordinate system. For example, a function defined on the
+Cartesian coordinate system in 2D, $$f(x,y)$$, represented in polar coordinates
+$$(r,\theta)$$ becomes $$f(r\cos\theta,r\sin\theta)$$. The coordinate transformation
+is indeed a $$\mathbb{R}^2\to\mathbb{R}^2$$ function
+
+$$\begin{align}
+x &= r\cos\theta \\
+y &= r\sin\theta \\
+\therefore\qquad J &= \begin{bmatrix}
+  \dfrac{\partial x}{\partial r} & \dfrac{\partial x}{\partial\theta}\\
+  \dfrac{\partial y}{\partial r} & \dfrac{\partial y}{\partial\theta}
+\end{bmatrix} = \begin{bmatrix}
+  \cos\theta & -r\sin\theta \\
+  \sin\theta & r\cos\theta
+\end{bmatrix}
+\end{align}$$
+
+and the Jacobian determinant is $$det(J)=r$$.
+
+If we consider the integral of $$f(x,y)$$ over a region $$A$$ on the Cartesian coordinate
+system, it can be transformed into polar coordinate using Jacobian:
+
+$$
+\iint_A f(x,y)dxdy
+= \iint_{A'} f(r\cos\theta,r\sin\theta)|J|drd\theta
+= \iint_{A'} f(r\cos\theta,r\sin\theta)rdrd\theta
+$$
+
+This means the infinisimal area $$dA=dxdy=rdrd\theta$$, i.e., the area is uneven
+and depends on $$r$$ in polar coordinate. Math.StackExchange has an article on
+[the proof of multivariable change of variable formula](https://math.stackexchange.com/questions/267267/)
+to explain this in the general coordinate system transform in integration.
+So, similarly if we apply the same to spherical coordinates $$(r,\theta,\phi)$$,
+
+$$\begin{align}
+x &= r\cos\theta\sin\phi \\
+y &= r\sin\theta\sin\phi \\
+z &= r\cos\phi \\
+\therefore\qquad J &= \begin{bmatrix}
+  \dfrac{\partial x}{\partial r} & \dfrac{\partial x}{\partial\theta} & \dfrac{\partial x}{\partial\phi} \\
+  \dfrac{\partial y}{\partial r} & \dfrac{\partial y}{\partial\theta} & \dfrac{\partial y}{\partial\phi} \\
+  \dfrac{\partial z}{\partial r} & \dfrac{\partial z}{\partial\theta} & \dfrac{\partial z}{\partial\phi}
+\end{bmatrix} = \begin{bmatrix}
+  \cos\theta\sin\phi & r\cos\theta\cos\phi & -r\sin\theta\sin\phi \\
+  \sin\theta\sin\phi & r\sin\theta\cos\phi & r\cos\theta\sin\phi \\
+  \cos\phi           & -r\sin\phi          & 0
+\end{bmatrix} \\
+|J| &= r^2\sin\phi
+\end{align}$$
+
+and we have $$dV=dxdydz=r^2\sin\phi drd\theta d\phi$$.
+
+With this, we can check the coefficient of the normal density function
+$$f(x) = \exp(-\frac{x^2}{2\sigma^2})$$:
+Consider $$f(x)f(y)=\exp(-\frac{x^2+y^2}{2\sigma^2})$$, and
+$$\int_{-\infty}^{\infty}f(x)dx\int_{-\infty}^{\infty}f(y)dy = \int_{-\infty}^{\infty}\int_{-\infty}^{\infty}f(x)f(y)dxdy$$
+and converting Cartesian coordinate into polar, we have
+
+$$\begin{align*}
+\int_{-\infty}^{\infty}\int_{-\infty}^{\infty} \exp(-\frac{x^2+y^2}{2\sigma^2}) dxdy
+&= \int_0^{2\pi}\int_0^{\infty} \exp(-\frac{r^2}{2\sigma^2}) rdrd\theta \\
+&= \int_0^{2\pi} \left.\left(-\frac{2\sigma^2}{2} \exp(-\frac{r^2}{2\sigma^2})\right)\right|_{r^2=0}^{r^2=\infty} d\theta \\
+&= \int_0^{2\pi} \sigma^2 d\theta = 2\pi\sigma^2 \\
+\therefore 
+\int_{-\infty}^{\infty} \exp(-\frac{x^2}{2\sigma^2}) dx &= \sqrt{2\pi\sigma^2}
+\end{align*}$$
+
+Therefore the normal density function should be
+$$f(x)=\frac{1}{\sqrt{2\pi\sigma^2}}\exp(-\frac{x^2}{2\sigma^2})$$. This is
+just one way to evaluate. See, for example, [Feynman's differentiation under
+integral sign technique](https://math.stackexchange.com/q/11149) against
+$$\int_0^{\infty}\frac{1}{1+x^2}e^{-t^2(1+x^2)/2}dx$$ (also
+[another example](https://math.stackexchange.com/questions/390850)) for a
+different approach to evaluate this Gaussian integral.
+
+Hessian matrix is the second derivative, $$H(f(x)) = J(\nabla f(x))^T$$,
+
+$$
+H_f = \begin{bmatrix}
+\dfrac{\partial^2 f}{\partial x_1^2} & \dfrac{\partial^2 f}{\partial x_1x_2} & \cdots & \dfrac{\partial^2 f}{\partial x_1x_n} \\
+\dfrac{\partial^2 f}{\partial x_2\partial x_1} & \dfrac{\partial^2 f}{\partial x_2^2} & \cdots & \dfrac{\partial^2 f}{\partial x_2x_n} \\
+\vdots & \vdots & \ddots & \vdots \\
+\dfrac{\partial^2 f}{\partial x_n\partial x_1} & \dfrac{\partial^2 f}{\partial x_nx_2} & \cdots & \dfrac{\partial^2 f}{\partial x_n^2}
+\end{bmatrix}
+$$
+
+This arises if we take the Taylor expansion of a vector function, in the coefficient of the quadratic term:
+
+$$
+y = f(\mathbf{x}+\Delta\mathbf{x}) = f(\mathbf{x}) + \nabla f(\mathbf{x})^T \Delta\mathbf{x} + \frac{1}{2!}\Delta\mathbf{x}^TH_f\Delta\mathbf{x} + O(\|\Delta\mathbf{x}\|^3)
+$$
+
+as well as the expansion of the gradient of a vector function:
+
+$$
+\nabla f(\mathbf{x}+\Delta\mathbf{x}) = \nabla f(\mathbf{x}) + H_f\Delta\mathbf{x} + O(\|\Delta\mathbf{x}\|^2)
+$$
+
+Therefore, we can expect to encounter Jacobian more often. Indeed we used it in
+the post about [Newton method](/2012-05-01-newtonmethod/) in vector functions.
+
+## Note
+
+In the Dartmouth course [Multivariable calculus](https://math.dartmouth.edu/archive/m13w12/public_html/syllabus.html),
+lecture 12 covers
+[change of variables and the Jacobian](https://math.dartmouth.edu/archive/m13w12/public_html/notes/class12.pdf).
+It derives the Jacobian determinant of the integral under change of variables.
+
+Feynman's differentiation under integral sign can use to attack a variation of
+Gaussian integrals, e.g., with cosine transform. See
+[Conrad](http://www.math.uconn.edu/~kconrad/blurbs/analysis/diffunderint.pdf)
+for detail.
