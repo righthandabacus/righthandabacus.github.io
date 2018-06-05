@@ -2,6 +2,7 @@
 layout: post
 title: Linear regression and confidence
 date: Fri, 25 May 2018 22:05:25 -0400
+lastedit: Fri, 01 Jun 2018 12:39:39 -0400
 tags: math
 ---
 
@@ -53,6 +54,10 @@ $$\mathrm{Var}(\hat{\mathbf{b}}) = \sigma^2 (\mathbf{X}^T\mathbf{X})^{-1}$$
 
 This is called the variance-covariance matrix and the standard error (used in
 the t-tests below) on the diagonal.
+
+Although in the above, we have multiple indepdent variables $$x_{ji}$$, in practice they
+can be correlated to each other. For example, by setting $$x_{ki} = x_{1i}^k$$ for $$k>1$$,
+we convert a linear regression model into a $$k$$-order polynomial regression model.
 
 The simplest form for linear regression model is $$p=1$$, which we only have
 coefficients $$\beta_0,\beta_1$$ and each data point is a ordered pair
@@ -126,6 +131,11 @@ $$\begin{align}
 } \\
 & \textrm{where}\ \hat{\sigma}^2 = \frac{1}{n-2}\sum_i\hat{\epsilon}_i^2
 \end{align}$$
+
+Because the SE decreases as $$n$$ increases, we can applying this reversely to
+check if (but not easy to derive due to dependency of variation of inputs
+$$x_i$$) the sample size $$n$$ is large enough given the error margin of
+$$y_i$$ and confidence level $$\alpha$$.
 
 (3) How accurate is the regression fit the data?
 
