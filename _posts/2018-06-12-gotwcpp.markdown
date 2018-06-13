@@ -1,0 +1,948 @@
+---
+layout: post
+title: Modern C++ Good Practice
+date: Wed, 13 Jun 2018 11:29:30 -0400
+tags: code
+---
+
+Some notes on reviewing what C++ changed since the introduction of C++11. Mostly
+comes from reading GotW: [casting](#casting), [smart pointers](#smart-pointers),
+[auto types](#auto-types), [initialization](#initialization),
+[temporaries](#temporaries), [class structure and owning
+pointers](#class-structure-and-owning-pointers), [const
+correctness](#const-correctness), [dependencies and
+pimpl](#dependencies-and-pimpl)
+
+# Casting
+
+There are four different ways of casting in C++ now. Traditional way is
+`new_type(expr)` or `(new_type)expr` but the intention is ambiguous. The new
+ways are:
+
+#### 1. const_cast
+
+    const_cast<new_type>(expr)
+
+to remove `const` or volatility, e.g.
+
+```cpp
+struct type {
+    type() :i(3) {}
+    void m1(int v) const {
+        // this->i = v;                 // compile error: this is a pointer to const
+        const_cast<type*>(this)->i = v; // OK as long as the type object isn't const
+    }
+    int i;
+};
+```
+
+This casting is resolved in compile time.
+
+#### 2. static_cast
+
+    static_cast<new_type>(expr)
+
+cannot remove `const` or volatility. Perform implicit conversion from `expr` to `new_type`,
+using user-defined conversions if possible.
+
+```cpp
+union U { int a; double b; } u;
+void* x = &u;                        // x's value is "pointer to u"
+double* y = static_cast<double*>(x); // y's value is "pointer to u.b"
+char* z = static_cast<char*>(x);     // z's value is "pointer to u"
+int n = static_cast<int>(3.14);      // type conversion
+```
+
+This casting also resolved in compile time.
+
+#### 3. dynamic_cast
+
+    dynamic_cast<new_type>(expr)
+
+cannot remove `const` or volatility. Perform conversion from `expr` to `new_type` with
+runtime check, especially when downcasting a base class pointer to derived class pointer
+
+return `new_type` if successful or otherwise, return a null pointer or throws an
+exception if `new_type` is a reference. Thus we should catch or check for null
+in casting result.
+
+```cpp
+struct V {
+    virtual void f() {};  // must be polymorphic to use runtime-checked dynamic_cast
+};
+struct A : virtual V {};
+struct B : virtual V {
+  B(V* v, A* a) {
+    // casts during construction (see the call in the constructor of D below)
+    dynamic_cast<B*>(v); // well-defined: v of type V*, V base of B, results in B*
+    dynamic_cast<B*>(a); // undefined behavior: a has type A*, A not a base of B
+  }
+};
+```
+
+This is the only type of casting that needs runtime code to determine the result.
+
+#### 4. reinterpret_cast
+
+    reinterpret_cast<new_type>(expr)
+
+returns a value of `new_type`. It is purely a compiler directive to treat expr
+as a different type and does not compile to any CPU instructions. cannot remove
+`const` or volatility.
+
+
+# Smart pointers
+
+There are three kinds of smart pointers in modern C++: `unique_ptr`,
+`shared_ptr`, and `weak_ptr`. (The fourth, `auto_ptr`, is deprecated in C++17)
+
+[When in doubt](https://herbsutter.com/2013/05/29/gotw-89-solution-smart-pointers/),
+use `unique_ptr`
+- you can still use it in a container, e.g. `vector<unique_ptr<widget> >`, like raw pointer
+- more efficient than `shared_ptr` for no reference count and control block
+- can always convert to other type when needed
+- create one by `make_unique`
+  - instead of `unique_ptr<T>{new T{}}`, avoids explicit new
+
+if needs shared ownership, use `make_shared` to create `shared_ptr`
+- if custom allocator is needed, use `allocate_shared`
+- if a raw pointer is given, pass it to constructor of `shared_ptr` directly
+- `shared_ptr` keeps two ref counts:
+   - strong reference count to track the number of `shared_ptr` keeping
+     the object alive
+   - weak reference count to track the nubmer of `weak_ptr` observing the object
+     - use `weak_ptr` only when we need to observe an object but do not require
+       it to remain alive
+   - using `make_shared` reduces memory fragmentation and allocation overhead, improves locality
+
+### Smart pointer as return type of factories
+
+Factory should not return pointer to object:
+
+```cpp
+widget* load_widget( widget::id desired );
+```
+
+for this will [never know who owns the object](https://herbsutter.com/2013/05/30/gotw-90-solution-factories/)
+as pointed by the returned pointer. Risk of memory leak. As a factory function,
+it should return a `unique_ptr` or `shared_ptr`.  Indeed, `unique_ptr` is the
+better choice and caller can convert it into `shared_ptr` if needed:
+
+```cpp
+// Accept as a unique_ptr (by default)
+auto up = load_widget(1);
+
+// Accept as a shared_ptr (if desired)
+auto sp = shared_ptr<widget>{ load_widget(2) };
+
+// Accept as your own smart pointer (if desired)
+auto msp = my::smart_ptr<widget>{ load_widget(3).release() };
+```
+
+If the factory is not producing a polymorphic type, we can simply return the movable
+object by value. Instead of this C++98 code:
+
+```cpp
+vector<gadget>* load_gadgets() {
+    vector<gadget>* ret = new vector<gadget>();
+    // ... populate *ret ...
+    return ret;
+}
+
+// Obsolete calling code (note: NOT exception-safe) 
+vector<gadget>* p = load_gadgets();
+if(p) use(*p);
+delete p;
+```
+
+do this:
+
+```cpp
+vector<gadget> load_gadgets() {
+    vector<gadget> ret;
+    // ... populate ret ...
+    return ret;
+}
+
+// Calling code (exception-safe)
+auto v = load_gadgets();
+use(v);
+```
+
+if the factory may return null, use optional<widget>. It has operator bool and therefore
+supports `if` construct to test for null:
+
+```cpp
+optional<vector<gadget>> load_gadgets() noexcept {
+    vector<gadget> ret;
+    // ... populate ret ...
+    if( success )            // return vector (might be empty)
+        return move(ret);    // note: move() here to avoid a silent copy
+    else
+        return {};           // not returning anything
+}
+
+// Calling code (exception-safe)
+auto v = load_gadgets();
+if(v) use(*v);
+```
+
+A factory that produces a non-reference type should return a value by default,
+and throw an exception if it fails to create the object. If not creating the
+object can be a normal result, return an `optional<>` value.
+
+### Smart pointer as [argument to functions](https://herbsutter.com/2013/06/05/gotw-91-solution-smart-pointer-parameters/)
+
+```cpp
+void f( shared_ptr<widget> );
+```
+
+This function, when called, will have the `shared_ptr` copy-constructed, and
+destroyed on function exit. Ref count on `shared_ptr` is atomic shared variable,
+all read-modify-write is synchronized.
+
+If we're using the `widget`, we prefer to pass the object by value, `*`, or `&`,
+not by smart pointer.
+
+Consider these:
+
+```cpp
+void f( widget* );              (a)
+void f( widget& );              (b)
+void f( unique_ptr<widget> );   (c)
+void f( unique_ptr<widget>& );  (d)
+void f( shared_ptr<widget> );   (e)
+void f( shared_ptr<widget>& );  (f)
+```
+
+(a) and (b) are preferred way to pass normal object parameters, and the pointer
+is not an "owning" raw pointer. In both case, the use of object is usually
+shorter than the lifetime of the object. Use (a) if we may pass `NULL`,
+otherwise use reference to object (b)
+
+(c) is a sink, i.e. consume the object `widget`. By calling the function, object
+is moved from the caller to callee and takes ownership away from the caller. Any
+pointer can be converted to `unique_ptr` with explicit conversion but doing so
+will transfer ownership. Consider these:
+
+```cpp
+void good_sink( unique_ptr<widget> p );
+
+widget* pw = ... ; 
+good_sink( unique_ptr<widget>{pw} );  // need explicit conversion: good
+
+unique_ptr<widget> pw = ... ;
+good_sink( move(pw) );       // compiles: crystal clear what's going on
+```
+
+The last example need explicit `move()` because we cannot pass a `unique_ptr` by
+value as another `unique_ptr` without explicitly showing our intention of
+transferring ownership.  Or make it implicit in the function declaration to
+avoid calling `move()` every time:
+
+```cpp
+void good_sink(unique_ptr<widget>&& p);
+```
+
+(d) should be used only when the function is supposed to take an existing
+`unique_ptr` and modify it to refer to a different object.  Use a non-const
+`unique_ptr&` parameter only to modify the `unique_ptr`.  And use `widget*`
+instead of `const unique_ptr&` as a parameter. Because it is unnecessary to ask
+the callee to manage widget's lifetime as the caller already manages it. Also
+make the function not limited to `unique_ptr`.
+
+(e) implies taking shared ownership, recommended only when the function wants to
+retain a copy.
+
+(f) same as (d), should be used only then the function is supposed to modify
+`shared_ptr` itself. Use a non-const `shared_ptr&` parameter only to modify the
+`shared_ptr`.  Use a `const shared_ptr&` as a parameter only if you're not sure
+whether or not you'll take a copy and share ownership; otherwise use `widget*`
+instead (or if not nullable, a `widget&`).
+
+
+# Initialization
+
+Initialization should be done [using braces](https://herbsutter.com/2013/05/09/gotw-1-solution/):
+
+```cpp
+// initialization with default constructor
+widget w;
+widget w();     // wrong: this is a function declaration!
+widget w{};     // modern c++
+
+// direct initialization
+widget w(x);
+widget w{x};    // modern c++
+
+// copy initialization: same as direction initialization
+widget w = x;
+widget w = {x}; // modern c++
+
+// prefered way
+auto w = widget{w};
+```
+
+Modern C++ introduces `{}` for initialization. It can guard against lossy,
+narrowing implicit conversion, e.g., this will fail because it narrowing a float
+to int:
+
+    int i{1.234};       // narrowing error
+    int i = int{1.234}; // narrowing error
+
+But initialization list may mean different things, especially in containers:
+
+```cpp
+vector<int> v(10, 20);   // 10 copies of 20
+vector<int> v{10, 20};   // two int: 10 and 20
+```
+
+using initializer list can make the following neat:
+
+```cpp
+rectangle foo(rectangle x)
+{
+    // ...
+    return {width, height}; // pass to rectangle constructor implicitly
+};
+
+y = foo({w, h});  // create rectangle implicitly and pass to function
+```
+
+
+# nullptr, lambda, and move
+
+Never use `NULL` again. Use `nullptr` instead when a null pointer is needed (as
+placeholder or otherwise):
+
+```cpp
+// c++98
+int* p = 0;
+// c++11
+int* p = nullptr;
+```
+
+Many STL supports using lambda. Compare:
+
+```cpp
+// c++98, naked loop is the easiest
+vector<int>::iterator i = v.begin(); // preserve i after the loop
+for( ; i != v.end(); ++i ) {
+    if( *i > x && *i < y ) break;
+}
+// c++11, using std::find_if and lambda
+auto i = find_if(begin(v), end(v), [=](int i) { return i > x && i < y; });
+```
+
+and with lambda, we can apply lock:
+
+```cpp
+// c++11 without lambdas
+{
+    lock_guard<mutex> hold { mut_x };
+    // use x
+}
+         
+// c++11 with lambdas
+// Algorithm: template<typename T> void lock( T& t, F f ) { lock_guard hold(t); f(); }
+lock( mut_x, [&]{
+  // use x
+});
+```
+
+Move semantics makes return-by-value more optimized:
+
+```cpp
+// old way to avoid copying: use pointers or reference
+vector<int>* make_big_vector(); // pointer
+vector<int>* result = make_big_vector();
+ 
+void make_big_vector( vector<int>& out ); // return by reference
+vector<int> result;
+make_big_vector( result );
+  
+// c++11 use move
+vector<int> make_big_vector();
+auto result = make_big_vector(); // if move is possible, no copy
+```
+
+In class, we can define a move constructor and move assignment:
+
+```cpp
+class T {
+    T(T&& x) noexcept :
+      myvar(std::move(x.myvar))
+    {};
+
+    T& operator=(T&& x) noexcept {
+        this->~T(); // clean up of myself
+        // move member vars from x to this
+        return *this;
+    };
+};
+```
+
+
+# Temporaries
+
+Try to [avoid temporaries](https://herbsutter.com/2013/05/13/gotw-2-solution-temporary-objects/).
+Prefer passing a read-only parameter by `const&` if
+you are only going to read from it.
+
+Prefer declaring variables using `auto`. Among other reasons to do so, it naturally
+guarantees zero extra temporaries due to implicit conversions.
+
+Postincrement `T T::operator++(int)` is usually less efficient than preincrement
+`T T::operator++(void)` because it has to remember and return its original value.
+Prefer preincrement. Only use postincrement if you’re going to use the original value.
+
+```cpp
+if( *i == name )
+```
+
+Watch out for hidden temporaries created by implicit conversions. One good way to
+avoid this is to make constructors and conversion operators explicit by default unless
+implicit conversions are really desirable.
+
+Return `string&` instead of `string`: Pitfall of returning a dangling reference to a
+local or temporary object. To avoid this, have to declare the return object as static:
+
+```cpp
+static const string empty;
+return empty;
+```
+
+Using ranged-based loop make temporary value due to comparison or preincrement
+[irrelevant](https://herbsutter.com/2013/05/16/gotw-3-solution-using-the-standard-library-or-temporaries-revisited/).
+See <https://stackoverflow.com/questions/8164567> on how to implement the data
+structure that supports range-based for-loop. (Range-based for-loop calls
+non-member `begin(x)` and `end(x)` to determine the range).
+
+Compare:
+
+```cpp
+// iterator loop:
+for( auto i = begin(emps); i != end(emps); i++ ) {
+    if( *i == name ) {
+        return i->addr;
+    }
+}
+
+// range-based for loop:
+for( const auto& e : emps ) {
+    if( e == name ) {
+        return e.addr;
+    }
+}
+```
+
+
+# Class structure and owning pointers
+
+Once we supply a user-written constructor, we [suppress the implicit generation of
+the default constructor](https://herbsutter.com/2013/05/20/gotw-4-class-mechanics/).
+
+```cpp
+class complex {
+    complex(double re, double im); // user-defined ctor
+    complex() = default;           // explicitly request to generate default ctor or we won't have it
+};
+```
+
+Besides `= default` above, we can also `= delete` to remove some particular
+default members. For example, this make the class cannot create by copy
+construction or overwritten by assginment:
+
+```cpp
+class complex {
+    complex(complex const&) = delete;
+    complex& operator= (complex const&) = delete;
+}
+```
+
+Prefer passing a read-only parameter by `const&` if you are only going to read
+from it (not make a copy of it).
+
+Instead of returning `void`, `operator+` should return an object containing the
+sum and not modify this object's value. That is, we should not implement it as a
+member function.
+
+If you supply a standalone version of an operator (e.g., `operator+`), always
+supply an assignment version of the same operator (e.g., `operator+=`) and
+prefer implementing the former in terms of the latter. Also, always preserve the
+natural relationship between `op` and `op=` (where `op` stands for any
+operator):
+
+```cpp
+T& T::operator+=( const T& other ) {
+    //...
+    return *this;
+}
+T operator+( T a, const T& b ) {
+    a += b;
+    return a;
+}
+```
+
+if you're going to copy from a parameter anyway, it's often better to pass it by
+value, (see `a` above in contrast with `b`) which will naturally enable a move
+operation if the caller passes a temporary object such as in expressions like
+`(val1 * val2) + val3`.
+
+Prefer these guidelines for making an operator a member vs. nonmember function:
+unary operators are members; `=`, `()`, `[]`, and `->` must be members; the
+assignment operators (`+=`, `–=`, `/=`, `*=`, etc.) must be members; all other
+binary operators are nonmembers.  Member binary operator can only define the
+class as left-hand argument, making the operator not commutative.
+
+Always return stream references (i.e., `ostream&`) from `operator<<` and `operator>>`.
+
+When you return `*this`, the return type should usually be a reference.
+
+For consistency, always implement postincrement in terms of preincrement,
+otherwise your users will get surprising (and often unpleasant) results.
+
+In C++11 we have `final` and `override` keyword to explicitly declare intention
+to make a member function [not overridable](https://herbsutter.com/2013/05/22/gotw-5-solution-overriding-virtual-functions/)
+by derived class, or make a member function to be overriding the counterpart in
+base class. Fail to meet the intention is a compile error
+
+```cpp
+class B final : public A  // class B has no derived class
+{
+    void foo() override;  // foo() is overriding A::foo()
+    void bar() final;     // bar() shall not be overrided by derived class
+}
+```
+
+In C++11, we should not use `new`, `delete`, and *owning* `*` pointers except in
+rare cases of implementing low-level data structure:
+
+```cpp
+// instead of
+base*   pb = new derived;
+delete pb;
+// prefer
+auto pb = unique_ptr<base>{ make_unique<derived>() };
+    // make_unique<>() returns a unique_ptr<>, then transfer ownership to pointer of base class
+    // above is equiv to `unique_ptr<base> pb = make_unique<derived>()`
+```
+
+Base class destructors should be `public` and `virtual` or `protected` and
+`nonvirtual`.  Corruption may happen when deleting derived object via
+pointer-to-base as the wrong destructor will be called. Public virtual
+destructor allows deleting via pointer-to-base and protected nonvirtual
+destructor requires derived class to call base destructor explicitly.
+
+When providing a non-overridden function with the same name as an inherited
+function, be sure to bring the inherited functions into scope with a
+using-declaration if you don’t want to hide them.
+
+```cpp
+class base
+{
+  public:
+    virtual void f(int);
+    virtual void f(int, int);
+}
+class derived : public base
+{
+  using base::f; // all f in base are exposed
+  virtual void f(double);
+}
+```
+
+Cleaner interface: prefer to have a class contains only `public virtual`
+functions, or no `public virtual` functions other than the destructor. A pure
+abstract base class should have only `public virtual` functions.
+
+
+# Const correctness
+
+Shared variables are those accessed from [more than one
+thread](https://herbsutter.com/2013/05/24/gotw-6a-const-correctness-part-1-3/).
+
+Keyword `const` on a shared variable means read-only for the purposes of
+concurrency, i.e. safe to use without external synchronization. A `const` member
+function is either (1) perform no writes to object's data or (2) internally
+synchronized
+
+Keyword `mutable` on a variable means the variable is writable but logically
+`const`, i.e.  (1) can be used safely by concurrent `const` operations, and (2)
+some `const` operations may actually the writers of the shared variable, so it
+should be protected with a mutex or made `atomic<>`
+
+In C++98, the `const` keyword means only logically `const` (but not physically
+or bitwise const) in a single-threaded code.
+
+```cpp
+void add_point(const point p); // unnecessary to declare const
+```
+
+Objects passed by value to a function [do not
+need](https://herbsutter.com/2013/05/28/gotw-6b-solution-const-correctness-part-2/)
+to be `const`. If that is needed, it should be in the definition, not
+declaration of the function. It only hints the compiler of the const nature in
+the definition of function.
+
+```cpp
+int f(int);
+int f(const int);  // same function for value params
+
+int g(int&);
+int g(const int&); // different function for non-value params
+```
+
+A member function that does not change the state of the object should mark `const`. If
+variable should be allowed to change in `const` function, it should be marked `mutable`
+(as well as synchronized, e.g., `atomic`):
+
+```cpp
+class X {
+    mutable atomic<double> area;
+};
+```
+
+An iterator that do not change the state of the collection should be a `const_iterator`.
+Using `auto` type will do this automatically for a `const` function.
+
+An binary operation should be defined as lhs passed by value and rhs passed by `const`
+reference, i.e.
+
+```cpp
+T operator+(T lhs, const T& rhs);
+```
+
+A local variable should also be declared `const` if it is not changed
+
+Never cast away `const` with `const_cast`, behaviour undefined.
+
+A reference cannot be `const`
+
+```cpp
+T& const x; // not allowed, as all ref cannot be reseated to ref to different obj
+```
+
+
+# Dependencies and pimpl
+
+Forward declaration just introduces a name. It is sufficient for a header until
+something is defined. For example, instead of `#include<iostream>`, we can just
+declare `ostream` by including `iosfwd`, which is a lighter header.
+
+```cpp
+// #include <iostream>
+#include <iosfwd>  // when forward declaration is suffice
+```
+
+Using forward declaration can avoid a lot of header include.
+
+Another way to clean up interdependencies in code is to use *pimpl* pointer:
+[Insulate](https://herbsutter.com/2013/12/31/gotw-7b-solution-minimizing-compile-time-dependencies-part-2/)
+clients from a class' private implementation details
+- use an opaque pointer (point to a declared but undefined helper class)
+
+For example, instead of this:
+
+```cpp
+// file widget.h
+//
+class widget {
+    // public and protected members
+private:
+    // private members; whenever these change,
+    // all client code must be recompiled
+};
+```
+
+do this:
+
+```cpp
+// file widget.h
+//
+#include <memory>
+
+class widget {
+public:
+    widget();
+    ~widget();
+    // public and protected members
+private:
+    struct impl;
+    std::unique_ptr<impl> pimpl;   // ptr to a forward-declared class
+};
+
+// file widget.cpp
+//
+#include "widget.h"
+
+struct widget::impl {
+    // private members; fully hidden, can be
+    // changed at will without recompiling clients
+};
+
+widget::widget() : pimpl{ make_unique<widget::impl>(/*...*/) } { }
+widget::~widget() =default;
+```
+
+This idiom breaks the caller's dependency on the private details
+- eliminate extra includes
+- implementation can be changed without recompiling client code
+- cost on performance:
+  - alloc/dealloc of memory on each construction/destruction
+  - extra indirection for each access of a hidden member
+
+Pimpl should factor all private nonvirtual members into the pointed
+implementation and make their access private. If the implementation needs to
+reference to the public object, we can consider passing `this` into
+the function: `pimpl->func(this, args)`
+
+Never inherit when [composition is
+sufficient](https://herbsutter.com/2014/01/06/gotw-7c-solution-minimizing-compile-time-dependencies-part-3/)
+. For example, instead of deriving X from class A privately and using its
+functions, we can have pimpl to class A instance.
+
+
+# auto type
+
+`auto` in C++ perform the [same type deduction as function
+template](https://herbsutter.com/2013/06/07/gotw-92-solution-auto-variables-part-1/)
+would do. But it will not be top level `const`, `volatile`, `&`, or `&&` unless
+declared explicitly
+
+Consider:
+
+```cpp
+int&        ir  = val;
+auto        e   = ir;  // int
+
+int*        ip  = &val; 
+auto        f   = ip;  // int*
+
+const int   ci  = val;
+auto        g   = ci;  // int
+
+const int&  cir = val;
+auto        h   = cir; // int
+
+const int*  cip = &val;
+auto        i   = cip; // const int*
+
+int* const  ipc = &val;
+auto        j   = ipc; // int*
+
+const int* const cipc = &val;
+auto             k    = cipc; // const int*
+```
+
+Variable `e` is of type `int`, not a reference. To make it a reference, we have to
+declare it as `auto&`. Variable `g` is similarly, also `int`.
+
+Variable `i` is `const int*` because the `const` is for `int`, not pointer.
+Hence it is not top level `const`. Variable `j` is `int*` because the `const` is
+for pointer, i.e., top level.
+
+But in this case:
+
+```cpp
+int val = 0;
+auto a { val };
+auto b = { val };
+```
+
+both `a` and `b` are of type `std::initializer_list<int>`
+
+### declaring variable as auto, and lambda type
+
+Prefer to declare local variables using `auto x = expr;` when you [don't need to
+explicitly commit to a type](https://herbsutter.com/2013/06/13/gotw-93-solution-auto-variables-part-2/).
+It is efficient by default and guarantees that no implicit conversions or
+temporary objects will occur.
+
+Consider declaring local variables `auto x = type{ expr };` when you do want to
+explicitly commit to a type. It is self-documenting to show that the code is
+explicitly requesting a conversion.
+
+```cpp
+// if you don't need an explicit type
+auto w = get_gadget();
+// if you do need to commit to an explicit type
+auto w = widget{ get_gadget() };
+```
+
+Correct way to hold a lambda is using `auto`, which binds to the exact (compiler-generated)
+type of the lambda. Use `std::function<...> name =` only when you need to
+rebind it to another target or pass it to another function that needs a `std::function<>`.
+Moreover, in lambda, argument type can be auto to make it a templated function call
+operator. Return type of lambda is implicitly `auto`.
+
+```cpp
+// not this
+function<void(vector<int>)> get_size
+    = [](const vector<int>& x) { return x.size(); };
+// but this
+auto get_size = [](const auto& x) { return x.size(); };
+// or this if give up const-enforcement
+auto get_size = [](auto&& x) { return x.size(); };
+```
+
+If we creates an object, prefer use `auto` to make our intention explicit:
+
+```cpp
+T w;          // w might be uninitialized (if T is built-in type of
+              // aggregate type, its members won't get initialized)
+auto w = T{}; // w guaranteed to be initialized
+```
+
+`auto` can also help avoid narrowing, e.g., assigning an `unsigned int` to `signed int`
+and lost the MSB. (see `cstdint` header for portable sized type names, e.g. `uint64_t`)
+However, `auto` can't help for combining (e.g. subtraction) signed and unsigned, we should
+use `as_signed`:
+
+```cpp
+// bad
+unsigned long x    = 42;
+signed short  y    = 43;
+auto          diff = x - y;   // one actual result: 18446744073709551615
+
+// good
+auto x = as_signed(integer_expr);
+auto x = as_unsigned(integer_expr);
+```
+
+type conversion in `auto`: use `{}` for explicit type, but `()` for narrowing:
+
+```cpp
+auto i = 1.0 * 42.0;        // get float type
+auto i = int{ 1.0 * 42.0 }; // error for narrowing conversion
+auto i = int( 1.0 * 42.0 ); // explicit narrowing
+```
+
+Use `auto` [almost always](https://herbsutter.com/2013/08/12/gotw-94-solution-aaa-style-almost-always-auto/).
+
+Write code against interfaces, not implementations
+- encapsulation to hide code, caller knows only the function signature
+- hide data: caller does not, and should not, commit to knowledge of the current
+  internal data or code
+- hide type (runtime polymorphism): OO is separation of interfaces to hide type,
+  caller does not, and should not, commit to a single concrete type, which would make
+  the caller’s code less general and less able to be reused with new types.
+- hide type (compile time polymorphism): Templates as a separation of interfaces to hide
+  type. Callers knows duck-typed set of operations only.
+
+Using `auto` is:
+- motivated primarily by correctness, performance, maintainability, and robustness
+  and only lastly about typing convenience.
+- still valid for commitment, use `auto x = type{ init };` instead of `type x{init};`
+- does not hurt readability by not knowing the exact type:
+   - if such knowledge is needed, it is code against implementations, not interfaces
+   - Overcommitting to explicit types makes code less generic and more interdependent,
+     and therefore more brittle and limited
+
+### Comparing classic and modern C++
+
+```cpp
+// Classic C++ declaration order     // Modern C++ style
+
+// variable declaration
+const char* s = "Hello";             auto s = "Hello";
+widget w = get_widget();             auto w = get_widget();
+
+employee e{ empid };                 auto e = employee{ empid };
+widget w{ 12, 34 };                  auto w = widget{ 12, 34 };
+
+
+// heap allocation
+widget* w = new widget{};            /* auto w = new widget{}; */
+unique_ptr<widget> w                 auto w = make_unique<widget>();
+  = make_unique<widget>();
+
+
+// literal suffix
+int x = 42;                          auto x = 42;
+float x = 42.;                       auto x = 42.f;
+unsigned long x = 42;                auto x = 42ul;
+std::string x = "42";                auto x = "42"s;   // C++14, user-defined
+chrono::nanoseconds x{ 42 };         auto x = 42ns;    // C++14, user-defined
+
+
+// lambda functions
+int f( double );                     auto f (double) -> int;
+…                                    auto f (double) { /*...*/ };
+…                                    auto f = [=](double) { /*...*/ };
+
+
+// template alias
+typedef set<string> dict;            using dict = set<string>;
+
+template<class T> struct myvec {     template<class T>
+  typedef vector<T,myalloc> type;    using myvec = vector<T,myalloc>;
+};
+```
+
+Literal suffix, see <https://akrzemi1.wordpress.com/2012/08/12/user-defined-literals-part-i/>
+for examples
+
+C++ is moving to the declaration style of the form
+
+    <category> <name> = <type and/or initializer>;
+
+where category can be auto or using.
+
+There is a case that we cannot declare with `auto`:
+
+```cpp
+auto lock = lock_guard<mutex>{ m };  // error, not moveable
+auto ai   = atomic<int>{};           // error, not moveable
+auto x = long long{ 42 };            // error, multi-word "long long"
+auto y = class X{1,2,3};             // error, multi-word "class X"
+```
+
+# New containers and algorithms
+
+Containers:
+
+- `unordered_set`
+- `unordered_multiset`
+- `unordered_map`
+- `unordered_multimap`
+- `forward_list`: singly-linked list but no random access to elements
+- `array`: stores n elements of type `T` contiguously in memory. It differs from a vector as it cannot be resized once created.
+
+Algorithms:
+
+- `all_of`: returns true if all the values in the range satisfy a predicate or the range is empty
+- `any_of`: returns true if any of the values in the range satisfy a predicate or the range is empty
+- `none_of`: returns true if none of the values in the range satisfy a predicate, or the range is empty
+- `find_if_not`: returns an iterator to the first value that causes a predicate to be false. This uses linear search. Similar to `partition_point`
+- `copy_if`: copies all elements that satisfy a predicate into another range.
+- `copy_n`: copies n elements from a range into another range.
+- `uninitialized_copy_n`: Similar to `uninitialized_copy`, except that it works for n elements.
+- `move`: moves elements from one range into another.
+- `move_backward`: moves elements from one range into another, reversing the order of the move.
+- `is_partitioned`: returns true if all of the elements in a range that satisfy a predicate are before all of those that do not, or the range is empty.
+- `partition_copy`: copies elements from a source range into two separate destination ranges based on whether the elements satisfy a predicate or not.
+- `partition_point`: returns an iterator to the first value that causes a predicate to be false. This uses binary search. Similar to `find_if_not`
+- `iota`: creates a range of sequentially increasing values, making use of the pre-increment operator (`++i`) to create the sequence.
+
+Sort-related algorithms (can use optional sorting comparison operator):
+- `partial_sort_copy`: copies all sorted elements from a source to a range. The number of elements copied is determined by the smaller of the sorted source range and the result range
+- `is_sorted`: returns true if the range is sorted
+- `is_sorted_until`: This returns an iterator to the last position for which the range is sorted
+- `is_heap`: returns true if the range is a heap, i.e. the first element is the largest
+- `is_heap_until`: returns an iterator to the last position for which the range is a heap
+- `min`: Finds the smallest value in the parameter list
+- `max`: Finds the largest value in the parameter list
+- `minmax`: This returns a pair of the smallest and largest elements
+- `minmax_element`: This returns two iterators, one pointing to the smallest element in the range and the other pointing to the largest element in the range
+
+# Reference
+
+- GotW (Geek of the Week): [Archive](http://www.gotw.ca/gotw/), and
+  from [Sutter's mill](https://herbsutter.com/gotw/) 
+- [Modern C++ features](https://arne-mertz.de/category/cpp/modern-cpp) blog posts
+- [ISO C++11 Overview](https://isocpp.org/wiki/faq/cpp11)
+- API-style reference: [cppreference](http://en.cppreference.com/w/cpp),
+  [cplusplus.com](http://www.cplusplus.com/reference/)
+
+-----
