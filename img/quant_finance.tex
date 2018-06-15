@@ -1,0 +1,677 @@
+\documentclass[9pt,twocolumn]{extarticle}
+%\documentclass{IEEEtran}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[margin=15mm]{geometry}
+\usepackage{unicode-math} % https://tex.stackexchange.com/questions/96024/how-to-use-system-font-for-equation-in-xelatex
+%\setmainfont[AutoFakeSlant,AutoFakeBold]{TeX Gyre Pagella}
+\defaultfontfeatures{Mapping=tex-text,Scale=MatchLowercase} %,Ligatures={Common,Rare}}
+\setmainfont{TeX Gyre Pagella} % Adventor Bonum Cursor Heros Pagella Termes Schola Chorus
+%\setmathfont{Asana Math}
+\setmathfont{TeX Gyre Pagella Math} % unicode-math: Cambria Math, Latin Modern Math, TeX Gyre Pagella Math, Asana Math, Neo Euler, STIX, XITS Math
+
+%\usepackage{parskip}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+\setlength{\parsep}{0pt}
+%\setlength{\headsep}{0pt}
+%\setlength{\topskip}{0pt}
+%\setlength{\topmargin}{0pt}
+%\setlength{\topsep}{0pt}
+\setlength{\partopsep}{0pt}
+\setlength{\abovedisplayskip}{1pt}
+\setlength{\belowdisplayskip}{1pt}
+\setlength{\abovedisplayshortskip}{0pt}
+\setlength{\belowdisplayshortskip}{0pt}
+\usepackage[compact]{titlesec}
+\titlespacing{\section}{0pt}{*1}{*0}
+\titlespacing{\subsection}{0pt}{*1}{*0}
+\titlespacing{\subsubsection}{0pt}{*1}{*0}
+
+\usepackage{pgfplots}
+\pgfplotsset{
+    compat=1.14,
+    axis lines=center,
+    scale only axis=true,
+    every axis y label/.style={
+        at={(ticklabel* cs:1)}, anchor=south, font=\tiny
+    },
+    every axis x label/.style={
+        at={(ticklabel* cs:1)}, anchor=west, font=\tiny
+    },
+    every axis title/.append style={
+        at={(0,1)},
+        anchor=north west,
+        font=\footnotesize,
+        xshift=3pt, yshift=0pt
+    },
+    every tick label/.append style={
+        font=\tiny
+    },
+    every axis legend/.append style={
+        font=\tiny,
+        fill=none,
+        draw=none
+    },
+    xtick distance=1,
+    restrict y to domain=-100:100,
+    unbounded coords=jump,
+}
+\tikzset{>=latex}
+\DeclareMathOperator{\E}{E}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+
+\usepackage{enumitem}
+\setlist{nosep} % or \setlist{noitemsep} to leave space around whole list
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[R]{\thepage}
+
+\usepackage{marginnote}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\section{Bond \& Time Value of Money}
+
+Compound interest, and continuous compounding:
+\begin{align*}
+FV &= PV\left(1+\frac{r}{n}\right)^{nt}  &  PV &= FV\left(1+\frac{r}{n}\right)^{-nt} \\
+P_t &= P_0 e^{rt}                        &  P_o &= P_t e^{-rt}
+\end{align*}
+
+Cash flow, with interest rate $r_i$ at period $i$:
+$$ PV = \sum_{i=1}^n \frac{CF_i}{(1+r_i)^i} $$
+
+Excel calculates for constant $CF$ and $r$ with \texttt{=PV(r,n,CF)}.
+
+\emph{Perpetual bond}: Fixed payment $CF$ each period forever, and assumed $r$ constant, $n\to\infty$:
+$$ PV = \sum_{i=1}^{\infty} \frac{CF}{(1+r)^i} = \frac{CF/(1+r)}{1-\frac{1}{1+r}} = \frac{CF}{r} $$
+Rate $r$ in perpetual bond is the hurdle rate of a corp such that it is the min
+IRR required for any investment.
+
+\emph{Gordon growth model}: payment grow at a constant rate $CF_i = CF_{i-1}(1+g)$. For finite term:
+$$ PV = \sum_{i=1}^n \frac{CF_0(1+g)^i}{(1+r_i)^i} = CF_0\sum_{i=1}^n \frac{(1+g)^n}{(1+r)^n} $$
+As $n\to\infty$, $ PV =  CF_0/(r-g) $
+
+\subsection*{Bond pricing}
+Bond with coupon $C$, constant discount rate $y$ and repaid \$1 after $n$ terms,
+$$ PV = \sum_{i=1}^n \frac{C}{(1+y)^i} + \frac{1}{(1+y)^n}
+      = \frac{C}{y} \left(1-\frac{1}{(1+y)^n}\right) + \frac{1}{(1+y)^n}.
+$$
+If PV is the price, $y$ here is the yield for the bond. Price sensitivity to the yield:
+\begin{gather*}
+\frac{\partial P}{\partial y}
+= \frac{\partial}{\partial y} \left(\sum_{i=1}^n \frac{C}{(1+y)^i} + \frac{Par}{(1+y)^n}\right)
+= \sum_{i=1}^n \frac{-iC}{(1+y)^{i+1}} + \frac{-nPar}{(1+y)^{n+1}} \\
+\frac{1}{P}\frac{\partial P}{\partial y}
+= -\frac{1}{1+y}\frac{1}{P}\left( \sum_{i=1}^n \frac{iC}{(1+y)^i} + \frac{nPar}{(1+y)^n} \right)
+\end{gather*}
+which we define the Macauley duration and modified duration as
+\begin{align*}
+D_{\textrm{Mac}} &= \frac{1}{P}\left( \sum_{i=1}^n \frac{iC}{(1+y)^i} + \frac{nPar}{(1+y)^n} \right) \\
+D_{\textrm{mod}} &= \frac{1}{1+y}D_{\textrm{Mac}}
+\end{align*}
+respectively. Then px sensitivity $\frac{1}{P}\frac{\partial P}{\partial y} = -D_{\textrm{mod}}$.
+Given $D_{\textrm{mod}}$, a bond at $P$ will see price change $\Delta P$ at yield change $\Delta y$
+by $\Delta P = -P\Delta y D_{\textrm{mod}}$. A zero-coupon bond will have $P = Par/(1+y)^n$ and
+$$ D_{\textrm{Mac}} = \frac{1}{P}\frac{nPar}{(1+y)^n} = \frac{1}{P} nP = n, $$
+which is most sensitive to $\Delta y$.
+Taylor expansion of price function
+$$ P(y+\Delta y) = P(y)
+				 + \frac{\partial P}{\partial y}\Delta y
+				 + \frac{1}{2}\frac{\partial^2 P}{\partial y^2}\Delta y^2
+$$
+where the second order term accounts for the convexity (as yield increases, $P$
+is less sensitive to $\Delta y$). Define dollar convexity
+$$ C = \frac{\partial^2 P}{\partial y^2}
+     = \sum_{i=1}^n \frac{i(i+1)C}{(1+y)^{i+2}} + \frac{n(n+1)Par}{(1+y)^{n+2}}, $$
+then price change is
+$$ \Delta P = -P\Delta y D_{\textrm{mod}} + \frac{1}{2}C\Delta y^2 + o(y^3). $$
+
+Numerical approximation of duration and convexity:
+\begin{align*}
+D_{\textrm{mod}} &= - \frac{P(y+\Delta y) - P(y - \Delta y)}{2P\Delta y} \\
+C &= \frac{P(y+\Delta y) - 2P(y) + P(y-\Delta y)}{\Delta y^2}
+\end{align*}
+Weakness of duration: It only measure interest rate risk, not yield curve risk
+(i.e., if yield curve changes shape, not only shifted).
+
+\section{Probability \& Statistics}
+Correlation between two RVs $X$ and $Y$:
+$$ r_{X,Y} = \frac{\sum_{i=1}^n (X-\bar{X})(Y-\bar{Y})}{(n-1)\sigma_X\sigma_Y} \in [-1, 1]$$
+which $\rho_{X,Y}=r_{X,Y}^2\in[0,1]$ is the \emph{coefficient of determination}.
+
+Sum of RVs: Let $Z = w_1X+w_2Y$, and $\Cov(X,Y) = \rho_{X,Y}\sigma_X\sigma_Y$ be the covariance,
+\begin{align*}
+\E(Z) &= w_1\bar{X} + w_2\bar{Y} \\
+\Var(Z) &= w_1^2 \sigma_X^2 + w_2^2 \sigma_Y^2 + 2w_1w_2 \Cov(X,Y)
+\end{align*}
+
+Lognormal distribution: Common to model stock price
+
+Wiener process: $W_t+u - W_t \sim N(0,u)$, i.e., standard deviation scales with sq root of time
+
+\subsection*{Regression}
+
+Linear regression: Find line $y=a+bx$ that is best linear unbiased estimator
+(BLUE) that relates $x_i$ to $y_i$. Error of regresion: SSR (sum of sq error
+due to regression), SSE (sum of sq errors), SST (sum of sq total error, equiv to
+sample variance times sample size):
+\begin{align*}
+SSR &= \sum_i (y(x_i) - \bar{y})^2 \quad \textrm{with }\bar{y} = \frac{1}{n}\sum_i y_i \\
+SST &= \sum_i (y_i - \bar{y})^2 \\
+SSE &= SST - SSR \\
+R^2 &= SSR/SST \in [0,1]
+\end{align*}
+$R^2$ measures the goodness of fit, i.e., percentage of variation of the data explained by the
+regression equation.
+
+Test for \emph{significance} of regression coefficients $a$ and $b$: by
+$t$-statistics. Simple linear regression on $n$ samples, the degree of freedom
+is $n-2$ for two coefficients are derived from them. With desired level of
+significance $\alpha$, a corresponding $t$ value ($t_{\alpha}$) is set. We test
+if $|t'| > t_{\alpha}$ to determine the regression coefficient is significant,
+i.e., the data is not random. Which (usually $\tilde{a}=0$ as null hypothesis)
+\begin{align*}
+t' &= \left|\frac{r_{X,Y}\sqrt{n-2}}{\sqrt{1-r_{X,Y}^2}}\right| & & \textrm{for sig of correlation coeff $r_{X,Y}$} \\
+t' &= \left|\frac{a-\tilde{a}}{s_a}\right| & & \textrm{for sig of regression coeff $a$ (or similarly $b$)}
+\end{align*}
+
+\subsection*{Time series}
+
+Regression on time series: $AR(n)$, auto-regression of lag $n$ periods. For
+$AR(1)$, the linear model is $Y_t = a + bY_{t-1}$, i.e. value at $t$ depends
+only on value at $t-1$.
+
+Random walk: $AR(1)$ model of $Y_t = a + b Y_{t-1} + \epsilon$ where error term
+$epsilon \sim N(0,\sigma^2)$ is independent of any $Y_{\tau}$. Here $b$ is the
+\emph{drift} term,
+\begin{itemize}
+\item if $b\in[0,1)$, the series is \emph{mean-reversion} (pull $Y_t$ back to
+the mean). Mean of $Y_t$ is the solution to $\mu = a + b \mu$ or $\mu = a/(1+b)$
+\item if $b\in(-1,0]$, the series is oscillating, with the same mean as above
+\item if $|b|=1$, the series is a Weiner process
+\item if $|b|>1$, the series is explosive
+\end{itemize}
+
+\section{Derivatives}
+
+\subsection*{Forward contract}
+
+Risk-free rate $r$, spot price $S_t$, price of forward contract in no-arbitrage
+argument:
+$$ F_{t,T} = S_t e^{r(T-t)} $$
+Forward price should equal to future value of spot price. The price of forward
+contract can be extended to include the cost of carry $s$, i.e., all storage,
+insurance, etc.: $F_{t,T} = (S_t + s)e^{r(T-t)}$.
+
+Forward contract: No up-front cost, settled at maturity, but no clearing house
+to regulate or monitor, with exposure to counterparty credit risk.
+
+\subsection*{Future contract}
+
+Standardized contract, with clearing house. Counterparties deposit an initial
+margin, with position marked to market every day and investors shall keep
+balance above the maintenance margin.
+
+Spot-future parity (no-arbitrage argument for pricing):
+$$ F_{t,T} = (S_t + s) e^{r(T-t)} $$
+extension to account for discrete dividents $\delta_i$ paid at times $t_i$:
+$$ F_{t,T} = (S_t + s) e^{r(T-t)} - \sum_{i=1}^n \delta_i e^{r(T-t_i)} $$
+or with continuous dividend $\delta$:
+$$ F_{t,T} = (S_t + s) e^{(r-\delta)(T-t)} $$
+
+Example: interest rate parity. Currency exchange rate $E_t$ at spot and forward
+rate $F_{t,T}$ at $T$. Domestic interest rate $r_D$ and foreign interest
+rate $r_F$. No arbitrage argument says that if one country's interest rate is
+higher than the other, it is balanced by the exchange rate. Then forward rate
+is $$F_{t,T} = E_t e^{(r_D - r_F) (T-t)}.$$
+
+Example: implied interest rate. Given future $F_{t,T}$ and spot $S_t$ are known,
+we can invert for the interest rate $$r = \frac{1}{T-t} \ln\left(\frac{F_{t,T}}{S_t+s}\right).$$
+
+\subsection*{Options}
+
+Options are traded for hedging, for speculation, and by arbitrageurs.
+
+Put-call parity: Hedge a stock by long a put option and short a call
+option with prices $S$, $p$, $c$ respectively, both options with strike price $K$ and
+expiry $t$. Stock and put option are financed by borrowed money $Ke^{-rt}$ at
+rate $r$ and the sale of call option:
+$$ S + p - c = Ke^{-rt} $$
+\marginnote{pic at p.100}
+Put-call parity can be solved to create synthetic position:
+\begin{itemize}
+\item put position = borrowing money, long call and short stock\\
+    $p=Ke^{-rt} + c - S$
+\item short on stock = lending money, long put and short call\\ $-S = p - c - Ke^{-rt}$
+\item long on stock = borrow money, short put and long call\\ $S = c - p + Ke^{-rt}$
+\end{itemize}
+Combining options:
+\begin{itemize}
+\item Naked call: selling call without owning the asset, payoff to the writer
+      is $c-\max(S-K,0)$
+\item Naked put: similarly, payoff to the writer is $p-\max(K-S,0)$
+\item Straddle: buy both put and a call with same $K$ and expiry, payoff
+	  function: $\max(K-S,0) + \max(S-K,0) - c - p$, will lose money (part of
+	  premium) if asset price close to $K$ at expiry
+\item Naked straddle: sell both put and call with same $K$ and expiry, payoff
+      is reverse of straddle
+\item Calendar spread: buy call at strike $K$ with expiry $t_1$ and sell call
+      at $K$ with expirt $t_2$, use the proceed from sales to finance purchase
+\item Bull spread: Long a call with low strike $K_1$ and short a call with
+	  higher strike $K_2$ at the same expiry, use the proceed from sale to
+	  finance purchase and produce a profit if stock price rises.
+\end{itemize}
+Nick Leeson \& Barings Bank: Naked straddle on Nikkei 225 at end of 1994.
+
+\subsection*{Option Valuation}
+Wiener process for variable $X_t$: $X_t = \mu t + \sigma B_t$ with $\mu$ and
+$\sigma^2$ the drift rate and variance rate respectively, $B_t \sim N(0,t)$.
+
+Ito's lemma: for $f(t,X_t)$, which $dX_t = \mu_t dt + \sigma_t dB_t$:
+\begin{align*}
+df &= \frac{\partial f}{\partial t} dt + \frac{\partial f}{\partial x} dx + \frac{1}{2} \frac{\partial^2 f}{\partial x^2}) dx^2 + O(dt^2) \\
+&= \left(\frac{\partial f}{\partial t} + \mu_t \frac{\partial f}{\partial x}+\frac{\sigma_t^2}{2}\frac{\partial^2 f}{\partial x^2}\right) dt + \sigma_t \frac{\partial f}{\partial x}dB_t.
+\end{align*}
+
+Asset price model: $dS/S = \mu dt + \sigma dB_t$ with $dB_t^2 \approx dt$,
+\begin{align*}
+dS &= \mu S dt + \sigma S dB_t \\
+dS^2 &= (\mu S dt + \sigma S dB_t)^2 \\
+     &= \mu^2 S^2 dt^2 + 2\mu \sigma S^2 dB_t dt + \sigma^2 S^2 dB_t^2 \\
+	 &\approx \sigma^2 S^2 dt
+\end{align*}
+Assume option price $V$ be a function of $S$ and $t$, using Ito's lemma,
+\begin{align*}
+dV
+&= \left(\mu S \frac{\partial V}{\partial S} + \frac{1}{2}\sigma^2 S^2 \frac{\partial^2 V}{\partial S^2} + \frac{\partial V}{\partial t}\right) dt + \sigma S \frac{\partial V}{\partial S} dB_t
+\end{align*}
+Construct a portfolio $\Pi$ with option $V$ and asset $S$ of quantity $-\Delta$,
+\begin{align*}
+\Pi &= V - \Delta S \\
+d\Pi &= dV - \Delta dS = dV - \Delta(\mu S dt + \sigma S dB_t)\\
+&= \left(\mu S \frac{\partial V}{\partial S} + \frac{1}{2}\sigma^2 S^2 \frac{\partial^2 V}{\partial S^2} + \frac{\partial V}{\partial t} - \Delta\mu S\right) dt + \sigma S \left(\frac{\partial V}{\partial S} - \Delta\right) dB_t
+\end{align*}
+We set $$\Delta = \frac{\partial V}{\partial S}$$ (``delta'', change in value
+of option for a change in value of the underlying asset) and $d\Pi = \Pi r dt$
+to make the portfolio deterministic, and in a no-arbitrage argument with
+risk-free rate $r$, then we have the Black-Scholes model in p.d.e.
+\begin{align*}
+d\Pi
+= \left(\mu S \frac{\partial V}{\partial S} + \frac{1}{2}\sigma^2 S^2 \frac{\partial^2 V}{\partial S^2} + \frac{\partial V}{\partial t} - \Delta\mu S\right) dt
+&= \left(V - \frac{\partial V}{\partial S} S\right)rdt \\
+\therefore\quad 
+\mu S \frac{\partial V}{\partial S} + \frac{1}{2}\sigma^2 S^2 \frac{\partial^2 V}{\partial S^2} + \frac{\partial V}{\partial t} - \frac{\partial V}{\partial S}\mu S
+&= Vr - \frac{\partial V}{\partial S} Sr \\
+\frac{\partial V}{\partial t} + \frac{1}{2}\sigma^2 S^2 \frac{\partial^2 V}{\partial S^2} + rS \frac{\partial V}{\partial S} - rV &= 0
+\end{align*}
+The model assumes:
+\begin{itemize}
+\item European option
+\item investor can borrow or lend at rate $r$
+\item asset volatility remains constant
+\item no dividends paid, no transaction costs, short sales allowed
+\end{itemize}
+If dividends $r_D$ are paid in the asset, replace $rS$ part with $(r-r_D)S$.
+
+\subsection*{Solving Black-Scholes equation}
+
+European call/put at expiry: $V = \max(S-K,0)$, or value of put $V=\max(K-S, 0)$.
+Then the value of a call/put is
+\begin{align*}
+c(S,t) &= SN(d_1) - Ke^{-rt}N(d_2) \\
+p(S,t) &= Ke^{-rt}N(-d_2) - SN(-d_1) \\
+\text{where }\qquad
+N(d) &= \frac{1}{\sqrt{2\pi}}\int_{-\infty}^d e^{-s^2/2} ds \\
+d_1 &= \frac{\log(S/K)+(r+\sigma^2/2)t}{\sigma\sqrt{t}} \\
+d_2 &= \frac{\log(S/K)+(r-\sigma^2/2)t}{\sigma\sqrt{t}}
+\end{align*}
+Solving $\sigma^2$ from option price = Implied volatility.
+
+Proof: With $\frac{\partial d_1}{\partial S}$ and $\frac{\partial d_2}{\partial
+S}$, fit $\frac{\partial c}{\partial t}$, $\frac{\partial c}{\partial S}$, and
+$\frac{\partial^2 c}{\partial S^2}$ into the Black-Scholes p.d.e. with boundary
+condition at $\lim_{S\to 0} c(S,t) = 0$ and
+$\lim_{S\to\infty} c(S,t) = S - Ke^{-rt}$. Then derive $p(S,t)$ from $c(S,t)$
+from put-call parity. $\square$
+
+Delta of call and put are respectively, $\frac{\partial c}{\partial S} = N(d_1)$
+and $\frac{\partial p}{\partial S} = N(d_1) - 1$
+
+Black-Scholes model is good at pricing options at the money but less so for out
+of the money and deep in the money options.
+
+Risk-neutrality approach (?): Assume asset price modeled with drift at interest rate $r$,
+$dS_t = rS_t dt + \sigma S_t dB_t$. Then the density function of future values of $S_t$
+$$ \Pr[S_t = s] = \frac{1}{\sigma s \sqrt{2\pi t}} \exp\left(-\frac{\left(\log(\frac{s}{S_0}) - (r-\frac{1}{2}\sigma^2)t\right)^2}{2\sigma^2t}\right)$$
+With payoff function $V(S_T,T)$ at time $T$, the expected payoff is
+$$ E[V(S_T,T)] = \frac{1}{\sigma \sqrt{2\pi T}} \int_0^{\infty} \frac{V(s)}{s} \exp\left(-\frac{\left(\log(\frac{s}{S_0}) - (r-\frac{1}{2}\sigma^2)T\right)^2}{2\sigma^2T}\right) ds $$
+discounting to present value:
+$$ E[V(S_0,0)] = \frac{e^{-rT}}{\sigma \sqrt{2\pi T}} \int_0^{\infty} \frac{V(s)}{s} \exp\left(-\frac{\left(\log(\frac{s}{S_0}) - (r-\frac{1}{2}\sigma^2)T\right)^2}{2\sigma^2T}\right) ds $$
+Which satisfies the p.d.e.
+
+\subsection*{Binomial tree method}
+
+For handling path-dependent options and situations that Black-Scholes equation
+cannot handle, e.g., interest rate options. Consider asset price $S$ at discrete
+time period $\Delta t$, the probability of upward ($S\to Su$) and downward
+($S\to Sd$) move are $\pi_u$ and $\pi_d$ respectively, $\pi_u+\pi_d = 1$.  To
+make the model fit $dS=\mu Sdt + \sigma S dB_t$,
+\begin{align*}
+    u &= e^{\sigma\sqrt{\Delta t}} &
+    d &= \frac{1}{u} &
+\pi_u &= \frac{e^{r\Delta t} - d}{u-d} &
+\pi_d &= 1=\pi_u = \frac{u - e^{r\Delta t}}{u-d}
+\end{align*}
+Algorithm:
+\begin{enumerate}
+\item set up a tree with $S_0$ at root, each time step branch into upward and downward price until expiry
+\item at leaf nodes, derive option value based on the price
+\item trace backward in time the expected option value, using the upward and downward probabilities
+\item expected option value at root = option price
+\end{enumerate}
+
+Trinomial method is similar, with possibility of sideway move at probability $\pi_m$:
+\begin{align*}
+  \E[dS/S] &= \pi_u u + \pi_m (0) + \pi_d d = \mu \Delta t \\
+\Var[dS/S] &= \pi_u u^2 + \pi_m (0) + \pi_d d^2 = \mu \Delta t^2 + \sigma^2 \Delta z^2 \approx \sigma^2 \Delta t \\
+        1 &= \pi_u + \pi_m + \pi_d
+\end{align*}
+which gives the following:
+\begin{align*}
+    u &= e^{\sigma\sqrt{2 \Delta t}} &
+    d &= \frac{1}{u} = e^{-\sigma\sqrt{2\Delta t}} \\
+\pi_u &= \left(\frac{e^{r\Delta t/2} - e^{-\sigma\sqrt{\Delta t/2}}}
+                    {e^{\sigma\sqrt{\Delta t/2}} - e^{-\sigma\sqrt{\Delta t/2}}}\right)^2 &
+\pi_d &= \left(\frac{e^{\sigma\sqrt{\Delta t/2}} - e^{r\Delta t/2}}
+                    {e^{\sigma\sqrt{\Delta t/2}} - e^{-\sigma\sqrt{\Delta t/2}}}\right)^2 \\
+\pi_m &= 1-\pi_u-\pi_d
+\end{align*}
+
+\subsection*{Finite difference method}
+
+Solve Black-Scholes p.d.e. by discretization: option value $V(S,t)$, solved on
+grid points of $(S,t)$ for $S\in[S_{\min},S_{\max}]$ and $t\in[0,T]$ with
+increments $\Delta S$ and $\Delta t$ respectively. We substitute with finite
+difference form of partial derivatives:
+\begin{align*}
+\frac{\partial V}{\partial t} & \approx \frac{V(S,t+\Delta t)-V(S,t)}{\Delta t} \\
+\frac{\partial V}{\partial S} & \approx \frac{V(S+\Delta S,t)-V(S-\Delta S,t)}{2\Delta S} \\
+\frac{\partial^2 V}{\partial S^2} & \approx \frac{V(S+\Delta S,t) - 2V(S,t) + V(S-\Delta S,t)}{\Delta S^2}
+\end{align*}
+into the p.d.e. and get
+\begin{align*}
+\frac{\partial V}{\partial t} +
+\frac{1}{2}\sigma^2S^2\frac{\partial^2V}{\partial S^2}+
+rS\frac{\partial V}{\partial S}-
+rV &= 0 \\
+\frac{V(S,t+\Delta t)-V(S,t)}{\Delta t} + 
+\frac{1}{2}\sigma^2S^2\frac{V(S+\Delta S,t)-2V(S,t)+V(S-\Delta S,t)}{\Delta S^2} & \\ + 
+rS\frac{V(S+\Delta S,t)-V(S-\Delta S,t)}{2\Delta S}-rV(S,t) &= 0 \\
+\end{align*}
+Solve for $V(S,t+\Delta t)$ gives a system of linear equations of $V(\cdot,t)$:
+\begin{align*}
+V(S,t+\Delta t) &= a V(S-\Delta S,t) + b V(S,t) + c V(S+\Delta S,t) \\
+\textrm{where}\qquad
+a &= -\frac{1}{2}\sigma^2\Delta t\frac{S^2}{\Delta S^2} + \frac{r\Delta t S}{2\Delta S} \\
+b &= 1+\frac{\sigma^2\Delta t S^2}{\Delta S^2} + r\Delta t \\
+c &= -\frac{1}{2}\sigma^2\Delta t\frac{S^2}{\Delta S^2} - \frac{r\Delta t S}{2\Delta S}
+\end{align*}
+Boundary conditions:
+\begin{itemize}
+\item for a call option, $S << K$, $V(S,t)=0$ and $V(S,t)=S$ as $S\to\infty$
+\item for a put option, $S >> K$, $V(S,t)=0$ and $V(S,t)=K$ as $S\to 0$
+\item at expiry, $V(S,t)=\max(S-K,0)$ for a call and $V(S,t)=\max(K-S,0)$ for a put
+\end{itemize}
+
+Solution by matrix: Compute $V(S,t)$ on a grid such that $S=S_{\min} + i\Delta S$
+and $t=t_0 + j\Delta t$ with $i=0,\cdots,M$ and $j=0,\cdots,N$. Then the above
+equation will become
+$$ a_iV_{i-1,j-1} + b_iV_{i,j-1} + cV_{i+1,j-1} = V_{i,j} $$
+And $V_{\cdot,j-1}$ is related to $V_{\cdot,j}$ by a tridiagonal matrix (which
+can be LU-factorized). We can derive $V(S,t_0)$ backward from $V(S,T)$ one step
+at a time by matrix multiplication.
+
+Solution by explicit derivation: The p.d.e. can be alternatively written as
+\begin{align*}
+\frac{V_{i,j+1}-V_{i,j}}{\Delta t} + 
+    \frac{1}{2}\sigma^2S^2\frac{V_{i+1,j+1}-2V_{i,j+1}+V_{i-1,j+1}}{\Delta S^2} & \\ + 
+    rS\frac{V_{i+1,j+1}-V_{i-1,j+1}}{2\Delta S}-rV_{i,j} &= 0
+\end{align*}
+by evaluating $\frac{\partial V}{\partial S}$ and $\frac{\partial^2V}{\partial S^2}$
+at $t = t_0+(j+1)\Delta t$. Solving for $V_{i,j}$ term
+\begin{align*}
+V_{i,j} &= d_i V_{i-1,j+1} + e_i V_{i,j+1} + f_i V_{i-1,j+1} \\
+\textrm{where}\qquad
+d_i &= \frac{1}{1+r\Delta t}\left(
+    -\frac{1}{2} r\Delta t\frac{S_{\min} + i\Delta S}{\Delta S}
+    +\frac{1}{2} \Delta t \sigma^2 \left(\frac{S_{\min} + i\Delta S}{\Delta S} \right)^2
+\right) \\
+e_i &= \frac{1}{1+r\Delta t}\left(
+    1-\Delta t\sigma^2 \left(\frac{S_{\min} + i\Delta S}{\Delta S} \right)^2
+\right) \\
+f_i &= \frac{1}{1+r\Delta t}\left(
+    \frac{1}{2} r\Delta t\frac{S_{\min} + i\Delta S}{\Delta S}
+    +\frac{1}{2} \Delta t \sigma^2 \left(\frac{S_{\min} + i\Delta S}{\Delta S} \right)^2
+\right)
+\end{align*}
+
+\subsection*{Monte Carlo analysis}
+Algorithm:
+\begin{enumerate}
+\item Generate random walks (usually lognormal) from $t$ to expiry with increment $\Delta t$
+\item At the end of each path, evaluate the payoff at expiry
+\item Compuate average of all such payoff, and discount to PV by $e^{-rt}$
+\end{enumerate}
+
+Model stock price with lognormal distribution:
+\begin{align*}
+    df &= \sigma S \frac{\partial f}{\partial S} dB_t + \left(\mu S
+    \frac{\partial f}{\partial S} + \frac{1}{2}\sigma^2S^2\frac{\partial^2
+f}{\partial S^2}\right)dt \\
+\intertext{with $f=\log S$:}
+d(\log S) &= \sigma S \frac{1}{S} dB_t + \left(\mu S
+\frac{1}{S} + \frac{1}{2}\sigma^2S^2(-\frac{1}{S^2})
+\right)dt \\
+&= \sigma dB_t + \left(\mu - \frac{1}{2}\sigma^2 \right)dt \\
+\log S_T - \log S_0 &= \int_{t=0}^{t=T} \sigma dB_t + \int_0^T (\mu - \frac{1}{2}\sigma^2)dt \\
+S_T &= S_0 \exp\left((\mu-\frac{1}{2}\sigma^2)T + \int_{t=0}^{t=T}\sigma dB_t
+\right) \\
+\implies\qquad \Delta S &= \exp\left((\mu-\frac{1}{2}\sigma^2)\Delta t + \sigma\sqrt{\Delta t} z \right)
+\end{align*}
+with $z\sim N(0,1)$. Random walk is generated from steps $Delta S$ of random size.
+
+\subsection*{Option greeks}
+\begin{align*}
+\Delta &= \frac{\partial V}{\partial S} &
+\Gamma &= \frac{\partial^2 V}{\partial S^2} &
+\theta &= \frac{\partial V}{\partial t} &
+v &= \frac{\partial V}{\partial\sigma} &
+\rho &= \frac{\partial V}{\partial r}
+\end{align*}
+Delta $\Delta$ always have positive slope, with call $\Delta\ge0$ and put
+$\Delta\le0$. Call's delta is 0 on extremely low stock price and 1 on extremely
+high price, for option is worthless if deep out of money and
+$\displaystyle\lim_{S\to\infty} V=S$ if deep into the money.
+
+Gamma $\Gamma$ is the rate of change of delta, always positive. Gamma for call
+and put are the same.
+
+Theta $\theta$ is most sensitive when the option is close to the money, with
+sensitivity decreasing as the option approaches expiry.
+
+Vega $v$ is the option sensitivity to change in volatility. Vega for call and
+put are the same.
+
+Rho $\rho$ is the sensitivity of option price to interest rate.
+
+\section{Fixed income}
+Bond equivalent yield is computed on the basis of a 365-day year.
+
+Probability of default estimation: A corporate bond with yield $y$ has
+probability of default $p$, which assumed default will lost all value, if a
+treasury bond has yield $y'$ and $(1-p)(1+y) = (1+y')$
+
+Par yield: Coupon rate, the yield if priced at par.
+
+Forward yield: Yield of a loan expected for future time.
+
+Spot yield: Yield of the market today. Always between par and forward.
+
+For an upward sloping yield curve (i.e., yield goes up for par yield and spot
+yield for longer time or forward yield further in the future), forward $>$ par.
+
+For a downward sloping yield curve, forward $<$ par.
+
+PCA finds that 90\% of price change of bonds was due to changes in interest
+levels; 8.5\% due to changing yield curve slope; 1.5\% due to change of
+curvature of the yield curve.
+
+Binomial tree method for valuation: Black-Derman-Toy model, Ho-Lee model, Heath-Jarrow-Morton model
+
+Morgage-backed securities: Common to assume an annualized constant prepayment
+rate (CPR) and find the equivalent single month mortality rate (SMM):\[
+SMM = 1 - (1-CPR)^{1/12}
+\]
+
+\section{Equity markets}
+Systematic risks: All stocks are subject to
+
+Unsystematic risk: Company-specific portion of the risk
+
+Price of stock calculated using perpetuity model: $P = \frac{DIV}{r_{CE}}$
+where $DIV$ is the dividend, expected to remain stable over time, $r_{CE}$ is the
+(unobservable) cost of equity capital (e.g. hurdle rate for new projects). If
+dividend is expected to grow at constant rate $g$, we have the Gordon growth
+model\[
+    P = \frac{DIV_0(1+g)}{r_{CE}-g}
+\]
+
+Common multiples for analysis:
+\begin{itemize}
+\item price/earnig ratio
+\item dividend/price (aka dividend yield): high dividend yield if price is
+    undervalued
+\item price/sales
+\item price/book value
+\item price/cashflow
+\item return on asset
+\end{itemize}
+
+Capital asset pricing model (CAPM): Compare return of stock $R_s$ to return of
+market $R_m$ with assumed risk-free return $R_f$ \[
+    R_s - R_f = \beta (R_m - R_f)
+\]
+where $\beta$ is the measure of correlation between the security and the market.
+The return above $R_f$ is the excess return.
+
+Dupont analysis: Calculate the return on equity as
+\begin{align*}
+ROE &= \frac{\textrm{sales}}{\textrm{assets}}\frac{\textrm{net
+    income}}{\textrm{sales}}\frac{\textrm{assets}}{\textrm{equity}} \\
+&= (\textrm{asset turnover})(\textrm{profit margin})(\textrm{leverage ratio})
+\end{align*}
+
+Markowitz efficient frontier: Return vs Risk cluster plot will show a boundary
+of max return on risk. The boundary is concave, monotonically increasing on
+increasing risk.
+
+\subsection*{Valuting convertible bonds}
+Convertible bond has a term sheet to specify a conversion price and conversion
+ratio. Most convertible bonds are callable, allowing the issuer to force
+conversion if so desired.
+
+\begin{enumerate}
+\item Determine the min value of the convertible bond (comparing the bond as a
+    straight bond without conversion feature)
+\item Calculate the investment premium
+\item Calculate the premium payback period
+\item Calulate value of the embedded convertible bond option
+\end{enumerate}
+Black-Scholes equation can be used to value option on the underlying stock but
+not be used to value the embedded call. Bonds do not have constant volatilities
+as BS assumed, but descreasing volatilities as bonds approach maturity, for
+holder receives a known par at maturity. Also bonds would never be worth more
+than its par value plus any accrued coupons, thus bonds does not fit a lognormal
+distribution which price of zero to infinity are possible.
+
+Example:
+\begin{enumerate}
+\item 8-yr 7\% coupon convertible bond, compare to 8\% yield in market, its
+par should be $\sum_{k=1}^{16} \frac{7}{2}(1.04)^{-k} + 100(1.04)^{-16} = 94.17$.
+The \$100 bond are convertible to 5.263 shares of stock when it hit \$19, which
+the conversion ratio is $k=100/19=5.263$. If the current stock price is \$15.5,
+the conversion value of the bond is $15.5k=81.576$. Taking the max of the two,
+the straight bond should worth \$94.17.
+\item If the market price for this convertible bond is \$120, the premium is
+$\frac{120}{94.17}-1 = 27\%$ over the market price of the bond. Alternatively,
+the expected price for stock conversion is $\frac{120}{5.263}=\$22.8$ per
+share, which is $\frac{22.8-15.5}{15.5}=47\%$ premium over the market price of
+the shares.
+\item A fair value is which the coupon/dividend interest
+should offset the premium we pay to hold the bond. Here the shares premium over
+the coupon is $\frac{120-5.263(15.5)}{7} = 5.48$ years. Normally we expect this
+to be 3--5 years.
+\item Value of the embedded call: price of convertible bond = price of straight
+bond + call option. Say, $T=8$, $S=15.5$, $K=19$, $r_f=5\%$, $\sigma=35\%$,
+using Black-Scholes, the call option per share worth $6.835$. Thus the price of
+the convertible bond should be $94.17 + 6.835(5.263) = 130.1$. If the issuer
+can also call the bond at any time after 3 years, we should subtract the value
+of issuer's call option.
+\end{enumerate}
+
+\section{Risk management}
+Value at Risk (VaR): the economic loss that can be expected at a given
+confidence level under adverse market condtions, calculated using simulation or
+distribution
+
+To measure VaR, first evaluate all possible risk exposures and choose a
+confidence level (e.g. 95\% or 99\%), and a time horizon. Then the "worst case"
+value is\[
+VaR = V_0 \alpha \sigma \sqrt{t}
+\]
+where $\alpha$ is the inv of std normal distribution at the selected confidence
+interval, $\sigma$ is the asset's std dev, $t$ is the time scale factor between
+$\sigma$ and VaR (equity takes $t=250$ to convert daily volitility to annual)
+and $V_0$ to the spot price.
+
+\appendix
+
+\section{Formulae}
+Taylor series
+$$ f(x) = \sum_{n=0}^\infty \frac{f^{(n)}(k)}{n!} (x-k)^n = f(k) + f'(k)(x-k) + \frac{f''(k)}{2!}(x-k)^2 + \cdots $$
+Multivariate Taylor series:
+\begin{align*}
+df(x,y) &= f(x+dx,y+dy) - f(x,y) \\
+        &=	\frac{\partial f}{\partial x}dx +
+		 	\frac{\partial f}{\partial y}dy +
+			\frac{1}{2!} \left(
+				\frac{\partial^2 f}{\partial x^2}dx^2 +
+				2\frac{\partial^2 f}{\partial x\partial y}dxdy +
+				\frac{\partial^2 f}{\partial y^2}dy^2
+			\right) + \cdots
+\end{align*}
+Variance scaling: $Var(\alpha X) = \alpha^2 Var(X)$
+
+CLT: $\displaystyle Z=\frac{\bar{X}-\mu_X}{\sigma_X/\sqrt{n}}$ is normally distributed regardless the distro of $X$
+
+Lognormal PDF: $\displaystyle f(x) = \frac{1}{\sqrt{2\pi\sigma^2x^2}}\exp\left(-\frac{(\ln x-\mu)^2}{2\sigma^2}\right)$
+\end{document}
+
+Notes
+-----
+<http://banach.millersville.edu/~bob/book/BlackScholes/main.pdf>
+<http://www.math.cuhk.edu.hk/~rchan/teaching/math4210/chap08.pdf>
+<http://www.math.uaic.ro/~annalsmath/pdf-uri%20anale/F1(2010)/Mosneagu.pdf>
+<http://www.iam.fmph.uniba.sk/institute/stehlikova/fd14en/lectures/05_black_scholes_1.pdf>
+https://www.math.upenn.edu/~deturck/m425/m425-blackscholessol-16a.pdf
+http://www.math.unl.edu/~sdunbar1/MathematicalFinance/Lessons/BlackScholes/Solution/solution.pdf
+http://www.ntu.edu.sg/home/nprivault/MA5182/black-scholes-pde.pdf
+
