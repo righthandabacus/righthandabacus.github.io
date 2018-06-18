@@ -4,6 +4,9 @@ title: Book list by topic
 permalink: /booklist/
 ---
 
+# My reading list
+- [ ] QA278.2/Applied logistic regression 3e;Hosmer Lemeshow Sturdivant;Wiley-2013
+
 # Financial engineering
 <https://www.quantstart.com/articles/Quantitative-Finance-Reading-List>
 

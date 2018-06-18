@@ -10,7 +10,7 @@ bibtex:
   title: "Dancing Links"
   author: Donald E. Knuth
   year: 2000
-  booktitle: {Millenial Perspectives in Computer Science: Proceedings of the 1999 Oxford-Microsoft Symposium in Honour of Sir Tony Hoare}
+  booktitle: "Millenial Perspectives in Computer Science: Proceedings of the 1999 Oxford-Microsoft Symposium in Honour of Sir Tony Hoare"
   pages: 187--214
   eprint: arXiv:cs/0011047
 ---
