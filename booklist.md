@@ -211,6 +211,88 @@ Time Series Forecasting
 - QA280/Time series analysis. Forecasting and control 5e;Box Jenkins Reinsel Ljung;Wiley-2016 [recommended]
 - bookpile/Practical Time Series Forecasting. A Hands-On Guide 2e (9780997847932);Shmueli;AS-2011
 
+# AIML book list
+- Large-Scale Inference: Empirical Bayes Methods for Estimation, Testing, and Prediction (Institute of Mathematical Statistics Monographs) by Bradley Efron
+- Asymptotic Statistics (Cambridge Series in Statistical and Probabilistic Mathematics) by A. W. van der Vaart
+- Introductory Lectures on Convex Optimization: A Basic Course (Applied Optimization) by Y. Nesterov
+- Introduction to Nonparametric Estimation (Springer Series in Statistics) by Alexandre B. Tsybakov
+- Introductory Functional Analysis with Applications by Erwin Kreyszig
+- Elements of Information Theory 2nd Edition (Wiley Series in Telecommunications and Signal Processing) by Thomas M. Cover, Joy A. Thomas
+- Matrix Computations (Johns Hopkins Studies in Mathematical Sciences)(3rd Edition) by Gene H. Golub, Van Loan, Charles F.
+- Introduction to Linear Optimization (Athena Scientific Series in Optimization and Neural Computation, 6) by Dimitris Bertsimas, John N. Tsitsiklis
+- Convex Optimization, With Corrections 2008 by Stephen Boyd, Lieven Vandenberghe
+- Probability: Theory and Examples (Probability: Theory & Examples) by Richard Durrett
+- A User's Guide to Measure Theoretic Probability (Cambridge Series in Statistical and Probabilistic Mathematics) by David Pollard
+- Probability and Random Processes by Geoffrey R. Grimmett, David R. Stirzaker
+- Monte Carlo Statistical Methods (Springer Texts in Statistics) by Christian P. Robert, George Casella
+- Elements of Large-Sample Theory (Springer Texts in Statistics) by E.L. Lehmann
+- A Course in Large Sample Theory (Chapman & Hall/CRC Texts in Statistical Science) by Thomas S. Ferguson
+- Statistical Inference by George Casella, Roger L. Berger
+- Mathematical Statistics and Data Analysis by John A. Rice
+- All of Statistics: A Concise Course in Statistics by Larry Wasserman
+- Pattern Recognition and Machine Learning by Christopher M. Bishop
+- The Elements of Statistical Learning by T. Hastie et al <http://www-stat.stanford.edu/~tibs/ElemStatLearn/>
+- Information Theory, Inference, and Learning Algorithms, David McKay <http://www.inference.phy.cam.ac.uk/itprnn/book.html>
+- Introduction to Information Retrieval - Manning et al. <http://nlp.stanford.edu/IR-book/information-retrieval-book.html>
+- The Algorithm Design Manual, 2nd Edition - Steven Skiena <http://www.algorist.com/>
+
+- Casella, G. and Berger, R.L. (2001). "Statistical Inference" Duxbury Press.
+- Ferguson, T. (1996). "A Course in Large Sample Theory" Chapman & Hall/CRC.\\
+  For a slightly more advanced book that's quite clear on mathematical techniques, the following book is quite good:
+- Lehmann, E. (2004). "Elements of Large-Sample Theory" Springer.\\
+  You'll need to learn something about asymptotics at some point, and a good starting place is:
+- Gelman, A. et al. (2003). "Bayesian Data Analysis" Chapman & Hall/CRC.\\
+  Those are all frequentist books. You should also read something Bayesian:
+- Robert, C. and Casella, G. (2005). "Monte Carlo Statistical Methods" Springer.\\
+  and you should start to read about Bayesian computation:
+- Grimmett, G. and Stirzaker, D. (2001). "Probability and Random Processes" Oxford.\\
+  On the probability front, a good intermediate text is:
+- Pollard, D. (2001). "A User's Guide to Measure Theoretic Probability" Cambridge.\\
+  At a more advanced level, a very good text is the following:
+- The standard advanced textbook is Durrett, R. (2005). "Probability: Theory and Examples" Duxbury.
+- Bertsimas, D. and Tsitsiklis, J. (1997). "Introduction to Linear Optimization" Athena.\\
+  Machine learning research also reposes on optimization theory. A good starting book on linear optimization that will prepare you for convex optimization:
+- Boyd, S. and Vandenberghe, L. (2004). "Convex Optimization" Cambridge.
+- Golub, G., and Van Loan, C. (1996). "Matrix Computations" Johns Hopkins.\\
+  Getting a full understanding of algorithmic linear algebra is also important. At some point you should feel familiar with most of the material in
+- Cover, T. and Thomas, J. "Elements of Information Theory" Wiley.\\
+  It's good to know some information theory. The classic is:
+
+Proof Technique
+- Velleman's "How to Prove It"
+- Gries and Schneider's "A Logical Approach to Discrete Math"
+
+Math
+- Calculus (best "lite" book - Calculus by Strang (free download), best "heavy" books - (d) Calculus by Spivak, (e) Principles of Mathematical Analysis a.k.a "Baby Rudin")
+- Discrete Math (ALADM above + (g) a good book on Algorithms, Cormen will do - though working through it comprehensively is ... hard!
+- Linear Algebra (First work through Strang's book, then (i) Axler's)
+- Probability (see Bradford's very comprehensive recommendations) and
+- Statistics (I would reccomend Devore and Peck for the total beginner but it is a damn expensive book. So hit a library or get a bootlegged copy to see if it suits you before buying a copy, see brad's list for advanced stuff.)
+- Information Theory (MacKay's book is freely available online)
+
+Basic AI
+- AIMA 3d Edition (I prefer this to Mitchell)
+
+Machine Learning
+- "Pattern Recognition and Machine Learning" by Christopher Bishop,
+- Elements of Statistical Learning" (free download).
+- Neural Network Design by Hagan Demuth and Kneale,
+- Neural Networks, A Comprehensive Foundation (2nd edition) - By Haykin (there is a newer edition out but I don't know anything about that, this is the one I used)
+- Neural Networks for Pattern Recognition ( Bishop).
+
+At this point you are in good shape to read any papers in NN. My reccomendations - anything by Yann LeCun and Geoffrey Hinton. Both do amazing research.
+Reinforcement Learning
+- Reinforcement Learning - An Introduction by Barto and Sutton (follow up with "Recent Advances In reinforcement Learning" (PDF) which is an old paper but a GREAT introduction to HierarchicalReinforcement learning)
+- Neuro Dynamic Programming by Bertsekas
+
+Computer Vision
+- Introductory Techniques for 3-D Computer Vision, by Emanuele Trucco and Alessandro Verri.
+- An Invitation to 3-D Vision by Y. Ma, S. Soatto, J. Kosecka, S.S. Sastry. (warning TOUGH!!)
+
+Robotics.
+- Probabilistic Graphical Models: Principles and Techniques (Adaptive Computation and Machine Learning) - not about robotics per se but useful to understand the next book
+- Probabilistic Robotics (Intelligent Robotics and Autonomous Agents) by Thrun, Burgard and Fox
+
 # Math
 <https://mathblog.com/mathematics-books/>
 

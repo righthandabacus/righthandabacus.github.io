@@ -31,7 +31,7 @@ There are two papers of the same title:
 
 # Breiman (1961) paper
 
-The 1961 paper is more mathematically vigorous. It discussed the following model
+The 1961 paper is more mathematically rigourous. It discussed the following model
 of gambling:
 
 Let outcome $$X$$ be taken on a set $$I=\{1,\cdots,s\}$$ such that
