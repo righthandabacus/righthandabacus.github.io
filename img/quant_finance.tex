@@ -277,8 +277,10 @@ $\sigma^2$ the drift rate and variance rate respectively, $B_t \sim N(0,t)$.
 
 Ito's lemma: for $f(t,X_t)$, which $dX_t = \mu_t dt + \sigma_t dB_t$:
 \begin{align*}
-df &= \frac{\partial f}{\partial t} dt + \frac{\partial f}{\partial x} dx + \frac{1}{2} \frac{\partial^2 f}{\partial x^2}) dx^2 + O(dt^2) \\
-&= \left(\frac{\partial f}{\partial t} + \mu_t \frac{\partial f}{\partial x}+\frac{\sigma_t^2}{2}\frac{\partial^2 f}{\partial x^2}\right) dt + \sigma_t \frac{\partial f}{\partial x}dB_t.
+df &= \frac{\partial f}{\partial t} dt + \frac{\partial f}{\partial x} dx + \frac{1}{2} \frac{\partial^2 f}{\partial x^2} dx^2 + O(dt^2) \\
+   &= \frac{\partial f}{\partial t} dt + \frac{\partial f}{\partial x} (\mu_t dt + \sigma_t dB_t) + \frac{1}{2} \frac{\partial^2 f}{\partial x^2} (\mu_t dt + \sigma_t dB_t)^2 + O(dt^2) \\
+   &= \frac{\partial f}{\partial t} dt + \frac{\partial f}{\partial x} \mu_t dt + \frac{\partial f}{\partial x}\sigma_t dB_t + \frac{1}{2} \frac{\partial^2 f}{\partial x^2} \sigma_t^2 dt + O(dt^2) \\
+   &= \left(\frac{\partial f}{\partial t} + \mu_t \frac{\partial f}{\partial x}+\frac{\sigma_t^2}{2}\frac{\partial^2 f}{\partial x^2}\right) dt + \sigma_t \frac{\partial f}{\partial x}dB_t.
 \end{align*}
 
 Asset price model: $dS/S = \mu dt + \sigma dB_t$ with $dB_t^2 \approx dt$,
