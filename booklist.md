@@ -46,11 +46,11 @@ permalink: /booklist/
 
 # Machine learning and deep learning
 
+- Q327/Pattern recognition and machine learning;Bishop;Springer-2006 [recommended]
 - Q325.5/Deep learning;Goodfellow Bengio Courville;MIT-2016
 - Q325.5/Hands-on machine learning with Scikit-Learn and TensorFlow. Concepts, tools, and techniques to build intelligent systems 1e;Geron;OReilly-2017
 - Q325.5/Machine learning. A probabilistic perspective;Murphy;MIT-2012
 - Q325.75/The elements of statistical learning. Data mining, inference, and prediction 2e;Hastie Tibshirani Friedman;Springer-2009
-- Q327/Pattern recognition and machine learning;Bishop;Springer-2006
 - Q375/Probabilistic graphical models. Principles and applications;Sucar;Springer-2015
 - QA267/Bayesian reasoning and machine learning;Barber;Cambridge-2011
 - QA276/An introduction to statistical learning. With applications in R;James;Springer-2013
