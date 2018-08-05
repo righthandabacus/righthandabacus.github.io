@@ -198,16 +198,16 @@ u_{2n}
 \end{align}$$
 
 The last inequality is due to $$\sum_{j,k} a_{j,k}^2 \le \max_{j,k} a_{j,k}$$ if
-$$a_{j,k}\ge 0$$ and sum to 1 (due to it is a distribution). Using Stirling's formula here,
+$$a_{j,k}\ge 0$$ and sum to 1 (due to it is a distribution). Using Stirling's
+formula here, together with the result of $$d=1$$,
 
 $$\begin{align}
 u_{2n}
 &\le \frac{1}{2^{2n}} \binom{2n}{n} \max_{\substack{j,k\\ j+k=n}}\left(3^{-n}\frac{n!}{j!(k-j)!(n-k)!}\right) \\
-&= \frac{1}{2^{2n}} \binom{2n}{n} \left(3^{-n}\frac{n!}{(\left[\frac{n}{3}\right]!)^3}\right) \\
-&= \frac{1}{2^{2n}} \binom{2n}{n} \left(3^{-n}\frac{\sqrt{2\pi n}n^ne^{-n}}{(\sqrt{2\pi n/3}(n/3)^{n/3}e^{-n/3})^3}\right) \\
-&= \frac{1}{2^{2n}} \binom{2n}{n} \left(3^{-n}\frac{\sqrt{2\pi n}n^ne^{-n}}{2\pi n/3 \sqrt{2\pi n/3} (n/3)^n e^{-n}}\right) \\
-&= \frac{1}{2^{2n}} \binom{2n}{n} \left(3^{-n}\frac{1}{2\pi n 3^{-3/2} 3^{-n}}\right) \\
-&= \frac{1}{2^{2n}} \binom{2n}{n} \frac{3^{3/2}}{2\pi n} \\
+&= \frac{1}{\sqrt{\pi n}} \left(3^{-n}\frac{n!}{(\left[\frac{n}{3}\right]!)^3}\right) \\
+&= \frac{1}{\sqrt{\pi n}} \left(3^{-n}\frac{\sqrt{2\pi n}n^ne^{-n}}{(\sqrt{2\pi n/3}(n/3)^{n/3}e^{-n/3})^3}\right) \\
+&= \frac{1}{\sqrt{\pi n}} \left(3^{-n}\frac{\sqrt{2\pi n}n^ne^{-n}}{2\pi n/3 \sqrt{2\pi n/3} (n/3)^n e^{-n}}\right) \\
+&= \frac{1}{\sqrt{\pi n}} \left(3^{-n}\frac{1}{2\pi n 3^{-3/2} 3^{-n}}\right) \\
 &= \frac{1}{\sqrt{\pi n}} \frac{3^{3/2}}{2\pi n} = O(n^{-3/2})
 \end{align}$$
 
@@ -235,8 +235,9 @@ $$ f^{d+1} \le f^d $$
 This is already established for $$d=1$$ and $$d=2$$.
 
 # Reference
+
 - Chapter 4 of "Probability. Theory and examples", 4th edition, by Durrett, Cambridge, 2010
 - Chapter 12 of "Introduction to probability", 2nd edition, by Grinstead and Snell, AMS, 1997
-- [Random Walks](http://www.math.ksu.edu/~cnmoore/randomwalk.pdf), by C. N. Moore, 2007
+- C. N. Moore, [Random Walks](http://www.math.ksu.edu/~cnmoore/randomwalk.pdf), 2007
 - Derek Johnston, "[An Introduction to Random Walks](https://www.math.uchicago.edu/~may/VIGRE/VIGRE2011/REUPapers/Johnston.pdf)", 2011
 - [Proving that 1- and 2-d simple symmetric random walks return to the origin with probability 1](https://math.stackexchange.com/questions/536/proving-that-1-and-2-d-simple-symmetric-random-walks-return-to-the-origin-with)

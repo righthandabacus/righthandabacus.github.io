@@ -1,0 +1,220 @@
+---
+layout: post
+title: '"Advanced" OpenSSH'
+date: Sat, 04 Aug 2018 22:18:01 -0400
+tags: system
+category: blog
+---
+
+I've written something about [SSH](/2017-07-17-ssh/) and here are more, on authentication, tunnelling and some other.
+
+# Configuration
+
+system-wide client: `/etc/ssh/ssh_config`
+
+system-wide daemon: `/etc/ssh/sshd_config`
+
+User: `~/.ssh/config`
+
+Format of `~/.ssh/config` (more on `man ssh_config`):
+
+```
+Host my-server.com
+User admin
+IdentityFile ~/.ssh/admin.id_dsa
+BatchMode yes
+EscapeChar none
+
+Host mm
+User matt
+HostName might.net
+IdentityFile ~/.ssh/matt.id_dsa
+
+Host *.lab.ucaprica.edu
+User u8193
+```
+
+
+# Key-based authentication
+
+Create key pair:
+
+    $ ssh-keygen -t dsa
+
+this will create private key in `~/.ssh/id_dsa` and public key in `~/.ssh/id_dsa/pub`. We can specify `-f path/to/key` if we want to specify the path for the newly generated key. We should set appropriate permission to the private key.
+
+Then append public key to `authorized_keys`:
+
+    $ cat ~/.ssh/id_dsa.pub | ssh remote_host `cat >> ~/.ssh/authorized_keys`
+
+We can also use `ssh-copy-id` command to do the above:
+
+    $ ssh-copy-id remote_server
+    The authenticity of host 'name-of-remote-server (144.144.144.144)' can't be established.
+    ECDSA key fingerprint is 9f:1e:ab:b6:ff:71:88:a9:98:7a:8d:f1:42:7d:8c:20.
+    Are you sure you want to continue connecting (yes/no)? yes
+    /usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed
+    /usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys
+    Password:
+
+Using a specified key other than the default `~/.ssh/id_rsa`:
+
+    $ ssh -i ~/.ssh/myprivatekey hostname
+
+## passphase
+
+`ssh-keygen` will ask for a passphase when a key is generated. We can change the passphase of an existing key by `ssh-keygen -p`
+
+## using ssh-agent
+
+To run ssh-agent:
+
+    $ eval $(ssh-agent)
+
+which in turn is something similar to the following:
+
+    SSH_AUTH_SOCK=/var/folders/y6/5fd4y7sj71g9v5d43fkpvn940000gn/T//ssh-ZMjJ69ERT1hc/agent.73328; export SSH_AUTH_SOCK;
+    SSH_AGENT_PID=73329; export SSH_AGENT_PID;
+    echo Agent pid 73329;
+
+After `ssh-agent` is running, we can list all the keys available to the `ssh-agent`:
+
+    $ ssh-add -L
+
+or add a key to the agent:
+
+    $ ssh-add ~/.ssh/path/to/privatekey
+
+Omitting the path to a particular key will add all default key files in `~/.ssh`. If there are too many keys in use, it is recommended to specify the correct key for a host in the ssh config file:
+
+    Host yourserver
+    HostName yourserver.tld
+    IdentityFile ~/.ssh/path/to/privatekey
+    IdentitiesOnly yes
+    User user
+
+Agents can also be forwarded if:
+
+- `ForwardAgent yes` in client's `ssh_config` file, or using `-A` in ssh command
+- `AllowAgentForwarding yes` in each server's `/etc/ssh/sshd_config` file
+
+Because these are required at every login and therefore it should be included in the `.bashrc` script, such as the following:
+
+    if [ -z "$SSH_AUTH_SOCK" ] ; then
+        eval `ssh-agent`
+        ssh-add # or ssh-add -K if in macOS
+    fi
+
+In macOS Sierra 10.12.2+, we can load keys automatically and make use of the macOS keychain to hold the key's passphase by adding the following to `~/.ssh/config`:
+
+    Host *
+      AddKeysToAgent yes
+      UseKeychain yes
+      IdentityFile ~/.ssh/id_rsa
+      IdentityFile ~/.ssh/id_dsa
+
+and macOS's way to add a key to `ssh-agent` using the passphase from keychain is the `-K` option:
+
+    $ ssh-add -K ~/.ssh/path/to/privatekey
+
+# Tunneling
+
+## local port forwarding (port listened locally)
+
+At host A, connect to a port at host B by way of host C:
+
+    hostA$ ssh hostC -L localport:hostB:remoteport
+    
+    hostA$ telnet localhost:localport
+
+If ssh goes with `-g` (option `GatewayPorts=yes`), the `localport` is bind to public instead of local loopback. Or we can explicitly specify the binding address:
+
+    hostA$ ssh hostC -L localaddress:localport:hostB:remoteport
+
+## remote port forwarding (port listened at remote host)
+
+Give remote host B access to host C by way of the local machine A:
+
+    hostA$ ssh hostB -R remoteport:hostC:targetport
+    
+    hostB$ telnet localhost:remoteport
+
+## SOCKS proxy
+
+    $ ssh-D localport remote_host
+
+then a SOCKS5 proxy is created at localhost port `localport` and traffic will be tunneled to `remote_host`. In Firefox, DNS will not be tunneled through SOCKS proxy unless `network.proxy.socks_remote_dns=True`
+
+## ProxyJump
+
+From host A connect to host B by way of host C. As if we first SSH into host C and then from there SSH into host B
+
+    hostA$ ssh -J userC@hostC:22 userB@hostB
+
+Multiple jump hops may be specified by commas
+
+    hostA$ ssh -J user1@host1:port1,user2@host2:post2 -p port3 user3@host3
+
+The `-J` option can also be specified in the config file as `ProxyJump` directive. Older version of SSH does not provide `ProxyJump` directive and we have to use `ProxyCommand` directive instead:
+
+    ProxyCommand ssh user@proxyhost -W %h:%p
+
+## create a **layer-3** `tun` device between hosts A and B
+
+Must be root at both hosts in order to create `tun0` virtual network devices. Also `PermitTunnel=yes` and `PermitRootLogin=yes` in `sshd_config` on both ends.
+
+    hostA# ssh -f -w 0:0 root@hostB true
+    hostA# ifconfig tun0 192.168.1.101 netmask 255.255.255.0
+    
+    hostB# ifconfig tun0 192.168.1.102 netmask 255.255.255.0
+
+## create a **layer-2** `tap` device between hosts A and B
+
+First we have to create the tap device on both hosts by either of the following two commands
+
+    # tunctl -t tap0
+    # tuntap add devtap0 mode tap
+
+Then set up addresses on both hosts:
+
+    hostA# ifconfig tap0 192.168.1.101 netmask 255.255.255.0
+    
+    hostB# ifconfig tap0 192.168.1.102 netmask 255.255.255.0
+
+Lastly set up the SSH tunnel:
+
+    hostA# ssh -o Tunnel=ethernet -f -w 0:0 root@hostB true
+
+we can check the tunnel working by ping on remote address, or the command `ethtool tap0` should give `Link detected: yes`
+
+To shutdown, send SIGTERM to the ssh process.
+
+## other useful arguments to ssh in tunneling
+
+- `-f` to drop ssh to background
+- `-N` to run no command at remote server (`-f -N` = daemonized mode)
+- `-o ServerAliveInterval=30` to send something over the TCP every 30 seconds to keep the tunnel alive. Similar options are `ClientAliveInterval` and `TCPKeepAlive`
+
+
+# Miscellaneous ssh usage
+
+Copy file:
+
+    cat file | ssh -c -e none remote_host 'cat > file'
+
+`-e none` is to disable escape sequences. `-c` enable compression (optional)
+
+SSH banner: Create a text file somewhere and edit `sshd_config` for:
+
+    Banner /etc/mybanner.txt
+
+Time lock against brute force SSH attack in iptables:
+
+    iptables -A INPUT -p tcp -m state --syn --state NEW --dport 22 -m limit --limit 1/minute --limit-burst 1 -j ACCEPT
+    iptables -A INPUT -p tcp -m state --syn --state NEW --dport 22 -j DROP
+
+# Reference
+- http://matt.might.net/articles/ssh-hacks/
+- https://www.taos.com/advanced-ssh-tunneling/
+- https://dzone.com/articles/advanced-secure-shell-6-things-you-can-do-with-ssh
+- http://rabexc.org/posts/using-ssh-agent
