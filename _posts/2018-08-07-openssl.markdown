@@ -1,0 +1,366 @@
+---
+layout: post
+title: Encrypting a file with OpenSSL
+date: Tue, 07 Aug 2018 22:02:30 -0400
+tags: system
+category: blog
+---
+
+A natural question from using [SSH](/2018-08-04-ssh/) for a while is whether we
+can reuse the SSH authentication key for other use, say, encrypting a file. The
+answer is affirmative in OpenSSL but it is not straightforward.
+
+# OpenSSL overview
+
+OpenSSL is a suite of tools. We can see the list of all "commands" it supported by
+
+    $ openssl list-standard-commands
+
+The following are some common commands:
+
+- `ca`: create certificate authorities
+- `dgst`: compute hash functions
+- `enc`: encrypt/decrypt using symmetric key algorithms
+    - to see all available ciphers: `openssl list-cipher-commands`
+    - e.g., `aes-{128,192,256}-{cbc,ecb}`
+- `genrsa`: generate a pair of public/private key for RSA algorithm
+- `password`: generate hashed passwords
+- `rand`: generation of pseudo-random bit strings
+- `rsa`: RSA data management
+- `rsautl`: to encrypt/decrypt or sign/verify signature with RSA
+- `verify`: checkings for X509
+- `x509`: data managing for X509
+
+The `enc` command can encrypt or decrypt a file, using symmetric ciphers. We
+will look further into it in the following.
+
+# Encryption with symmetric cipher
+
+To encrypt and decrypt a file, `plain.txt`, of arbitrary size, we use the
+following commands respectively:
+
+    $ openssl enc -aes-256-cbc -in plain.txt -out plain.txt.enc -pass pass:pa55w0rd
+    $ openssl enc -aes-256-cbc -d -in plain.txt.enc -out plain.txt -pass pass:pa55w0rd
+
+OpenSSL will ask for password from stdin if `-pass` is not provided in the
+command line. We can also provide an optional `-salt` flag to the `enc` command
+to request for a salted password to be used. There is a special cipher,
+`-base64` that does not take password as base64 is just an encoding, not really
+a cipher.
+
+The above example is using AES-256 as cipher. OpenSSL supports a number of
+ciphers: AES, Blowfish, RC4, 3DES, RC2, DES, CAST5, SEED. Some of these are
+stream ciphers and others are block ciphers. The `cbc` stands for "cipher
+block chaining", which is one of the many [block cipher mode of
+operations](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation). The
+mode of operaions is to address how we should handle multiple block of data in
+encryption using block cipher. Below are the summary of some common modes, with
+plaintext blocks denoted by $$T_i,\ i=1,2,\cdots$$; ciphertext blocks $$Z_i$$;
+encryption function with key $$K$$ denoted by $$E_K()$$:
+
+- Electronic Codebook (ECB)
+  - Operation: $$Y_i = E_K(T_i)$$
+  - Ciphertext: $$Z_i = Y_i$$
+- Cipher Block Chaining (CBC)
+  - Operation: $$Y_i = T_i \oplus Z_{i-1}$$
+  - Ciphertext: $$Z_i = E_K(Y_i)$$ with $$Z_0 = IV$$
+- Propagating Cipher Block Chaining (PCBC)
+  - Operation: $$Y_i = T_i \oplus (Z_{i-1} \oplus T_{i-1})$$
+  - Ciphertext: $$Z_i = E_K(Y_i)$$ with $$Z_0 = IV$$
+- Cipher Feedback (CFB)
+  - Operation: $$Y_i = Z_{i-1}$$
+  - Ciphertext: $$Z_i = T_i \oplus E_K(Y_i)$$ with $$Z_0 = IV$$
+- Output Feedback (OFB)
+  - Operation: $$Y_i=E_K(Y_{i-1})$$ with $$Y_0 = IV$$
+  - Ciphertext: $$Z_i = T_i \oplus Y_i$$
+- Counter (CTR)
+  - Operation: $$Y_i = E_K(IV+g(i))$$ with IV=token() where $$g(i)$$ is a deterministic function, usually an identity function
+  - Ciphertext: $$Z_i = T_i \oplus Y_i$$
+
+We usually use CBC, CFB, or OFB for better security.
+
+# Digitally sign a file
+
+Cryptography is not only for encryption. We can also cryptographically verify
+the integrity of a file. This involves public key cryptography but we cannot use
+it on a file of large size. We should first generate a digest from a file using
+a hash algorithm:
+
+    $ openssl dgst -sha256 -out digest.txt input.txt
+
+The `-sha256` is a hash algorithm, the alternatives are `-sha1`, `-ripemd160`,
+`-md5` and so on. To see all supported we can use `openssl list-message-digest-commands`.
+
+We can now have a small-size digest that correspond to the larger data. To sign
+it, we use the RSA algorithm through the `rsautl` command in OpenSSL with a
+private key stored in `private.pem`:
+
+    $ openssl rsautl -sign -in digest.txt -out signature.txt -inkey private.pem
+
+The signature file will contain `digest.txt` and we can "verify" the signature
+and get back the `digest.txt` using the public key (assumed stored in
+`public.pem`):
+
+    $ openssl rsautl -verify -in signature.txt -out digest.txt -inkey public.pem -pubin
+    Verified OK
+
+Indeed we can do both hashing and signing at the same time:
+
+    $ openssl dgst -sha256 -sign private.pem -out signature.txt input.txt
+
+and this can be verified with:
+
+    $ openssl dgst -sha256 -verify public.pem -signature signature.txt input.txt
+
+But the signature in [this two approaches differ](https://stackoverflow.com/questions/9951559/difference-between-openssl-rsautl-and-dgst),
+namely, the `dgst` sign is to create a hash in ASN1 encoding and signing the
+ASN1 encoded hash. The `rsautl` sign is signing without using the ASN1 encoding.
+The `dgst` version does not limit to RSA key pairs. We can also [use elliptic
+curve (ECDSA)](https://superuser.com/questions/737574/openssl-ecdsa-sign-and-verify-file):
+
+    $ openssl dgst -ecdsa-with-SHA1 -sign private.pem -out signature.bin input.txt
+    $ openssl dgst -ecdsa-with-SHA1 -verify public.pem -signature signature.bin input.txt
+    Verified OK
+
+To see if ECDSA can be used with message digest algorithms other than SHA1,
+check
+
+    $ openssl list-message-digest-algorithms
+
+# Encrypt a small file with public key
+
+Public key cryptography can only be used to encrypt a small file. For example,
+[2048-bit RSA can only encrypt a file no more than 245 bytes](https://security.stackexchange.com/questions/33434/rsa-maximum-bytes-to-encrypt-comparison-to-aes-in-terms-of-security)
+
+If the input file is small enough, we can encrypt and decrypt using the
+following commands:
+
+    $ openssl rsautl -encrypt -oaep -in small.txt -pubin -inkey public.pem -out small.txt.enc
+    $ openssl rsautl -decrypt -oaep -in small.txt.enc -inkey private.pem -out small.txt
+
+The `-oaep` is optional but recommanded. It adds padding to input and if we used
+it in encryption, we must use it in decryption as well.
+
+# Key handling
+
+OpenSSL provides tools to generate key pairs. For example, RSA key pair (both
+public and private keys in ame file) can be generated by:
+
+    $ openssl genrsa -out key.pem 1024
+
+and optionally we can encrypt the keypair using a passphrase:
+
+    $ openssl rsa -in key.pem -des3 -out enc-key.pem
+    writing RSA key
+    Enter PEM pass phrase:
+    Verifying - Enter PEM pass phrase:
+
+Indeed, `genrsa` is deprecated and OpenSSL recommends to use `genpkey` instead,
+which allows various kind of public key algorithms to be used:
+
+    $ openssl genpkey -out key.pem -algorithm rsa -pkeyopt rsa_keygen_bits:2048
+    ...+++
+    ..+++
+    $ openssl genpkey -out key.pem -algorithm rsa -pkeyopt rsa_keygen_bits:2048 -des3
+    ........+++
+    .........+++
+    Enter PEM pass phrase:
+    Verifying - Enter PEM pass phrase:
+
+If we want to extract the public key from the key pair, such as to send it out:
+
+    $ openssl rsa -in key.pem -pubout -out public.pem
+
+SSH can also use RSA keys for authentication, only the SSH public key's format is not
+the default PEM format of OpenSSL (private key, however, is). We can make use of
+`ssh-keygen` to convert an existing key file (public only, even if you provide
+the private key as input) into PKCS8 format:
+
+    $ ssh-keygen -e -f ~/.ssh/id_rsa.pub -m PKCS8 > public.pem
+
+or conversely, ask `ssh-keygen` to convert the PKCS8 format public key into the
+format SSH uses:
+
+    $ openssl ecparam -genkey -name prime256v1 -noout -out prime256v1.key.pem
+    $ openssl ec -in prime256v1.key.pem -pubout | ssh-keygen -f /dev/stdin -i -m PKCS8
+    read EC key
+    writing EC key
+    ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBC3FrhznL2pQ/titzgnWrbznR3ve2eNEgevog/aS7SszS9Vkq0uFefavBF4M2Txc34sIQ5TPiZxYdm9uO1siXSw=
+
+Alternatively, OpenSSL can convert a private RSA key or convert a private RSA
+key to its public key (of course, not the other way round):
+
+    $ openssl rsa -in id_rsa -pubout -outform pem > public.pem
+    $ openssl rsa -in id_rsa -outform pem > private.pem
+
+The PKCS8 format key file contains the base64 encoded key and bears the boundary
+line saying `BEGIN PRIVATE KEY` or so. But OpenSSL's default PEM format will
+bear the key type name, such as `BEGIN EC PRIVATE KEY`. The base64 encoded
+binary is also [in different representations](https://stackoverflow.com/questions/46870569/ssh-keygen-and-openssl-gives-two-different-public-keys):
+OpenSSH use XDR-like wire format but OpenSSL use X.509 in ASN.1 (see also
+[RSA public key format](https://stackoverflow.com/questions/12749858/rsa-public-key-format))
+
+Take elliptic curve keys as an example, we can convert between the two format
+(with optional encryption to the key itself) by: 
+
+    $ openssl ec -aes-128-cbc -in pkcs8.pem -out tradfile.pem
+    $ openssl ec -in pkcs8.pem -out tradfile.pem
+    $ openssl pkcs8 -topk8 -in tradfile.pem -out pkcs8.pem
+    $ openssl pkcs8 -topk8 -nocrypt -in tradfile.pem -out pkcs8.pem
+
+The first two above is to convert a PKCS8 key into traditional PEM format. The
+latter two is the other way round. By default, output of `openssl pkcs8` will be
+encrypted but `openssl ec` is unencrypted. We need a switch to toggle the
+otherwise. These output key files are in base64 encoding. We can elect to make
+binary key file as well, a.k.a. DER format, using `-outform DER` switch:
+
+    $ openssl ec -in pkcs8.pem -outform DER -out tradfile.der
+    $ openssl pkcs8 -topk8 -in tradfile.pem -outform DER -out pkcs8.der
+
+Elliptic curve public key is generated by `openssl ecparam` but there are
+several curves in the family that we have to choose one. The name of all
+supported curves can be seen by:
+
+    $ openssl ecparam -list_curves
+
+Each curve is defined by certain parameters. We can pick one (e.g secp256k1) and
+generate a EC parameter file:
+
+    $ openssl ecparam -name secp256k1 -out secp256k1.pem
+    $ openssl ecparam -name secp256k1 -out secp256k1.pem -param_enc explicit
+
+The latter one will give an "explicit" parameter file that keeps *all* EC
+parameters. This is useful to apply this to older version of OpenSSL that does
+not understand the name of the curve so we can generate the whole curve from
+scratch. Now given the parameter file, the elliptic curve key is then
+generated (`-genkey`) and parameter is not included in the output (`-noout`):
+
+    $ openssl ecparam -in secp256k1.pem -genkey -noout -out ecprivate.pem
+
+or we can use `pkey` command to generate the key pair:
+
+    $ openssl ecparam -genkey -name secp256k1 -out param_and_key.pem
+    $ openssl pkey -in param_and_key.pem -out ecprivate.pem
+    $ openssl pkey -in param_and_key.pem -pubout -out ecpublic.pem
+
+or we can combine the parameter file generation and key generation together:
+
+    $ openssl ecparam -name secp256k1 -genkey -noout -out private.pem
+
+# The whole workflow
+
+We show RSA and EC separately.
+
+## using RSA key pair
+
+Assume we have the public and private keys in files `public.pem` and
+`private.pem` respectively, The procedure is:
+
+1. generate a random 32-byte (256-bit) password for symmetric cipher
+2. encrypt the file of arbitrary size with the 256-bit password using AES-256
+3. encrypt the symmetric cipher password using RSA public key
+4. [optional] digest and sign the file with the RSA public key
+5. deliver the signature, encrypted password, and encrypted data file, delete the original file and generated plaintext password
+
+The commands are:
+
+```sh
+openssl rand -out password.txt 32
+openssl enc -aes-256-cbc -salt -in bigfile.txt -out bigfile.txt.enc -pass file:password.txt
+openssl rsautl -encrypt -oaep -pubin -inkey public.pem -in password.txt -out password.txt.enc
+openssl dgst -sha256 -sign private.pem -out signature.txt bigfile.txt
+echo "attached" | mutt -a signature.txt -a password.txt.enc -a bigfile.txt.enc -s "encrypted files" -c recipient@example.com -y
+```
+
+The first command, `openssl rand`, can take an extra option `-base64` to encode the
+output in base64.
+
+If we want to use key from SSH, the `openssl rsautil` command becomes the
+following instead:
+
+    openssl rsautl -encrypt -oaep -pubin -inkey <(ssh-keygen -e -f ~/.ssh/id_rsa.pub -m PKCS8) -in password.txt -out password.txt.enc
+
+Decryption and verification is to do the reverse:
+
+1. decrypt the symmetric cipher password using RSA private key
+2. decrypt the file of arbitrary size with the password using AES-256
+3. [optional] verify the integrity of the file with the signature
+
+```sh
+openssl rsautl -decrpyt -oaep -inkey private.pem -in password.txt.enc -out password.txt
+openssl enc -aes-256-cbc -d -in bigfile.txt.enc -out bigfile.txt -pass file:password.txt
+openssl dgst -sha256 -verify public.pem -signature signature.txt input.txt
+```
+
+If we want to use key from SSH, the `openssl rsautil` command becomes the
+following instead:
+
+    openssl rsautl -decrypt -oaep -inkey ~/.ssh/id_rsa -in password.txt.enc -out password.txt
+
+## using elliptic curve key pair
+
+The procedure for EC is similar, but EC cryptography does not define anything
+about encryption and decryption. For this purpose, we will use Diffie-Hellman
+exchange with the EC keys to compute a shared secret (i.e., we need Alice and
+Bob's key pairs in the process, four keys in total) and apply the shared secret
+as password for symmetric cipher. If we only have the recipient key pair, we
+can generate the other key pair temporarily, but the key must be in the same
+bit length for the Diffie-Hellman to work:
+
+1. Generate a temporary EC private key using `openssl ec`
+2. Use the recipient's public key to derive a shared secret using `openssl pkeyutl`
+3. Encrypt the plaintext using `openssl enc` using the derived secret key
+4. Generate the EC public key from the private key using `openssl ecparam`
+5. Deliver the public key and the encrypted file to the recipient
+
+Commands:
+
+```sh
+openssl ec -genkey -param_enc explicit -out temppriv.pem -name brainpool512r1
+openssl pkeyutl -derive -inkey temppriv.pem -peerkey public.pem -out secret.txt
+openssl enc -aes-256-cbc -in bigfile.txt -out bigfile.txt.enc -pass file:secret.txt
+openssl ecparam -in temppriv.pem -pubout -out temppub.pem
+echo "attached" | mutt -a temppub.txt -a bigfile.txt.enc -s "encrypted files" -c recipient@example.com -y
+```
+
+The `openssl enc` command will use the shared secret generated from
+Diffie-Hellman to generate the IV and key but if we use `-pass file:secret.txt`,
+the password is read from the first line of it (OpenSSL pretending the input
+file is a text file). If the binary secret file happen to contain some special
+characters (e.g., first byte is NULL), the encryption command may fail. A sure
+way to solve the issue is to save the shared secret in base64, e.g.
+
+    $ openssl pkeyutl -derive -inkey temppriv.pem -peerkey public.pem | base64 -w0 > secret.txt
+
+Optinally, we can also provide hash of the file file for integrity check.
+Besides the signature as mentioned above, we can also use
+[HMAC](https://en.wikipedia.org/wiki/HMAC) of, for example, the cipher text:
+
+    $ openssl dgst -sha256 -hmac secret.txt
+    SHA256(secret.txt)= a713a86fa73ccfaf96f5b073205170dcb9ff78ae8c3ab225311e4aa61dc94d38
+    $ KEY=`openssl dgst -sha256 -hmac secret.txt|awk '{print $2}'`
+    $ openssl dgst -sha256 -mac HMAC -macopt "hexkey:$KEY" -out hmac.txt bigfile.txt.enc
+
+To decrypt is to reverse the work:
+
+1. Use the sender's public key to derive a shared secret using `openssl pkeyutl`
+2. Generate the HMAC from ciphertext
+3. Verify the HMAC matches
+4. Decrypt the cipher text using `openssl enc` using the derived secret key
+
+Commands:
+
+```sh
+openssh pkeyutl -derive -inkey private.pem -peerkey temppub.pem -out secret.txt
+openssl dgst -sha256 -mac HMAC -macopt "hexkey:`openssl dgst -sha256 -hmac secret.txt|awk '{print $2}'`" -out my_hmac.txt bigfile.txt.enc
+openssl enc -d -aes-256-cbc -in bigfile.txt.enc -out bigfile.txt -pass file:secret.txt
+```
+
+# References
+
+- [OpenSSL intro](https://users.dcc.uchile.cl/~pcamacho/tutorial/crypto/openssl/openssl_intro.html)
+- [OpenSSL wiki on command line utilities](https://wiki.openssl.org/index.php/Command_Line_Utilities)
+- [Encrypt file using ssh key](https://bjornjohansen.no/encrypt-file-using-ssh-key)
+- [Elliptic curve operations of OpenSSL](https://wiki.openssl.org/index.php/Command_Line_Elliptic_Curve_Operations)
+- [Encrypt a file using EC public key](https://superuser.com/questions/1003690/how-can-i-encrypt-a-file-with-an-ec-public-key)
+- [OpenSSL command cheatsheet](https://medium.freecodecamp.org/openssl-command-cheatsheet-b441be1e8c4a)
