@@ -77,6 +77,23 @@ which in turn is something similar to the following:
     SSH_AGENT_PID=73329; export SSH_AGENT_PID;
     echo Agent pid 73329;
 
+Or, for putting into `~/.bashrc` or `~/.bash_profile` ([source](http://rabexc.org/posts/pitfalls-of-ssh-agents)):
+
+```bash
+ssh-add -l &>/dev/null
+if [ "$?" == 2 ]; then
+  test -r ~/.ssh-agent && \
+    eval "$(<~/.ssh-agent)" >/dev/null
+
+  ssh-add -l &>/dev/null
+  if [ "$?" == 2 ]; then
+    (umask 066; ssh-agent -t 3600 > ~/.ssh-agent)
+    eval "$(<~/.ssh-agent)" >/dev/null
+    ssh-add
+  fi
+fi
+```
+
 After `ssh-agent` is running, we can list all the keys available to the `ssh-agent`:
 
     $ ssh-add -L

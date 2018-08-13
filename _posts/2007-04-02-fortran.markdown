@@ -176,7 +176,7 @@ String is assigned by `=` and the text string is quoted. Extra spaces in the cha
 
 Strings can be concatenated by `//` in Fortran, for example:
 
-  metal = 'cad' // 'mium'
+    metal = 'cad' // 'mium'
 
 String length is measured by `len(s)` and `index(n,h)` returns the position of needle `n` in the haystack `h`. If `n` is at the very beginning of `h`, `index` returns 1. It returns zero if not found.
 
