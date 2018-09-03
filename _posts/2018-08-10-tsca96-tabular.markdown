@@ -2,7 +2,6 @@
 layout: post
 title: "Tupaj et al (1996) Extracting Tabular Information From Text Files"
 date: 2018-08-10 12:00:00 -0400
-tags: parsing
 category: paper
 bibtex:
   type: misc
