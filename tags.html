@@ -8,18 +8,20 @@ foot_js:
 
 <div>
   {% assign tags = site.tags | sort %}
-  <ul class="nav nav-tabs" role="tablist">
+  <div class="nav nav-tabs nav-fill" role="tablist">
     {% for tag in tags %}
-      <li role="presentation"{% if forloop.first %} class="active"{% endif %}>
-        <a href="#{{ tag[0]}}" aria-controls="home" role="tab" data-toggle="tab">
-          {{ tag[0] }} <span class="badge">{{ tag | last | size }}</span>
-        </a>
+      <a href="#{{ tag[0] }}" class="nav-item nav-link{% if forloop.first %} active{% endif %}"
+         data-toggle="tab" role="tab" id="{{ tag[0] }}-tab" aria-controls="{{ tag[0] }}"
+         aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
+        {{ tag[0] }} <span class="badge badge-pill badge-secondary">{{ tag | last | size }}</span>
+      </a>
       </li>
     {% endfor %}
-  </ul>
+  </div>
   <div class="tab-content">
     {% for tag in tags %}
-      <div role="tabpanel" class="tab-pane fade{% if forloop.first %} in active{% endif %}" id="{{ tag[0] }}">
+      <div role="tabpanel" id="{{ tag[0] }}" aria-labelledby="{{ tag[0] }}-tab"
+           class="tab-pane fade{% if forloop.first %} show active{% endif %}">
         <ul>
           {% for post in tag[1] %}
             <a class="post-title" href="{{ site.baseurl }}{{ post.url }}">

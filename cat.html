@@ -8,18 +8,19 @@ foot_js:
 
 <div>
   {% assign cats = site.categories | sort %}
-  <ul class="nav nav-tabs" role="tablist">
+  <div class="nav nav-tabs nav-fill" role="tablist">
     {% for cat in cats %}
-      <li role="presentation"{% if forloop.first %} class="active"{% endif %}>
-        <a href="#{{ cat[0]}}" aria-controls="home" role="tab" data-toggle="tab">
-          {{ cat[0] }} <span class="badge">{{ cat | last | size }}</span>
-        </a>
-      </li>
+      <a href="#{{ cat[0] }}" class="nav-item nav-link{% if forloop.first %} active{% endif %}"
+         data-toggle="tab" role="tab" id="{{ cat[0] }}-tab" aria-controls="{{ cat[0] }}"
+         aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
+        {{ cat[0] }} <span class="badge badge-pill badge-secondary">{{ cat | last | size }}</span>
+      </a>
     {% endfor %}
-  </ul>
+  </div>
   <div class="tab-content">
     {% for cat in cats %}
-      <div role="tabpanel" class="tab-pane fade{% if forloop.first %} in active{% endif %}" id="{{ cat[0] }}">
+      <div role="tabpanel" id="{{ cat[0] }}" aria-labelledby="{{ cat[0] }}-tab"
+           class="tab-pane fade{% if forloop.first %} show active{% endif %}">
         <ul>
           {% for post in cat[1] %}
             <a class="post-title" href="{{ site.baseurl }}{{ post.url }}">

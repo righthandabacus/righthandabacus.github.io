@@ -6,5 +6,6 @@ $(document).ready(function(){
     };
     $('.nav-tabs a').on('shown.bs.tab', function(e){
         window.location.hash = e.target.hash;
+        window.scrollTo(0,0);
     });
 });
