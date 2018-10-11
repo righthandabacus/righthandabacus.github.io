@@ -10,7 +10,7 @@
           Carousel banner via bootstrap.js
       {% endcomment %}
       {% if page.titlebanner %}
-        <div id="header-carousel" class="carousel slide" data-ride="carousel" data-pause="null" data-keyboard="false" data-interval="3000">
+        <div id="header-carousel" class="carousel slide" data-ride="carousel" data-pause="false" data-keyboard="false" data-interval="3000">
           <ol class="carousel-indicators">
             {% for titlebanner in page.titlebanner %}
               <li data-target="#header-carousel" data-slide-to="{{ forloop.index0 }}"></li>
@@ -37,8 +37,8 @@
           text on the header section of a page
       {% endcomment %}
       <div class="container">
-        <div class="row">
-          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <div class="row justify-content-center">
+          <div class="col-lg-8 col-md-10">
             <div class="{{ include.type }}-heading">
               <h1>{% if page.title %}{{ page.title }}{% else %}&nbsp;{% endif %}</h1>
               {% if page.subtitle %}
