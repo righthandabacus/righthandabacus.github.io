@@ -414,6 +414,11 @@
       };
     };
   }
+  @media only screen and (max-width: 991px) {
+    .navbar .avatar-container {
+      display: none;
+    }
+  }
 
 
 /*
