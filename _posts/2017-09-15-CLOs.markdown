@@ -9,7 +9,7 @@ Various thing about CLOs or other structured fixed income product.
 
 # Overview, terms
 
-Collateralised loan obligations: generally between ﹩300M to ﹩1B in size and own loans issued by 80--300 borrowers
+Collateralised loan obligations: generally between $300M to $1B in size and own loans issued by 80--300 borrowers
   - CLOs are companies with very limited purpose and no staff of their own
   - Special purpose vehicles (SPV, aka issuer or depositor) with a manager company
      - usually based in jurisdictions that pay no corporation tax
@@ -32,7 +32,7 @@ Collateralised loan obligations: generally between ﹩300M to ﹩1B in size and 
 
 Tranche: French word for a slice
 - different tranche, different level of credit production or risk exposure
-- some tranche absort early repayments (i.e., other has more predictible cash flow)
+- some tranche absorb early repayments (i.e., other has more predictable cash flow)
 - two waterfall may exists on loans and mortgages as it is easy to differentiate
   the principal repayment and interest
   - interest waterfall, principal waterfall
@@ -44,9 +44,9 @@ Tranche: French word for a slice
   - in the past, the fiduciary can exercise their judgement for their interest.
     Now, no such fiduciary exists.
 
-Overcollateralization (OC): pooling assets of principal amount greater than the security issued
+Overcollateralisation (OC): pooling assets of principal amount greater than the security issued
 - usually by 10--20%
-- e.g. MBS with principal amount issued of ﹩100MM while the underlying mortgage worth ﹩120MM
+- e.g. MBS with principal amount issued of $100MM while the underlying mortgage worth $120MM
 
 Indenture: Legal document governing the CLO
 
@@ -65,7 +65,7 @@ Bonds vs Loans
      - typically restricts the borrower from taking on more than a certain
        amount of leverage or limit the amount of capital expenditure
   - bonds usually pay interest at a fixed rate, whereas loans usually pay a floating rate
-     - floating rate in terms of a margin on top of Libor
+     - floating rate in terms of a margin on top of LIBOR
   - bonds usually repay all their principal at maturity (a.k.a. bullet maturity), whereas loans often amortise
      - loans most frequently found in CLOs have either bullet maturity or repay
        only a small portion of principal before maturity
@@ -184,7 +184,7 @@ Tests: carried out at each payment date, starting at the effective date
   - if failed, rules changed to the benefit of debt investors and at the expenses of equity investors
 
 Two types of tests:
-  - failure results in early paydown of some liabilities
+  - failure results in early pay down of some liabilities
   - failure results in manager prevented from carrying out some actions (maintain-or-improve tests)
 
 Overcollateralisation (OC) test
@@ -192,9 +192,9 @@ Overcollateralisation (OC) test
      - pass level (i.e., required ratio) are set such that the most junior OC test will fail first
      - if failed, interest proceeds cannot pay equity distributions or interest
        on all liabilities junior to that particular tranche
-     - may start to paydown principal of most senior class of outstanding notes
+     - may start to pay down principal of most senior class of outstanding notes
         - a.k.a. diversion of interest
-        - paydown improves OC ratio by reducing the denominator
+        - pay down improves OC ratio by reducing the denominator
      - if OC test fails, principal payments must be used to pay down debt instead of buy new assets
   - par value of CLO's collateral divided by the outstanding amount of that
     particular class of notes and notes senior to it
@@ -207,7 +207,7 @@ Overcollateralisation (OC) test
      - combined OC test for the two most senior notes (AAA and AA)
         - no way to skip payment
 
-Interst diversion test
+Interest diversion test
   - triggers earlier than any of the OC tests
   - failure = distribution to equity investors are suspended
      - diverted interest to invest in new assets
@@ -240,8 +240,8 @@ Common maintain-or-improve tests:
   - weighted average rating factor (WARF) test: measure the quality of a CLO's portfolio in rating terms
      - only Fitch and Moody's has WARF to convert rating into a numerical score
   - weighted average spread (WAS) or coupon tests: ensure CLO does not invest in too many low-yielding assets
-  - Moody's diversity test: Mesuring the industry diversity of a portfolio
-     - Moody's diversity score: a number to address teh correlation within the portfolio
+  - Moody's diversity test: Measuring the industry diversity of a portfolio
+     - Moody's diversity score: a number to address the correlation within the portfolio
      - prevent correlation of default risk of each borrowers
   - S&P industry concentration limits: S&P's approach to measure diversity,
     setting limit on concentrations to any particular industry
@@ -252,7 +252,7 @@ Common maintain-or-improve tests:
   - concentration limits: different tests to ensure they stick to promised
     limits for exposure to different type of investments
       - second-lien loans
-      - convenant-lite loans
+      - covenant-lite loans
       - exposure to individual loan or borrower
 
 
@@ -264,7 +264,7 @@ CLO structure: 80% debt tranche, 20% equity
 
 CLO notes are almost always rated
   - CLO default is an event with low probability: history has no loss
-  - rating agencies disclused their methodology but not the specific mathematical rules
+  - rating agencies disclosed their methodology but not the specific mathematical rules
   - Fitch and S&P: likelihood of suffering any kind of loss (first-dollar-of-loss approach)
   - Moody's: magnitude of loss during its life (expected loss)
   - Rating fee: 0.07% of the size of the tranche upfront
@@ -284,7 +284,7 @@ Rating methodology:
      - compare expected loss, e.g. Aaa rating needs expected loss <0.0055% for 10 yrs
      - stress factors (i.e., additional haircut) may be imposed to take account of other risks
   - Fitch and S&P
-     - Monte Carlo modelling under different scenraios, e.g., different levels
+     - Monte Carlo modelling under different scenarios, e.g., different levels
        and patterns of default, interest rate projections, timings of defaults
      - calculate how many defaults it would take for each tranche to suffer a loss
      - S&P: compare to break-even default rate for each tranche
@@ -297,7 +297,7 @@ Reports
   - Trustee reports, prepared by the portfolio administrator, is received by all classes of investors
      - number based
   - monthly report: from manager, list the CLO's current assets
-     - with size, price of all purchases and slaes in the month
+     - with size, price of all purchases and sales in the month
      - details cash balances
      - reports compliance of various performance tests
   - note valuation report: from manager, show how much cash the CLO has received and all payments in that period
@@ -306,7 +306,7 @@ Reports
      - shows how much money is left to equity
   - notices: tell investors of rating change, or minor change to the terms, or
     invitation to vote on proposed change
-  - report usually lacks market value of loans that hte CLO own
+  - report usually lacks market value of loans that the CLO own
 
 Refinancing and repricing
   - after crisis: equity investors are easier to refinance the CLO debt
@@ -352,7 +352,7 @@ Payment
 ## Equity
 
 CLO equity holders receive distributions only if debt and other obligations are honoured
-  - receives the lion's ahre of profits if things go well
+  - receives the lion's share of profits if things go well
   - CLO equity is unlike corporate equity that CLO operates by pre-set rules
       - no borrowing to pay dividends
       - cannot change strategy
@@ -430,9 +430,9 @@ Cashflow = Scheduled payment + Prepayment + Defaults $$-$$ Loss Severity $$-$$ S
   * (Defaults $$-$$ Loss Severity) = Recoverable loans
 
 Flat rate: Interest rate calculated without considering amortisation. For
-example, 12% annual flat rate of ﹩1200 loan for 1 year repaid monthly, the
-monthly principal payment is ﹩100 and the monthly interest is ﹩1200 $$\times$$ 1% = ﹩12,
-thus the monthly payment is ﹩112. This yields a effective interest rate of 144%
+example, 12% annual flat rate of $1200 loan for 1 year repaid monthly, the
+monthly principal payment is $100 and the monthly interest is $1200 $$\times$$ 1% = $12,
+thus the monthly payment is $112. This yields a effective interest rate of 144%
 p.a. at the last payment. Or equivalently, a 23.68% APR compounded monthly for
 the overall payment (calculated using XIRR).
 
@@ -516,6 +516,8 @@ where
 moddur proportional to macaulay duration because bonds with longer duration have
 greater price volatility.
 
+Alternatively, $$\textrm{moddur} = \frac{1}{P}\frac{dP}{dr}$$ for $$P$$ the price of the bond (i.e., PV of cashflow)
+
 Effective duration: a more accurate measurement of price volatility for loans and MBS
 
 $$\begin{aligned}
@@ -533,14 +535,14 @@ $$\begin{aligned}
 
 ## discount margin
 
-DM: spread over Libor discount curve
+DM: spread over LIBOR discount curve
   - expressed in basis points
 
 DM comes from the solution to
 
 $$c_0 = \sum_{i=1}^n c_i d_i$$
 
-where $c_0$ is the initial purchase outflow, $c_i$ and $d_i$ are the cashflows and discount factor at time $i$
+where $$c_0$$ is the initial purchase outflow, $$c_i$$ and $$d_i$$ are the cashflows and discount factor at time $$i$$
 and the forward discount factor DM satisfies
 
 $$ \frac{d_i}{1 + d_i} = \frac{1}{1 + [\textrm{forward Libor from time }i\textrm{ to }i+1] + \textrm{DM}} $$
@@ -609,12 +611,12 @@ Rule of 72: time it takes to double, e.g.
 - etc.
 
 Rule of 78, aka sum-of-the-digits method:
-assume total interest of whole period to be ﹩$$N$$
+assume total interest of whole period to be $($$N$$)
 and the total period to be $$n$$ months
-then the monthly payment ﹩$$P$$ on month $$k$$ will include the interest portion of
+then the monthly payment $($$P$$) on month $$k$$ will include the interest portion of
 $$N \times k/S_n$$ where $$S_n = 1+2+...+n$$
   
- - Using rule of 78 need to find the total financial cost ﹩$$N$$ before hand
+ - Using rule of 78 need to find the total financial cost $($$N$$) before hand
  - The interest payment is front-loaded: interest payment is higher than simple interest
     - not beneficial to prepayment: there is more principal remain to be paid off
 
@@ -698,7 +700,7 @@ events of default
 
 Supplemental indentures = changing rules
   - to clarify some ambiguity in original indenture
-  - to accomodate some change in rating agency methodologies
+  - to accommodate some change in rating agency methodologies
   - significant changes need to be approved by a majority of each class of investors
   - some minor change to correct an error can be made without an investor vote
   - other minor change only need rating agency confirmation that change does not affect ratings of the CLO notes
@@ -744,7 +746,7 @@ Trustees and portfolio administrators
      - makes payments and issues reports to investors
      - portfolio administrator takes direction from controlling class of investor in case of default
   - fee for trustee and portfolio administrator is around 1 b.p. (0.01%) of CLO's total size a year
-  - top trustees: US Bank, BNY Mellon, Deutsche Bank, Citibank, StateSTreet
+  - top trustees: US Bank, BNY Mellon, Deutsche Bank, Citibank, StateStreet
 
 Law firms
   - Arranger, manager, trustee will each employ a separate firm to negotiate and create documents
@@ -762,7 +764,7 @@ Law firms
 Rating agencies
   - all tranches except equity are rated
   - investors such as insurance companies and banks require the bonds they buy to be rated
-  - rating agenciies monitor the deals' performance through its life and upgrading/downgrading the various notes
+  - rating agencies monitor the deals' performance through its life and upgrading/downgrading the various notes
   - arrangers usually discuss a planned CLO with officials from agencies to
     ensure that it will gain their desired ratings
   - after crisis: rated by 1 or 2 agencies instead of 3 because more CLOs are
@@ -835,7 +837,7 @@ Sub-advisor: when original manager sold its right to manage a CLO
 
 Manager removal:
   - managers are free to resign
-  - right to choose a successor may be held by equity investors or require all calsses of investors to approve
+  - right to choose a successor may be held by equity investors or require all classes of investors to approve
   - deemed consent: investors who do not exercise their right to vote are deemed to have approved the proposal
   - for cause removal: the controlling class of investor can vote to remove the manager for cause
     - happen only in narrowly defined circumstances, e.g.,
@@ -885,10 +887,10 @@ Prepayments
   - reinvestment: common assumption is that manager will be able to reinvest
     all prepayment proceeds while reinvestment period and 50% of them after reinvestment end date
 
-Libor floor
+LIBOR floor
   - feature of many loans in US since 2008
-  - Libor fell to below 1% in early 2009
-  - States that Libor part of calculation = max(libor floor, real libor rate)
+  - LIBOR fell to below 1% in early 2009
+  - States that LIBOR part of calculation = max(LIBOR floor, real LIBOR rate)
 
 Modelling variations
   - default projection: remain low for long periods of time and then jump higher during recessions
@@ -913,7 +915,7 @@ Equity valuation
   - the total market value of the CLO's asset minus the total market value of debts
       - Net Asset Value, NAV
       - market value overcollateralisation
-      - problems: market price of CLO debt unknown, what manager will buy in the future is also unknwon
+      - problems: market price of CLO debt unknown, what manager will buy in the future is also unknown
 
 
 ## Secondary market
@@ -939,8 +941,8 @@ CLO trade: over the counter market
   - dealer with inventories of CLO debt or equity regularly send list of the
     CLOs they hold with an indication of the price they prepared to sell
   - bwics: holder circulates to dealers and brokers a list of CLO pieces it
-    wants to sell, and sets a time and date for the end of aution
-      - the list usually start to circule 3-4 days before deadline
+    wants to sell, and sets a time and date for the end of auction
+      - the list usually start to circulate 3-4 days before deadline
       - at deadline, investor chooses the highest bid for each asset
       - or no trade will take place if bids fall short of the expectation
       - after deadline, by convention, seller circulates "colour" on trading to all bidders
@@ -976,7 +978,7 @@ Balance sheet CLO
      - bank retains the equity tranche
      - act as deal's manager in limited fashion
   - Europe: balance sheet CLO from bank vs arbitrage CLO put together by asset manager
-  - manager retaining the equity tranche can also consdiered balance sheet CLOs
+  - manager retaining the equity tranche can also considered balance sheet CLOs
      - to be more common after risk retention rules in effect
 
 Currencies
@@ -985,9 +987,9 @@ Currencies
   - Europe: shortage of loan borrowers
      - some prefer to issue in GBP, CHF, or Scandinavian currencies
      - CLO to buy multiple currencies
-  - max currency CLO: liabilites in more than one currency
+  - max currency CLO: liabilities in more than one currency
      - currency loss incurred when an asset is sold are offset by the liabilities side
-     - handful of multicurrency CLOs issued in 2007-2008
+     - handful of multi-currency CLOs issued in 2007-2008
 
 
 # Regulations
@@ -1003,6 +1005,7 @@ Basel Accord: banks are required to have a basic capital ratio >8%
      - CLOs are not covered fund only if it satisfies any of these: (1) 100%
        loans, (2) no right to remove manager, (3) 3a7-compliant structure in EUR
        deals
+     - *update*: [repealed for CLO in 2018](https://www.reuters.com/article/us-clo-courtcase/court-rules-to-exempt-clos-from-dodd-frank-risk-retention-rules-idUSKBN1FT2E6)
 
 US SFA: Supervisory formula approach
   - for all securitisation positions
@@ -1016,6 +1019,18 @@ Risk retention:
      - possibly, manager holds equity tranche
 
 # Misc
+
+## Formula
+
+$$ \textrm{MVOC} = \frac{\textrm{Asset MV}}{\textrm{Senior balance} + \textrm{Pari-passu balance}} $$
+
+$$ \textrm{Par Subordination} = \frac{\textrm{Asset MV} - \textrm{Senior balance} - \textrm{Pari-passu balance}}{\textrm{Asset MV}} $$
+
+$$ \textrm{NAV} = \frac{\textrm{Asset MV} - \textrm{Senior balance}}{\textrm{Pari-passu balance}} $$
+
+$$ \textrm{Attachment point} = \frac{\textrm{Collateral MV} + \textrm{Cash} - \textrm{Senior balance} - \textrm{Pari-passu balance}}{\textrm{Collateral MV}} $$
+
+$$ \textrm{Detachment point} = \frac{\textrm{Collateral MV} + \textrm{Cash} - \textrm{Senior balance}}{\textrm{Collateral MV}} $$
 
 ## Mortgage terms
 
@@ -1039,6 +1054,6 @@ Example: 100 units put up for sale. Bids are as follows:
 - $1.1 for 40 units
 - $1.0 for 60 units
 
-So the price is set at ﹩1.0 (highest price $$x$$ such that bids $$\ge x$$ meet or exceed
+So the price is set at $1.0 (highest price $$x$$ such that bids $$\ge x$$ meet or exceed
 100 units); and total bids are 150 units thus each bidder allocates 2/3 of the
 bid.
