@@ -1,0 +1,58 @@
+---
+layout: post
+title: "Pandey et al (2017) A Fast x86 Implementation of Select"
+date: 2018-11-05
+category: paper
+bibtex:
+  type: misc
+  title: "A Fast x86 Implementation of Select"
+  author: "Prashant Pandey and Michael A. Bender and Rob Johnson"
+  year: 2017
+  url: "arxiv:1706.00990v1"
+---
+
+The paper tries to solve the problem of SELECT and RANK: SELECT is to find the
+$$r$$-th asserted bit in a bit vector and RANK is to find the total number of
+asserted bits in the $$j$$-bit prefix of the bit vector. For example, if the
+bit vector is 100101001010 (12-bit vector), RANK(5) is 3 for the bits 0 to 5 in
+the bit vector is 100101 and SELECT(4) is 8 for bits 0 to 8 is 100101001.
+
+Implementing SELECT and RANK for arbitrarily long vector in a naive way
+involves loops. For example, we can use POPCOUNT to count the asserted bits in
+a machine word. With a bit mask, we can make RANK function for a machine word.
+For multiple machine words, we can simply accumulate the count for each words
+in a loop.
+
+SELECT operation is harder to implement. The paper mention about a slightly
+different problem in section 2: the SELECT on large bit vectors. Two references
+are reviewed: The CS-Poppy and SDSL. The former maintains a hierarchy of bit
+blocks. For each block in the same level of hierarchy, the result of RANK is
+stored. Therefore, to find the result for SELECT, we can do a linear search on
+the top level for the block that held the result, then move down a level for
+a refined block and so on. At the lowest level, we can do linear scan of machine
+words. SDSL, however, store the position of every 4096-th asserted bits in a
+table. Upon evaluating SELECT, we can easily find the candidate range and
+perform linear scan for the result. In either way, some form of iteration is
+required.
+
+The paper mention about PTSelect, as invented by the first author. This make use
+of two new machine instructions in Intel's Haswell CPUs:
+
+- PDEP($$v,x$$): Deposit bits from operand $$v$$ to bits as specified by operand $$x$$
+- TZCNT($$x$$): Returns the number of trailing zeros in $$x$$
+
+For example, PDEP($$v,x$$) for $$v=$$`abcdefgh` and $$x=$$`10101101` results in
+bit vector $$y=$$`d0e0fg0h`. We can observe that the zero positions in $$x$$
+remains to be zero in $$y$$ but the asserted positions in $$x$$ will be set
+according to the value of $$v$$, from the LSB to the MSB.
+
+The PTSelect algorithm is then implemented as:
+
+$$ \mathrm{PTSelect}(x, r) = \mathrm{TZCNT}(\mathrm{PDEP}(2^r, x)) $$
+
+Which $$\mathrm{PTSelect}(x, r)$$ find the position of the $$r$$-th asserted
+bits in $$x$$. The function above use a left-shift on 2 to create a bit vector
+of only a single bit asserted and with $$r$$ trailing zeros. Then with PDEP to
+distribute the $$r$$ zero on $$x$$, we reset $$r$$ asserted bits from the LSB of
+$$x$$ and keep only the $$(r+1)$$-th asserted bit. Then the SELECT instruction
+is simply counting the trailing zero in such manipulated bit vector.
