@@ -1,0 +1,102 @@
+---
+layout: post
+title: Multiprocessing behaviour of Python in Windows vs non-Windows
+date: Fri, 16 Nov 2018 11:19:03 -0500
+tags: code
+---
+
+Recently some interesting behaviour of Python implementation is found. Indeed,
+it is mentioned in
+[StackOverflow](https://stackoverflow.com/questions/38236211/why-multiprocessing-process-behave-differently-on-windows-and-linux-for-global-o)
+some time ago already.
+
+Consider the following piece of [code](/img/pyfork.py):
+
+```python
+import argparse
+import multiprocessing
+
+def parsearg():
+    parser = argparse.ArgumentParser(description="mp test")
+    parser.add_argument("-i", "--input", default=0, type=int, help="some input")
+    args = parser.parse_args()
+    print("got args -i %s" % args.input)
+    return args
+
+def worker(n):
+    print("%d - %d" % (n, n*args.input))
+    return n*argcopy
+
+def main():
+    pool = multiprocessing.Pool(4)
+    print(args.input)
+    output = list(pool.map(worker, range(10)))
+    print(output)
+
+args = parsearg()
+argcopy = 0
+if __name__ == "__main__":
+    argcopy = args.input
+    main()
+```
+
+The output in Unix environments, including Cygwin's implementation of Python, is the following:
+
+```
+$ python pyfork.py -i 2
+got args -i 2
+2
+0 - 0
+1 - 2
+2 - 4
+4 - 8
+5 - 10
+3 - 6
+6 - 12
+7 - 14
+8 - 16
+9 - 18
+[0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
+```
+
+This is as what we expected:
+
+- command line argument is correctly parsed
+- in forking processes via `multiprocessing.Pool`, all variables, most notably
+  `argcopy`, are passed from parent process to children processes
+
+However, in Windows version of CPython, the output is as follows:
+
+```
+got args -i 2
+2
+[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+got args -i 2
+6 - 12
+got args -i 2
+0 - 0
+1 - 2
+2 - 4
+3 - 6
+4 - 8
+5 - 10
+7 - 14
+8 - 16
+9 - 18
+```
+
+Forget about the concurrency issue of which `print()` statement goes first, the issue here is that in Windows
+
+- there is not a COW `fork()` function
+- the python `multiprocessing` module is mimicking the `fork()` behaviour by
+  calling the same program again with the same command line argument, but other
+  state variables are not passed to the children
+
+The consequence is that, whatever the function that executes in the children
+needs but not passed on as function arguments may trigger an exception at best
+(e.g., if the `parsearg()` function is put inside `main()`, or if the code is
+more complicated we may run into issue of not correctly loading some modules),
+or simply be wrong silently at worst (e.g., the case in the code above). In
+other words, if we want to speed up the python program by multiprocessing and
+it happens to be executed in Windows, the workhorse in child process must be
+purely functional.
