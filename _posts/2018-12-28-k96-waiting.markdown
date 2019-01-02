@@ -1,0 +1,256 @@
+---
+layout: post
+title: "Koutras (1996) On a waiting time distribution in a sequence of Bernoulli trials"
+date: 2018-12-28
+category: paper
+bibtex:
+  type: article
+  title: "On a waiting time distribution in a sequence of Bernoulli trials"
+  author: "M. V. Koutras"
+  journal: "Ann. Inst. Statist. Math."
+  volume: 48
+  number: 4
+  pages: 789-806
+  year: 1996
+  url: https://pdfs.semanticscholar.org/5b6a/5299008293657032d170c062bc54f04ce3eb.pdf
+---
+
+Consider a Bernoulli trial with success probability $$p = 1-q$$, this paper is interested
+in the problem of the number of trials needed to see the $$r$$-th occurrence of
+seeing 2 successes within a window of no more than $$k$$ trials. Windows are
+non-overlapping.
+
+A window having 2 successes are defined such that only the first and last trials
+are by definition a success and its length is less than or equal to $$k$$. Alternative
+definition of the problem is based on a "2-out-of-$$k$$ sliding window detector".
+
+These are the symbols defined in the paper:
+
+- $$X_1, X_2, \cdots$$ are Bernoulli trial sequence, takes values of 0 or 1
+- $$p = 1-q$$ is the Bernoulli parameter, the probability of success
+- $$k\ge 2$$ is the maximum window size
+- $$r\ge 1$$ is the number of occurrences to look for
+- $$T_{k,r}$$ is the waiting time, i.e., number of trials to see the $$r$$-th
+  occurrence of 2 successes within windows of size $$k$$
+- $$N_{n,k}$$ is the number of occurrences of a strand of at most $$k$$
+  consecutive trials containing 2 successes. $$P(N_{n,k}\ge r) = P(T_{k,r} \le n)$$
+- $$f_{k,r}(n) = P(T_{k,r}=n)$$ is the distribution function for $$T_{k,r}$$
+- $$\phi_{k,r} = \sum_{n=0}^{\infty} f_{k,r}(n)z^n$$ is the probability generating function
+
+We can see that,
+
+$$T = T_{k,1} = \inf\left\{n\ge 1: \sum_{i=\max(1,n-k+1)}^n X_i \ge 2\right\}$$
+
+$$P(T>n) = P(N_{n,k} = 0)$$
+
+In sec 3, we consider only $$T=T_{k,1}$$, with $$f(n)=f_{k,1}(n)$$, and the
+first theorem is derived as follows: Obviously $$f(0)=f(1)=0$$ for we cannot
+have two successes before the second trial. For $$n\le k$$, i.e., within the size
+of one window, then $$f(n) = (n-1)p^2q^{n-2}$$
+which is interpreted as having one success somewhere within first $$n-1$$ trials
+and the other success at trial $$n$$. Consider the probability $$f(n)$$
+for larger $$n$$. We sure we see a success at trial $$n$$. If the result of the
+first trial is failure (with probability $$q$$), then we are looking for the
+occurrence of such pattern from second trial onward, i.e. with probability $$qf(n-1)$$.
+But if the first trial is success (with probability $$p$$), we cannot have another
+success in trials 2 to $$k$$ to meet the criteria that $$T_{k,1} = n$$. So the
+probability will be $$pq^{k-1}f(n-k)$$. Therefore, we established:
+
+$$f(n) = f_{k,1}(n) = \begin{cases}
+0 & n\in\{0,1\} \\
+(n-1)p^2q^{n-2} & 1<n\le k \\
+qf(n-1)+pq^{k-1}f(n-k) & n>k
+\end{cases}$$
+
+Note that $$\sum_n f(n) = q\sum_n f(n-1) + pq^{k-1} \sum_n f(n-k)$$, so the
+tail probabilities $$F(n) = P(T>n) = \sum_{x=n+1}^{\infty} f(x)$$
+satisfy the same recurrence relation.
+
+Here, we have a special case of $$k=2$$: (this is an interview question I was
+asked, but at the time I wasn't realized that there is no close form solution
+and we have to resolve into numeric answer)
+
+$$\begin{align}
+f(n) = f_{2,1}(n)
+&= qf(n-1)+pqf(n-2) \\
+&= f(n-1)+p^2qf(n-3)
+\end{align}$$
+
+Here we have a few properties of $$f(n)$$: On $$1<n\le k-1$$,
+
+$$\frac{f(n+1)}{f(n)} = \frac{n}{n-1}q$$
+
+and
+
+$$\begin{align}
+\frac{n}{n-1}q \ge 1
+\Rightarrow\quad nq \ge n-1
+\Rightarrow\quad np \ge 1
+\end{align}$$
+
+therefore
+
+$$\begin{cases}
+f(n+1) \ge f(n) & \textrm{if } n\le 1/p \\
+f(n+1) \le f(n) & \textrm{if } n\ge 1/p.
+\end{cases}$$
+
+For $$f(n+1),\; n\ge k$$, it should be lower-bounded by the case that first $$k-1$$
+trials are all failed (which is stricter case than only the first trial failed):
+
+$$\begin{align}
+f(n+1) &\ge q^{k-1}f(n-k+1) \\
+qf(n)+pq^{k-1}f(n-k+1) &\ge q^{k-1}f(n-k+1) \\
+qf(n) &\ge (1-p)q^{k-1}f(n-k+1) \\
+f(n) &\ge q^{k-1}f(n-k+1)
+\end{align}$$
+
+Hence is the equation on p.792. From this we can see that
+
+$$\begin{align}
+f(n+1) - f(n)
+&= qf(n)+pq^{k-1}f(n-k+1) - f(n) \\
+&= -pf(n)+pq^{k-1}f(n-k+1) \\
+&\ge p[-q^{k-1}f(n-k+1)+q^{k-1}f(n-k+1)] = 0 \\
+f(n+1) - f(n) &\ge 0
+\end{align}$$
+
+So here we concluded that $$f(n)$$ is unimodal with maximum attained
+at $$n=\left[\min(k-1, 1/p)\right]+1$$ but the strong unimodality characterization $$f^2(n)\ge f(n-1)f(n+1)$$
+reversed the sign on $$n=k+1$$. Therefore its convolution with other unimodal distributions
+is not necessarily unimodal --- so it is not easy to tell the properties of
+$$f_{k,r}$$ from $$f_{k,1}$$.
+
+The generating function: First consider that $$f(n) = qf(n-1)+p^2q^{n-2}$$
+for $$1<n\le k$$. Then
+
+$$\begin{align}
+\phi(z) &= \phi_{k,1}(z) \\
+&= \sum_{n=0}^{\infty} f(n)z^n \\
+&= \sum_{n=0}^{k} f(n)z^n + \sum_{n=k+1}^{\infty} f(n)z^n \\
+&= \sum_{n=2}^{k} (qf(n-1)+p^2q^{n-2})z^n + \sum_{n=k+1}^{\infty} (qf(n-1)+pq^{k-1}f(n-k))z^n \\
+&= qz\sum_{n=2}^{k} f(n-1)z^{n-1} + p^2 z^2\sum_{n=2}^{k} q^{n-2}z^{n-2}
+ + qz\sum_{n=k+1}^{\infty} f(n-1)z^{n-1} + pq^{k-1}z^k\sum_{n=k+1}^{\infty} f(n-k)z^{n-k} \\
+&= qz\sum_{n=1}^{k-1} f(n)z^n
+ + p^2 z^2\sum_{n=0}^{k-2} q^n z^n
+ + qz\sum_{n=k}^{\infty} f(n)z^n
+ + pq^{k-1}z^k\sum_{n=1}^{\infty} f(n)z^n \\
+&= qz\sum_{n=1}^{\infty} f(n)z^n
+ + p^2 z^2 \frac{1-(qz)^{k-1}}{1-qz}
+ + pq^{k-1}z^k\sum_{n=1}^{\infty} f(n)z^n \\
+&= qz\phi(z)
+ + (pz)^2 \frac{1-(qz)^{k-1}}{1-qz}
+ + pq^{k-1}z^k\phi(z) \\
+\phi(z) &= \frac{(pz)^2(1-(qz)^{k-1})/(1-qz)}{1-qz-pq^{k-1}z^k}
+\end{align}$$
+
+From which we can find the mean and variance of $$T=T_{k,1}$$ (corollary 3.1):
+
+$$\begin{align}
+\mu = E[T] &= \phi'(1) \\
+&= \frac{2-q^{k-1}}{p(1-q^{k-1})} \\
+\sigma^2 = \mathrm{Var}[T] &= \phi''(1)+\phi'(1)-(\phi'(1))^2\\
+&= \frac{q}{p^2} + (2k-1)\frac{q^{k-1}}{p(1-q^{k-1})^2}+\frac{q}{p^2(1-q^{k-1})^2}
+\end{align}$$
+
+and for higher order moments, $$m_s = E[T^s]$$, $$s\ge 0$$, we have (theorem 3.3)
+
+$$\begin{align}
+m_s
+&= \sum_{n=2}^k n^s f(n) + \sum_{n=k+1}^{\infty} n^s f(n) \\
+&= p^2 \sum_{n=2}^k n^s q^{n-2} + q\sum_{n=2}^{\infty} n^s f(n-1) + pq^{k-1} \sum_{n=k+1}^{\infty} n^s f(n-k) \\
+&= p^2 \sum_{n=2}^k n^s q^{n-2} + q\sum_{n=1}^{\infty} (n+1)^s f(n) + pq^{k-1} \sum_{n=1}^{\infty} (n+k)^s f(n) \\
+&= p^2 \sum_{n=2}^k n^s q^{n-2} + q\sum_{i=1}^{s} \binom{s}{i}m_i + pq^{k-1} \sum_{i=0}^{s} \binom{s}{i}k^{s-i}m_i \\
+&= \frac{1}{p(1-q^{k-1})}\left[p^2\sum_{n=2}^k n^sq^{n-2}+q\sum_{i=0}^{s-1}\binom{s}{i}(1+pq^{k-2}k^{s-i})m_i\right]
+\end{align}$$
+
+Using the above result, the paper proposed a way to estimate the Bernoulli parameter $$p$$:
+
+$$ E[T] = \frac{1}{p}\left(1+\frac{1}{1-(1-p)^k}\right) $$
+
+which $$E[T] = \frac{1}{N}\sum_{i=0}^N T^{(i)}$$ is determined by Monte Carlo simulation.
+Indeed, the summation $$\sum_{i=0}^N T^{(i)}$$ is one instance of $$T_{k,N}$$.
+
+I tried out this estimation:
+
+```python
+import random
+
+p = 0.14159
+k = 5
+rangen = random.SystemRandom()
+
+def trial():
+    # simulate a Bernoulli trial, with success prob p
+    return rangen.random() <= p
+
+def Tn():
+    """Simulate T
+
+    Returns:
+        tuple (T, n), which T is number of trials done until we see 2 head in a
+        window of k, and n is the total number of success encountered in T
+    """
+    T = 0
+    last_k = []
+    while True:
+        result = trial()
+        T += 1
+        last_k.append(result)
+        if not result:
+            continue
+        if sum(last_k[-k:]) == 2:
+            return (T, sum(last_k))
+
+def main():
+    # simulate 1000 count of T
+    N = 1000
+    sum_T = 0
+    sum_n = 0
+    for _ in range(N):
+        T, n = Tn()
+        sum_T += T
+        sum_n += n
+    # compute probability
+    simple_p = float(sum_n)/float(sum_T)
+    mean_T = float(sum_T) / N
+    h = (1 + 1/(1 - (1 - simple_p)**k)) / simple_p
+    th_h = (1 + 1/(1 - (1 - p)**k)) / p
+    print("T, n: %d, %d" % (sum_T, sum_n))
+    print("real p: %.6f" % p)
+    print("simple p: %.6f" % simple_p)
+    print("computed h from simple p: %.6f" % h)
+    print("experimental T: %.6f" % mean_T)
+    print("theoretical T: %.6f" % th_h)
+
+if __name__ == "__main__":
+    main()
+```
+
+and found that this approach is less accurate than simply using the result of
+all Bernoulli trials ever performed -- for the reason that we use vastly less
+number of samples.
+
+Sec 4 answers the ultimate question of $$T_r = T_{k,r}$$. It can be seen as a
+sum $$r$$ of iid random variables $$T_{k,1}$$ and therefore, the paper starts
+with the probability generating function
+
+$$\begin{align}
+\phi_r(z) &= \sum_{n=0}^{\infty} f_r(n)z^n = E[z^{\sum T}] = (E[z^T])^r\\
+&= \left[\frac{(pz)^2(1-(qz)^{k-1})/(1-qz)}{1-qz-pq^{k-1}z^k}\right]^r
+\end{align}$$
+
+This can help finding the probability distribution:
+
+$$\begin{align}
+\phi_r(z) &= [\phi(z)]^r \\
+\therefore \phi_{r+1}(z) &= \phi(z)\phi_r(z) \\
+\therefore f_r(n) &= \phi_r(0)
+\end{align}$$
+
+and by the properties of sum of iid random variables
+
+$$\begin{align}
+E[T_r] &= rE[T] \\
+\mathrm{Var}[T_r] &= r\mathrm{Var}[T]
+\end{align}$$
