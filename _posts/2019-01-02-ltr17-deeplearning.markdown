@@ -91,6 +91,11 @@ function often used:
 
 $$\mathbf{\sigma}(\mathbf{x}) = \frac{e^{\mathbf{x}}}{\sum_i e^{y_i}}$$
 
+[Note: $$e^{\mathbf{x}}$$ is applying exponential to individual elements of
+$$\mathbf{x}$$. Softmax function is to normalize a vector such that sum of all
+elements become 1 and each element becomes positive due to exponentiation. Such
+normalization is not linear.]
+
 Comparing this to the notation of $$\mathbf{p}(\mathbf{x})$$ above, we can see
 that we can rewrite it as:
 
