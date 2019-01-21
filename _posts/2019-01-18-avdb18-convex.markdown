@@ -1,0 +1,147 @@
+---
+layout: post
+title: "Agrawal et al (2018) A rewriting system for convex optimization problems"
+date: Fri, Jan 18, 2019 4:15 PM
+category: paper, code
+bibtex:
+  type: article
+  title: "A rewriting system for convex optimization problems"
+  author: "Akshay Agrawal and Robin Verschueren and Steven Diamond and Stephen Boyd"
+  journal: "Journal of Control and Decision"
+  volume: 5
+  number: 1
+  page: 42--60
+  year: 2018
+  doi: 10.1080/23307706.2017.1397554
+  url: https://web.stanford.edu/~boyd/papers/pdf/cvxpy_rewriting.pdf
+---
+
+I learn about this paper when I am studying the python package `cvxpy`. This is
+an interface to other solvers such as glpk and Boyd who authored the book of
+Boyd & Vandenberghe is one of the creator. This package, however, requires some
+special formulation of the problem called "disciplined convex programming"
+notation. This paper describes the DCP and the rationale behind it, while the
+focus is on how to automatically rewrite a programming problem to fit a solver.
+
+The paper describe mathematical optimization problem as a composition of
+variables, constraints, and objective function. Convex optimization problems
+are those with convex objective function and with constraints that are
+equalities with affine functions and inequalities with convex functions. It is
+known that convex optimization can be solved in polynomial time. DCP is to
+address the issue of how to confirm an optimization problem is a convex one.
+The notation is to allow a solver to check if it is the case.
+
+Convex problems is a large class. The most restrictive one, linear programming
+problems (LP), can be reduced to quadratic programming (QP), and in turn, a
+second-order cone programming (SOCP), semidefinite programming (SDP), cone
+programming (CP), graph form programming (GFP). That is, $$LP \subset QP
+\subset SOCP \subset SDP \subset CP \subset GFP$$. But using a solver of more
+general problem reduces the efficiency in solving it.
+
+Canonicalization is the process of converting an optimization problem to a form
+compatible to the solver. The paper is to describe an engine for
+canonicalization that sits in front of the solver. The following reductions
+might be done:
+
+- flipping objectives: maximization of $$f$$ becomes minimization of $$-f$$
+- moving expressions to left side of a relation: $$f = g$$ constraint becomes
+  $$f-g = 0$$, and $$f \le g$$ becomes $$f-g \le 0$$
+- introducing slack variable: $$f(x) \le g(x)$$ becomes $$f(x) + s = g(x)$$ for
+  some aux slack variable $$s \ge 0$$
+- monotone transformation: For a monotonic increasing function $$F(x)$$, if
+  $$f(x) \le g(x)$$ than $$F(f(x)) \le F(g(x))$$. Applying monotonic increasing
+  function to the objective function also do not change the optimization
+  result.
+   - useful to reduce exponential and logarithms
+- changing variables by bijective function: If $$\phi$$ is a one-to-one mapping
+  from domain of $$z$$ to domain of $$x$$, then $$f(x)\le g(x)$$ can be written
+  as $$f(\phi(z)) \le g(\phi(z))$$ and the optimization is on $$z$$ instead
+   - useful to convert a non-convex problem to convex
+   - example: min $$f_0(x)$$ s.t. $$f_i(x)\le 1$$ and $$h_i(x)=1$$ for all
+     $$i$$ is a geometric program if $$f_i(x)$$ are polynomials and $$h_i(x)$$
+     are monomials.  Substituting $$x=e^z$$ converts this to convex problem.
+     And further, if $$f_i(x)$$ are all monomials, it converts to linear
+     problem.
+- eliminating complex numbers
+
+and in "presolve" stage, there are several eliminations:
+
+- fixed variables: Variables constrained to a constant is replaced with the constant
+- free variables: Variables $$x$$ with no upper nor lower bound are replaced
+  with $$x=x_{+} - x_{-}$$, with the introduction of two new non-negative aux
+  variables
+- redundant constraints: Remove all constraints that whose remove leaves the
+  feasible region unchanged
+  - e.g. linear constraints that is a linear combination of other linear constraints
+- scaling
+
+Canonicalization is in three steps: Lift a problem into "smith form", relax the
+lifted problem into convex problem, and finally replace all non-linear atom
+with conic constrains that encode its *graph implementation*.
+
+Below is specific to `cvxpy` module. First, an example on its syntax:
+
+```python
+import cvxpy as cp
+
+# Create two scalar optimization variables.
+x = cp.Variable()
+y = cp.Variable()
+
+# Create two constraints.
+constraints = [x + y == 1, x - y >= 1]
+
+# Form objective.
+obj = cp.Minimize((x - y)**2)
+
+# Form and solve problem.
+prob = cp.Problem(obj, constraints)
+prob.solve() # Returns the optimal value.
+print("status:", prob.status)
+print("optimal value", prob.value)
+print("optimal var", x.value, y.value)
+```
+
+output:
+
+```
+status: optimal
+optimal value 0.999999999761
+optimal var 1.00000000001 -1.19961841702e-11
+```
+
+The `prob.solve()` will use the most optimal method. The optimal value is `inf`
+or `-inf` for infeasible or unbounded problems in minimization (vice versa for
+maximization). The problem status will return "infeasible" or "unbounded"
+instead of "optimal" in those cases. Actually `prob` can be printed, like this
+(line breaks are added):
+
+```
+Problem(
+	Minimize(Expression(CONVEX, NONNEGATIVE, ())),
+	[
+		Equality(Expression(AFFINE, UNKNOWN, ()), Constant(CONSTANT, NONNEGATIVE, ())),
+		Inequality(Constant(CONSTANT, ZERO, ())),
+		Inequality(Expression(AFFINE, NONNEGATIVE, (3,))),
+		Inequality(Variable((3,), integer=True))
+	]
+)
+```
+
+The stringified output of a problem helps to understand DCP (disciplined convex
+programming). What it means is that we confine an expression to a composition
+of `cvxpy.Variables()`, `cvxpy.Parameters()`, `float`, `np.array()`, `+`, `-`,
+`*`, `/`, and cvxpy library functions. An expression written in this way can
+have its sign deduced, to be any of zero, positive, negative, or unknown.
+`cvxpy` encourage to use its library functions because this helps it to deduce
+the attributes, for example, `x*x` is unknown sign until sign of `x` is known,
+but `cvxpy.square(x)` is positive. Besides the sign, we can also deduce the
+curvature of an expression to be constant, affine, convex, concave, or unknown.
+(constant = independent of variables, affine = linear)
+
+A problem written in DCP means the objective is either max a concave or min a
+convex function, and the constraints are only allowed to be:
+  - affine `==` affine
+  - convex `<=` concave
+  - concave `>=` convex
+
