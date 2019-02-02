@@ -2,6 +2,7 @@
 layout: post
 title: Solving Sudoku with Simulated Annealing
 date: Wed, 30 Jan 2019 19:12:32 -0500
+lastedit: Thu, 31 Jan 2019 18:55:25 -0500
 tags: code
 ---
 
@@ -379,6 +380,11 @@ do. The value of `T`, however, plays a role in the probability function of
 acceptance and thus it set as such.
 
 ![](/img/simanneal.png)
+
+How about SA with constant temperature? Make `Tmin` and `Tmax` equal.  How
+about simple hill-climbing instead of SA? Set `Tmax` to as close to zero as
+possible so the acceptance probability function is virtually 0.  But a problem
+of combinatorial nature should not be suitable for hill-climbing search.
 
 ## Reference
 
