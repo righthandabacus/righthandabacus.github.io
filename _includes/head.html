@@ -3,105 +3,101 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 
-  {% capture titlestring %}
-    {% if page.title %}
+  {%- capture titlestring -%}
+    {%- if page.title -%}
       {{ page.title }}{% if page.subtitle %} &middot; {{ page.subtitle }}{% endif %}
-    {% else %}
+    {%- else -%}
       {{ site.title }}{% if site.subtitle %} &middot; {{ site.subtitle }}{% endif %}
-    {% endif %}
-  {% endcapture %}
+    {%- endif -%}
+  {%- endcapture -%}
   <title>{{ titlestring | strip }}</title>
 
   <meta name="author" content="{{ site.author.name }}" />
-  {% if page.subtitle %}
+  {%- if page.subtitle -%}
     <meta name="description" content="{{ page.subtitle }}" />
-  {% endif %}
+  {%- endif -%}
 
   <link rel="alternate" type="application/rss+xml" title="{{ site.title }} - {{ site.description }}" href="{{ site.baseurl }}/feed.xml" />
 
-  {% if layout.css %}
-    {% for css in layout.css %}
-      {% if css contains "//" %}
+  {%- if layout.css -%}
+    {%- for css in layout.css -%}
+      {%- if css contains "//" -%}
         <link rel="stylesheet" href="{{ css }}" />
-      {% else %}
+      {%- else -%}
         <link rel="stylesheet" href="{{ css | prepend: site.baseurl }}" />
-      {% endif %}
-    {% endfor %}
-  {% endif %}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
 
-  {% if layout.more_css %}
-    {% for css in layout.more_css %}
-      {% if css contains "//" %}
+  {%- if layout.more_css -%}
+    {%- for css in layout.more_css -%}
+      {%- if css contains "//" -%}
         <link rel="stylesheet" href="{{ css }}" />
-      {% else %}
+      {%- else -%}
         <link rel="stylesheet" href="{{ css | prepend: site.baseurl }}" />
-      {% endif %}
-    {% endfor %}
-  {% endif %}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
 
-  {% if page.bibtex %}
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
-  {% endif %}
-
-  {% if layout.googlefonts %}
+  {%- if layout.googlefonts -%}
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family={{ layout.googlefonts | join: '|' }}" />
-  {% endif %}
+  {%- endif -%}
 
-  {% if page.css %}
-    {% for css in page.css %}
-      {% if css contains "//" %}
+  {%- if page.css -%}
+    {%- for css in page.css -%}
+      {%- if css contains "//" -%}
         <link rel="stylesheet" href="{{ css }}" />
-      {% else %}
+      {%- else -%}
         <link rel="stylesheet" href="{{ css | prepend: site.baseurl }}" />
-      {% endif %}
-    {% endfor %}
-  {% endif %}  
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
 
-  {% if page.googlefonts %}
-    {% for font in page.googlefonts %}
+  {%- if page.googlefonts -%}
+    {%- for font in page.googlefonts -%}
       <link rel="stylesheet" href="//fonts.googleapis.com/css?family={{ font }}" />
-    {% endfor %}
-  {% endif %}
+    {%- endfor -%}
+  {%- endif -%}
 
-  {% if layout.head_js %}
-    {% for js in layout.head_js %}
-      {% if js contains "//" %}
+  {%- if layout.head_js -%}
+    {%- for js in layout.head_js -%}
+      {%- if js contains "//" -%}
         <script src="{{ js }}"></script>
-      {% else %}
+      {%- else -%}
         <script src="{{ js | prepend: site.baseurl }}"></script>
-      {% endif %}
-    {% endfor %}
-  {% endif %}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
 
-  {% comment %} Facebook OpenGraph tags {% endcomment %}
+  {%- comment %} Facebook OpenGraph tags {% endcomment -%}
   <meta property="og:title" content="{{ titlestring | strip }}" />
   <meta property="og:type" content="website" />
-  {% if page.id %}
+  {%- if page.id -%}
     <meta property="og:url" content="{{ site.url }}{{ page.url }}" />
-  {% else %}
+  {%- else -%}
     <meta property="og:url" content="{{ site.url }}{{ page.url | remove: '/index.html' | remove: '.html' }}" />
-  {% endif %}
-  {% if page.share-img %}
+  {%- endif -%}
+  {%- if page.share-img -%}
     <meta property="og:image" content="{{ page.share-img }}" />
-  {% elsif site.avatar %}
+  {%- elsif site.avatar -%}
     <meta property="og:image" content="{{ site.url }}{{ site.avatar }}" />
-  {% else %}
+  {%- else -%}
     <meta property="og:image" content="" />
   {% endif %}
   
-  {% comment %} Twitter summary cards {% endcomment %}
+  {%- comment %} Twitter summary cards {% endcomment -%}
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:site" content="@{{ site.author.twitter }}" />
   <meta name="twitter:creator" content="@{{ site.author.twitter }}" />
   <meta name="twitter:title" content="{{ titlestring | strip }}" />
   <meta name="twitter:description" content="{{ page.content | strip_html | xml_escape | truncatewords: 50 }}" />
-  {% if page.share-img %}
+  {%- if page.share-img -%}
     <meta name="twitter:image" content="{{ page.share-img }}" />
-  {% elsif site.avatar %}
+  {%- elsif site.avatar -%}
     <meta name="twitter:image" content="{{ site.url }}{{ site.avatar }}" />
-  {% endif %}
+  {%- endif -%}
   
-  {% comment %} mathjax in style of math.stackexchange {% endcomment %}
+  {%- comment %} mathjax in style of math.stackexchange {% endcomment -%}
   <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
       jax: ["input/TeX", "output/HTML-CSS"],

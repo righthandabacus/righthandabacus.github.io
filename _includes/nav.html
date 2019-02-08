@@ -5,37 +5,37 @@
         </button>
         <a class="navbar-brand" href="{{ site.baseurl }}/">{{ site.title }}</a>
     </div>
-    {% if site.avatar and (layout.show_avatar or page.show_avatar) %}
+    {%- if site.avatar and (layout.show_avatar or page.show_avatar) -%}
     <div class="mt-5 position-relative avatar-container">
         <a href="{{ site.url }}/">
             <img class="rounded-circle avatar-img-border"
                  src="{% if site.avatar contains '//' %}{{ site.avatar }}{% else %}{{ site.avatar | prepend: site.baseurl }}{% endif %}" />
         </a>
     </div>
-    {% endif %}
+    {%- endif -%}
     <div class="navbar-collapse collapse dual-collapse2 justify-content-end">
         <ul class="navbar-nav mx-4">
-            {% for link in site.navbar %}
-                {% if link[1].first %}
+            {%- for link in site.navbar -%}
+                {%- if link[1].first -%}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="javascript:void(0)" id="navbar{{ link[0] }}"
                            role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             {{ link[0] }}
                         </a>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                            {% for childlink in link[1] %}
-                                {% for linkparts in childlink %}
-                                    <span class="dropdown-item">{% include navbarlink.html link=linkparts %}</span>
-                                {% endfor %}
-                            {% endfor %}
+                            {%- for childlink in link[1] -%}
+                                {%- for linkparts in childlink -%}
+                                    <span class="dropdown-item">{%- include navbarlink.html link=linkparts -%}</span>
+                                {%- endfor -%}
+                            {%- endfor -%}
                         </div>
                     </li>
-                {% else %}
+                {%- else -%}
                     <li class="nav-item">
-                        <span class="nav-link">{% include navbarlink.html link=link %}</span>
+                        <span class="nav-link">{%- include navbarlink.html link=link -%}</span>
                     </li>
-                {% endif %}
-            {% endfor %}
+                {%- endif -%}
+            {%- endfor -%}
         </ul>
     </div>
 </nav>

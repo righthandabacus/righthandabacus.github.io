@@ -22,13 +22,15 @@ exclude: ["Gemfile","Gemfile.lock","LICENSE","README.md","CNAME","*.bak","NOTES.
 
 timezone:      "America/New_York"
 markdown:      kramdown
-highlighter:   rouge
+highlighter:   rouge # githubpage won't allow to change this
 permalink:     /:year-:month-:day-:title/
 paginate:      5
 paginate_path: '/page/:num'
 
 kramdown:
   input: GFM
+  syntax_highlighter_opts:
+    disable: true
 
 plugins:
   - jekyll-feed
