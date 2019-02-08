@@ -1,0 +1,80 @@
+---
+layout: post
+title: "PACELC theorem"
+date: Thu, 07 Feb 2019 19:19:07 -0500
+tags: code
+---
+
+A few years ago I learned about [ACID, BASE, and the CAP theorem](/2012-11-21-captheorem).
+Recently I learned about an extension, the PACELC theorem. So some recap:
+
+## ACID and BASE
+
+[ACID](https://en.wikipedia.org/wiki/ACID_(computer_science)) is about database
+transaction operation. It means:
+
+- atomicity: transaction is either fully succeed or entirely rolled back
+- consistency: database state should never be invalidated. All necessary
+  constraints, triggers, cascades should be applied
+- isolation: parallel execution of transactions should as-if executed
+  sequentially. Incomplete transaction may even invisible to other
+  transactions.
+- durability: completed transactions persist, committed to non-volatile memory,
+  so we can even sustain from power failure
+
+The common confusion is on the term *consistency*, which here means not
+self-contradicting in different part of the database state constraints. The
+other use of the keyword is to mean identical data in a distributed system, or
+convergence to the same state between different hosts.
+
+[BASE](https://en.wikipedia.org/wiki/Eventual_consistency) transaction is at
+the other extreme, which use the other meaning of consistency:
+
+- basically available: system responsive even without guarantee on data consistency
+- soft-state: database state may change over time while no user update
+- eventual consistency: the soft-state of database will converge to a stable
+  state when data propagated to all hosts
+
+ACID is the standard mode of operation for RDBMS to guarantee data accuracy. So
+usually mutex is used and hurts I/O throughput.  BASE, however, is common for
+NoSQL database cluster to optimize for availability and best-effort response
+time while sacrificing correctness.
+
+## CAP and PACELC
+
+Connecting ACID and BASE paradigm is the CAP theorem. It concerns the following
+attributes of a distributed data store:
+
+- consistency: read reflects the most recent write (A and D in ACID, same
+  meaning of consistency in BASE)
+- availability: respond to every request without above consistency guarantee
+- partition tolerance: the system continue to operate despite network failure,
+  e.g., partially disconnected, packet drop, severe delay
+
+We cannot avoid partition in a distributed system, so CAP theorem means a
+distributed system should choose between consistency or availability. ACID
+database chose consistency (refuse response if cannot check with peers) while
+BASE database chose availability (respond with local data without ensuring it
+is the latest with its peers).
+
+[PACELC theorem](https://en.wikipedia.org/wiki/PACELC_theorem) give further
+detail on what happen when there is no partitioning (i.e., network is healthy).
+The acronym means if we suffer from network partitioning (P), we have to choose
+between availability (A) or consistency (C), else (E) we have to choose between
+latency (L) or consistency (C). The PAC is same as the CAP theorem and the ELC
+is the extension.
+
+The whole thesis is assuming we maintain high availability by replication. So
+when there is failure, CAP theorem prevails. But if not, we still have to
+consider the tradeoff between consistency and latency of a replicated system.
+Now we can classify come database systems:
+
+- MySQL cluster: PC+EC, such RDBMS always prioritize for consistency of data
+- Amazon DynamoDB: PA+EL, it aimed for fast respond time by trading off
+  consistency of data
+
+## Reference
+
+Daniel Abadi, [Consistency Tradeoffs in Modern Distributed Database System
+Design](http://cs-www.cs.yale.edu/homes/dna/papers/abadi-pacelc.pdf). IEEE
+Computer, pp.37--42, Feburary 2012.

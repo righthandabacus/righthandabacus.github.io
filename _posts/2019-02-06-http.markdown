@@ -1,0 +1,181 @@
+---
+layout: post
+title: "Evolution of HTTP"
+date: Wed, 06 Feb 2019 16:55:00 -0500
+tags: system code
+---
+
+In the beginning, there were HTTP. Then we started to version it. First we have
+HTTP/0.9, then HTTP/1.0 (RFC1945), then HTTP/1.1 (RFC2068 in 1997), and
+recently we have HTTP/2 (RFC7540 in 2015) and HTTP/3 ([Internet
+draft](https://tools.ietf.org/html/draft-ietf-quic-http-18) in 2018). So it
+should be a time to review how the protocol evolved in a high level.
+
+The predominant HTTP/1.1 protocol[^1] uses one TCP connection for each request, and
+we can reuse the connection after a request has finished. Usually a browser
+will limit limit to opening at most 6 connections at a time. Optionally, we can
+run HTTP above SSL. SSL is versioned as 1.0 (the Netscape version), 2.0 (1995),
+and later 3.0 (1996), which is then renamed and evolved to TLS 1.0 (RFC2245 in
+1999).  These are are deprecated and now we have TLS 1.1 (RFC4346 in 2006), TLS
+1.2 (RFC5246 in 2008), and TLS 1.3 (RFC8446 in 2018). TLS 1.2 gradually becomes
+mandatory after the European GDPR and TLS 1.3 is on the way becomes the norm.
+
+[^1]: RFC2068 in 1997, RFC2616 in 1999, RFC7230 in 2014
+
+### SPDY and HTTP/2
+
+This is so far for now. But years back, Google is experiementing SPDY: a
+revision to HTTP to allow breaking a HTTP stream into frames and interleave the
+frames of different streams under the same TCP connection. This idea is getting
+standardized into HTTP/2. Features are:
+
+- add multiplexing and pipelining over HTTP/1.1
+  - concurrent requests in a single connection
+  - save overhead on TCP handshake, SSL
+  - Standard adopted from Google SPDY spec
+  - RFC7540 (HTTP/2) and RFC7541 (HPACK), May 2015
+- "binary framing layer" introduced, not backward compatible with HTTP/1.x
+  - a layer above TLS layer and below HTTP/2.0 application layer
+  - use TLS 1.2+
+  - HTTP/1.x protocol is newline delimited plaintext, HTTP/2 is smaller
+    messages and frames, each is encoded in a binary format
+- server push: multiple response per single request
+  - for example, request index.html, response with related js and css
+  - send with `PUSH_PROMISE` frame to signal client ahead of what to expect so
+    client will not send redundant requests
+- header compression: HPACK
+  - implicit imply request headers from other frame (of other requests)
+
+HTTP/2 introduced a new concept of stream to represent a flow of bytes over a
+connection. Each stream comprises of multiple messages. The old HTTP request or
+response is one message. Each message is a logical request or response. A
+message is assembled from frames. Frames are the smallest unit of
+communication. Each containing a frame header and carries a specific type of
+data, such as message payload or HTTP headers. Frames are interleaved in a
+stream and reassembled to recover the message.
+
+With such, we can multiplex multiple message in one TCP connection and we can
+use single connection to serve concurrent requests. This is called connection
+coalescing and desharding. This makes the TCP connections more long-lived.
+However, as there is only a single TCP, it may not perform any better than
+HTTP/1.x if the packet loss rate is high.
+
+HTTP/2 specification does not mandatory require TLS, but in reality, browsers only
+implemented it with TLS.
+
+### HTTP/3
+
+The next step of Google's invention after SPDY is QUIC. It uses UDP instead of
+TCP for the transport and it was named as HTTP over QUIC or HTTP/2 over QUIC
+but now undergoing standardization to called HTTP/3 in the internet draft.
+
+
+QUIC [^2] is UDP-based multiplexed and secure transport. IETF version requires TLS
+1.3 (RFC8446) as the foundation for crypto and security layer (compared to TLS
+1.2, requires fewer handshake round trips) but uses only "TLS messages" but not
+"TLS records". Which the standard OpenSSL API does not support without a patch
+(as of now). The mandatory requirement of TLS encryption is a mean to combat
+*protocol ossification* [^3], so that middle boxes cannot see much of the
+protocol passing through and thus force them to be agnostic about the protocol
+detail.
+
+[^2]: QUIC originally was an acronym Quick UDP Internet Connections
+
+[^3]: ossification means forming of bones, or a protocol cannot be changed due to networking equipment assumed and requires it to operate in an old version behaviour. Any change will be considered bad or illegal by the networking equipment.
+
+The current implementation of QUIC may not work well. Experiments by Google and
+FB found that it needs twice the CPU for same traffic load. May be due to Linux
+not yet optimized for UDP in high speed transfer and no hardware offloading
+available for TLS over UDP.
+
+HTTP over QUIC is therefore using UDP instead of TCP. It worth to point out
+that Google has its own version of QUIC but not interoperable with IETF's
+HTTP/3. Similar to HTTP/2, we have the concept of stream and frames but they
+are on top of a datagram protocol so substantial change needed. Most notably is
+QPACK is introduced to replace HPACK as the latter depends on order delivery of
+streams inside TCP connection, which such in-order delivery is not guaranteed
+in UDP.
+
+### QUIC and HTTP/3 details
+
+QUIC:
+- offers both 0-RTT and 1-RTT handshakes
+  - 0-RTT handshake only works if there has been a previous connection
+    established and a secret from that connection has been cached
+- concept originate from TCP Fast Open (RFC7413, Dec 2014): application can
+  pass data to the server in the first TCP SYN packet
+  - need OS support and network not to interfere with TCP Fast Open
+- QUIC guarantees in-order delivery of streams but not between streams
+  - loss packet on one stream leads to recovery operation, but other stream may proceed as usual
+
+How QUIC works:
+- connection: single conversation between two QUIC endpoints
+  - connection establishment = version negotiation + cryptographic handshake
+  - connection IDs: selected by one endpoint for its peer to use
+    - allow change in addressing of lower layer (IP/UDP), i.e. migrate between
+    IP address and network interfaces (e.g., wifi to cellular)
+  - port numbers: UDP has 16-bit port number field
+- streams: unidirectional or bidirectional
+  - streams between two endpoints may run concurrently, interleaved with other
+    streams (inherently due to UDP transport), and can be cancelled
+  - each stream are individually flow controlled
+    - allow endpoint to limit memory commitment or apply back pressure
+  - stream is an ordered byte stream abstraction
+  - stream IDs: 62-bit integer, with 2 LSBs used to identify the type of stream
+    - LSB = initiator, client-initiated = 0, server-initiated = 1
+  - 2nd LSB = direction, unidirectional = 1, bidirectional = 0
+  - end point may limit the number of concurrent streams to each of its peer
+    - by announcing max stream IDs
+  - multiple streams are not necessarily delivered in the original order
+    - multiplexed, with no prioritization
+  - prioritization is the decision of application that uses QUIC, at HTTP layer
+- 0-RTT: allow client send data immediately without waiting for a handshake to complete
+  - reuse parameters of the same server from cache
+
+Operation of HTTP/3:
+
+1. initial connection: done over TCP with possibly parallel attempt via QUIC
+2. then negotiate HTTP/2 in the first handshake
+3. after connection has been set up, the server can tell client the preference
+   for HTTP/3
+4. advertise with `Alt-Svc` (alternate service, RFC7838) header, example (HTTP/3
+   on UDP port 50781):
+
+        Alt-Svc: h3=":50781"
+
+There are nine different types of HTTP/3 Frames as of Dec 18, 2018. Some of
+them are:
+
+- HEADERS - for compressed HTTP headers
+    - compressed using QPACK algorithm, using two additional unidirectional
+      QUIC streams to carry dynamic table information in either direction
+- DATA - for binary data contents
+- GOAWAY - signal for shutdown of this connection
+- PRIORITY - set priority and dependency on a stream
+  - weight value 1 to 256, resources to streams are allocated proportionally
+    based on thier weight
+  - a dependent stream should only be allocated resources if either all of
+    the streams that it depends on are closed or it is not possible to make
+    progress
+- PUSH_PROMISE - server show what request would look like for any server-push
+- CANCEL_PUSH - client cancel of server-push
+
+For example, HTTP request is a bidirectional stream which HEADERS frame
+followed by a series of DATA frames plus a possibility of final HEADERS frame
+for trailers. HTTP response is returned on the same bidirectional stream,
+similarly, is HEADERS + DATA + optional trailing HEADERS frame.
+
+Using UDP rather than TCP has additional security consideration. One issue is
+the amplification attacks and rely on clients and servers to implement
+mitigation. For example, a suggestion is to enforce an initial packet of at
+least 1200 bytes and the server must not send more than 3 times the size of
+request before receiving a client response.
+
+
+# References
+- [HTTP/3 explained](https://http3-explained.haxx.se/en/) (or [github source](https://github.com/bagder/http3-explained))
+- [HTTP/2 explained](https://http2-explained.haxx.se/content/en/)
+- [Index of QUIC implementations](https://github.com/quicwg/base-drafts/wiki/Implementations)
+- [Internet draft on QUIC](https://tools.ietf.org/html/draft-ietf-quic-recovery-18)
+
+-----
