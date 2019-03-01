@@ -14,7 +14,7 @@ bibtex:
   year: 2007
 ---
 
-Objective of dynamo
+Objectives of dynamo
 
 - dealing with failures in an infrastructure comprised of millions of components
 - data store that only need primary-key access
@@ -224,3 +224,9 @@ Client: At application library to implement the request coordination logic
 - client needs to sync membership state with a random dynamo node periodically
 - better performance in latency
 - efficiency depends on how fresh the membership information is at the client
+
+# References
+
+[Understanding the architecture of
+Cassandra](https://docs.datastax.com/en/cassandra/3.0/cassandra/architecture/archTOC.html):
+Some authors of dynamo built Cassandra and they share a few architectural strategies

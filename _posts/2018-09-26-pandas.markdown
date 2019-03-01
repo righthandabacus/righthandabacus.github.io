@@ -91,6 +91,14 @@ We can also extract the underlying numpy array of a DataFrame:
 df.values
 ```
 
+but this method will subject to the limitation of numpy, namely, if the data
+has a mix of float and int, the result will be converted to float. Otherwise,
+we can extract each element one by one:
+
+```python
+[[df.at[i, c] for c in df.columns] for i in df.index]
+```
+
 The SQL statement `SELECT column FROM table` (i.e., cover all rows but some
 subset of columns) is equivalent to the following in pandas. The `copy()` is a
 safety precaution that the extracted data will become independent of the
@@ -706,7 +714,7 @@ assert s1.tolist() == list(s1)
 
 
 # Terminology
-Panel (3D), DataFrame (3D), Series (1D)
+Panel (3D), DataFrame (2D), Series (1D)
 - Series index: row id of each item in vector
 - DataFrame index: row id (numeric from 0 onward by default)
 - DataFrame column: column id
