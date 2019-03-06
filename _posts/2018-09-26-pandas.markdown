@@ -2,6 +2,7 @@
 layout: post
 title: Comparing pandas and SQL
 date: Wed, 26 Sep 2018 12:30 PM
+lastedit: 2019-03-01
 tags: code
 category: blog
 ---
