@@ -6,7 +6,7 @@ tags: work
 These are really really old stuff.
 
 I took the HKALE in 1999 and during 1998 to 1999, I created a set of notes for
-my revision. After I get into the univeristy, I re-organized them up and put
+my revision. After I get into the university, I re-organized them up and put
 them into an archive. Unfortunately, my hard disk crashed in 2003 (possibly due
 to over-heat) and all my stuff are lost.
 
@@ -14,7 +14,7 @@ Recently, I get them back from a CD-ROM (I really don't remember I have a copy
 on CD! Thanks Ronnie for that) and I put them here, in case somebody needs. The
 files are created using M$ Word 97.
 
-PS: I found that the HKEA sucks.....the current syllabus is trimed so much! No
+PS: I found that the HKEA sucks.....the current syllabus is trimmed so much! No
 wonder I found the current freshmen are so dumb in certain aspects.
 
 ## AL Chemistry
@@ -38,7 +38,7 @@ wonder I found the current freshmen are so dumb in certain aspects.
 - [Acid-Base Equilibria](/img/chemphy-14.doc)
 - [Redox Equilibria](/img/chemphy-15.doc)
 - [Phase Equilibria](/img/chemphy-16.doc)
-### Inorganic Chemsitry
+### Inorganic Chemistry
 - [Periodic Properties](/img/cheminorg-1.doc)
 - [Hydrolytic Behavior](/img/cheminorg-2.doc)
 - [s-Block Elements](/img/cheminorg-3.doc)
