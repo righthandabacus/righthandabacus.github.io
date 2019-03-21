@@ -1,0 +1,16 @@
+---
+layout: post
+title: Artificial Neural Network using only numpy
+date: Wed, 20 Mar 2019 22:08:26 -0400
+tags: code
+---
+
+I know there are tensorflow, pytorch, kera and a whole bunch of other libraries
+out there but I need something that can work on [Termux](https://termux.com/)
+but no success (at least no longer after Python 3.7 upgrade). But after reading
+again the textbook on how a neural network operates, it doesn't seem hard to
+write my own library.
+
+<script src="https://gist.github.com/righthandabacus/892d65186cfb749307d4ed617440062e.js"></script>
+
+I will update this post to elaborate. But the code above should be self-explanatory.
