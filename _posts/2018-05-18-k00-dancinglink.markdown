@@ -21,7 +21,7 @@ depth-first-search. Wikipedia has an article about that, named [Knuth's
 Algorithm X](https://en.wikipedia.org/wiki/Knuth%27s_Algorithm_X).
 
 Below is [my implementation](https://gist.github.com/righthandabacus/aae789127ff384e82a522a8cccad6277)
-using modern C++, trying to mimick exactly the algorithm depicted in the paper
+using modern C++, trying to mimic exactly the algorithm depicted in the paper
 without obscure optimization:
 
 ```cpp

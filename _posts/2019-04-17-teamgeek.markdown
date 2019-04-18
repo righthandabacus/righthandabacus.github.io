@@ -1,0 +1,398 @@
+---
+layout: post
+title: "Team Geek"
+subtitle: "Fitzpatrick and Collins-Sussman / 2012"
+date: Wed, 17 Apr 2019 19:06:27 -0400
+category: book
+bibtex:
+  type: book
+  title: "Team Geek: A Software Developer's Guide to Working Well with Others"
+  author: Brian W. Fitzpatrick and Ben Collins-Sussman
+  pages: 167
+  month: July
+  year: 2012
+  publisher: O'Reilly
+  isbn: 9781449302443
+---
+
+TLDR: A book summarizing a lot of common sense on working in an engineering
+organization. It proposed the concept "HRT" -- humble, respect, trust -- as the
+general rule for dealing with people, whether they are coworkers, managers,
+customers.
+
+## Chapter 1: The Myth of the Genius Programmer
+
+Linus' real achievement: lead people and coordinate their work
+- Stallman did not write all GNU
+- Ken Thompson and Dennis Ritchie did not write the whole UNIX
+
+Insecurity
+- people are afraid of others seeing and judging their work-in-progress
+- Hiding is considered harmful
+  - collaboration moves faster
+  - "fail early, fail fast, fail often": **tight feedback loops**
+  - truck factor of project
+  - high bandwidth low friction team connection
+  - working alone is riskier then working with others
+
+Three pillars of collaboration
+- **humility**: open to self improvement
+  - Lose the ego: self confidence is good, but don't become like a know it all
+  - build a group pride, the collective ego
+- **respect**: care about others, appreciate their abilities and achievements
+  - constructive criticism = respect, care about improvement 
+- **trust**: believe others are competent and will do the right thing
+  - Failure is an option: key to learning is to document the failures (postmortems)
+    - what was learned? What is going to change?
+    - summary, timeline of events, primary cause, impact and damages, fixes,
+      preventions implemented, lessons learned
+
+Software development is team sport
+- Almost all social conflict is due to lack of humility, respect, trust
+
+Adapt the system to your desires, get the system to do your work
+
+Once you reach a local maximum on your team, you stopped learning
+- then get bored
+- then became obsolete
+- humility = willing to learn
+
+Top down engineer = get full picture of every call before proceeding to
+tackle the bug
+
+Bottom up engineer = dive then dig the way out
+
+Vulnerable to influence
+- in order to be heard properly, you first need to listen to others
+- do not live in defence. Team mates are collaborators, not competitors
+
+## Chapter 2: Building an Awesome Team Culture
+
+Story of a sourdough: starter yeast, strong enough to overtake any other
+wild strains of yeast or bacteria
+
+Team culture: set of shard experiences, values, goals
+- continue to change and develop
+- elements of a culture: **design doc, TDD, code review**
+- root culture by founders and earliest employees
+  - team leader does not curate the culture of the team
+  - when someone joins the team, she pick up culture from everyone she works with
+
+Good company: allow engineers safely share ideas and have a voice in the
+decision making process
+- top down management: alpha engineer is the team lead and lesser engineers
+  are hired as team members
+  - subservient team members are cheaper and easier to push around
+  - but will be hard to hire great engineers
+  - "if she can drive the bus, she will not want to ride the bus"
+- consensus driven management, entire team participate in the decision making
+  process
+- crappy leaders also too insecure to deal with great engineers, and also
+  tend to boss people around
+- introvert people rarely excel in an aggressive environment
+  - discourage them from being active participants
+
+Communication
+- as few people as necessary in a synchronous communication
+- boarder audience for asynchronous communication
+- if you don't expend any effort on good communication, you'll waste
+  considerable effort doing work that's either unnecessary or already being
+  done by other members of your team
+
+Mission statement in engineering team
+- clarifying what the team should and shouldn't be working on
+- not: marketing-speak
+- should include: direction and scope limiter
+  - discussion to come to an agreement on product direction
+- if radical changes happen, team members need to be honest and reevaluate
+  whether the mission still make sense
+
+Efficient meetings: like sewage treatment plants, few, far between, and downwind
+- standing meeting: every week, absolutely basic announcements
+  - anything worth deeper discussion should take place after the meeting
+  - people should be happy to leave the meeting once the main part of it is done
+- meeting with 5+ people, one arbiter to make decisions
+- meetings = interruption to "make time"
+  - "maker's schedule" vs "manager's schedule" (Paul Graham)
+  - makers need 20-30 hours of "make time" set aside in larger blocks
+
+Five rule for meeting
+1. only invite people who absolutely need to be there
+2. have an agenda and distribute it well before the meeting
+    - people start reading email in a meeting = people should not be in the meeting
+3. end the meeting early if goals accomplished
+4. keep meeting on track
+5. schedule the meeting near other interrupt points in the day (e.g. lunch, end of day)
+
+Design docs
+- owned by one, authored by 2-3, reviewed by a larger set
+- high level blueprint of project
+- low cost way to communicate on what you want to do and how you intend to do it
+- at design doc, easier to accept criticism
+  - because not yet invested weeks writing code
+  - update doc when coding started, as project grows and changes
+- control time: doc should not dominate project time
+
+Communication tools
+- mailing list: history of your project, easy to refer for newcomers
+- online chat: quick request to a teammate without interrupting her work
+  - old time: IRC channel group chat
+- issue tracker: processing and triaging bugs
+  - just a specialized bulletin board
+- code comments: most useful at function or method level
+
+## Chapter 3: Every Boat Needs a Captain
+
+Someone needs to get into the driver's seat
+- driver = motivated, impatient
+- help team resolve conflicts, make decisions, coordinate people
+
+Why management
+- Peter principle (so don't force people into management)
+- to scale yourself
+
+Management
+- "carrot and stick" method of management
+  - ineffective and harmful to engineers' productivity
+  - only for assembly line worker of years past, because those workers could be
+    trained in days
+- engineer needs nurturing, time, and space to think and create
+- traditional managers worry about how to get things done, leaders worry about
+  what things get done
+- Google tech lead manager: responsible for tech direction for all of a
+  product in addition to the careers and happiness of the engineers on the team
+
+Quantifying management work is difficult. Making the team happy and productive
+is a measure.
+
+Resist the urge to manage
+- otherwise: micromanagement, ignoring low performers, hiring pushovers
+- **servant leadership**: smooth the way, advise when necessary
+  - manage both the technical and social health of the team
+
+Antipatterns
+- hiring pushovers: ppl not as smart or ambitious as you
+  - they feel more insecure than you
+  - without them, you have opportunities to investigate new possibilities
+- ignore low performers: hardest part of dealing with humans is handling
+  someone who isn't meeting expectations
+  - hope is not a strategy
+  - hurts team morale, and did not help the low performers grow
+  - sometimes they merely need some encouragement or direction
+    - temporary micromanagement can help
+    - a lot of HRT, specific goal, small and incremental goals
+- ignore human issues: manager need to balance focus on both technical and
+  human side
+  - without empathy to ppl, manager lost respect from ppl
+- be everyone's friend: Be a tough leader without tossing existing friendship
+  - socially connected with lunch
+  - informal conversations
+- compromise hiring bar: cost in hiring = save in team productivity
+  - Steve Jobs "A people hire other A people. B people hire C people"
+  - without raw material for a great team,  you are doomed
+- treat them like your children: give them opportunity to be responsible for
+  their job
+  - do not micromanage or disrespectful of their abilities
+  - trust people
+  - Google tech shop: stealing is possible, but the cost of a workforce like
+    children is more than a few pens or USB drives
+
+Leadership patterns
+- lose the ego
+  - humility is not lacking confidence
+  - trust your team, respect their abilities, even if they're new to the team
+  - leaders drive, people decide the nuts and blots
+  - promote greater sense of ownership
+  - encourage inquiry, focus on the big picture you want to accomplish
+- be a Zen master
+  - Less vocally skeptical while still letting your team know you're aware of the intricacies and obstacles involved in your work
+  - maintain calm, no matter what blew up, what crazy things happened
+  - ask questions
+- be a catalyst
+  - lead without official authority: working to build team consensus
+  - jump in to clear roadblocks that they cannot get past but easy for you to handle
+    - e.g., because you know the right person to contact
+  - let your team know it is ok to fail
+  - praise an individual in front of the team, constructive criticism in private
+- be a teacher and a mentor
+  - give team member a chance to learn
+  - three things needed:
+    - experience the process and systems;
+    - explain to the team;
+    - ability to gauge how much help your mentee needs
+- set clear goals
+  - create a concise mission statement
+  - then set back and let the team work autonomously
+  - goal helps efficiency by not wasting time
+- be honest
+  - "I will tell you when I can't tell you something or if I just don't know"
+  - do not use compliment sandwich, straight to the point with respect
+    - clear feedback without candy coat
+- track happiness
+  - ask "what do you need?"
+  - evenly distribute thankless tasks
+  - remember people have life outside work
+    - unrealistic expectation about the amount of time they can work = burnt out
+    - be sensitive to situations change outside work
+- delegate but keep your hands dirty
+  - dirty hand earns respect
+- seek to replace yourself
+  - give team the opportunity to take on more responsibility
+  - identify who can lead and who willing to lead
+- be bold to make waves
+  - problems will not work themselves out, don't wait
+  - delay the inevitable cause untold damages
+- shield your team from chaos
+- share information with the team
+- let the team know when they are doing well
+- always say yes if something is easy to undo
+  - let people try and learn
+
+**People like plants**, some need more light and some need more water. It is the
+manager to figure out which needs what and give it to them
+
+The bigger their stake is in the success of the product, the greater their
+interest is in seeing it succeed
+
+An engineer's skills are like the blade of a knife: you may spend tens of
+thousands of dollars to find engineers with the sharpest skills, but if you
+use that knife for years without sharpening it, you will wind up with a
+useless dull knife
+
+If you can help them see the purpose of their work, you will see a tremendous
+increase in their motivation and productivity
+
+## Chapter 4: Dealing with Poisonous People
+
+Poisonous people: irritating
+- it is the behaviour to filter out
+- it is not people that is either good or bad
+
+Founding team need strong culture, or other cultures will overgrow it
+- cultures are self selecting, nice people tend to be attracted to existing
+  nice communities
+
+Threats
+- team's attention and focus
+- people do not deliberately being jerks, they have issues of ignorance, apathy, rather than malice
+  - do not respect other people's time: Do not read manuals and FAQs
+  - incapable of accepting consensus decisions
+    - will reopen discussions that have been long settled
+  - overentitlement: keep complaining about a bug without contributing
+  - perfectionists: perfect is the enemy of good
+
+Resolution
+- redirect the energy of perfectionists
+- **do not feed the troll**
+- remember your job is to write software, not to appease every visitor
+  - choose your battles carefully
+- look for the facts, and focus only on the facts
+- look at the long term, react only if there are benefits
+  - HRT culture is irreplaceable, technical contribution is replaceable
+
+## Chapter 5: The Art of Organizational Manipulation
+
+Ideal
+- proactive, responsibility seeking to reduce your manager's workload
+- take risks and don't fear failure
+- a good manager wants a team to push the envelope to see what they can and
+  what they can't do
+- you can never over-communicate, don't hesitate to update your team's leader
+  on what you're doing
+
+Reality
+- bad managers will frequently train their teams to act like children by
+  squashing any initiative, responsibility, or rule breaking
+  - fear of failure
+  - insecurity: make them very conservative, antithetical to the work style
+    of engineer
+  - take credit for your successes and blame you for  your failures
+- office politician: spends more time looking impactful than actually being
+  impactful
+  - route around him where possible
+  - don't badmouth him to other people above him, because difficult to know
+    who he has hoodwinked and who is wise to him
+- most companies are not engineering-focused
+  - there are someone who is willing to sacrifice the health and sanity of
+    the employees to meet the needs of the business
+  - treat engineers like slaves
+  - power struggles: people obsessed with titles and organizational hierarchy
+  - lack focus, vision, direction
+
+Manipulating your organization
+- it's easier to ask for forgiveness than permission
+  - have colleagues and friends in your company as a sounding board for your
+    ideas
+  - if risky, get second opinion from a trusted source before act
+- make a path: get enough people to buy into your idea
+  - psychology: one will give more weight to the idea when it's hitting him
+    from multiple directions and not just from you
+- it's impossible to simply stop a bad habit, you need to replace it with a
+  good habit
+- manage upward: **underpromise and overdeliver whenever possible**
+
+offensive work vs defensive work
+- manage tech debt: defensive
+  - aimed at the long-term health of a product
+- new feature: offensive
+  - user-visible, shiny things
+
+**Lucky people are skilled at creating and noticing chances**
+
+Powerful friends
+- connectors: people who know everyone
+- old-timers: carry a lot of institutional knowledge and wield a lot of
+  influence just because they've been around for a long time
+- administrative assistants: agents of the executives
+
+Effective Email
+- three bullets and a call to action; nothing more
+- keep low mental overhead
+
+Plan B:
+- if you can't change the system, there's no point in continuing to put energy
+  into changing it
+- "If I don't get fired, I've done the right thing for everyone. If I do get
+  fired, this is the wrong employer to work for in the first place"
+
+## Chapter 6: Users Are People, Too
+
+Three phases of user engagement
+
+1. Get users to notice your software
+2. what people experience when they start using your software
+3. how to interact productively with them once they're firmly engaged with your creation
+
+Public Perception
+- marketer = antithesis of engineering culture
+  - engineer don't spin our descriptions of the world
+  - we state facts and work to change them
+  - the marketing guy = lies
+- the marketing folks are masters of emotional manipulation
+
+People experience
+- first impression is important
+  - first minute with a product is critical
+- underpromise and overdeliver
+- choose your audience
+  - git is popular among alpha geeks for the same reasons UNIX-like OSes are
+    - hard to learn but provides raw access to outrageous power
+  - UNIX and git are counterexamples to the norm
+- success: measure usage by minutes, not users by head count
+- speed is a feature
+- some of the best software succeeds because it defines the problem narrowly
+  and solves it well
+- hide complexity
+  - an elegant design makes easy things easy and hard things possible
+  - do not seal the software so tight that it ends up handcuffing all your users
+- Trust: people use your software because they want to, not because they're trapped
+  - users don't want to participate in the analysis process, they just want
+    to get something done
+  - trust is emotional, because of the cumulative set of interactions they've
+    had with you
+- As the number of users increases, their average level of technical ability decreases
+
+Three points on user
+- marketing: Be aware of how people perceive your software
+- usability: easy to try, friendly, accessible
+- customer service: proactive engagement with long-term users
