@@ -4,7 +4,6 @@ title: "Scrum. The Art of Doing Twice the Work in Half the Time"
 subtitle: "Jeff Sutherland / 2015"
 date: 2017-12-02 11:07 -0500
 category: book
-published: false
 bibtex:
   type: book
   title: 用一半的時間做兩倍的事
@@ -17,6 +16,7 @@ bibtex:
 
 English original: Scrum. The Art of Doing Twice the Work in Half the Time
 
+<pre>
 第一章 世界的運作法則已瓦解
 
 P.15	艾森豪曾說過，為戰爭擬定計畫固然重要，但是等開了第一槍後，計劃就化為烏有了。
@@ -282,4 +282,4 @@ P.329	製作燃盡圖，其中一軸是團隊在這一段衝刺中尚待完成�
 P.330	9.衝刺檢視或衝刺展示，展示在該衝刺中得以移動到「已完成」欄位下的作業項目
 	10.衝刺回顧，彼此之間要具備互信，不要找人來譴責
 	11.馬上展開下一個衝刺循環
-
+</pre>

@@ -7,49 +7,80 @@ category: blog
 published: false
 ---
 
+"[Everything You Always Wanted to Know About SDRAM (Memory): But Were Afraid to
+Ask][1]" is a excellent read. So here is the summary.
+
 Low-voltage ICs: 1.3V to 1.5V
 
-SDRAM (synchronous dynamic random access memory) is made up of array of
-storage (2D lattice of word lines intersecting with bit lines). Each array is
-called a bank. Each IC constains one or more banks.
+SDRAM (synchronous dynamic random access memory) is made up of array of storage
+(2D lattice of word lines intersecting with bit lines). Each array/grid/lattice
+is called a bank. Each IC contains one or more banks.
 
-DIMM (dual inline memory module) is a housing. One side of DIMM hoses one or two
-*rank*, which is a group of several banks.  DDR is in groups of 2, DDR2 is in
+DIMM (dual inline memory module) is a housing. Each side of DIMM houses one
+*rank*, which is a group of several banks. DDR is in groups of 2, DDR2 is in
 groups of 4, DDR3 is in groups of 8. ECC RAM may have one more bank in a rank.
 
-Example: 2G DDR3 DIMM has two sides, totally 16 ICs, 8 ICs per side. Each side of 8 ICs
-is one rank. Each IC has 8 banks of addressable memory of 16K pages and 1K
-column, and each column stores 8-bit word.
-- 1 byte per column address
-- 1024 column per page
-- 16384 pages per bank
+Example: 2G DDR3 DIMM has two sides (dual-sided), totally 16 ICs, 8 ICs per
+side. Each side of 8 ICs is one rank (dual-rank). Each IC has 8 banks of
+addressable memory of 16K pages and 1K column, and each column stores 8-bit
+word.
+- 1 byte (8 bits) per column address
+- 1024 column per page (row)
+- 16384 pages (rows) per bank
 - 8 banks per IC
 - Each IC: 8x16384x1024 bytes = 128 MB
 - 8 ICs each rank: 8x128 MB = 1024 MB
 - two ranks in the DIMM: 2x1024MB = 2GB
 
-synonym: row = pages?
+In above example, each row in an IC is 1 Kbytes. If we read a page, it is
+reading from the same bank of all ICs in the rank, which is 8 Kbytes in this
+example.
+- In one IC, we have stacked banks
+- In one page, we have the same bank spread across all ICs in the rank
 
 One read in DDR3: all ICs in a rank are read/written synchronously. There are 8
 ICs each rank, specify only the row (page) and column, there are 8x8 bytes = 64
 bytes in one fetch
+- 8n-prefetch in DDR3 = each rank has 8 ICs, so fetching n banks exercise all 8
+  ICs results in 8n bytes
 
 See [page 3 of this slide](http://www.eng.utah.edu/~cs7810/pres/11-7810-12.pdf)
-for the functional diagram.
-
-[?] DDR3 core has 8n-prefetch where n=number of banks per rank: each access reads a minimum of 8 bytes
-
-Refresh cycle: SDRAM is miniature capacitors, need to work against dissipated
-charge.
-- refresh an entire page
-- each page is read and written in one refresh cycle
-- refresh period (tREF) is usually 100s to 1000 clocks
--
+for a functional diagram. And the diagram below is from the page quoted above:
 
 ![functional diagram of DDR3 memory](https://images.anandtech.com/doci/3851/DRAM%20Memory%20Topology.png "Functional diagram of DDR3 RAM")
 
-# Reference:
-1. [Everything You Always Wanted to Know About SDRAM (Memory): But Were Afraid to Ask][1]
+Operation of SDRAM:
+
+![state machine of SDRAM](https://images.anandtech.com/doci/3851/DRAM%20Simplified%20State%20Diagram.png "state machine of SDRAM")
+
+Refresh cycle: SDRAM is miniature capacitors, need to work against dissipated
+charge.
+- refresh = each page is read and written again in each cycle
+- refresh an entire page
+- refresh period (tREF): usually several hundred to 1000 clocks
+- after refresh, the banks are in the idle (precharged) state and ready for
+  access after Row Refresh Cycle delay (tRFC)
+
+Read and write: A bank need to be activated first
+- memory controller send command ACT for the rank, bank, and page
+- time to activate a bank: Row-Column Delay (tRCD), the min time needed to
+  prepare column-level access
+- following activation, we can issue commands for READ or write (WRI) any
+  column of a full page of 8KB
+- Column Address Strobe (CAS) Latency = time to read a byte of data from the
+  open page
+  - denoted by symbol: CL, or tCAS
+  - min time needed to have the word of data on the memory bus
+- reading a different page need another activation (tRCD)
+- only one page per bank may be open at any time, but pages from different bank
+  can be concurrently opened
+  - time to activate different banks: Read-to-Read Delay (tRRD)
+- closing a page: Precharge (PR) command for one bank, or Precharge All (PRA)
+  for all opened banks in the rank
+  - alternative: combine precharge with a read or write, Read with
+    Auto-Precharge (RDA), or Write with Auto-Precharge (WRA) commands
+  - Precharge: commits data back to memory cells
+  - Time to precharge an open bank: Row Access Strobe (RAS) Precharge Delay (tRP)
 
 [1]: https://www.anandtech.com/show/3851/everything-you-always-wanted-to-know-about-sdram-memory-but-were-afraid-to-ask
 
@@ -57,67 +88,6 @@ charge.
 -------------
 
 
-All banks must be precharged and idle for a minimum of the RAS Precharge (tRP)
-delay before the Refresh (REF) command can be applied. An address counter,
-internal to the device, supplies the bank address used during the course of the
-refresh cycle. When the refresh cycle has completed, all banks are left in the
-precharged (idle) state. A delay between the REF command and the next Activate
-(ACT) command or subsequent REF command must be greater than or equal to the Row
-Refresh Cycle Time (tRFC). In other words, a minimum wait of tRFC cycles is
-required following a refresh to an idle bank before it can be again activated
-for access.
-
-Figure 2. A simplified SDRAM state transition diagram. Don't stare too long
-Before the SDRAM is ready to respond to read and write commands, a bank must
-first be opened (activated). The memory controller accomplishes this by sending
-the appropriate command (ACT), specifying the rank, bank, and page (row) to be
-accessed. The time to activate a bank is called the Row-Column (or Command)
-Delay and is denoted by the symbol tRCD. This variable represents the minimum
-time needed to latch the command at the command interface, program the control
-logic, and read the data from the memory array into the Sense Amplifiers in
-preparation for column-level access.
-Following activation, the open bank contains within the array of Sense Amps a
-complete page of memory only 8KB in length. At this time, multiple Read (READ)
-and Write (WRI) commands can be issued, specifying the starting column address
-to be accessed. The time to read a byte of data from the open page is called the
-Column Address Strobe (CAS) Latency and is denoted by the symbol CL or tCAS.
-This variable represents the minimum time needed to latch the command at the
-command interface, program the control logic, gate the requested data from the
-Sense Amps into the Input/Output (I/O) Buffers, through a process known as
-pre-fetching, and place the first word of data on the Memory Bus.
-Only one page per bank may be open at a time. Access to other pages in the same
-bank demands the open page first be closed. As long as the page remains open the
-memory controller can issue any combination of READ or WRI commands, sometimes
-switching back and forth between the two, until such time as the open page is no
-longer needed or a pending request to read/write data from an alternate page in
-the same bank requires the current page be closed so that another may be
-accessed. This is done by either issuing a Precharge (PR) command to close the
-specified bank only or a Precharge All (PRA) command to close all open banks in
-the rank.
-Alternatively, the Precharge command can be effectively combined with the last
-read or write operation to the open bank by sending a Read with Auto-Precharge
-(RDA) or Write with Auto-Precharge (WRA) command in place of the final READ or
-WRI command. This allows the SDRAM control logic to automatically close the open
-page as soon as certain conditions have been met: (1) A minimum of RAS
-Activation Time (tRAS) has elapsed since the ACT command was issued, and (2) a
-minimum of Read to Precharge Delay (tRTP) has elapse since the most recent READ
-command was issued.
-Precharging prepares the data lines and sense circuitry to transmit the stored
-charge in the Sense Amps back into the open page of individual memory cells,
-undoing the previous destructive read, making the DRAM core ready to sample the
-next page of memory to be accessed. The time to Precharge an open bank is called
-the Row Access Strobe (RAS) Precharge Delay and is denoted by the symbol tRP.
-The minimum time interval between successive ACT commands to the same bank is
-determined by the Row Cycle Time of the device, tRC, found by simply summing
-tRAS and tRP (to be defined). The minimum time interval between ACT commands to
-different banks is the Read-to-Read Delay (tRRD).
-
-
-The process of moving data in and out of the Memory Array and over the Memory
-Bus is not overly complicated, although the massive parallelization of the
-actual effort can make it somewhat difficult to fully envision what's really
-happening without some pretty concise visual aids. We'll try our best to help
-you out in this regard.
 Both read and write access to DDR[3] SDRAM is burst oriented; access starts at a
 selected location and continues in a pre-programmed sequence for a Burst Length
 (BL) of 8-bits, or 1 byte, per bank. This begins with the registration of an ACT

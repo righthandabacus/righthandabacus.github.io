@@ -2,8 +2,8 @@
 layout: post
 title: Modern portfolio theory
 date: Fri, 22 Jun 2018 16:27:03 -0400
-published: false
-tags: business math
+published: true
+tags: work math
 ---
 
 Markowitz portfolio theory, CAPM, Arbitrary Pricing Theory
