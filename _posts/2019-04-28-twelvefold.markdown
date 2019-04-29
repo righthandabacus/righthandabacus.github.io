@@ -24,7 +24,7 @@ identifies the twelve cases. First the nature of mapping:
 2. Injective $$f$$, so $$f(a)$$ is unique: $$\forall a\in N,\ \exists !b\in X$$
 3. Surjective $$f$$: $$\forall b\in X,\ \exists a\in N, f(a)=b$$
 
-And the equivalence of mappings:
+Then the equivalence of mappings:
 
 1. $$f$$, simple
 2. $$f\circ S_n$$, equality up to a permutation of $$N$$
@@ -252,7 +252,7 @@ $$\genfrac{\{}{\}}{0pt}{}{n}{x} = \frac{1}{x!}\sum_{k=0}^x (-1)^k\binom{x}{k}(x-
 ## (12) Surjective f maps unlabelled N to unlabelled X
 
 Problem: How many ways to put $$n$$ identical balls into $$x$$
-undistinguishable urns such that no urn is left empty?
+indistinguishable urns such that no urn is left empty?
 
 Solution: This is the simplified problem of (4) and the solution is the
 partition number, which is the number of ways to write integer $$n$$ as sum of
