@@ -1,0 +1,284 @@
+---
+layout: post
+title: Git, mercurial, and synchronized repositories
+date: Sat, 20 Jul 2019 15:05:14 -0400
+tags: system
+---
+
+The first version control system I used was CSV, then I moved to Subversion as
+everyone else does. Later, people start to look for server-less solutions and I
+used Mercurial. I even made a
+[cheatsheet about it](https://www.mercurial-scm.org/wiki/QuickReferenceCardsAndCheatSheets?action=AttachFile&do=get&target=Mercurial-Cheatsheet-Adrian-v1.0.pdf)
+that is now the top result on Google for searching "mercurial cheatsheet". But
+when I was in my day job, I need to learn to use git instead. The popularity of
+Github compared to BitBucket seems made git the winner version control system.
+But can I use both? After all, I wish to keep my repositories hosted by
+multiple providers while keeping them in sync as well.
+
+# Bridging git and mercurial
+
+The git command line is `git` and mercurial is `hg`. Google can tell you that.
+However, if you want to use both git and mercurial in the same repository, what
+it means is that you can make a commit in git and see it as a revision in
+mercurial. Or vice versa. What we want to avoid is to make a git commit and
+then we have to craft a mercurial revision *separately*.
+
+There are two ways to do it: We ask `git` to copy the commit into mercurial
+revision or ask `hg` to copy a revision into git commit. There are multiple
+tools to do that but these two are quite official nowadays:
+
+- `git-remote-hg`: <https://github.com/felipec/git-remote-hg>, this is a plugin for git and we use `git` as the tool
+- `hg-git`: <http://hg-git.github.io/>, this is a plugin for mercurial and we use `hg` as the tool
+
+We will focus on the former here.
+
+There are multiple projects of `git-remote-hg`, all in the same name. The one
+quoted above is semi-official one and most widely used. The architecture make
+use of a feature from git, the
+[git-remote-helper](https://linux.die.net/man/1/git-remote-helpers). It defines
+a protocol for git to use when it talk remotely. This is how git knows how to
+handle `ssh://` or `https://` URLs. With this plugin, git can do:
+
+    git clone hg::ssh://hostname//path/to/repository
+
+which it will convert a Mercurial repo located at `/path/to/repository` in a
+remote host to a local git repo. Afterwards, we can push and pull in the local
+git repo to synchronize with the remote mercurial.
+
+# Creating a local co-existing git and mercurial repo with git tool
+
+It is best to demonstrate by example. Prerequisites: Allows SSH to localhost,
+with `hg` command line installed and accessible by non-login shells (i.e., set
+up `$PATH` in `~/.bashrc` if needed)
+
+```bash
+# create a repo in a directory
+$ mkdir testrepo
+$ cd testrepo
+$ git init
+$ hg init
+
+# make some files and create a git commit
+$ echo .hg > .gitignore
+$ echo .git > .hgignore
+$ git add .hgignore .gitignore
+Initialized empty Git repository in /path/to/testrepo/.git/
+$ git commit -m 'ignores'
+[master (root-commit) b289014] ignores
+ 2 files changed, 2 insertions(+)
+ create mode 100644 .gitignore
+ create mode 100644 .hgignore
+ 
+# set up mercurial as a "remote", but actually a local
+$ git remote add localhg hg::ssh://localhost/`pwd`
+
+# push, and set up remote master branch
+$ git push --set-upstream localhg master
+no changes found
+searching for changes
+remote: adding changesets
+remote: adding manifests
+remote: adding file changes
+remote: added 1 changesets with 2 changes to 2 files
+To hg::ssh://localhost//path/to/testrepo
+ * [new branch]      master -> master
+Branch 'master' set up to track remote branch 'master' from 'localhg'.
+
+# verify the mercurial revision history
+$ hg log
+…
+
+# Add another commit and revision
+$ echo "something should be here" > README
+$ git add README
+$ git commit -m 'Add readme'
+[master 67fda75] Add readme
+ 1 file changed, 1 insertion(+)
+ create mode 100644 README
+
+$ git push localhg
+searching for changes
+no changes found
+searching for changes
+remote: adding changesets
+remote: adding manifests
+remote: adding file changes
+remote: added 1 changesets with 1 changes to 1 files
+To hg::ssh://localhost//path/to/testrepo
+   b289014..67fda75  master -> master
+```
+
+Pay attention that we need `.gitignore` to have `.hg` and `.hgignore` to have
+`.git` so that git will not mess with the mercurial metadata and mercurial not
+with git either.
+
+# Multihost repository
+
+What I mean is to have the repository hosted by multiple providers and synchronized.
+
+Git has a concept of [*remote*](https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes),
+which we can see all remotes set up in a repo with the following:
+
+```bash
+$ git remote -v
+bakkdoor  https://github.com/bakkdoor/grit (fetch)
+bakkdoor  https://github.com/bakkdoor/grit (push)
+cho45     https://github.com/cho45/grit (fetch)
+cho45     https://github.com/cho45/grit (push)
+defunkt   https://github.com/defunkt/grit (fetch)
+defunkt   https://github.com/defunkt/grit (push)
+koke      git://github.com/koke/grit.git (fetch)
+koke      git://github.com/koke/grit.git (push)
+origin    git@github.com:mojombo/grit.git (fetch)
+origin    git@github.com:mojombo/grit.git (push)
+```
+
+The remote named `origin` is special that it is the default remote when you
+didn't specify one in the git commands `fetch`, `pull`, and `push`.
+
+The interesting feature in git is that, we can set multiple URLs for a remote.
+When it is set, we can push to all URLs in one push command:
+
+This is how we set up multiple URLs in one remote (`origin` in this case):
+
+```bash
+# assume we do not have any remote and we add remote origin
+$ git remote add origin hg::ssh://localhost//path/to/myrepo
+
+# with first URL set for the remote, we add more
+$ git remote set-url origin --add ssh://git@github.com/myhandle/myrepo.git
+$ git remote set-url origin --add ssh://git@gitlab.com/myhandle/myrepo.git
+$ git remote set-url origin --add hg::ssh://hg@bitbucket.org/myhandle/myrepo
+
+# check the setting
+$ git remote -v
+origin	hg::ssh://localhost//path/to/myrepo (fetch)
+origin	hg::ssh://localhost//path/to/myrepo (push)
+origin	ssh://git@github.com/myhandle/myrepo.git (push)
+origin	ssh://git@gitlab.com/myhandle/myrepo.git (push)
+origin	hg::ssh://hg@bitbucket.org/myhandle/myrepo (push)
+```
+
+or if this is clearer, the `.git/config` will look like the following:
+
+```
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+	ignorecase = true
+	precomposeunicode = true
+[remote "origin"]
+	url = hg::ssh://localhost//path/to/myrepo
+	url = ssh://git@gitlab.com/myhandle/myrepo.git
+	url = ssh://git@github.com/myhandle/myrepo.git
+	url = hg::ssh://hg@bitbucket.org/myhandle/myrepo
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "master"]
+	remote = origin
+	merge = refs/heads/master
+```
+
+And this is what happen when we push, note that each location is pushed one by
+one:
+
+```
+$ git push
+searching for changes
+no changes found
+searching for changes
+remote: adding changesets
+remote: adding manifests
+remote: adding file changes
+remote: added 1 changesets with 1 changes to 1 files
+To hg::ssh://localhost//path/to/myrepo
+   571ca86..60a40a0  master -> master
+Enumerating objects: 5, done.
+Counting objects: 100% (5/5), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 369 bytes | 369.00 KiB/s, done.
+Total 3 (delta 1), reused 0 (delta 0)
+To ssh://gitlab.com/myhandle/myrepo.git
+   571ca86..60a40a0  master -> master
+searching for changes
+no changes found
+searching for changes
+remote: adding changesets
+remote: adding manifests
+remote: adding file changes
+remote: added 1 changesets with 1 changes to 1 files
+To hg::ssh://hg@bitbucket.org/myhandle/myrepo
+   60a40a0..60a40a0  master -> master
+Enumerating objects: 5, done.
+Counting objects: 100% (5/5), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 369 bytes | 369.00 KiB/s, done.
+Total 3 (delta 1), reused 0 (delta 0)
+remote: Resolving deltas: 100% (1/1), completed with 1 local object.
+To ssh://git@github.com/myhandle/myrepo.git
+   571ca86..60a40a0  master -> master
+```
+
+# using SSH to access remote repositories
+
+SSH is supported by github, gitlab, and bitbuckets. I would prefer to set a specific SSH key to use them, e.g.,
+
+    ssh-keygen -t ecdsa -f id_ecdsa.github
+
+If we have multiple accounts on github et al, we can generate one key for each
+account. The repo service will remember each SSH key you assign to an account.
+No two accounts are allowed to share a key. This way, we can set up our
+`~/.ssh/config` as follows:
+
+```
+Host myname.bitbucket.org
+    HostName bitbucket.org
+    User hg
+    PreferredAuthentications publickey
+    IdentityFile ~/.ssh/id_ecdsa.bitbucket.priv
+    IdentitiesOnly yes
+
+Host myname.github.com
+    HostName github.com
+    User git
+    PreferredAuthentications publickey
+    IdentityFile ~/.ssh/id_ecdsa.github.priv
+    IdentitiesOnly yes
+```
+
+and in `.git/config`, we use the following:
+
+```
+[core]
+repositoryformatversion = 0
+filemode = true
+bare = false
+logallrefupdates = true
+ignorecase = true
+precomposeunicode = true
+[remote "origin"]
+url = hg::ssh://myname.bitbucket.org/myhandle/myrepo
+fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "master"]
+remote = origin
+merge = refs/heads/master
+```
+
+The `url` part will use `myname.bitbucket.org` instead of `bitbucket.org`
+because we defined such host in SSH config.  It does not need to be an existing
+DNS name. But because of the config, SSH will know to authenticate with a
+particular key so the remote knows it is you.  We also omitted the login name
+`git` or `hg` because it is defined in SSH's config.
+
+If you did not clone the repository yet, you can create one by:
+
+    git clone ssh://myname.github.com/mygithubname/myproject
+
+or
+
+    git clone hg::ssh://myname.bitbucket.com/mygithubname/myproject
+
+which will have the above "origin" pre-set.

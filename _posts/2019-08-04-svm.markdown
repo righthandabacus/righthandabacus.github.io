@@ -1,0 +1,379 @@
+---
+layout: post
+title: Convex optimization with Lagrangian function and Support Vector Machine
+date: Mon, 04 Aug 2019 18:20:28 -0400
+tags: math
+---
+
+This is a summary of the math behind the support vector machine. Start from the
+constrained optimization problem, solving one using Lagrangian function, and
+application to support vector machine.
+
+# Lagrangian function and primal-dual
+
+A general (primal) optimization problem can be prosed as follows:
+
+$$\begin{align}
+&& \min_x\ f(x) \\
+\textrm{subject to}&& h_i(x) &\le 0 \qquad\forall i\\
+&& l_j(x) & = 0 \qquad\forall j
+\end{align}$$
+
+This is a standard form, using min and $$\le$$.
+
+The corresponding *Lagrangian function* is
+
+$$L(x,u,v) = f(x) + \sum_i u_i h_i(x) + \sum_j v_j l_j(x)$$
+
+where $$u_i$$ and $$v_j$$ are Lagrangian multipliers and $$u_i\ge 0$$ as they
+are corresponding to inequalities upperbounded by 0, and $$v_j\in\mathbb{R}$$
+can be positive or negative.
+
+**Lemma 1**: Any feasible $$x$$ satisfies $$f(x) = \sup_{u\ge 0, v} L(x, u,
+v)$$ and the supremum attains at $$u_ih_i(x)=0$$
+
+**Proof of Lemma 1**: $$x$$ is feasible if $$h_i(x)\le 0$$ and $$l_j(x)=0$$. Thus we have
+
+$$\begin{align}
+L(x,u,v) &= f(x) + \sum_i u_i h_i(x) + \sum_j v_j l_j(x) \\
+& \le f(x)
+\end{align}$$
+
+and the equality holds iff $$u_i h_i(x) = 0$$ for all $$i$$.
+
+The above introduced the Karush-Kuhn-Tucker optimality condition. We will use
+this a lot in solving the Lagrangian function for optimality.
+
+**Lemma 2**: Optimal value $$f^{\ast} = \min_x f(x)$$ satisfies
+
+$$ f^{\ast} = \inf_x \sup_{u\ge 0, v} L(x, u, v) $$
+
+**Proof of Lemma 2**: Any feasible $$x$$ satisfies
+$$f(x) = \sup_{u\ge 0, v} L(x, u, v)$$. Thus by substitution we have $$f^{\ast}$$.
+
+## Duality
+
+$$ f^{\ast} = \inf_x \sup_{u\ge 0, v} L(x, u, v) $$
+
+in some cases, we can swap the operator to have
+
+$$\begin{align}
+f^{\ast} &= \sup_{u\ge 0, v} \inf_x L(x, u, v) \\
+&= \sup_{u\ge 0, v} g(u, v)
+\end{align}$$
+
+which we defined the *Lagrangian dual function* as
+
+$$ g(u, v) = \inf_x L(x, u, v). $$
+
+The infimum does not require $$x$$ to be in the feasible region. So the
+corresponding *dual problem* of constrained optimization is:
+
+$$\begin{align}
+&& \max_{u,v} & g(u, v) \\
+\textrm{subject to}&& u &\ge 0
+\end{align}$$
+
+and the optimal value is
+
+$$ g^{\ast} = \sup_{u\ge 0, v} \inf_x L(x,u,v) = \sup_{u\ge 0, v} g(u, v). $$
+
+**Lemma 3**: The dual problem is always convex
+
+**Proof of Lemma 3**: By definition of $$L(x, u, v)$$, we have
+
+$$ g(u, v) = \inf_x [ f(x) + \sum_i u_i h_i(x) + \sum_j v_j l_j(x) ] $$
+
+thus $$g(u,v)$$ is a pointwise infimum of affline functions of $$u$$ and $$v$$.
+Therefore, the dual problem is a maximization of concave function.
+
+We have optimal values $$f^{\ast}$$ from the primal problem and $$g^{\ast}$$
+from the dual problem. We always have $$f^{\ast} \ge g^{\ast}$$ in
+minimization. This is called the *weak duality*. In case of $$f^{\ast} = g^{\ast}$$,
+it has a strong duality.
+
+# Examples of deriving Lagrangian dual
+
+## Least square solution of linear equation
+
+For vectors $$x$$ and $$b$$ and matrix $$A$$,
+
+$$\min_x x^T x \quad \textrm{s.t.}\quad Ax = b$$
+
+The Lagrangian function is:
+
+$$L(x, v) = x^T x + v^T (Ax-b)$$
+
+to look for $$\inf_x L(x,v)$$ we solve for
+
+$$\begin{align}
+\frac{\partial L}{\partial x} &= 2x + A^T v = 0 \\
+x &= -\frac{1}{2} A^T v
+\end{align}$$
+
+Therefore the dual function is
+
+$$\begin{align}
+g(v) &= L(-\frac{1}{2}A^T v, v) \\
+&= \frac{1}{4}v^TAA^Tv - \frac{1}{2}v^TAA^Tv - b^Tv \\
+&= -\frac{1}{4}v^TAA^Tv - b^Tv
+\end{align}$$
+
+## Quadratic programming
+
+Assume we have a symmetric positive semi-definite matrix $$Q \succeq 0$$
+
+$$\begin{align}
+&& \min_x & \frac{1}{2} x^TQx + c^Tx \\
+\textrm{subject to}&& Ax &= b \\
+&& x & \ge 0
+\end{align}$$
+
+The Lagrangian function is
+
+$$ L(x,u,v) = \frac{1}{2} x^TQx + c^Tx - u^Tx + v^T(Ax-b). $$
+
+Deriving the dual function,
+
+$$\begin{align}
+\frac{\partial L}{\partial x} &= Qx + c - u + A^Tv = 0 \\
+\therefore x &= - Q^{-1} (c - u + A^Tv)
+\end{align}$$
+
+Substitute back into $$L(x,u,v)$$,
+
+$$\begin{align}
+L(x,u,v) &= \frac{1}{2} x^TQx + c^Tx - u^Tx + v^T(Ax-b) \\
+&= \frac{1}{2} x^TQx + (c - u + A^Tv)^T () - b^T v \\
+&= \frac{1}{2} (c - u + A^Tv)^TQ^{-1}QQ^{-1}(c - u + A^Tv) - (c - u + A^Tv)^T Q^{-1} (c - u + A^Tv) - b^T v \\
+&= -\frac{1}{2} (c - u + A^Tv)^TQ^{-1}(c - u + A^Tv) - b^T v \\
+\therefore g(u,v) &= -\frac{1}{2} (c - u + A^Tv)^TQ^{-1}(c - u + A^Tv) - b^T v
+\end{align}$$
+
+## QCQP
+
+The general form of quadratically constrained quadratic program:
+
+$$\begin{align}
+&& \min_x\ \frac{1}{2} x^TP_0x + q_0^Tx + r_0 \\
+\textrm{subject to}&& \frac{1}{2}x^TP_ix + q_i^Tx + r_i &\le 0\quad \forall i
+\end{align}$$
+
+If we define $$P(\lambda) = P_0 + \sum_i\lambda_iP_i$$,
+$$q(\lambda) = q_0 + \sum_i\lambda_iq_i$$, and
+$$r(\lambda) = r_0 + \sum_i\lambda_ir_i$$, then the Lagrangian function is
+
+$$ L(x,u,v) = \frac{1}{2} x^TP(\lambda)x + q(\lambda)^Tx + r(\lambda) $$
+
+then,
+
+$$\begin{align}
+\frac{\partial L}{\partial x} &= P(\lambda)^Tx + q(\lambda) = 0 \\
+\therefore x &= - [P(\lambda)^T]^{-1} q(\lambda)
+\end{align}$$
+
+Substitute back into $$L(x,u,v)$$,
+
+$$\begin{align}
+g(\lambda) &= L(- [P(\lambda)^T]^{-1} q(\lambda), \lambda) \\
+&= \frac{1}{2} q(\lambda)^TP(\lambda)^{-1}P(\lambda)P(\lambda)^{-1}q(\lambda) - q(\lambda)^TP(\lambda)^{-1}q(\lambda) + r(\lambda) \\
+&= -\frac{1}{2} q(\lambda)^TP(\lambda)^{-1}q(\lambda) + r(\lambda)
+\end{align}$$
+
+So the corresponding dual problem is
+
+$$\begin{align}
+&& \max_{\lambda}\ & -\frac{1}{2} q(\lambda)^TP(\lambda)^{-1}q(\lambda) + r(\lambda) \\
+\textrm{subject to}&& \lambda & \ge 0
+\end{align}$$
+
+# Binary classification with support vector machine
+
+Traditionally a binary classifier has output of $$\pm 1$$. Assume the input is
+$$x$$ and output $$y=\pm 1$$ are given for $$N$$ data points. If the data are
+linearly separable, we look for maximized margin to the hyperplane $$w^Tx+b$$
+which
+
+$$\begin{align}
+w^T x_i + b & \ge 1 & \textrm{if }y_i &= +1 \\
+w^T x_i + b & \le 1 & \textrm{if }y_i &= -1
+\end{align}$$
+
+and we use $$y_i = \mathrm{sgn}(w^T x_i + b)$$ as classifier.
+
+The optimization problem is therefore
+
+$$\begin{align}
+&& \max_{w,b}\ \frac{1}{\lVert w\rVert}&\quad \Leftrightarrow \quad \min_{w,b}\ \frac{1}{2}\lVert w\rVert^2 \\
+\textrm{subject to}&& y_i(w^T x_i + b) & \ge 1\quad \forall i
+\end{align}$$
+
+The above are called hard margin. If we allow error in classification, we have the soft margin model:
+
+$$\begin{align}
+&& \min_{w,b,\xi}\ & \left(\frac{1}{2}\lVert w\rVert^2 +c\sum_i\xi_i\right) \\
+\textrm{subject to}&& y_i(w^T x_i + b) & \ge 1-\xi_i \quad \forall i \\
+&& \xi_i &\ge 0\quad \forall i
+\end{align}$$
+
+which $$\xi_i>0$$ is the error margin and $$c>0$$ is the trade off between
+margin and loss. Here wrong classification is allowed when $$\xi_i > 1$$ but we
+aimed to minimize $$\xi_i$$ so to avoid misclassification as much as possible.
+
+The Lagrangian function in this case is therefore
+
+$$ L(w, b, \xi, \alpha, \nu) = \frac{1}{2}\lVert w\rVert^2 +c\sum_i\xi_i + \sum_i\alpha_i\left(1-\xi_i-y_i(w^Tx_i+b)\right) + \sum_i\nu_i(-\xi_i) $$
+
+with $$\alpha_i\ge 0$$ and $$\nu_i\ge 0$$. Solving the differential,
+
+$$\begin{align}
+\frac{\partial L}{\partial w} &= w - \sum_i \alpha_i y_i x_i = 0 &\Rightarrow&& w &= \sum_i \alpha_iy_ix_i \\
+\frac{\partial L}{\partial b} &= - \sum_i \alpha_i y_i = 0 &\Rightarrow&& \sum_i \alpha_iy_i &= 0 \\
+\frac{\partial L}{\partial \xi_i} &= c - \alpha_i - \nu_i = 0 &\Rightarrow&& \alpha_i &= c - \nu_i \le c \\
+\end{align}$$
+
+Substitute $$w=\sum_i\alpha_iy_ix_i$$ back into $$L(w,b,\xi,\alpha,\nu)$$ to find the dual function:
+
+$$\begin{align}
+L(w,b,\xi,\alpha,\nu)
+&= \frac{1}{2}\lVert w\rVert^2 +c\sum_i\xi_i + \sum_i\alpha_i\left(1-\xi_i-y_i(w^Tx_i+b)\right) + \sum_i\nu_i(-\xi_i) \\
+&= \frac{1}{2}\lVert w\rVert^2 +c\sum_i\xi_i + \sum_i\alpha_i - \sum_i\alpha_i\xi_i - \sum_i\alpha_iy_iw^Tx_i - \sum_i\alpha_iy_ib - \sum_i\nu_i\xi_i \\
+g(\alpha,\nu)
+&= \frac{1}{2}\sum_i\sum_j\alpha_i\alpha_jy_iy_jx_i^Tx_j
+  + c\sum_i\xi_i + \sum_i\alpha_i - \sum_i\alpha_i\xi_i
+  - \sum_i\sum_j\alpha_i\alpha_jy_iy_jx_i^Tx_j - b\underbrace{\sum_i\alpha_iy_i}_{=0} - \sum_i(c-\alpha_i)\xi_i \\
+&= -\frac{1}{2}\sum_i\sum_j\alpha_i\alpha_jy_iy_jx_i^Tx_j + \sum_i\alpha_i
+\end{align}$$
+
+and the corresponding dual problem:
+
+$$\begin{align}
+&& \max_{\alpha}\ & -\frac{1}{2}\sum_i\sum_j\alpha_i\alpha_jy_iy_jx_i^Tx_j + \sum_i\alpha_i \\
+\textrm{subject to}&& 0 \le \alpha_i &\le c \\
+&& \sum_iy_i\alpha_i &= 0
+\end{align}$$
+
+Solving this dual problem gives $$\alpha_i$$, which we can find the optimal $$w^{\ast} = \sum_i\alpha_iy_ix_i$$. To find the offset $$b$$ of the hyperplane, we have for each $$(x_i, y_i)$$,
+
+$$\begin{align}
+y_i(w^{\ast T}x_i + b) &= 1 \\
+\therefore y_i &= w^{\ast T} x_i + b \\
+b &= y_i - w^{\ast T}x_i
+\end{align}$$
+
+and we have a different $$b$$ for each $$(x_i, y_i)$$. But we usually use the mean of all data in the result:
+
+$$ b = \frac{1}{N}\sum_i \big[y_i - \big(\underbrace{\sum_j\alpha_jy_jx_j}_{=w^{\ast}}\big)x_i\big]$$
+
+We prefer to solve a SVM with dual problem as it gives hyperplane parameters in closed form with only dot products.
+
+The complementary slackness condition tells some additional information on the error and the Lagrangian multiplier:
+
+- In case of correct classification, $$\alpha_i=0$$, we have $$\nu_i = c > 0$$ and therefore $$\xi_i = 0$$. In this case,
+
+  $$ y_i(w^Tx_i + b) \ge 1 $$
+
+- In case of the data point is on the hyperplane, $$0<\alpha_i<c$$ and $$\nu_i>0$$ and $$\xi_i=0$$. In this case,
+
+  $$ y_i(w^Tx_i + b) = 1 - \xi_i = 1 $$
+
+- In case of some margin error, $$\alpha_i = c > 0$$, we have $$\nu_i = 0$$ and $$\xi_i \ge 0$$. In this case
+
+  $$ y_i(w^Tx_i + b) = 1 - \xi_i \le 1 $$
+
+## Kernel tricks
+
+SVM works best if data are linearly separable. Otherwise the classification may
+give error. However, we may convert data from non-linearly separable into
+linearly separable by projecting data into higher dimension, through function
+$$\phi(x)$$:
+
+$$\phi(x) : \mathbb{R}^d \mapsto \mathbb{R}^n\quad d < n$$
+
+But in practice, we use kernel function in the model instead of projecting all
+data into higher dimension before feeding into the model:
+
+$$K(x,y) = \phi(x)\phi(y)$$
+
+The kernel function is by definition symmetric. The SVM with kernel function becomes
+
+$$ g(\alpha,\nu) = \sum_i\alpha_i -\frac{1}{2}\sum_i\sum_j\alpha_i\alpha_jy_iy_jK(x_i,x_j) $$
+
+and the classifier is
+
+$$ \hat{y} = \mathrm{sgn}(\sum_i\alpha_iy_iK(x_i,\hat{x}) + b). $$
+
+The following are some common kernels:
+
+Squared kernel $$K(x,y) = (x^T y)^2 = (\sum_i x_iy_i)(\sum_j x_jy_j)$$. In
+case of a 3-vector $$x=\begin{bmatrix}x_1 & x_2 & x_3\end{bmatrix}^T$$, the
+kernel $$K(x,y)=\phi(x)^T\phi(y)$$ is equivalent to
+
+$$
+\phi(x) = \begin{bmatrix}
+x_1 x_1 \\
+x_1 x_2 \\
+x_1 x_3 \\
+x_2 x_1 \\
+x_2 x_2 \\
+x_2 x_3 \\
+x_3 x_1 \\
+x_3 x_2 \\
+x_3 x_3
+\end{bmatrix}
+$$
+
+but computing $$\phi(x)$$ is $$O(N^2)$$ while computing $$K(x,y)$$ is only $$O(N)$$.
+
+Quadratic kernel $$K(x,y) = (x^Ty+c)^2 = \sum_i\sum_j(x_ix_j)(y_iy_j) + \sum_i(\sqrt{2c}x_i)(\sqrt{2c}y_i) + c^2$$. In
+case of a 3-vector $$x=\begin{bmatrix}x_1 & x_2 & x_3\end{bmatrix}^T$$, the
+kernel $$K(x,y)=\phi(x)^T\phi(y)$$ is equivalent to
+
+$$
+\phi(x) = \begin{bmatrix}
+x_1 x_1 \\
+x_1 x_2 \\
+x_1 x_3 \\
+x_2 x_1 \\
+x_2 x_2 \\
+x_2 x_3 \\
+x_3 x_1 \\
+x_3 x_2 \\
+x_3 x_3 \\
+\sqrt{2c}x_1 \\
+\sqrt{2c}x_2 \\
+\sqrt{2c}x_3 \\
+c
+\end{bmatrix}
+$$
+
+Polynomial kernel $$K(x,y) = (x^Ty+c)^d$$ for some positive integer $$d$$. This
+kernel maps vector $$x$$ into a feature space of monomials of the form
+$$x_{i_1}x_{i_2}\cdots x_{i_d}$$ up to order $$d$$. The feature space is of
+dimension $$\binom{N+d}{d}$$ but the kernel computation is still $$O(N)$$.
+
+Gaussian kernel (a.k.a. radial basis function, RBF)
+$$K(x,y) = \exp\left(-\dfrac{\lVert x-y\rVert^2}{2\sigma^2}\right)$$. This can
+be viewed as an infinite-degree polynomial kernel.
+
+Kernel function can be written as a matrix: For $$m$$ vectors
+$$x_1, x_2, \cdots, x_m$$, we define a $$m\times m$$ kernel matrix
+$$K = (k_{ij})_{m\times m}$$ as
+
+$$ k_{ij} = K(x_i, x_j) = \phi(x_i)^T \phi(x_j) = k_{ji} $$
+
+The kernel matrix $$K$$ is symmetric and positive semi-definite (i.e., $$z^T K
+z \ge 0$$ for all $$z$$). This is the necessary and sufficient condition for a
+valid kernel, as proved by the Mercer theorem.
+
+## Application of kernel trick
+
+Handwritten digit recognition: Input is 16x16 pixels of binary value
+transformed into a 256-vector, but a polynomial kernel or Gaussian kernel can
+give very good performance.
+
+String matching: There are $$26^k$$ possible strings of length $$k$$ on
+case-insensitive alphabets. For $$k=4$$, $$26^4 \approx 460000$$. If we build a
+model to classify text based on count of occurrences of all $$k$$-gram from a
+long string, the size of vector $$\phi(x)$$ will be intractable. But for a
+kernel, we can compute $$K(x,y)=\phi(x)^T\phi(y)$$ by dynamic programming.

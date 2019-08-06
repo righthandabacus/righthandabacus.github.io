@@ -302,7 +302,9 @@ $$\genfrac{\lvert}{\rvert}{0pt}{}{n}{x} = \genfrac{\lvert}{\rvert}{0pt}{}{n-1}{x
 The twelvefold way is attributed to Gian-Carlo Rota (according to Wikipedia)
 and the Wikipedia page also mentioned an extension to twentyfold way, which
 include the cases that all urn must have exactly one ball (i.e., the mapping
-$$f$$ is bijective).
+$$f$$ is bijective), or the urn is presented as a list instead of a set, so
+there is ordering of the balls in the urn (in which case, [Lah
+number](https://en.wikipedia.org/wiki/Lah_number) is involved).
 
 A paper [Let's Expand Rota's Twelvefold Way For Counting
 Partitions!](https://arxiv.org/pdf/math/0606404.pdf) also extends the
