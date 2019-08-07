@@ -184,7 +184,7 @@ b
 \begin{bmatrix}
 x \\
 v
-\end{bmatrix &=\begin{bmatrix}
+\end{bmatrix} &=\begin{bmatrix}
 Q & A^T \\
 A & 0
 \end{bmatrix}^{-1}\begin{bmatrix}
