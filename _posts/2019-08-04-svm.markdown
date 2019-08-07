@@ -2,6 +2,7 @@
 layout: post
 title: Convex optimization with Lagrangian function and Support Vector Machine
 date: Mon, 04 Aug 2019 18:20:28 -0400
+lastedit: Wed, 07 Aug 2019 10:43:58 -0400
 tags: math
 ---
 
@@ -148,6 +149,48 @@ L(x,u,v) &= \frac{1}{2} x^TQx + c^Tx - u^Tx + v^T(Ax-b) \\
 &= \frac{1}{2} (c - u + A^Tv)^TQ^{-1}QQ^{-1}(c - u + A^Tv) - (c - u + A^Tv)^T Q^{-1} (c - u + A^Tv) - b^T v \\
 &= -\frac{1}{2} (c - u + A^Tv)^TQ^{-1}(c - u + A^Tv) - b^T v \\
 \therefore g(u,v) &= -\frac{1}{2} (c - u + A^Tv)^TQ^{-1}(c - u + A^Tv) - b^T v
+\end{align}$$
+
+If we relax the constraint of $$x \ge 0$$, we have a quadratic programming
+problem with equality constraints
+
+$$\begin{align}
+&& \min_x & \frac{1}{2} x^TQx + c^Tx \\
+\textrm{subject to}&& Ax &= b
+\end{align}$$
+
+Which then,
+
+$$\begin{align}
+L(x,v) &= \frac{1}{2} x^TQx + c^Tx + v^T(Ax-b) \\
+\frac{\partial L}{\partial x} &= Qx + c + A^Tv = 0 \\
+\therefore Qx +A^Tv &= - c \\
+\frac{\partial L}{\partial v} &= Ax - b = 0 \\
+\end{align}$$
+
+which we can rewrite the above equations into matrix form and solve it:
+
+$$\begin{align}
+\begin{bmatrix}
+Q & A^T \\
+A & 0
+\end{bmatrix}\begin{bmatrix}
+x \\
+v
+\end{bmatrix} &=\begin{bmatrix}
+-c \\
+b
+\end{bmatrix} \\
+\begin{bmatrix}
+x \\
+v
+\end{bmatrix &=\begin{bmatrix}
+Q & A^T \\
+A & 0
+\end{bmatrix}^{-1}\begin{bmatrix}
+-c \\
+b
+\end{bmatrix}
 \end{align}$$
 
 ## QCQP
