@@ -253,7 +253,11 @@ $$\begin{align}
 && \sum_iy_i\alpha_i &= 0
 \end{align}$$
 
-Solving this dual problem gives $$\alpha_i$$, which we can find the optimal $$w^{\ast} = \sum_i\alpha_iy_ix_i$$. To find the offset $$b$$ of the hyperplane, we have for each $$(x_i, y_i)$$,
+Solving this dual problem gives $$\alpha_i$$, which we can find the optimal
+$$w^{\ast} = \sum_i\alpha_iy_ix_i$$. Note that $$w^{\ast}$$ depends only on the
+data points $$(x_i,y_i)$$ for which $$\alpha_i\ne 0$$. Those data points are
+the *support vectors* of the model which gives the name. To find the offset
+$$b$$ of the hyperplane, we have for each $$(x_i, y_i)$$,
 
 $$\begin{align}
 y_i(w^{\ast T}x_i + b) &= 1 \\
@@ -261,23 +265,29 @@ y_i(w^{\ast T}x_i + b) &= 1 \\
 b &= y_i - w^{\ast T}x_i
 \end{align}$$
 
-and we have a different $$b$$ for each $$(x_i, y_i)$$. But we usually use the mean of all data in the result:
+and we have a different $$b$$ for each $$(x_i, y_i)$$. But we usually use the
+mean of all data in the result:
 
 $$ b = \frac{1}{N}\sum_i \big[y_i - \big(\underbrace{\sum_j\alpha_jy_jx_j}_{=w^{\ast}}\big)x_i\big]$$
 
-We prefer to solve a SVM with dual problem as it gives hyperplane parameters in closed form with only dot products.
+We prefer to solve a SVM with dual problem as it gives hyperplane parameters in
+closed form with only dot products.
 
-The complementary slackness condition tells some additional information on the error and the Lagrangian multiplier:
+The complementary slackness condition tells some additional information on the
+error and the Lagrangian multiplier:
 
-- In case of correct classification, $$\alpha_i=0$$, we have $$\nu_i = c > 0$$ and therefore $$\xi_i = 0$$. In this case,
+- In case of correct classification, $$\alpha_i=0$$, we have $$\nu_i = c > 0$$
+  and therefore $$\xi_i = 0$$. In this case,
 
   $$ y_i(w^Tx_i + b) \ge 1 $$
 
-- In case of the data point is on the hyperplane, $$0<\alpha_i<c$$ and $$\nu_i>0$$ and $$\xi_i=0$$. In this case,
+- In case of the data point is on the hyperplane, $$0<\alpha_i<c$$ and
+  $$\nu_i>0$$ and $$\xi_i=0$$. In this case,
 
   $$ y_i(w^Tx_i + b) = 1 - \xi_i = 1 $$
 
-- In case of some margin error, $$\alpha_i = c > 0$$, we have $$\nu_i = 0$$ and $$\xi_i \ge 0$$. In this case
+- In case of some margin error, $$\alpha_i = c > 0$$, we have $$\nu_i = 0$$ and
+  $$\xi_i \ge 0$$. In this case
 
   $$ y_i(w^Tx_i + b) = 1 - \xi_i \le 1 $$
 
@@ -355,6 +365,11 @@ dimension $$\binom{N+d}{d}$$ but the kernel computation is still $$O(N)$$.
 Gaussian kernel (a.k.a. radial basis function, RBF)
 $$K(x,y) = \exp\left(-\dfrac{\lVert x-y\rVert^2}{2\sigma^2}\right)$$. This can
 be viewed as an infinite-degree polynomial kernel.
+
+Other common kernels:
+
+- Linear: $$K(x,y) = x^Ty$$
+- Two-layer neural network: $$K(x,y) = \tanh(\kappa x^T y + \theta)$$
 
 Kernel function can be written as a matrix: For $$m$$ vectors
 $$x_1, x_2, \cdots, x_m$$, we define a $$m\times m$$ kernel matrix

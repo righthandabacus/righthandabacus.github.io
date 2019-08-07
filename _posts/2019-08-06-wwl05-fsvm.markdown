@@ -1,0 +1,136 @@
+---
+layout: post
+title: "Wang, Wang, & Lai (2005) A New Fuzzy Support Vector Machine to Evaluate Credit Risk"
+date: Tue, 06 Aug 2019 19:26:12 -0400
+category: paper
+bibtex:
+  type: article
+  author: Yongqiao Wang and Shouyang Wang and K. K. Lai
+  title: A New Fuzzy Support Vector Machine to Evaluate Credit Risk
+  journal: IEEE Transactions on Fuzzy Systems
+  volume: 13
+  number: 6
+  year: 2005
+  pages: 820--831
+  doi: 10.1109/TFUZZ.2005.859320
+---
+
+A paper referenced by [Yu (2014)](/2019-08-06-y14-credit/) which introduced the
+  FSVM to the domain.
+
+The math model is mentioned by the [Yu (2014) paper](/2019-08-06-y14-credit/),
+The idea behind fuzzy SVM is to mitigate the over fitting problem in training
+the SVM. A weight (membership) is imposed so that the effect of outliers or
+noises are decreased. The fuzzy SVM is prosed as follows
+
+$$\begin{align}
+&& \min_{w,b,\xi}\ & \frac{1}{2}w^Tw + C\sum_k m_k\xi_k \\
+\textrm{subject to}&& y_k(w^T \phi(x_k) + b) & \ge 1-\xi_k & \forall k \\
+&& \xi_k &\ge 0 & \forall k
+\end{align}$$
+
+The membership $$m_k$$ of each training data shall be determined. The paper
+mentioned several approaches, such as distance measure between the data point
+and the class centre.
+
+The novel idea of this paper is to use each training data point twice for
+binary classification problem, once for each classification result. In contrast
+to the previous fuzzy SVM, the author call this the bilateral-weighted fuzzy
+SVM (B-FSVM). For each of the $$N$$ training data $$(x_k, y_k)$$, where
+$$y_k=\pm 1$$, B-FSVM use it as $$(x_k, 1, m_k)$$ and $$(x_k, -1, 1-m_k)$$ so
+there will be $$2N$$ training samples. In the tuple $$(x,y,m)$$, $$x$$ is the
+input vector, $$y$$ is the observed result, and $$m\in[0,1]$$ is the
+membership. The classification problem is then
+
+$$\begin{align}
+&& \min_{w,b,\xi, \eta}\ & \frac{1}{2}w^Tw + C\sum_k [m_k\xi_k + (1-m_k)\eta_k] \\
+\textrm{subject to}&& w^T \phi(x_k) + b & \ge 1-\xi_k & \forall k \\
+&& w^T \phi(x_k) + b & \le -1+\eta_k & \forall k \\
+&& \xi_k &\ge 0 & \forall k \\
+&& \eta_k &\ge 0 &  \forall k
+\end{align}$$
+
+Note that there are two errors $$\xi$$ and $$\eta$$, which associate with
+weights $$m$$ and $$1-m$$ respectively. Formulate the above into Lagrangian
+function,
+
+$$\begin{align}
+L(w,b,\xi,\eta;\alpha,\beta,\mu,\nu) =
+& \frac{1}{2}w^Tw + C\sum_k m_k\xi_k + C\sum_k (1-m_k)\eta_k \\
+& - \sum_k \alpha_k [w^T \phi(x_k) + b - 1 + \xi_k ] \\
+& + \sum_k \beta_k [w^T \phi(x_k) + b + 1 - \eta_k ] \\
+& - \sum_k \mu_k\xi_k - \sum_k \nu_k\eta_k
+\end{align}$$
+
+and we have
+
+$$\begin{align}
+\frac{\partial L}{\partial w} &= w - \sum_k\alpha_k\phi(x_k) + \sum_k\beta_k\phi(x_k) = 0 \\
+\frac{\partial L}{\partial b} &= -\sum_k\alpha_k +\sum_k\beta_k = 0 \\
+\frac{\partial L}{\partial \xi_k} &= Cm_k - \alpha_k - \mu_k = 0 & \forall k\\
+\frac{\partial L}{\partial \eta_k} &= C(1-m_k) - \beta_k - \nu_k = 0 & \forall k\\
+\alpha_k [w^T \phi(x_k) + b - 1 + \xi_k ] &=0 & \forall k \\
+\beta_k [w^T \phi(x_k) + b + 1 - \eta_k ] &=0 & \forall k \\
+\mu_k \xi_k &= 0 & \forall k \\
+\nu_k \eta_k &= 0 & \forall k
+\end{align}$$
+
+where the last four above are from the KKT conditions. From these we have
+
+$$\begin{gather}
+w = \sum_k (\alpha_k - \beta_k)\phi(x_k) \\
+0 \le \alpha_k \le Cm_k \\
+0 \le \beta_k \le C(1-m_k) \\
+\xi_k(Cm_k-\alpha_k) = 0 \\
+\eta_k[C(1-m_k)-\beta_k] = 0
+\end{gather}$$
+
+and then
+
+$$\begin{align}
+\sum_k \alpha_k [w^T \phi(x_k) + b - 1 + \xi_k ] - \sum_k \beta_k [w^T \phi(x_k) + b + 1 - \eta_k ] &=0 \\
+\sum_k (\alpha_k - \beta_k) w^T \phi(x_k) + b \sum_k (\alpha_k - \beta_k) - \sum_k (\alpha_k + \beta_k) + \sum_k (\alpha_k \xi_k + \beta_k\eta_k) &= 0 \\
+\sum_k (\alpha_k - \beta_k) w^T \phi(x_k) - \sum_k (\alpha_k + \beta_k) + \sum_k (\alpha_k \xi_k + \beta_k\eta_k) &= 0
+\end{align}$$
+
+also,
+
+$$\begin{align}
+\sum_k \xi_k(Cm_k - \alpha_k) + \sum_k \eta_k[C(1-m_k) - \beta_k] &= 0 \\
+C \sum_k m_k \xi_k - \sum_k \alpha_k\xi_i + C \sum_k (1-m_k)\eta_k - \sum_k \beta_k\eta_k &= 0 \\
+C \sum_k m_k \xi_k + C \sum_k (1-m_k)\eta_k &= \sum_k \alpha_k\xi_i + \sum_k \beta_k\eta_k \\
+&= - \sum_k (\alpha_k - \beta_k) w^T \phi(x_k) + \sum_k (\alpha_k + \beta_k)
+\end{align}$$
+
+Substitute this back to the objective function of the original optimization problem:
+
+$$\begin{align}
+& \frac{1}{2}w^Tw + C\sum_k [m_k\xi_k + (1-m_k)\eta_k] \\
+=& \frac{1}{2}w^Tw - \sum_k (\alpha_k - \beta_k) w^T \phi(x_k) + \sum_k (\alpha_k + \beta_k) \\
+=& \frac{1}{2}\sum_i\sum_j(\alpha_i-\beta_i)(\alpha_j-\beta_j)\phi(x_i)^T\phi(x_j) - \sum_i \sum_j (\alpha_i - \beta_i) (\alpha_j - \beta_j) \phi(x_i)^T\phi(x_j) + \sum_k (\alpha_k + \beta_k)
+\end{align}$$
+
+we can rewrite the problem as
+
+$$\begin{align}
+\max_{\gamma, \beta}\ & -\frac{1}{2}\sum_i \sum_j \gamma_i\gamma_jK(x_i,x_j) + \sum_k \gamma_k + 2\sum_k\beta_k \\
+\textrm{subject to } & \sum_k\gamma_k = 0 \\
+& 0 \le \beta_k + \gamma_k \le Cm_k & \forall k \\
+& 0 \le \beta_k \le C(1-m_k) & \forall k
+\end{align}$$
+
+where $$\gamma_k = \alpha_k - \beta_k$$. Solved this for $$\alpha_k, \beta_k$$,
+the final classifier is
+
+$$ y(x) = \mathrm{sign}\left(\sum_k (\alpha_k-\beta_k)K(x,x_k) + b\right) $$
+
+So far, the value of membership $$m_k$$ is not determined. The paper summarized
+the procedure of training such fuzzy SVM as:
+
+1. Use basic credit scoring method to evaluate each training data for the credit score $$s_k$$
+2. Compute the membership $$m_k$$ from $$s_k$$
+3. Solve the quadratic programming problem for the final classifier
+
+which the membership can be computed according to linear scaling of all scores,
+or transformed the score by a logistic function, or transformed by a cumulative
+normal distribution function. The paper assumes we already have $$s_k$$.

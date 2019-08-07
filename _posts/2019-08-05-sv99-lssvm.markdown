@@ -1,0 +1,87 @@
+---
+layout: post
+title: "Suykens and Vandewalle (1999) Least Squares Support Vector Machine Classifiers"
+date: Mon, 05 Aug 2019 23:45:11 -0400
+category: paper
+bibtex:
+  type: article
+  author: J. A. K. Suykens and J. Vandewalle
+  title: Least Squares Support Vector Machine Classifiers
+  journal: Neural Processing Letters
+  volume: 9
+  number: 3
+  pages: "293--300"
+  year: 1999
+---
+
+A short paper reviews the prior work on SVM with kernel functions and then move
+on the introduce a SVM classifier formulated by optimizing for least square
+error. Refer to [previous post](/2019-08-04-svm/) for notations.
+
+The classification problem is:
+
+$$\begin{align}
+&& \min_{w,b,e}\ \frac{1}{2} w^T w + \gamma\frac{1}{2}\sum_i e_i^2 \\
+\textrm{subject to}&& y_i[w^T\phi(x_i) + b] = 1-e_i & \quad \forall i
+\end{align}$$
+
+The error is modelled by $$e_i$$ and we have equality constraints here because
+the minimization objective will always make $$e_k$$ to measure the error from
+the correct side of hyperplane.
+
+The Lagrangian function is
+
+$$L(w,b,e,\alpha) = \frac{1}{2} w^T w + \gamma\frac{1}{2}\sum_i e_i^2 - \sum_i\alpha_i\left(y_i[w^T\phi(x_i)+b]-1+e_i\right)$$
+
+Then the conditions for optimality:
+
+$$\begin{align}
+\frac{\partial L}{\partial w} &= w - \sum_i \alpha_i y_i \phi(x_i) & \Rightarrow && w &= \sum_i \alpha_i y_i \phi(x_i) \\
+\frac{\partial L}{\partial b} &= \sum_i \alpha_i y_i & \Rightarrow && \sum_i \alpha_i y_i &= 0 \\
+\frac{\partial L}{\partial e_i} &= \gamma e_i - \alpha_i & \Rightarrow && \alpha_i &= \gamma e_i \\
+\frac{\partial L}{\partial \alpha_i} &= y_i[w^T\phi(x_i)+b]-1+e_i & \Rightarrow && y_i[w^T\phi(x_i)+b]-1+e_i &= 0
+\end{align}$$
+
+Writing this in matrix form
+
+$$\begin{bmatrix}
+I & 0 & 0 & -Z^T \\
+0 & 0 & 0 & -Y^T \\
+0 & 0 & \gamma I & -I \\
+Z & Y & I & 0
+\end{bmatrix}\begin{bmatrix}
+w \\
+b \\
+e \\
+\alpha
+\end{bmatrix} = \begin{bmatrix}
+0 \\
+0 \\
+0 \\
+1
+\end{bmatrix}$$
+
+where
+
+$$\begin{align}
+Z &= \begin{bmatrix}\phi(x_1)^Ty_1 & \cdots & \phi(x_N)^Ty_N\end{bmatrix}^T \\
+Y &= \begin{bmatrix}y_1 & \cdots & y_N\end{bmatrix}^T \\
+e &= \begin{bmatrix}e_1 & \cdots & e_N\end{bmatrix}^T \\
+\alpha &= \begin{bmatrix}\alpha_1 & \cdots & \alpha_N\end{bmatrix}^T \\
+\end{align}$$
+
+and the solution is given by
+
+$$\begin{bmatrix}
+0 & -Y^T \\
+Y & ZZ^T+\gamma^{-1}I
+\end{bmatrix}
+\begin{bmatrix}
+b \\
+\alpha
+\end{bmatrix}
+=
+\begin{bmatrix}
+0 \\
+1
+\end{bmatrix}$$

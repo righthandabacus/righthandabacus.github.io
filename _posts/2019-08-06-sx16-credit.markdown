@@ -1,0 +1,62 @@
+---
+layout: post
+title: "Shi and Xu (2016) Credit Scoring by Fuzzy Support Vector Machines with a Novel Membership Function"
+date: Tue, 06 Aug 2019 21:50:47 -0400
+category: paper
+bibtex:
+  type: article
+  author: Jian Shi and Benlian Xu
+  title: Credit Scoring by Fuzzy Support Vector Machines with a Novel Membership Function
+  journal: Journal of Risk and Financial Management
+  volume: 9
+  number: 13
+  year: 2016
+  doi: 10.3390/jrfm9040013
+---
+
+The paper by [Wang et al (2005)](/2019-08-06-wwl05-fsvm/) introduced the fuzzy
+SVM but did not address how we can obtain the membership value. This paper fill
+up the void.
+
+The paper surveyed some prior work and reported that one way to find the
+membership is to measure the distance between each data point and its
+corresponding class center. For two classes of labels $$\pm 1$$, the training
+samples $$(x_i, y_i)$$ are used to find the radius of each class:
+
+$$\begin{align}
+r_+ &= \max \lvert x_+ - x_i\rvert &\forall i \textrm{ where }y_i=+1 \\
+r_- &= \max \lvert x_- - x_i\rvert &\forall i \textrm{ where }y_i=-1
+\end{align}$$
+
+which $$x_+$$ and $$x_-$$ are the mean $$x_i$$ of the respective class. Then
+the fuzzy membership of each sample is given by
+
+$$ s_i = \begin{cases}
+1-\dfrac{\lvert x_+ - x_i\rvert}{r_+ + \delta} &\textrm{where }y_i = +1 \\
+1-\dfrac{\lvert x_- - x_i\rvert}{r_- + \delta} &\textrm{where }y_i = -1
+\end{cases}$$
+
+The above is operating on the input space. Small constant $$\delta>0$$ is to
+prevent $$s_i = 0$$. We can easily extend the above by replacing $$x_i$$ with
+$$\phi(x_i)$$ in case input vectors are mapped into feature space.
+
+However, this paper propose to use a *support vector data description* (SVDD)
+to supplement SVM to find the membership. Similar to SVM finding a hyperplane,
+SVDD is to find a hypersphere with minimum volume that enclosed all target
+objects. The formulation of SVDD is as follows:
+
+$$\begin{align}
+\min_{R,\xi} & R^2 + C\sum_i\xi_i \\
+\textrm{subject to } & \lVert\phi(x_i) - a\rVert^2 \le R^2 + \xi_i & \forall i \\
+& \xi_i \ge 0 & \forall i
+\end{align}$$
+
+This paper suggested to use SVDD on the same training data to find the class
+center $$a$$ and radius $$R$$. Then we use the distance to the class center
+scaled by the radius as the membership
+
+$$s_i = 1 - \sqrt{\frac{d_i^2}{R^2+\delta}}$$
+
+The above is operated in the feature space. The paper argues that using the
+SVDD hypersphere to determine the membership is more explicit and
+interpretable.

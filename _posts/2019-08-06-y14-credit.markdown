@@ -1,0 +1,139 @@
+---
+layout: post
+title: "Yu (2014) Credit Risk Evaluation with a Least Squares Fuzzy Support Vector Machine Classifier"
+date: Tue, 06 Aug 2019 09:43:27 -0400
+category: paper
+bibtex:
+  type: article
+  author: Lean Yu
+  title: Credit Risk Evaluation with a Least Squares Fuzzy Support Vector Machine Classifier"
+  journal: Discrete Dynamics in Nature and Society
+  volume: 2014
+  year: 2014
+  doi: http://dx.doi.org/10.1155/2014/564213
+---
+
+A paper first surveys some variations of support vector machines and their solution, and then apply to credit risk evaluation.
+
+The standard SVM is formulated as
+
+$$\begin{align}
+&& \min_{w,b,\xi}\ & \frac{1}{2}w^Tw + C\sum_i\xi_i \\
+\textrm{subject to}&& y_i(w^T \phi(x_i) + b) & \ge 1-\xi_i \quad \forall i \\
+&& \xi_i &\ge 0\quad \forall i
+\end{align}$$
+
+with $$\xi_i$$ the error margin. Solving the above optimization problem is to
+find the saddle point of the Lagrangian function.
+
+Training a SVM requires each training data belongs to one class or the other
+instead of a fuzzy measure. If we associate a membership grade $$\mu_i\in
+[0,1]$$ to each data point as a measure of membership between two classes, we
+can modify the above optimization problem for a fuzzy SVM:
+
+$$\begin{align}
+&& \min_{w,b,\xi}\ & \frac{1}{2}w^Tw + C\sum_i\mu_i\xi_i \\
+\textrm{subject to}&& y_i(w^T \phi(x_i) + b) & \ge 1-\xi_i \quad \forall i \\
+&& \xi_i &\ge 0\quad \forall i
+\end{align}$$
+
+Note the $$\mu_i\xi_i$$ summation term in the objective function. In FSVM, the
+error term $$\xi_i$$ is scaled by the membership value $$\mu_i$$, to reflect
+the relative confidence of the training samples.
+
+Borrowing from the [LS-SVM paper](/2019-08-04-sv99-lssvm/), we can use least
+square measure for the error term and replace the constraint with equality:
+
+$$\begin{align}
+&& \min_{w,b,\xi}\ & \frac{1}{2}w^Tw + \frac{1}{2}C\sum_i\mu_i\xi_i^2 \\
+\textrm{subject to}&& y_i(w^T \phi(x_i) + b) & = 1-\xi_i \quad \forall i
+\end{align}$$
+
+which we do not even enforce $$\xi_i$$ to be non-negative as the objective
+function will penalize for the result offset from $$\pm 1$$ in both direction.
+Solving this LS-FSVM equation, we first find the Lagrangian
+
+$$ L(w,b,\xi,\alpha) = \frac{1}{2}w^Tw + \frac{1}{2}C\sum_i\mu_i\xi_i^2 - \sum_i\alpha_i\left[y_i\left(w^T\phi(x_i)+b\right)-1+\xi_i\right] $$
+
+The Lagrangian multiplier $$\alpha_i$$ can be positive or negative as it
+associates with a equality constraint. To find the saddle point,
+
+$$\begin{align}
+\frac{\partial L}{\partial w} &= w - \sum_i \alpha_i y_i \phi(x_i) & \Rightarrow && w &= \sum_i \alpha_i y_i \phi(x_i) \\
+\frac{\partial L}{\partial b} &= - \sum_i \alpha_i y_i & \Rightarrow && \sum_i \alpha_i y_i &= 0 \\
+\frac{\partial L}{\partial \xi_i} &= \mu_i C\xi_i - \alpha_i & \Rightarrow && \alpha_i &= \mu_i C\xi_i \\
+\frac{\partial L}{\partial \alpha_i} &= y_i[w^T\phi(x_i)+b]-1+\xi_i & \Rightarrow && y_i[w^T\phi(x_i)+b]-1+\xi_i &= 0
+\end{align}$$
+
+Substituting $$w$$ from the last equation above (i.e., the constraint equality) gives
+
+$$\begin{align}
+y_i[\sum_j\alpha_jy_j\phi(x_j)^T\phi(x_i)+b]+\xi_i &= 1 \\
+\sum_j\alpha_jy_iy_j\phi(x_j)^T\phi(x_i)+by_i+\frac{\alpha_i}{\mu_iC} &= 1
+\end{align}$$
+
+Which, together with the equation $$\sum_i\alpha_iy_i=0$$, we can write in the
+following matrix form:
+
+$$\begin{bmatrix}
+\mathbf{\Omega} & \mathbf{Y} \\
+\mathbf{Y}^T & \mathbf{0}
+\end{bmatrix}
+\begin{bmatrix}
+\mathbf{\alpha} \\
+\mathbf{b}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\mathbf{1} \\
+\mathbf{0}
+\end{bmatrix}$$
+
+which
+
+$$\begin{align}
+\Omega_{ij} &= y_i y_j \phi(x_i)^T\phi(x_j) + \frac{1}{\mu_i C} \\
+\mathbf{Y} &= \begin{bmatrix}y_1 & y_2 & \cdots & y_N\end{bmatrix}^T
+\end{align}$$
+
+(i.e., $$\mathbf{\Omega}$$ is positive semi-definite) and the solution to the LS-FSVM are:
+
+$$\begin{align}
+\mathbf{\Omega\alpha} + \mathbf{Y}^T\mathbf{b} &= \mathbf{1} \\
+\mathbf{\alpha} &= \mathbf{\Omega}^{-1}(\mathbf{1} - \mathbf{Y}^T\mathbf{b})
+\end{align}$$
+
+and 
+
+$$\begin{align}
+\mathbf{Y}^T\mathbf{\alpha} &= \mathbf{0} \\
+\mathbf{Y}^T\mathbf{\Omega}^{-1}(\mathbf{1} - \mathbf{Y}^T\mathbf{b}) &= \mathbf{0} \\
+\mathbf{Y}^T\mathbf{\Omega}^{-1} &= (\mathbf{Y}^T\mathbf{\Omega}^{-1}\mathbf{Y})\mathbf{b} \\
+\mathbf{b} &= \frac{ \mathbf{Y}^T\mathbf{\Omega}^{-1} }{ \mathbf{Y}^T\mathbf{\Omega}^{-1}\mathbf{Y} }
+\mathbf{b} &= \frac{1}{ \mathbf{Y}^T\mathbf{\Omega}^{-1}\mathbf{Y} }\mathbf{Y}^T\mathbf{\Omega}^{-1} 
+\end{align}$$
+
+Note the above that a closed form solution to LS-FSVM is provided by solving a
+set of linear equations. We did not introduce quadratic programming and thus it
+has lower computational complexity.
+
+Then the paper proceed to evaluate LS-FSVM with credit data. Evaluation is to
+compare the accuracy, true positive rate, and true negative rate among
+different classifiers. The paper used linear nad logistic regression, ANN, and
+various kind of SVM. RBF kernel is used for all SVM. For ANN, the paper used a
+3-layer back-propagation network with 10 sigmoidal neurons in the hidden layer;
+trained with Levenberg-Marquardt algorithm for 1600 epochs, with learning and
+momentum rates of 0.1 and 0.15 respectively and accepted average square error
+of 0.05.
+
+The input data has 14 attributes (year of birth, number of children, income of
+applicant and spouse, value of home, mortgage balance outstanding, etc.) and
+interpolation is used to impute missing data. There are some treatments used in
+the training: (1) Because insolvency is relatively rare, the number of observed
+bad borrowers are tripled to make the number nearly equal to the number of good
+borrowers in the training, to avoid the impact of imbalanced samples. (2) FSVM
+depends on membership grade. It is generated by a transformation function.
+
+The result shows a significant improvement of accuracy in LS-FSVM compared to
+plain SVM or even ANN and regressions. The advantage over simple LS-SVM or FSVM
+are not so significant.
