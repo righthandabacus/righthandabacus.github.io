@@ -2,6 +2,7 @@
 layout: post
 title: Git, mercurial, and synchronized repositories
 date: Sat, 20 Jul 2019 15:05:14 -0400
+lastedit: Wed, 07 Aug 2019 21:04:34 -0400
 tags: system
 ---
 
@@ -221,6 +222,58 @@ remote: Resolving deltas: 100% (1/1), completed with 1 local object.
 To ssh://git@github.com/myhandle/myrepo.git
    571ca86..60a40a0  master -> master
 ```
+
+# Convenience setting for multihome repositories
+
+Example is better than words, this is the `.git/config` of an example repository:
+
+```
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+	ignorecase = true
+	precomposeunicode = true
+[user]
+	name = Myfirstname Mylastname
+	email = myname@gmail.com
+[branch "master"]
+	remote = origin
+	merge = refs/heads/master
+[remote "origin"]
+	url = git@github.com:myhandle/projectname.git
+	url = git@gitlab.com:myhandle/projectname.git
+	url = git@bitbucket.org:myhandle/projectname.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[remote "upstream"]
+	url = https://github.com/otherpeople/projectname
+	fetch = +refs/heads/*:refs/remotes/upstream/*
+[remote "github"]
+	url = git@myhandle.github.com:myhandle/projectname.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[remote "gitlab"]
+	url = git@gitlab.com:myhandle/projectname.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[remote "bitbucket"]
+	url = git@bitbucket.org:myhandle/projectname.git
+	fetch = +refs/heads/*:refs/remotes/bitbucket/*
+```
+
+This repository is cloned from elsewhere and I am extending it. Then I can:
+
+1. Rebase my change to upstream by
+
+       git fetch upstream
+       git rebase upstream
+
+2. Push my changes to all my repository servers
+
+       git push
+
+3. Push (or pull) my changes to only one repository
+
+       git push github
 
 # using SSH to access remote repositories
 

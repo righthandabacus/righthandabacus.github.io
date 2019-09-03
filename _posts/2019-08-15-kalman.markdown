@@ -1,0 +1,459 @@
+---
+layout: post
+title: "Use of Kalman filter in finance and estimation of value-at-risk"
+date: Sun, 18 Aug 2019 01:20:17 -0400
+category: paper
+---
+
+Kalman filter is, in certain sense, a way to give the moving average of a time
+series. It keeps track on a vector of state variables with its corresponding
+covariance matrix. The Kalman algorithm usually give a converging covariance
+matrix after several iterations of prediction-update. A common use is to give
+educated guess of the current state, and prediction (in range of value) of a
+future state with level of confidence. In the case of value-at-risk of a
+portfolio, we will need the covariance matrix of return of the assets in the
+portfolio. Therefore we might be able to make use of Kalman filter to find the
+VaR.
+
+Below are some related papers that I found. The symbols we used are
+standardized at the bottom (adapted from the [Kalman
+cheatsheet](http://www.swarthmore.edu/NatSci/echeeve1/Ref/Kalman/MatrixKalman.html)).
+
+## Arnold et al (2008) A simplified approach to understanding the Kalman filter technique
+
+```bibtex
+@article{
+  author = {Tom Arnold and Mark J. Bertus and Jonathan Godbey},
+  title = {A simplified approach to understanding the Kalman filter technique},
+  journal = {The Engineering Journal},
+  volume = 53,
+  pages = {140--155},
+  year = 2008,
+  issn = {0013-791X},
+  doi = {10.1080/00137910802058574},
+  url = {https://scholarship.richmond.edu/finance-faculty-publications/8/},
+}
+```
+
+This paper is not about VaR but this is an interesting paper to explain how to
+use Kalman filter for price prediction, without matrix notation and use scalar
+instead, and with algorithm examples in Excel.
+
+The paper covers only the single variable time series, with the equations:
+
+- State transition: $$x_{t+1\mid t} = a_t x_{t\mid t} + u_t + w_t$$
+- Prediction: $$z_{t+1\mid t} = h_t x_{t+1\mid t} + b_{t+1} + v_{t+1}$$
+- Measurement error: $$y_{t+1} = z_{t+1} - z_{t+1\mid t}$$
+- Update: $$x_{t+1\mid t+1} = x_{t+1\mid t} + k_{t+1}y_{t+1}$$
+- Kalman gain: $$k_{t+1} = \dfrac{\mathrm{Cov}[x_{t+1\mid t}, z_{t+1\mid t}]}{\mathrm{Var}[z_{t+1\mid t}]}$$
+
+In the paper, we assumed $$h_t$$ is known, and $$u_t, a_t$$ are constant over
+time, $$w_t, v_t$$ are drawn from normal distribution with zero mean and
+constant variance. The best result is when the predicted measurement fits the
+observation. Very often we do not know how to set these model parameters. But
+we can figure out the best fit parameters by maximum likelihood. Over $$T$$
+periods, the probability of seeing $$z_t$$ given we assumed
+$$z_{t\mid t-1} \sim N(\mu_t, \sigma^2_t)$$ (normal distribution) is:
+
+$$\prod_{t=1}^T \left[\dfrac{1}{\sqrt{2\pi\sigma^2_t}}\exp\left(-\frac{(z_t - \mu_t)^2}{2\sigma^2_t}\right)\right]$$
+
+and taking log will become
+
+$$\begin{align}
+& \log \prod_{t=1}^T \left[\dfrac{1}{\sqrt{2\pi\sigma^2_t}}\exp\left(-\frac{(z_t - \mu_t)^2}{2\sigma^2_t}\right)\right] \\
+=& \sum_{t=1}^T \left[\log\left(\dfrac{1}{\sqrt{2\pi\sigma^2_t}}\right)-\frac{(z_t - \mu_t)^2}{2\sigma^2_t}\right] \\
+=& \sum_{t=1}^T \left[-\frac{1}{2}\left(\log 2\pi+ \log\sigma^2_t\right)-\frac{1}{2}\frac{(z_t - \mu_t)^2}{\sigma^2_t}\right] \\
+=& -\frac{T\log 2\pi}{2}-\frac{1}{2}\sum_{t=1}^T \log\sigma^2_t-\frac{1}{2}\sum_{t=1}^T\frac{(z_t - \mu_t)^2}{\sigma^2_t} \\
+\end{align}$$
+
+By maximizing (expectation maximization (EM) algorithm) the above quantity over
+model variables $$a, \sigma^2_w, \sigma^2_v$$, we obtain the optimal filter
+result.
+
+The paper gives an example and implemented the Kalman algorithm in Excel.
+Assume in oil market, we have spot market which the price is not observable but
+oil futures are actively traded on organized exchange with observable price.
+Assume spot price $$S_t$$ as state variable and future price is the future
+value of spot price with interest rate $$r$$ and maturity $$\tau$$:
+
+$$\begin{align}
+F_t &= S_t \exp(r\tau) \\
+dS_t &= \mu S_0 dt + \sigma S_0 dB_t \\
+&\sim N(\mu S_0 dt, \sigma^2 S_0^2dt) \\
+dB_t &\sim N(0, dt) \\
+z_t = \log F_t &= \log S_t + r\tau + v_t \\
+&= x_t + r\tau + v_t \\
+dx_t &= \left(\mu - \frac{\sigma^2}{2}\right)dt + \sigma dB_t \\
+x_{t+1} &= x_t + \left(\mu - \frac{\sigma^2}{2}\right)\Delta t + w_t \\
+w_t &\sim N(0, \sigma^2\Delta t)
+\end{align}$$
+
+The paper generate a random time series with the gBm on $$S_t$$ and computed
+the corresponding $$F_t$$ in Excel. Then assume we do not know the $$S_t$$ but
+only $$F_t$$ is observable and operate on the logarithm domain,
+$$x_t=\log S_t$$ and $$z_t=\log F_t$$. Then the Kalman algorithm is provided by:
+
+$$\begin{align}
+x_{t+1\mid t} &= x_{t\mid t} + \left(\mu - \frac{\sigma_w^2}{2}\right)\Delta t \\
+P_{t+1\mid t} &= P_{t\mid t} + \sigma_w^2\Delta t \\
+\\
+z_{t+1\mid t} &= x_{t\mid t} + \left(\mu - \frac{\sigma_w^2}{2}\right)\Delta t + r\tau \\
+K_{t+1} &= \frac{P_{t+1}}{P_{t+1}+\sigma^2_v} \\
+P_{t+1\mid t+1} &= P_{t+1\mid t}(1-K_{t+1}) \\
+x_{t+1\mid t+1} &= x_{t+1\mid t}+K_{t+1}(z_{t+1} - z_{t+1\mid t})
+\end{align}$$
+
+And in Excel, for convenience of composing the equation, two MLE metrics are computed as well:
+
+$$\begin{align}
+E_1 &= -\frac{1}{2}\log(P_{t+1\mid t} + \sigma^2_v) \\
+E_2 &= -\frac{(z_{t+1} - z_{t+1\mid t})^2}{2(P_{t+1\mid t} + \sigma^2_v)}
+\end{align}$$
+
+which are the two summation terms in the log-likelihood equation above. The
+paper suggest to use the solver add-on in Excel to optimize for the maximum
+likelihood and find the best-fit parameters for the model (fit only to $$F_t$$
+as $$S_t$$ is assumed not available).
+
+## Xu & Zhang (2015) Application of Kalman filter in prediction of stock price
+
+```bibtex
+@inproceedings{
+  author = {Yan Xu and Guosheng Zhang},
+  title = {Application of Kalman Filter in the Prediction of Stock Price},
+  booktitle = {Proc International Symposium on Knowledge Acquisition and Modeling (KAM)},
+  year = 2015,
+}
+```
+
+This is a 2-page paper giving an easy-to-understand example of using Kalman
+filter to predict stock price in short future. Here we have only one time
+series and the state variable is observable up to present ($$z_t=x_t$$).
+Represent the price as $$x_t$$, the system is modelled as:
+
+$$\begin{align}
+\begin{bmatrix} x_{t+1} \\ \dot{x}_{t+1}\end{bmatrix} &= \begin{bmatrix}1 & T \\ 0 & 1\end{bmatrix}\begin{bmatrix} x_t \\ \dot{x}_t\end{bmatrix} + w_t \begin{bmatrix} T^2/2 \\ T\end{bmatrix} \\
+z_t &= \begin{bmatrix}1 & 0\end{bmatrix}\begin{bmatrix} x_{t+1} \\ \dot{x}_{t+1}\end{bmatrix} + v_t
+\end{align}$$
+
+or in matrix form, $$\mathbf{x}_{t+1} = \mathbf{Fx}_t + w_t \mathbf{\Gamma}$$
+and $$z_t = \mathbf{Hx}_t + v_t$$. $$T=1$$ is used for simplicity. And the
+Kalman equations:\\
+(initialization)
+
+$$\begin{align}
+\hat{\mathbf{x}}_{0\mid 0} &= \mathbb{E}[\mathbf{x}_0] = \mathbf{\mu}_0 \\
+\mathbf{P}_{0\mid 0} &= \mathbb{E}[(\mathbf{x}_0-\mathbf{\mu}_0)^T(\mathbf{x}_0-\mathbf{\mu}_0)] = \mathbf{P}_0 \\
+\end{align}$$
+
+(prediction)
+
+$$\begin{align}
+\hat{\mathbf{x}}_{t+1\mid t} &= \mathbf{F}\hat{\mathbf{x}}_{t\mid t} \\
+\mathbf{P}_{t+1\mid t} &= \mathbf{F P}_{t\mid t}\mathbf{F}^T + \mathbf{\Gamma Q \Gamma}^T \\
+\end{align}$$
+
+(Kalman gain)
+
+$$\begin{align}
+\mathbf{K}_{t+1} &= \mathbf{P}_{t+1\mid t}\mathbf{H}^T(\mathbf{HP}_{t+1\mid t}\mathbf{H}^T + R)^{-1} \\
+\end{align}$$
+
+(update)
+
+$$\begin{align}
+y_{t+1} &= z_{t+1} - \mathbf{H}\hat{\mathbf{x}}_{t+1\mid t} \\
+\hat{\mathbf{x}}_{t+1\mid t+1} &= \hat{\mathbf{x}}_{t+1\mid t} + y_{t+1}\mathbf{K}_{t+1} \\
+\mathbf{P}_{t+1\mid t+1} &= (\mathbf{I} - \mathbf{K}_{t+1}\mathbf{H})\mathbf{P}_{t+1\mid t} \\
+\end{align}$$
+
+where $$\mathbf{Q}$$ and $$\mathbf{R}$$ are the variance "matrices" (scalar in this
+case) of noise terms $$w_t$$ and $$v_t$$. And we define
+$$\dot{x}_t=\dfrac{x_t - x_{t-1}}{T}$$. It is common to have both $$x_t$$ and
+$$\dot{x}_t$$ in the state variable in this sort of use case.
+
+
+## Cortazar et al (2003) Term structure estimation in low-frequency transaction markets
+
+```bibtex
+@techreport{
+  author = {Gonzalo Cortazar and Eduardo S. Schwartz and Lorenzo Naranjo},
+  title = {Term Structure Estimation in Low-Frequency Transaction Markets: A Kalman Filter Approach with Incomplete Panel-Data},
+  institution = {EFA 2004 Maastricht Meetings Paper},
+  number = 3102,
+  month = March,
+  year = 2004,
+  url = {https://papers.ssrn.com/sol3/papers.cfm?abstract_id=567090},
+  url = {https://pdfs.semanticscholar.org/f164/1f1f36b36a8e4df549091afb1655421b8228.pdf},
+}
+```
+
+This paper focus on thin (illiquid) markets. It uses Kalman filter to estimate
+the missing observations. Then use historical price data and a dynamic model to
+estimate the current term structure.
+
+As the paper concerns bond but not stock price, it uses Vasicek (1977) model
+for interest rates, which is an Ornstein-Uhlenbeck process governed by the SDE
+
+$$dx_t = \theta (\mu - x_t) dt + \sigma dB_t$$
+
+for some constant drift $$\mu$$, and parameters $$\theta,\sigma>0$$. Generalized into
+matrix form for $$\mathbf{x}_t$$ to become a vector of factors:
+
+$$d\mathbf{x}_t = -(\mathbf{u}+\mathbf{Kx}_t)dt+d\mathbf{w}_t$$
+
+where $$\mathbf{K}$$ is an $$n\times n$$ diagonal matrix with
+strictly positive diagonal terms. $$\mathbf{x}_t, d\mathbf{w}_t$$ are
+$$n$$-vector such that $$(d\mathbf{w}_t)^T(d\mathbf{w}_t)=\mathbf{Q}dt$$.
+$$\mathbf{u}$$ is a vector of the market price of risk.
+
+This equation models the *mean reversion*, which the reversion rate is given by
+$$\mathbf{K}$$, and instantaneous interest rate depends on the factors (state variables)
+$$\mathbf{x}_t$$:
+
+$$r_t = \mathbf{1}^T\mathbf{x}_t  + \delta$$
+
+The mean reversion model means that every perturbation is reduced by half in
+$$\dfrac{\log 2}{k_i}$$ units of time, for $$k_i$$ the corresponding diagonal
+term on matrix $$\mathbf{K}$$.
+
+Given the interest rate model, we can model the price of a bond (pure discount
+or coupon), and its yield to maturity. Derivation is in the paper.
+
+To the issue of thin market, once we modelled the price movement in a state
+space (prediction equations in Kalman algorithm), the problem is that the
+measurement is always incomplete: Only some of the state is observable at a
+time due to illiquid market. Depends on the subset of state variables
+$$\mathbf{z}$$ observed, we adjust the matrix $$\mathbf{H}$$ accordingly.
+Indeed, we skip the update step in Kalman algorithm in case of missing data.
+
+## Nkomo & Kabundi (2013) Kalman filtering and online learning algorithms for portfolio selection
+
+```bibtex
+@techreport{
+  title = {Kalman filtering and online learning algorithms for portfolio selection},
+  author = {Raphael Nkomo and Alain Kabundi},
+  year = 2013,
+  month = Nov,
+  institution = {Economic Research Southern Africa},
+  number = {working paper 394},
+}
+```
+
+This paper uses Kalman filter as a replacement for moving average for dynamic
+portfolio selection.
+
+In a market of $$m$$ assets with closing price of asset $$i$$ at time $$t$$
+denoted by $$p_{t,i}$$, price relative is defined as
+$$x_{t,i} = \dfrac{p_{t,i}}{p_{t-1,i}}$$. A portfolio is defined as a
+$$m$$-vector $$\mathbf{b} = \begin{pmatrix}b_1 & b_2 & \cdots & b_m\end{pmatrix}$$,
+which $$\sum_i b_i = 1$$ and $$b_i\ge 0$$ for all $$i$$.
+
+Assume initial capital of $$S_0$$, the wealth at end of time $$t$$ is
+
+$$S_t = S_{t-1}\sum_{i=1}^m b_i x_{t,i} = S_{t-1}(\mathbf{b}^T\mathbf{x}_t)$$
+
+If the portfolio is time-varying, we denote $$\mathbf{b}_{t-1}$$ the portfolio
+vector at trading period $$t$$, then the wealth will be
+
+$$\begin{align}
+S_T &= S_0\prod_{t=1}^T \mathbf{b}_{t-1}^T\mathbf{x}_t \\
+&= S_0\exp\left( \sum_{t=1}^T \log(\mathbf{b}_{t-1}^T\mathbf{x}_t) \right) \\
+&= S_0\exp( T W_T(B) )
+\end{align}$$
+
+which the period return is $$\mathbf{b}_{t-1}^T\mathbf{x}_t$$ and
+$$W_T(B) = \frac{1}{T}\sum_{t=1}^T \log(\mathbf{b}_{t-1}^T\mathbf{x}_t)$$
+is the log-utility function. Maximizing $$W_T(B)$$ maximizes $$S_T$$.
+
+As a baseline, a buy-and-hold (BAH) strategy will be $$\mathbf{b}_0 = \mathbf{b}$$
+fixed and never rebalance the portfolio. This results in the portfolio vector
+given by:
+
+$$\mathbf{b}_{t} = \frac{1}{\mathbf{b}_{t-1}^T\mathbf{x}_t} (\mathbf{b}_{t-1}\odot \mathbf{x}_t)$$
+
+where $$\odot$$ denotes elementwise multiplication between vectors
+$$\mathbf{b}_{t-1}$$ and $$\mathbf{x}_t$$. BAH assumes stock market to grow
+over time and will perform badly in case of severe market correction.
+
+Another strategy is constant rebalancing (CBAL), which maintains a fixed
+portfolio weight $$\mathbf{b}_t = \mathbf{b}$$ for all trading period $$t$$. It
+takes advantage of market fluctuations but subject to transaction cost.
+
+The portfolio selection algorithm in this paper is to find the optimal
+$$\mathbf{b}_t$$ based on past data. The approach is named cyclically adjusted
+price relative (CAPR): If we remove the noise from the price relative time
+series $$x_t = p_t/p_{t-1}$$, we can capture both the price momentum and price
+reversal and make use of that to adjust the portfolio.
+
+Common way to remove noise from a time series is the moving average (or EWMA)
+but the moving average will change the statistical properties of the time
+series. For example, it will fail to capture large deviation from average as a
+sign of price reversal but contribute that to momentum. In CAPR, we maintain a
+Kalman filtered price $$p_t^K$$ and keep track on the ratio $$p_t/p_t^K$$,
+which offset from 1 represents how much over sold or over bought of the stock.
+The paper derived that this ratio is Gaussian distributed.
+
+The Kalman model for $$p_t^K$$ is as follows: It starts with initial estimate
+$$p_0^K$$ with mean $$\mu_0$$ and variance $$P$$, then the prediction:
+
+$$\begin{align}
+p_t^K &:= \phi p_{t-1}^K \\
+P &:= \phi^2 P + Q \\
+p_t &:= Mp_t^K
+\end{align}$$
+
+and update:
+
+$$\begin{align}
+K &:= MP(PM^2 + R)^{-1} \\
+p_t^K &:= p_t^K + K(p_t - Mp_t^K) \\
+P &:= P(1-KM)^2 + RK^2
+\end{align}$$
+
+With this, the paper reuses the Anticor algorithm from Borodin (2006). This
+algorithm is based on equal size periods (windows) and trading is on the end of
+window, to transfer wealth from recently high-performing assets to
+anti-correlated low-performing assets. Precisely, for stocks $$i,j$$ if
+$$\mu_i > \mu_j$$ in the last window and $$\mathrm{corr}_{i,j} > 0$$, then
+transfer wealth from $$i$$ to $$j$$. The Anticor algorithm is as follows:
+
+For $$m$$ stocks and window of length $$w$$, at each time $$t$$ we have a
+$$m$$-vector of $$x_t$$ and define two consecutive window as $$w\times n$$
+matrices:
+
+$$\begin{align}
+LX_1 &= \begin{bmatrix}
+  \log(x_{t-2w+1}) & \cdots & \log(x_{t-w})
+  \end{bmatrix}^T \\
+LX_2 &= \begin{bmatrix}
+  \log(x_{t-w+1}) & \cdots & \log(x_{t})
+  \end{bmatrix}^T
+\end{align}$$
+
+Let $$LX_k(j)$$ be the $$j$$-th column of $$LX_k$$ and
+$$\mu_k(j), \sigma_k^2(j)$$ be the mean and variance of $$LX_k(j)$$. The
+cross-covariance matrix between columns of $$LX_k$$ is
+
+$$\mathrm{cov}_{i,j} = \frac{1}{w-1}\left(LX_1(i)-\mu_1(i)\right)^T\left(LX_2(j)-\mu_2(j)\right)$$
+
+and the cross-correlation matrix:
+
+$$\mathrm{corr}_{i,j} = \begin{cases}
+  \dfrac{cov_{i,j}}{\sigma_1(i)\sigma_2(j)} & \textrm{if $\sigma_1(i),\sigma_2(j)\ne 0$} \\
+  0 & \textrm{otherwise}
+\end{cases}$$
+
+and the amount to move from $$i$$ to $$j$$ is
+
+$$\mathrm{corr}_{i,j} + \max(-\mathrm{corr}_{i,i}, 0) + \max(-\mathrm{corr}_{j,j}, 0)$$
+
+
+
+## Berardi et al (2002) Estimating value at risk with the Kalman filter
+
+```bibtex
+@techreport{
+  author = {Andrea Berardi and Stefano Corradin and Cristina Sommacamagna},
+  title = {Estimating Value at Risk with the Kalman Filter},
+  month = December,
+  year = 2002,
+}
+```
+
+Value-at-risk in percentage terms of a portfolio is given by VaR
+$$= z_{\alpha}\sqrt{\mathbf{w}'\mathbf{\Sigma w}}\sqrt{\Delta t}$$ which the variance of
+portfolio return is $$\sigma_P^2 = \mathbf{w}'\mathbf{\Sigma w}$$, $$\mathbf{w}$$ is a vector of weights,
+$$z_{\alpha}$$ the confidence level, $$\Delta t$$ is the time horizon and $$\mathbf{\Sigma}$$
+the covariance matrix of asset returns. If we anchor to the market return
+$$R_m$$, we can use the CAPM to express the return of each asset in a portfolio as
+$$R_i = \alpha_i + \beta_i R_m + \epsilon_i$$. If we use a vector
+$$\mathbf{\beta}$$ for all assets, the VaR can be redefined as
+$$z_{\alpha}\sqrt{\mathbf{w}'\mathbf{\beta\beta}'\mathbf{w}\sigma_m^2}\sqrt{\Delta t}$$,
+with the estimated market index variance $$\sigma_m^2$$.
+
+This paper is to use Kalman filter to estimate vector $$\mathbf{\beta}$$ and
+thus the VaR can be found using the above formula. The system equation for a
+single asset is
+
+$$\begin{align}
+R_{i,t} &= \mathbf{\alpha}_i + \mathbf{\beta}_{i,t}R_{m,t} + \mathbf{\epsilon}_{i,t} \\
+\mathbf{\beta}_{i,t} &= \phi_t\mathbf{\beta}_{i,t-1} + \mathbf{\xi}_{i,t}
+\end{align}$$
+
+In vector form, defining
+
+$$\begin{align}
+\mathbf{w}_t &= \begin{pmatrix}\epsilon_{1,t} & \cdots & \epsilon_{n,t}\end{pmatrix}^T \sim N(0,\mathbf{Q}_t) \\
+\mathbf{v}_t &= \begin{pmatrix}\xi_{1,t} & \cdots & \xi_{n,t}\end{pmatrix}^T \sim N(0,\mathbf{H}_t)
+\end{align}$$
+
+and $$\mathbf{z}$$ the return of stock, and $$\mathbf{x}$$ the state variable,
+then we will have the Kalman equations as in the summary at the bottom of this
+page.  The matrices and the variances of noises are to be estimated by
+expectation-maximization.
+
+-----
+
+## Brief summary of Kalman filter
+
+Variables:
+
+| usage |dimension| symbols |
+|------:|:-------:|----------|
+| State | $$n\times 1$$ | $$\mathbf{x}_j$$, approx by $$\hat{\mathbf{x}}_{j\mid j}$$ and $$\hat{\mathbf{x}}_{j\mid j-1}$$ |
+| Control input | $$p\times 1$$ | $$\mathbf{u}_j$$ |
+| Measurement output | $$m\times 1$$ | $$\mathbf{z}_j$$ |
+| State gain |$$n\times n$$ | $$\mathbf{F}$$ |
+| Input gain |$$n\times p$$ | $$\mathbf{B}$$ |
+| Output gain |$$m\times n$$ | $$\mathbf{H}_j$$ |
+| Process noise |$$n\times 1$$ | $$\mathbf{w}_j$$ |
+| Process noise covariance | $$n\times n$$ | $$\mathbf{Q}$$ |
+| Measurement noise | $$m\times 1$$ | $$\mathbf{v}_j$$ |
+| Measurement noise covariance | $$m\times m$$ | $$\mathbf{R}$$ |
+| A priori covariance | $$n\times n$$ | $$\mathbf{P}_{j\mid j-1}$$ |
+| A posteriori covariance | $$n\times n$$ | $$\mathbf{P}_{j\mid j}$$ |
+| Kalman gain | $$n\times m$$ | $$\mathbf{K}_j$$ |
+
+Discrete time system: State transition and measurement
+
+$$\begin{align}
+\mathbf{x}_j &= \mathbf{F}\mathbf{x}_{j-1} + \mathbf{B}\mathbf{u}_j + \mathbf{w}_j \\
+\mathbf{z}_j &= \mathbf{H}_j\mathbf{x}_j + \mathbf{v}_j
+\end{align}$$
+
+Prediction (a priori):
+
+$$\begin{align}
+\hat{\mathbf{x}}_{j\mid j-1} &= \mathbf{F}\hat{\mathbf{x}}_{j-1\mid j-1} + \mathbf{B}\mathbf{u}_j \\
+\mathbf{P}_{j\mid j-1} &= \mathbb{E}[(\mathbf{x}_j - \hat{\mathbf{x}}_{j\mid j-1})(\mathbf{x}_j - \hat{\mathbf{x}}_{j\mid j-1})^T] \\
+&= \mathbf{F}\mathbf{P}_{j-1\mid j-1}\mathbf{F}^T + \mathbf{Q} \\
+\end{align}$$
+
+Pre-fit residual:
+
+$$\begin{align}
+\tilde{\mathbf{y}}_j &= \mathbf{z}_j - \mathbf{H}_j\hat{\mathbf{x}}_{j\mid j-1} \\
+\mathbf{S}_j &= \mathbf{H}_j\mathbf{P}_{j\mid j-1}\mathbf{H}_j^T + \mathbf{R} = \mathrm{Cov}[\tilde{\mathbf{y}}_j]
+\end{align}$$
+
+Kalman gain:
+
+$$\begin{align}
+\mathbf{K}_j &= \mathbf{P}_{j\mid j}\mathbf{H}_j^T(\mathbf{H}_j\mathbf{P}_{j\mid j}\mathbf{H}_j^T+\mathbf{R})^{-1} \\
+&= \mathbf{P}_{j\mid j}\mathbf{H}_j^T\mathbf{S}_j^{-1}
+\end{align}$$
+
+Update (a posteriori):
+
+$$\begin{align}
+\hat{\mathbf{x}}_{j\mid j} &= \hat{\mathbf{x}}_{j\mid j-1} + \mathbf{K}_j(\mathbf{z}_j - \mathbf{H}_j\mathbf{x}_{j\mid j-1}) \\
+&=\hat{\mathbf{x}}_{j\mid j-1} + \mathbf{K}_j\tilde{\mathbf{y}}_j \\
+\mathbf{P}_{j\mid j} &= \mathbb{E}[(\mathbf{x}_j - \hat{\mathbf{x}}_{j\mid j})(\mathbf{x}_j - \hat{\mathbf{x}}_{j\mid j})^T] \\
+&= (\mathbf{I}-\mathbf{K}_j\mathbf{H}_j)\mathbf{P}_{j\mid j-1}
+\end{align}$$
+
+Post-fit residual:
+
+$$\tilde{\mathbf{y}}_{j\mid j} = \mathbf{z}_j - \mathbf{H}_j\hat{\mathbf{x}}_{j\mid j}$$
+
