@@ -2,6 +2,7 @@
 layout: post
 title: "Use of Kalman filter in finance and estimation of value-at-risk"
 date: Sun, 18 Aug 2019 01:20:17 -0400
+lastupdate: Sat, 07 Sep 2019 08:31:04 -0400
 category: paper
 ---
 
@@ -171,6 +172,36 @@ where $$\mathbf{Q}$$ and $$\mathbf{R}$$ are the variance "matrices" (scalar in t
 case) of noise terms $$w_t$$ and $$v_t$$. And we define
 $$\dot{x}_t=\dfrac{x_t - x_{t-1}}{T}$$. It is common to have both $$x_t$$ and
 $$\dot{x}_t$$ in the state variable in this sort of use case.
+
+## Bassett et al (1991) Kalman filter estimation for valuing nontrading securities
+
+```bibtex
+@article{
+  author = {Gilbert W. Bassett, Jr and Virginia G. France and Stanley R. Pliska},
+  title = {Kalman Filter Estimation for Valuing Nontrading Securities, with Applications to the MMI Cash-Future Spread on October 19 and 20, 1987},
+  journal = {Review of Quantitative Finance and Accounting},
+  volume = 1,
+  pages = 135--151,
+  year = 1991,
+  url = {https://gib.people.uic.edu/Kalman%20Filter.pdf},
+}
+```
+
+Another example of using Kalman filter for prediction. It uses a 0-1 matrix as
+measurement matrix $$H$$ (direct observation to price but only some of them)
+and use the predicted price in place of non-observed prices. The state variable
+$$X$$ is the true price, measured every minute, and the measurement $$Z$$ is
+the traded subset of $$X$$, i.e., the trade price.
+
+This paper suggested some ways to set up the parameters: The covariance matrix
+$$Q$$ of the state transition noise is the empirical covariance from the whole
+last day. The covariance matrix $$R$$ of the measurement noise is chosen based
+on the bid-ask spread of 1/8 tick size, $$R=0.005I$$. The initial state $$X_0$$
+is chosen to be the last closing price. The tricky part is the initial variance
+$$P_0$$. It is evaluated from previous data on non-trading minutes. It answers
+the question of what will best fit the dispersion on state variable $$X$$ if
+there is no measurement for $$n$$ periods (minutes). By measuring the
+dispersion over past non-trading minutes, variance $$P_0$$ is computed.
 
 
 ## Cortazar et al (2003) Term structure estimation in low-frequency transaction markets
@@ -392,6 +423,56 @@ and $$\mathbf{z}$$ the return of stock, and $$\mathbf{x}$$ the state variable,
 then we will have the Kalman equations as in the summary at the bottom of this
 page.  The matrices and the variances of noises are to be estimated by
 expectation-maximization.
+
+## Date & Bustreo (2016) Value-at-risk for fixed-income portfolios
+
+```bibtex
+@article{
+  author = {P. Date and R. Bustreo},
+  title = {Value-at-Risk for fixed-income portfolios: a Kalman filtering approach},
+  journal = {IMA Journal of Management Mathematics},
+  volume = 27,
+  number = 4,
+  pages = 557--573,
+  month = Oct,
+  year = 2016,
+  doi = {https://doi.org/10.1093/imaman/dpv016},
+  url = {https://bura.brunel.ac.uk/bitstream/2438/12202/1/Fulltext.pdf},
+}
+```
+
+Another example of VaR calculation, but this one is based on bonds.
+
+This paper mentions a test (Kupiec, 1995) for the VaR by chi-squared
+statistics. We introduce indicator variable $$I_n$$ for 1 if the actual loss of
+portfolio is greater than VaR and 0 otherwise. We expect $$I_n$$ follows a
+binomial distribution
+
+$$f(n) = \binom{N}{n}p^n(1-p)^{N-n}$$
+
+which $$p=1-\alpha$$ for $$\alpha$$ the level chosen for VaR. Then the null
+hypothesis $$H_0$$ is $$p=n/N$$ and
+
+$$LR=-2\log\left(\frac{(1-p)^{N-n}p^n}{(1-\frac{n}{N})^{N-n}(\frac{n}{N})^n}\right)\sim\chi^2$$
+
+which for 1 DoF, 95% CI, we reject null hypothesis if $LR>3.841$.
+
+## Idea of using Kalman filter for VaR calculation
+
+The literature above should give a good insight on how VaR is calculated. In
+case of a portfolio, VaR is $$z_\alpha\sqrt{\mathbf{w}'\mathbf{\Sigma w}}$$
+with $$\mathbf{\Sigma}$$ the covariance matrix of returns of assets in the
+portfolio. $$z_\alpha$$ is a parameter of choice and $$\mathbf{w}$$ corresponds
+to the portfolio. The only unknown is covariance matrix $$\mathbf{\Sigma}$$.
+
+Kalman filter equations also involves covariance matrix $$\mathbf{P}$$ in the
+state transition. We may run the history of asset returns as state variables
+$$\mathbf{x}$$ and determine the matrix $$P$$. This approach can incorporate
+illiquid assets in the portfolio as the measurement of Kalman algorithm can
+handle missing (unobserved) data. The Kalman parameters: state gain
+$$\mathbf{F}$$, and output gain $$\mathbf{H}$$ are easy to decide. However, we
+also introduced two unknown noise covariance matrices $$\mathbf{Q}$$ and
+$$\mathbf{R}$$, which their value affects the quality of the result.
 
 -----
 
