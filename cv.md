@@ -13,7 +13,7 @@ In case you're interested:
 
 Selected publications:
 
-- RAPID: Avoiding TCP Incast Throughput Collapse in Public Clouds with Intelligent Packet Discarding, *IEEE J. Sel. Area of Comm.*, 37(8):1911--1923, with Yang Xu, Shikhar Shukla, Zehua Guo, Sen Liu, Kang Xi, H. Jonathan Chao (July 2019)
+- [RAPID: Avoiding TCP Incast Throughput Collapse in Public Clouds with Intelligent Packet Discarding](https://ieeexplore.ieee.org/abstract/document/8766803), *IEEE J. Sel. Area of Comm.*, 37(8):1911--1923, with Yang Xu, Shikhar Shukla, Zehua Guo, Sen Liu, Kang Xi, H. Jonathan Chao (Aug 2019)
 - [TCP PLATO: Packet Labelling to Alleviate Time-Out](https://ieeexplore.ieee.org/document/6689484/), *IEEE J. Sel. Area of Comm.*, 32(1):65--76, with Shikhar Shukla, Shingau Chan, Abhishek Gupta, Yang Xu, and H. Jonathan Chao (Jan 2014)
 - [Preventing TCP Incast Throughput Collapse at the Initiation, Continuation, and Termination](https://drive.google.com/open?id=1xFfZivf3oqsqeod7TuUS1hwuQKO3NLxY), In *Proceedings of 20th IWQoS*, with Kang Xi, Yang Xu, H. Jonathan Chao (June 2012)
 - Resilience Control Plane for Data Center Networks, In *Proc. Workshop on High-Speed Network Research* (Feburary 2012)
