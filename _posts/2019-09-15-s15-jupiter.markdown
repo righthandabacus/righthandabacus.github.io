@@ -1,0 +1,247 @@
+---
+layout: post
+title: "Singh et al (2015) Jupiter Rising"
+date: 2019-09-15
+category: paper
+bibtex:
+  type: inproceedings
+  title: "Jupiter Rising: A decade of Clos topologies and centralized control in Google's datacenter network"
+  author: "Arjun Singh and Joon Ong and Amit Agarwal and Glen Anderson and Ashby Armistead and Roy Bannon and Seb Boving and Gaurav Desai and Bob Felderman and Paulie Germano and Anand Kanagala and Jeff Provost and Jason Simmons and Eiichi Tanda and Jim Wanderer and Urs Hölzle and Stephen Stauart and Amin Vahdat"
+  booktitle: "Proc SIGCOMM'15"
+  address: London, United Kingdom
+  Month: August
+  pages: 183--197
+  year: 2015
+  doi: 10.1445/2785956.2787508
+---
+
+A paper documenting Google's data center network architecture.
+
+Background:
+- Bandwidth demands in DC double every 12-15 months
+- Commodity switch: For WAN, links are expensive, emphasis on high availability
+- Data center: bandwidth is cheap, prudent to trade cost for reduced intermittent capacity
+- Google created 5 generations of DCN, using Clos topologies
+  - Clos can scale to arbitrary size by adding stages, and with substantial in-built path diversity and redundancy
+
+Merchant silicon: Used in place of commodity switches
+- upgrade the switch silicon = upgrade network fabrics
+- network fabrics = the switching network gear
+
+Vast amount of switching elements: Complex control and management
+- collecting and distributing link state information from central point
+- calculate forwarding table from current link state by individual switch
+
+2004: Cluster network (figure 2)
+- 4 cluster routers, 2x10G side-way
+- 512x1G to ToR switch
+- 40 servers per ToR, 20K servers per cluster
+- bottleneck: Traffic across ToR, as ToR up-links are oversubscribed
+  - application should fit in one ToR for performance
+
+Large cluster
+- efficient bin-packing for job scheduling
+  - due to reduced stranding: one powerful is better than many smaller
+- across failure domain for resilience
+  - need uniform bandwidth across the cluster
+- clos topology: scalable to arbitrary size
+
+Firehose 1.0 (2005)
+- 1Gbps nonblocking bandwidth to each of 10K servers
+- building blocks: 8x10G switch for fabric, 4x10G switch for ToR
+  - fabric: 4x10G facing north, 4x10G facing south; spine has all 8x10G facing south
+  - ToR: 2x10G to the fabric, 24x1G facing south but only 20x1G is used to connect to servers
+  - One aggregation block: (figure 5)
+    - each ToR (stage 1) connect to 2 agg switch (stage 2)
+    - Stage 2 and 3 agg switch: 8 switches in each stage, interconnected in Clos topology
+    - each aggregation block has 16 ToR, 16x20=320 servers
+  - One spine block (figure 5):
+    - Stage 4 connects to aggregation block, 4 links south and 4 links north
+    - 8 stage 4 switches, each has 4 links south, connects to 32 aggregation blocks in total
+    - Stage 5 switches (4 of them) connects to stage 4 switches. Each of stage 4 connects to each of stage 5
+  - whole network: 32 aggregation blocks, 32 spine blocks, connected as Clos topology
+    - total servers: 32x320=10240=10K servers
+- Problem: ToR has only 2 up-links, if source and dest ToR each has one failed up-link
+  and on the opposite side, they can't talk to each other
+- Experiment of building PCI board for switching fabric and put into server
+  - server up-time is too poor for network appliance
+
+Firehose 1.1 (2006)
+- Build FH 1.0 into custom chassis
+  - Dedicated single-board computer with 6 PCI to control 6 line cards
+  - no backplane: no interconnect with switch chips
+- upgraded switch chips for ToR (stage 1): 4x10G+24x1G
+  - 2x10G: two ToRs with side-way connection
+  - 2x2x10G: two ToRs together with 4x10G up-links
+  - 2x24x1G: two ToRs together connects to servers over 48x1G
+  - target over-subscription of 2:1 (compare to 320 servers in FH 1.0, now 640 servers)
+- stage 2 and 3: Cabled as single block similar to Flat Neighborhood Network
+  - clos network: 4 south and 4 up, so 4 switches on each stage on each pod
+  - FNN: 8 switches on each stage interconnect to another 8 switches on next stage, even for only 4 fan-outs
+    - FNN problem: for N endpoints, each has n fan-outs, and a few K-port switches, we connect each endpoints to n switches such that any two endpoints can talk to each other via at least one switch
+    - Math related:
+      - http://aggregate.org/TechPub/WMPP2005/SFNN-WMPP-final.pdf
+      - https://math.stackexchange.com/questions/464932/dobble-card-game-mathematical-background
+      - [uniform block design](https://en.wikipedia.org/wiki/Block_design)
+- Challenge: 14m CX4 cable length
+  - CX4: 10GbE over copper connector
+  - For ToR to next stage, need to use custom-made electrical-optical-electrical cables of 100m length
+- Transition from cluster network: bag-on-the-side approach
+  - ToR connect to both old cluster router and the Firehose 1.1 fabric at the same time until transition complete
+  - 10G link for Firehose fabric, while 1G link to cluster router
+
+Watchtower (2008)
+- next generation merchant silicon: 16x10G
+- Chassis: 8 line cards, each card 3 switch chips
+  - chip 1 and 3: half to external (16x10GB SFP+ ports, 8 south and 8 north)
+  - all 3 chips: connect to a backplane for connectivity
+    - 3 stages within a line card
+    - backplane: clos network between stage 1 and 2 and 2 and 3 across all eight line cards in the chassis
+- one rack = 2 chassis, two racks colocated together as a group
+  - allow cable bundling as a cost saving measure (capex and opex)
+  - fiber bundle is cheaper vs individual strands
+  - bundled cables reduces deployment complexity
+- cost optimization by depopulation
+  - init deployment of reduced scale of cluster, by using only half of S2 (aggregation) switches or half of S3 (spine) switches
+  - Depopulated S2 switches has 2x more depopulated elements
+  - Depopulated S3 switches reduces upfront cost of deployment and maintains full ToR burst bandwidth
+  - Watchtower and Saturn uses depopulation of S2 while Jupiter depopulates S3 for a higher ToR burst bandwidth
+
+Saturn (2009)
+- replaced with 24x10G merchant silicon
+- Chassis: 12 line cards, total 288x10G port non-blocking switch
+  - similar design as Watchtower
+- ToR switch: Pluto single-chip switch (Google proprietary)
+  - 20x10G for servers and 4x10G for cluster fabric for average 2 Gbps uplink to each server;
+    or 16x10G for servers and 8x10G for cluster fabric for average of 5 Gbps uplink to each server
+  - Each server has burst bandwidth of 10Gbps
+
+Jupiter (2012), figure 13
+- uses 40G-capable merchant silicon (16x40G)
+- introduced into the network in situ, need to support heterogeneous hardware and speeds transiently
+- Centauri chassis: 4RU chassis with 2 line cards, each with two 16x40G chips
+  - Each Centauri chassis has 32x40G north and 32x40G south ports
+  - Each port can be a single 40G or 4x10G
+  - No back plane data connection between chips
+- Centauri chassis as ToR switch: 48x10G to server and 16x10G to fabric
+  - switch chip uses as 64x10G
+  - each server has 40G burst bandwidth
+- Middle block (MB, aggregation block) as 4 Centauris
+  - 2-stage (clos) blocking network with 256x10G to ToR and 64x40G to the spine
+  - two stages, each stage has 8 chips across 4 chassis
+- Aggregation block as 8 middle blocks
+  - total 512x40G to 256 spine blocks
+  - Each ToR chip connects to 8 middle blocks, with 2x10G link (dual redundancy) to each MB
+- Spine block: 6 chassis
+  - two layer clos network
+  - 128x40G ports toward aggregation blocks
+- Jupiter network: limited to 64 aggregation blocks, with dual redundant link between spine and aggregation blocks
+  - bisection bandwidth at largest scale: 1.3 Pbps
+
+External connectivity
+- should not limit burst bandwidth of ToR: helps migrating service of copying large search indexes across clusters
+- decommission the cluster routers (CR), external connectivity as a separate aggregation block
+  - an isolated layer of switches to peer with external routers
+  - 10% of total aggregate intra-cluster bandwidth for external connectivity
+- eBGP between CBRs (cluster border routers) and inter-cluster networking switches
+  - multiple clusters within same building, multiple buildings on the same campus
+  - connectivity by Freedome block
+- Freedome block (FDB): 2 freedom border routers (FBR, at north) and k freedom edge routers (FER, at south)
+  - iBGP within the FDB, eBGP for outside connectivity (out of north and south)
+  - Datacenter Freedome (DFD): 4 FDBs, connecting to CBRs in Clos network
+    - inter-cluster traffic: Between clusters' CBR layer to Datacenter Freedome
+  - Campus Freedome (CFD): 4 FDBs, connecting to DFDs in Clos network
+    - WAN at north of CFD
+  - Redundancy: each FDBs can be removed from service
+
+Routing
+- OSPF, IS-IS, BGP on custom control plane
+- need equal-cost multipath forwarding (ECMP) in Clos network
+- Centralized solution: Route controller collected dynamic link state information and redistributed to all switches over a out-of-band control plane network (CPN)
+  - the "firepath master"
+  - Jupiter network is largely static topology with massive multipath
+  - Switch can calculate forwarding tables based on current link state as deltas to the known static topology
+  - The whole datacenter network is then a single fabric with tens of thousands of ports
+    - standard BGP only for route exchange at the edge of the fabric
+    - learned routes are redistributed by firepath
+- Routing
+  - all switches are configured with the baseline or intended topology
+  - switch ports: neighbor discovery (ND)
+    - determine the peer IDs of each port and verify correct cabling
+    - Interface Manager (IFM) module: Monitors the ND state of each port
+      - a port is up only if PHY UP and ND UP
+  - IGP: Firepath (layer 3 routing up to ToR level)
+    - one ToR = one broadcast domain
+    - Firepath: Centralized state distribution, distributed forwarding table computation
+    - Firepath master: subset of spine switch, one elected master and others for redundancy
+      - master to switch: multicast over CPN
+      - link state database: updated by master with increasing version number
+      - entire network's LSD: within 64KB
+    - Fabric switch = Firepath client, talk to master over Control Plane Network (CPN)
+      - computes ECMP shortest path forwarding from LSD
+- Failures
+  - transient loss during convergence
+  - local failure recovered within 300ms, non-local failures takes 4 sec
+    - local: S2-S3 link failure, or S2/S3 chassis failure
+    - non-local: ToR-S2 link failure, all S3 need to avoid the S2 chassis for the ToR
+  - ECMP: The switch can quickly prune the failed link or next hop from an ECMP group
+  - Frequency of failure: 2000 per month, 70 per day, 3 per hour
+- Firepath master: On spine switches
+  - static configuration for redundant masters
+  - Firepath Master Redundancy Protocol (FMRP) for master election and bookkeeping
+    - active master maintains keepalive with backup masters and ensures current LSD in sync
+    - sticky election: misbehaving master candidate does not cause changes in mastership
+  - CPN partition will create multi-master, which network operators need manual intervention
+- Cluster border routers: Runs BGP to external networks
+  - also as proxy to mirror BGP routes to inter-cluster routes in Firepath and vice versa
+  - assume all CBRs are viable for traffic leaving/entering cluster
+
+Configuration management
+- Top-down design: Single fabric of switches with pre-assigned roles
+- Configuration system:
+  - input: Cluster-level specification, e.g. size of spine and base IP prefix, and list of ToRs
+  - output:
+    - bill of materials
+    - rack layouts
+    - CPN design and switch addresses
+    - updates to network and monitoring databases and systesm
+    - common fabric configuration file
+    - summary data for graphical views
+- Switch management: Make switches essentially look like regular machines
+  - image management, installation, monitoring, syslog, alerts
+  - manage device by Common Management Access Layer (CMAL) interface
+  - with standard two-phase verify-commit protocol for orchestrated deploy of new configuration
+- Fabric operation and management
+  - switch firmware upgrade: exploit fabric redundancy, divide chassis of a block into four sets
+  - upgrade on one set at a time
+
+Congestion
+- congestion drop as utilization approaches 25%
+  - due to burstiness of flow led to inadmissible traffic (incast and outcast)
+  - limited buffer in commodity switches
+  - oversubscription in uplinks of a ToR
+  - imperfect flow hashing in presence of variation in flow volume
+- alleviation of congestion
+  - QoS scheduler to drop packets from lower priority traffic
+  - smaller TCP congestion window to avoid overrunning the switch buffers
+  - link level pause at ToR to keep servers from over-running oversubscribed uplinks
+  - Explicit Congestion Notification (ECN) on switches and let hosts to respond to ECN
+  - Pluto ToR switch: provision bandwidth (4 or 8 uplinks) based on monitored bandwidth requirement
+  - Repopulate links if depop was causing congestion
+  - Tune the buffering sharing scheme on merchant silicon to absorb traffic bursts
+  - Revise hash function for better load balancing
+- after alleviation: 25% utilization loss rate drop from 1% to less than 0.01%
+
+Outages
+- power event caused the entire fabric to restart simultaneously
+  - link state will spuriously go from up to down and up again
+  - need to include in test plan
+  - protocol timer tuned to balance the reaction time and correct handing of the worst case
+- aging hardware: e.g., backplane link failure
+  - dual link between switches for redundancy: need to monitor both the active and standby links
+  - monitoring and alerting in fabric backplane and CPN links
+- mis-configuration outage on Freedome fabric
+  - Freedome chassis = CBR with integrated BGP stack
+  - CLI for CBR BGP needs locking to prevent simultaneous read/write access to BGP configuration
+    - must not use a port to read configuration while change is underway
+    - need safer tools
