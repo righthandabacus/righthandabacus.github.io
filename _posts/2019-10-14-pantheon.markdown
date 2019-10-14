@@ -1,0 +1,55 @@
+---
+layout: post
+title: Pantheon on Debian Buster
+date: Mon, 14 Oct 2019 17:03:19 -0400
+tags: system
+---
+
+Pantheon desktop or the elementaryOS are temptingly beautiful. What I see most
+attractive is the Pantheon terminal, which, in my opinion, finally we get a
+Linux terminal on par with what macOS can provide.
+
+However, the official Debian repository does not carry Pantheon. So to use it,
+I can either install elementaryOS and side load Debian into it, or the other
+way round: On <https://gandalfn.ovh/> we can download an ISO for Debian
+Buster+Pantheon Desktop installation. It will boot with lightdm and load the
+full set of Pantheon desktop GUI. So simply speaking:
+
+    wget https://gandalfn.ovh/iso/pantheon-buster-juno-amd64.hybrid.iso
+    dd if=pantheon-buster-juno-amd64.hybrid.iso of=/dev/rdisk3 bs=1M
+
+will give you a USB thumbdrive installer. Then install with it will have a
+Pantheon desktop running on Debian buster, with the Pantheon repository added
+to the apt system.
+
+**But.** Do not blindly `apt-get update; apt-get dist-upgrade` on it after install.
+It will break.
+
+After some painstakingly debug, it is found that the issue lies on this package:
+
+    https://gandalfn.ovh/debian/pool/main/p/pantheon-greeter/pantheon-greeter_3.3.1-0+pantheon+buster+juno5_amd64.deb
+
+The original (working) Debian package is versioned
+`3.3.1-0+pantheon+buster+juno3`. I cannot tell how the `juno5` and `juno3` are
+different, but everything were fine until this package is upgraded. Then,
+loading of lightdm will give you this `GLib-GIO-ERROR` on its log:
+
+    Settings schema 'org.gnome.settings-daemon.plugins.housekeeping' does not contain a key named 'active'
+
+it is same as [this issue](https://github.com/elementary/greeter/issues/226)
+but I may need to instigate the Debian source package to tell if, as mentioned
+in the github issue, simply because of an omitted build switch.
+
+So this is the correct upgrade process after initial installation:
+
+1. Install with the Pantheon+Buster ISO, just like an ordinary Debian
+2. Go to terminal
+    1. comment out the source list at `/etc/apt/sources.list.d/pantheon-debian.list`
+    2. add `deb http://deb.debian.org/debian buster-updates main contrib non-free` to `/etc/apt/sources.list`
+3. `apt-get update; apt-get dist-upgrade` to bring the Debian base up to date
+4. Uncomment the source list at `/etc/apt/sources.list.d/pantheon-debian.list`; then `apt-get update`
+5. Manually upgrade (`apt-get install`) everything except `pantheon-greeter`
+4. Comment out again the source list at `/etc/apt/sources.list.d/pantheon-debian.list`; then `apt-get update`
+
+The repository seems not upgraded for months. So I would believe it is just
+fine to disable that. For now.

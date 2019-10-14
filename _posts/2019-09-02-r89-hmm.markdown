@@ -1,0 +1,243 @@
+---
+layout: post
+title: "Rabiner (1989) A tutorial on hidden Markov models"
+date: 2019-09-02
+category: paper
+bibtex:
+  type: article
+  title: "A tutorial on hidden Markov models and selected applications in speech recognition"
+  author: "Lawrence R. Rabiner"
+  journal: "Proceedings of the IEEE"
+  volume: 77
+  number: 2
+  month: Feb
+  year: 1989
+  pages: 257--286
+  doi: 0018-9219/89/0200-0257
+---
+
+The renowned article to describe hidden Markov models (HMMs). I may not have
+enough background knowledge to a:ppreciate the speech recognition part but this
+is very clear and easy to follow to understand the HMM mechanics.
+
+For some background: A Markov chain is to model an autonomous system with state
+observable. If we can manipulate the state transition of the system, we have
+the Markov decision process. HMM is, however, about an autonomous system with
+unobservable state.
+
+A Markov process is modelled as following: We have set of states
+$$S=\{1,\cdots,N\}$$ which the state at time $$t$$ is specified as $$q_t$$ (or
+sequence denoted as $$Q=q_1q_2\cdots q_T$$), and the transition probability is
+specified by
+
+$$\begin{align}
+a_{ij} &= \mathbb{P}[q_t = j\mid q_{t-1} = i] \\
+\sum_{j=1}^N a_{ij} &= 1
+\end{align}$$
+
+The hidden Markov model introduces an observation sequence
+$$O = O_1O_2\cdots O_T$$ to the Markov process. We can describe a HMM as follows:
+There is a set of $$N$$ urns and a Markov process of selecting an urn. Then a ball
+is drawn from the selected urn with replacement, which is of a set of colors
+$$V=\{1,\cdots,M\}$$, i.e. $$O_t\in V$$. Only the sequence of ball drawn is
+observable as $$O$$. The observation probability is given by
+
+$$b_j(k) = \mathbb{P}[O_t=k \mid q_t=j]$$
+
+and the initial probability is given by
+
+$$\pi_j = \mathbb{P}[q_1 = j]$$
+
+The HMM is parameterized by $$\lambda = (A, B, \Pi)$$ which
+$$A=(a_{ij})_{N\times N}$$ is the state transition probability matrix,
+$$B=(b_j(k))_{N\times M}$$ is the observation probability matrix, and
+$$\Pi=(\pi_j)_{N\times 1}$$ is the vector of initial probability.
+
+The HMM is usually to solve for one of the following three problems:
+
+1. $$\mathbb{P}[O\mid \lambda]$$: Given model $$\lambda$$ find the probability of a given observation $$O$$.
+2. $$Q=\arg\max \mathbb{P}[Q\mid O,\lambda]$$: Given observation sequence $$O$$ and model $$\lambda$$, determine the optimal state sequence $$Q=q_1q_2\cdots q_T$$ that correspond to $$O$$
+3. $$\lambda=\arg\max\mathbb{P}[O\mid \lambda]$$: Given observation $$O$$, determine the parameter $$\lambda$$
+
+Below address each of these problems:
+
+## Solution to $$\mathbb{P}[O\mid \lambda]$$
+
+Consider a fixed state sequence $$Q=q_1q_2\cdots q_T$$,
+
+$$\begin{align}
+\mathbb{P}[O\mid Q,\lambda] &= \prod_{t=1}^T\mathbb{P}[O_t\mid q_t,\lambda] \\
+&= \prod_{t=1}^T b_{q_t}(O_t) \\
+&= b_{q_1}(O_1)b_{q_2}(O_2)\cdots b_{q_T}(O_T)
+\end{align}$$
+
+and
+
+$$\begin{align}
+\mathbb{P}[Q\mid\lambda] &= \pi_{q_1}a_{q_1q_2}a_{q_2q_3}\cdots a_{q_{T-1}q_T} \\
+\mathbb{P}[O,Q\mid\lambda] &= \mathbb{P}[O\mid Q,\lambda]\mathbb{P}[Q\lambda] \\
+\therefore\ \mathbb{P}[O\mid\lambda] &= \sum_Q\mathbb{P}[O\mid Q,\lambda]\mathbb{P}[Q\mid\lambda] \\
+&= \sum_{q_1q_2\cdots q_T} \pi_{q_1}b_{q_1}(O_1)a_{q_1q_2}b_{q_2}(O_2)a_{q_2q_3}\cdots a_{q_{T-1}q_T}b_{q_T}(O_T)
+\end{align}$$
+
+which the last equation above is explained as follows: The multiplication
+inside summation is $$2T$$ terms, which computes the probability that, at
+$$t=1$$, we start at state $$q_1$$ with probability $$\pi_{q_1}$$; and at state
+$$q_1$$, observation $$O_1$$ is generated at probability $$b_{q_1}(O_1)$$; and
+at $$t=2$$, the transition from $$q_1$$ to $$q_2$$ at probability
+$$a_{q_1q_2}$$; and so on until state $$q_T$$ observing $$O_T$$. Such
+probability should sum over the $$N^T$$ possible state sequences $$Q$$.
+
+A naive computation is in the order of $$O(N^T T)$$ but we can speed it up to
+$$O(N^2 T)$$ by dynamic programming on a lattice structure through the
+forward-backward procedure: Defining
+
+$$\alpha_t(i) = \mathbb{P}[O_1O_2\cdots O_t, q_t=i\mid\lambda]$$
+
+Solving recursively, we have
+
+$$\begin{align}
+\alpha_1(i) &= \pi_i b_i(O_1) &&\textrm{for }i=1,\cdots,N \\
+\alpha_{t+1}(j) &=\left(\sum_{i=1}^N \alpha_t(i)a_{ij}\right)b_j(O_{t+1}) &&\textrm{for }1\le t\le T-1, 1\le j\le N \\
+\mathbb{P}[O\mid\lambda] &= \sum_{i=1}^N \alpha_T(i)
+\end{align}$$
+
+For the convenience of the subsequent discussion we can define the backward
+counterpart:
+
+$$\beta_t(i) = \mathbb{P}[O_{t+1}O_{t+2}\cdots O_T\mid q_t=i,\lambda]$$
+
+and recursively:
+
+$$\begin{align}
+\beta_T(i) &=1 &&\textrm{for }i=1,\cdots,N \\
+\beta_t(i) &=\sum_{j=1}^N a_{ij}b_j(O_{t+1})\beta_{t+1}(j) &&\textrm{for }1\le t\le T-1, 1\le i\le N
+\end{align}$$
+
+## Solution to $$Q = \arg\max \mathbb{P}[Q\mid O,\lambda]$$
+
+We can treat each state $$q_t$$ separately and find the most likely state at
+each time step. Then the probability is given by
+
+$$\begin{align}
+\gamma_t(i) &= \mathbb{P}[q_t=i\mid O,\lambda] \\
+&= \frac{1}{\sum_{j=1}^N \alpha_t(j)\beta_t(j)}\alpha_t(i)\beta_t(i)
+\end{align}$$
+
+which the fraction term above is to make $$\sum_{i=1}^N \gamma_t(i)=1$$ and
+this allows us to solve $$q_t$$ individually for all $$1\le t\le T$$
+
+$$q_t = \arg\max_i \gamma_t(i)$$
+
+This approach, however, maximize the number of correct $$q_t$$ in the sequence
+$$Q$$ but not the most probable sequence $$Q$$ as a whole. To find the single
+best sequence $$Q$$, we use the **Viterbi algorithm**:
+
+Define the highest running probability of a sequence as
+
+$$\delta_t(i) = \max_{q_1\cdots q_{t-1}} \mathbb{P}[q_1q_2\cdots q_{t-1}, q_t=i, O_1O_2\cdots O_t\mid\lambda]$$
+
+i.e., this is the highest probability of subsequence $$q_1q_2\cdots q_{t-1}$$
+given $$q_t=i$$ and observation sequence $$O_1O_2\cdots O_t$$. Then the next
+time step is recursively,
+
+$$\delta_{t+1}(j) = \max_i \delta_t(i)a_{ij}b_j(O_{t+1})$$
+
+and ultimately $$\mathbb{P}[Q\mid O,\lambda]=\max_i\delta_T(i)$$. So we have
+the following algorithm:
+
+Initially we have, for $$1\le i\le N$$,
+
+$$\begin{align}
+\delta_1(i) &= \pi_i b_i(O_1) \\
+\psi_1(i) &= 0
+\end{align}$$
+
+Then in time steps $$2\le t\le T$$ and for all states $$1\le j\le N$$,
+
+$$\begin{align}
+\delta_t(j) &= \max_i \delta_{t-1}(i)a_{ij}b_j(O_t) \\
+\psi_t(j) &= \arg\max_i\delta_{t-1}(i)a_{ij}
+\end{align}$$
+
+and finally after time step $$T$$, we back track the whole sequence $$Q$$,
+
+$$\begin{align}
+\mathbb{P}[Q\mid O,\lambda] &= \max_i \delta_T(i) \\
+q_T = \arg\max_i\delta_T(i) \\
+q_t = \psi_{t+1}(q_{t+1}) &&\textrm{for }1\le t\le T-1
+\end{align}$$
+
+## Solution to $$\lambda = \arg\max\mathbb{P}[O\mid\lambda]$$
+
+By local maximization using expectation-maximization (EM) method: Define the
+probability of transition from $$i$$ to $$j$$ at time $$t$$ to $$t+1$$ as
+
+$$\begin{align}
+\xi_t(i,j) &= \mathbb{P}[q_t=i, q_{t+1}=j\mid O,\lambda] \\
+&= \frac{\alpha_t(i)a_{ij}b_j(O_{t+1})\beta_{t+1}(j)}{\mathbb{P}[O\mid\lambda]} \\
+&= \frac{\alpha_t(i)a_{ij}b_j(O_{t+1})\beta_{t+1}(j)}{\sum_{ij}\alpha_t(i)a_{ij}b_j(O_{t+1})\beta_{t+1}(j)}
+\end{align}$$
+
+and hence the probability of state at individual time step
+$$\gamma_t(i)=\sum_j\xi_t(i,j)$$ for $$1\le t\le T$$. The corresponding
+expected number of transition from state $$i\in S$$ is
+$$\sum_{t=1}^{T-1}\gamma_t(i)$$; and expected number of transition from state
+$$i$$ to state $$j$$ is $$\sum_{t=1}^{T-1}\xi_t(i,j)$$.
+
+Given we have enough data to train the model, we can estimate the model
+parameter as follows:
+
+$$\begin{align}
+\pi_i &= \gamma_1(i) \\
+a_{ij} &= \frac{\sum_{t=1}^{T-1}\xi_t(i,j)}{\sum_{t=1}^{T-1}\gamma_t(i)} \\
+b_j(j) &= \frac{\sum_{t:O_t=k}\gamma_t(j)}{\sum_{t=1}^T\gamma_t(j)}
+\end{align}$$
+
+These estimation depends on $$\gamma_t(i)$$ and $$\xi_t(i,j)$$ which in turn
+depends on $$\lambda=(A,B,\Pi)$$. We recursively apply these estimation formula
+and update $$\lambda$$ until converge. This is the *re-estimation procedure*
+and each step will give a greater $$\mathbb{P}[O\mid\lambda]$$.
+
+An alternative approach is to solve for the maxima of
+$$\mathbb{P}[O\mid\lambda]$$ by Lagrangian multipliers, which yields this set
+of formula:
+
+$$\begin{align}
+\pi_i  &= \pi_i  \frac{\partial\mathbb{P}}{\partial\pi_i}   \left(\sum_{k=1}^N \pi_k \frac{\partial\mathbb{P}}{\partial \pi_k} \right)^{-1} \\
+a_{ij} &= a_{ij} \frac{\partial\mathbb{P}}{\partial a_{ij}} \left(\sum_{k=1}^N a_{ik}\frac{\partial\mathbb{P}}{\partial a_{ik}}\right)^{-1} \\
+b_j(k) &= b_j(k) \frac{\partial\mathbb{P}}{\partial b_j(k)} \left(\sum_{h=1}^M b_j(h)\frac{\partial\mathbb{P}}{\partial b_j(h)}\right)^{-1}
+\end{align}$$
+
+## Iterative procedure in Markov decision process
+
+The following formula is based on the notation used in Wikipedia. It turns out
+the iterative procedure to converge to the solution is common to this sort of
+problems.
+
+A Markov decision process is modelled as $$(S, A, P_a, R_a)$$ which $$S$$ as
+the set of states, $$A$$ is the set of actions, and
+
+$$P_a(i,j) = \mathbb{P}[s_{t+1}=j\mid s_t=i, a_t=a]$$
+
+and $$R_a(i,j)\in\mathbb{R}$$ are, respectively, the probability of transition
+given action $$a$$ and the reward of the transition given action $$a$$.
+
+The MDP is to find a policy function $$\pi: S\mapsto A$$ that selects the
+action $$a\in A$$ for the state $$s\in S$$. This is a simplified form as the
+function is time-invariant, which reduces the MDP into a Markov chain, and
+
+$$P_a(i,j) = \mathbb{P}[s_{t+1}=j\mid s_t=i, a_t=\pi(s)]$$
+
+becomes the state transition probability matrix. To determine the policy
+function $$\pi(s)$$, we aimed at maximizing the present value of the reward
+
+$$\sum_{t=0}^\infty \gamma^t R_{a_t}(s_t, s_{t+1})$$
+
+which $$\gamma = \frac{1}{1+r}\in [0,1]$$ is a discount factor. The algorithm
+is to apply the following until converge:
+
+$$\begin{align}
+\textrm{value:}&& V(s) &= \sum_{s'}P_{\pi(s)}(s,s')\left[R_{\pi(s)}(s,s')+\gamma V(s')\right]\\
+\textrm{policy:}&& \pi(s) &= \arg\max_a\left\{\sum_{s'}\mathbb{P}[s'\mid s,a]\left(R_a(s,s')+\gamma V(s')\right)\right\}
+\end{align}$$
