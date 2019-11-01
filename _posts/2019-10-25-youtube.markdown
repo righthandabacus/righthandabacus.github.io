@@ -2,6 +2,7 @@
 layout: post
 title: Parsing Cantopop titles by machine learning
 date: 2019-10-25 14:21:09 -0400
+lastedit: 2019-10-31
 tags: code
 ---
 
@@ -18,7 +19,7 @@ If you search "cantopop" in YouTube, you will find loads of music videos. Each o
 
 Can we figure out the name of the artist and the name of the song from the title?
 
-This problem is closely similar to the problem of segmentation in the first sight. The problem of Chinese segmentation is to identify phases from a string of characters, which then we can look up a dictionary or otherwise, identify each phases part of speech. One of the way to do segmentation is to train a hidden Markov model. However, I don't think this approach is applicable here -- for a segmentation problem usually work on a fairly long sentence and train with a massive data, which the phases are supposed to be repeated fairly often. The problem here does not fit. Firstly, quite often we know how to segment the title: There are punctuations to group ideograph characters. Secondly, tagging the segmented phases by dictionary means we have a full dictionary of all artist names and songs, which the problem would be trivial if we have one and it can't cope with new entries.
+This problem is closely similar to the problem of segmentation in the first sight. The problem of Chinese segmentation is to identify phases from a string of characters, which then we can look up a dictionary or otherwise, identify each phases part of speech. One of the way to do segmentation is to train a [hidden Markov model](/2019-09-02-r89-hmm) or using LSTM. However, I don't think this approach is applicable here -- for a segmentation problem usually work on a fairly long sentence and train with a massive data, which the phases are supposed to be repeated fairly often. The problem here does not fit. Firstly, quite often we know how to segment the title: There are punctuations to group ideograph characters. Secondly, tagging the segmented phases by dictionary means we have a full dictionary of all artist names and songs, which the problem would be trivial if we have one and it can't cope with new entries.
 
 Of course, we can assume that the name of the song vs the name of the artist would bias to a different subset of characters. But we can also base on some contextual hints. For example, we can expect the phase inside 《..》 is the name of the song and the short phase closer to the beginning of the title is more likely than not the name of the artist. Instead of figuring out the rules to do this, we can learn through data and build an engine. Here I use scikit-learn.
 

@@ -1,0 +1,92 @@
+---
+layout: post
+title: "Sholler et al (2019) Ten simple rules for helping newcomers become contributers to open projects"
+date: 2019-10-31
+category: paper
+bibtex:
+   type: article
+   title: Ten simple rules for helping newcomers become contributors to open projects
+   author: Dan Sholler and Igor Steinmacher and Denae Ford and Mara Averick and Mike Hoye and Greg Wilson
+   journal: PLoS Comput Biol
+   volume: 15
+   number: 9
+   month: Sep
+   year: 2019
+   doi: https://doi.org/10.1371/journal.pcbi.1007296
+   url: https://journals.plos.org/ploscompbiol/article?id=10.1371%2Fjournal.pcbi.1007296
+---
+
+Community: common goal, mutually engaged, shared resource
+
+Rule 1: Be welcoming
+- make a good first impression, make a proactive effort to foster positive feelings
+- offering assistance in finding ways to make an initial contribution
+- directing the newcomer to project members who have a similar background or skill set
+- pointing the newcomer to essential project resources (e.g., the contribution guidelines)
+- clearly identify work items they can start with
+- tag bugs or issues as "suitable for newcomers" and ask established members not to fix them
+
+Rule 2: Help potential contributors evaluate if the project is a good fit
+- LibreOffice, e.g., provides a way for developers to filter available tasks by required skills and difficulty
+- "basic Python skills" means very different things to different people
+
+Rule 3: Make governance explicit
+- "The Cathedral and the Bazaar": an egalitarian world in which everyone could contribute equally to open projects
+  - reality: authority lies with those willing to shout loudest and longest
+  - the realities of how power arises, becomes concentrated, and used to perpetuate itself
+  - Freeman’s influential essay "The Tyranny of Structurelessness" (1972)
+  - The solution is to make a project’s governance explicit so that people know who makes which decisions
+- consensus-building: Martha’s Rules (at bottom)
+- decide on the rules well in advance of contentious issues emerging
+
+Rule 4: Keep knowledge up to date and findable
+- make sure that all necessary information is both accessible and findable
+  - use wikis, files in GitHub, shared Google Docs, old tweets or Slack messages, and email archives
+  - Signaling the absence or staleness of material can save newcomers time
+- provide "how to contribute" guidelines: GitHub’s recommendation for placing such information in a `CONTRIBUTING.md`
+
+Rule 5: Have and enforce a code of conduct
+- make norms about acceptable behavior explicit
+  - ensure that everyone will find the environment healthy and welcoming
+  - sends a clear signal that the community actually has standards
+- A code of conduct is only useful if there is a clear reporting mechanism
+
+Rule 6: Develop forms of legitimate peripheral participation
+- legitimate peripheral participation (LPP)
+  - Newcomers become members of a community by participating in simple, low-risk tasks
+  - newcomers become acquainted with the community’s tasks, vocabulary, and governance so that they can ease into the project
+- encourage newcomers to submit issues to a repository when they notice a bug
+- have newcomers help with documentation, particularly with translation and localization
+- mark some issues as suitable for newcomers.
+
+Rule 7: Make it easy for newcomers to get started
+- going from "I want to help" to "I’m able to help" to "I’m helping"
+- Any complexity or confusion at this point is therefore a significant barrier to participation
+
+Rule 8: Use opportunities for in-person interaction—With care
+- face-to-face vs remote communication: each form has benefits and drawbacks
+  - In-person interaction is valuable for uninterrupted, synchronous dialog
+  - benefit from engaging newcomers in in-person interaction from time to time
+- potential contributors might shy away from the project if they are introverted
+
+Rule 9: Acknowledge all contributions
+- gratitude and recognition are the most powerful tools community builders have
+- every project should adopt and publicize guidelines describing what constitutes a contribution, how contributions will be acknowledged, and how they will be used
+
+Rule 10: Follow up on both success and failure
+- Helping newcomers find the next problem they might want to work on or pointing them at the next thing they might enjoy reading
+- encouraging them to help the next wave of newcomers is both a good way to recognize what they have learned
+  - Mentoring programs
+- projects should also try to follow up on their failures
+  - Why did potential contributors not become community members?
+  - Did they realize that the project wasn’t a good fit (in which case, the overview may need an overhaul)?
+  - Was it too difficult to find a starting point or to get set up to start work (in which case information may need to be consolidated, tagged, filled in, or updated)?
+  - Or did they feel uncomfortable or undervalued (in which case the community may need to have a more difficult conversation)?
+
+Martha’s rules
+- Anyone may put forward a proposal up to 24 hours before a meeting. Proposals must include a one-line summary, a brief description, any required background information, and a discussion of pros and cons (including alternatives).
+- Once a person has sponsored a proposal, they are responsible for it; the group may not discuss or vote on the issue unless the sponsor is present.
+- After the sponsor presents the proposal, a "sense" vote is taken prior to any discussion in which people indicate whether they like the proposal, can live with it, or are uncomfortable with it.
+- If all or most of the group likes or can live with the proposal, it moves to a formal vote with no further discussion.
+- If most of the group is uncomfortable with the proposal, it is postponed for further rework by the sponsor.
+- If some members are uncomfortable, they can briefly state their objections. After 10 minutes of moderated discussion, the facilitator calls for a yes-or-no vote on adoption. If a majority vote "yes", the proposal is implemented. Otherwise, the proposal is returned to the sponsor for further work.
