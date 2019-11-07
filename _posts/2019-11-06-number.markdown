@@ -1,0 +1,60 @@
+---
+layout: post
+title: Numbers for machine learning
+date: Wed, 06 Nov 2019 18:58:04 -0500
+tags: code
+---
+
+How much data is enough? This was the question for any statistical exercise, such as experiments, simulations, surveys. But nowadays, this is also the question for machine learning.
+
+In case of statistics, sometimes this is easy. For example, flipping a biased coin with head-tail probabilities of $$p$$ and $$1-p$$, the process of flipping $$N$$ times is modeled as binomial distribution. We expect to see $$Np\pm z_{\alpha}\sqrt{Np(1-p)}$$ number of heads, which $$z_{\alpha}=1.96$$ for a 95% confidence interval. So to confirm the coin is fair ($$p=0.5\pm\epsilon$$ which $$\epsilon$$ is the margin of error accepted), we need
+
+$$\begin{align}
+z_{\alpha}\sqrt{\frac{p(1-p)}{N}} &\le \epsilon \\
+\therefore N &\ge p(1-p)\left(\frac{z_{\alpha}}{\epsilon}\right)^2 \\
+&= \frac{1}{4}\left(\frac{z_{\alpha}}{\epsilon}\right)^2
+\end{align}$$
+
+Here we have a close form solution to find the number of data required to fit the model. In fact, for hypothesis testing in general, we have
+
+$$\begin{align}
+N &= \left(\frac{z_{\alpha}\sigma}{\epsilon}\right)^2 \\
+\epsilon &= z_{\alpha}\frac{\sigma}{\sqrt{N}}
+\end{align}$$
+
+However, it is not so easy to determine analytically the amount of data required for linear regression as well as other models. But we do have some common beliefs on how much data should be needed.
+
+The classic problem of regression has the [1 in 10 rule](https://en.wikipedia.org/wiki/One_in_ten_rule), which says we need 10 cases for each predictor/feature used. But sometimes we may need 1 in 20 or even 1 in 50 in case of coefficient shrinkage.
+
+In statistical learning theory, we have the concept of [Vapnik-Chervonenkis dimension](https://en.wikipedia.org/wiki/Vapnik%E2%80%93Chervonenkis_dimension) which states that the minimum number of samples need to train a binary function is expressed as a big-O notation:
+
+$$N = \Theta\left(\frac{D-\log\delta}{\epsilon}\right)$$
+
+which
+- $$D$$ is the Vapnik-Chevronenkis dimension (a measure of complexity of a model, e.g., linear function can separate 3 arbitrary points but not 4 points in a 2D plane so the linear function has dimension 3)
+- $$\delta$$ is the probability of failure
+- $$\epsilon$$ is the learning error
+
+But this is not a close form formula that can give guidance on the the sample size. I did not see any mention of the VC dimension outside academic discussion.
+
+So how much data is needed for machine learning? Instead of explicitly giving out a number, a paper by Wang et al[^1] proposes to tell when to stop adding more data instead. Each sample is associates with a number of features. So the set of samples gives out a distribution of a particular feature $$x$$ and we can model the probability by the empirical distribution (possibly after kernel function is applied). Then, whether empirical distribution $$\tilde{f}(x)$$ is similar to distribution $$f(x)$$ can be determined by Kullback-Liebler divergence
+
+$$KL(\tilde{f}(x)\mid f(x)) = \int \tilde{f}(x)\log\frac{\tilde{f}(x)}{f(x)}dx$$
+
+The paper suggests to keep adding data until the distribution is stablised, i.e., when the KL divergence is getting small. This is the other way of saying we expect to see the law of diminishing return in the amount of data. However, one can also see that we may have many KL divergences to check -- not only one for each feature we used, but also the joint distribution of any combination of features.
+
+[^1]: Wenshuo Wang, Chang Liu, and Ding Zhao, "How Much Data is Enough? A Statistical Approach with Case Study on Longitudinal Driving Behavior". arXiv:1706.07637, 2017. <https://arxiv.org/pdf/1706.07637.pdf>
+
+This gives us some insight on what we should expect: The amount $$N$$ of sample data and the accuracy $$A$$ of the learned model should exhibit power law relationship: $$A\propto \log N$$. This is confirmed by some works[^2] but as we can expect, the power law will reach a plateau eventually. Especially in traditional problems, the plateau appears earlier than the deep learning problems, probably due to the complexity involved.
+
+[^2]: See the references in <https://towardsdatascience.com/how-do-you-know-you-have-enough-training-data-ad9b1fd679ee>, especially Zhu et al., "Do we Need More Training Data?", March 2015 (<https://arxiv.org/abs/1503.01508>)
+
+So here we come with some popular heuristics[^3]: For classification problems, we need a *minimum of 1000 samples per class*, but bear in mind of the 1 in 10 rule. So if some feature is sparse, we need to collect more samples overall to compensate that. In harder problems, we may need up to 100K to 1 million samples. In case of computer vision, we are fortunate enough to have many pre-trained models available so we can use fewer than 1000 samples per class if we use one of those. Also generating variations from input (e.g., flipping and rotating images) is also common in computer vision that essentially provide more data to learn. This is an example of imbalance correction techniques (other examples: under- and over-sampling, ensemble learning) that can compensate for not enough training data.
+
+[^3]: See <https://www.quora.com/How-much-data-is-required-for-machine-learning> and <https://machinelearningmastery.com/much-training-data-required-machine-learning/>
+
+But we should beware that more data is not always better. A discussion on [Quora](https://www.quora.com/In-machine-learning-is-more-data-always-better-than-better-algorithms) explained this well: A model that doesn't perform well can due to high variance or high bias. The former is because the model used is too complicated[^4] compare to the data. We can tell if the model's error on test set is significantly higher than the training set (i.e., overfitting). This is where more data can help. Or we can try with less number of input features (e.g., in case of NLP, do not use one-hot encoding for every word in the vocabulary). The latter is the converse, namely, the model is too simple to explain the data. This case, we need to extract more or better features[^5] from the data.
+
+[^4]: Alon Halevy, Peter Norvig, and Fernando Pereira, "[The unreasonable effectiveness of data](https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/35179.pdf)". IEEE Intelligent Systems, 2009
+
+[^5]: István Pilászy and Domonkos Tikk, "Recommending New Movies: Even a Few Ratings Are More Valuable Than Metadata". In Proceedings of the third ACM conference on Recommender systems, pp 93-100. New York, New York, USA, October 23-25, 2009. <https://doi.org/10.1145/1639714.1639731>
