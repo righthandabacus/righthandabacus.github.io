@@ -4,7 +4,9 @@ title: CV
 permalink: /cv/
 ---
 
-Thanks for your interest. My current CV is [here](https://drive.google.com/open?id=1KHga7JvykmeZ_LAUW0QVAgtSvSf4SpAG)
+Thanks for your interest. My current CV:
+- Tech focused is [here](https://drive.google.com/open?id=1KHga7JvykmeZ_LAUW0QVAgtSvSf4SpAG)
+- Finance focused is [here](https://drive.google.com/open?id=1PgnmtnJFDYWj47Ld000FPc963d6AhrdU)
 
 In case you're interested:
 

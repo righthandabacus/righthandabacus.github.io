@@ -1,0 +1,59 @@
+---
+layout: post
+title: "Pimbley (2016) Better measurements for CLO equity performance"
+date: 2019-11-20
+category: paper
+bibtex:
+   type: article
+   title: Better measurements for CLO equity performance
+   author: Joseph M. Pimbley
+   journal: The Journal of Structured Finance
+   volume: Summer
+   year: 2016
+   pages: 24--30
+---
+
+A short paper arguing how to evaluate CLO equity performance. As the equity
+tranche of a CLO has a maturity date, we can consider that as a bond with
+indeterministic coupon. So it is natural to use IRR as a measure for equity.
+IRR is the solution of $$r$$ in
+
+$$\sum_j \frac{p_j}{(1+r)^{t_j}} = 0$$
+
+where $$p_j$$ is the payment (negative if from investor) and $$t_j$$ is the
+time measured in years. IRR measures the yield amounts to break-even PV of
+cash flows.
+
+Problems of IRR:
+- different IRR for different compounding period
+- market rate affects rate of return but IRR can't distinguish the attribution of yields
+- In case of zero or negative profit: IRR give more negative $$r$$ for shorter term of recovery
+  - e.g., zero profit, recover whole investment in 1 yr vs 10 yr are both IRR 0%
+  - e.g., loss, recover 50% of investment in 1 yr vs 10 yr. 10 yr has less negative IRR
+
+Alternative measure is "return of exposure" (ROX). The paper claims that it is
+similar to discount margin
+
+$$ROX = \sum_{j=0}^N z_j\frac{p_j}{\phi_0 D}$$
+
+where $$z_j$$ are zero coupon discount factors, $$\phi_0$$ is exposure par amount, $$D$$ is *spread duration*,
+
+$$D=\sum_{j=1}^N z_j(t_j-t_{j-1})\frac{\phi_{j-1}}{\phi_0}$$
+
+with $$\phi_j$$ the remaining par of the investment at time $$t_j$$. ROX is the
+PV of all payments received ($$j=1,\cdots,N$$) minus the PV of all funded
+investments ($$j=0$$), divided by the sum-product of exposure par amount and
+duration. If the investment return if LIBOR-flat (i.e., LIBOR+0), ROX is zero.
+
+The metric this paper proposed is "CLO Sharpe" (CLO#). Defined as follows:
+Excess return $$\xi_j$$ (for $$j=1,\cdots,N$$) is actual payments $$p_j$$ minus
+the LIBOR interest on outstanding residual par
+
+$$\xi_j = p_j - \psi_{j-1}L_{j-1}(t_j-t_{j-1})$$
+
+with $$\psi_0=\phi_0$$, $$\phi_j=\phi_{j-1}-\xi_j$$ for $$j=1,\cdots,N$$
+
+The proposed volatility measure:
+
+$$CLO\# = \frac{\textrm{mean}(\xi_j)}{\textrm{StdDev}(\xi_j)}$$
+

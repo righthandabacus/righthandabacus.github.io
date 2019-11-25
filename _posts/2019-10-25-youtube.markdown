@@ -357,7 +357,7 @@ $$p(y\mid X) = \frac{p(X\mid y)p(y)}{p(X)} = \frac{p(X\mid y)p(y)}{\sum_y p(X\mi
 
 The models Logistic Regression and Gaussian Process Classifier are regression based:
 
-**Logistic regression:** Classification based on the function $$\hat{y}=\sigma(w^Tx)$$ for features $$x$$, learned weights $$w$$, and logistic function $$\sigma()$$. Sometimes we will incoporate the classification result $$y\in\{+1,-1\}$$ into the function for training, $$\hat{y}=\sigma(y\cdot w^Tx)$$
+**Logistic regression:** Classification based on the function $$\hat{y}=\sigma(w^Tx)$$ for features $$x$$, learned weights $$w$$, and logistic function $$\sigma()$$. Sometimes we will incorporate the classification result $$y\in\{+1,-1\}$$ into the function for training, $$\hat{y}=\sigma(y\cdot w^Tx)$$
 
 **Gaussian process classifier:** Generalization of logistic regression, using $$\hat{y}=\sigma(f(x))$$ with kernel function $$f()$$. In the above case, the radial basis function is used.
 
@@ -375,7 +375,7 @@ There are also three decision tree-based models:
 
 **Random forest:** multiple decision trees based on random subset of training data and then pick the best performing one
 
-**AdaBoost:** adaptive boosting, by default it is a decision tree model. It begin with equal weight samples and iteratively trained the decision tree and afterwards weights are adjusted to favor wrong classifications.
+**AdaBoost:** adaptive boosting (Freund and Schapire, 1996), by default it is a decision tree model. It begin with equal weight samples and iteratively trained the decision tree and afterwards assign heavier weight to those with wrong classifications.
 
 And finally a **neural network**, a.k.a. multilayer perceptrons. In here is 3-layer network with ReLU activation and 100 perceptrons in the middle layer.
 
