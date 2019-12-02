@@ -1,0 +1,346 @@
+---
+layout: post
+title: VSM for text normalization
+date: 2019-11-22
+tags: code
+---
+
+In many occasions we have textual labels in structured data. The case we
+considered in this paper is the industry designations to companies. While there
+are standard to govern the industry designation, its use is found to be
+arbitrary.
+
+There are two common industry designations, namely, the Moody's 35 Industry
+Categories[^1] and the Global Industry Classification Standard[^2].
+Alternatives includes the TRBC[^5], NAICS[^6], ISIC[^7], and others. In the loan
+market, for example, usually required to have the Moody's 35 and GICS designation
+for the loan issuers in order to obtain a credit rating from Moody's and
+Standard & Poor's respectively. However for various reasons, the industry
+designation we see from vendors of financial data are not standardized. There
+may be typos, abbreviations, and other kind of variations. Some are even
+misidentified.
+
+It is trivial to see the merit of standardizing the correcting the industry
+designation in the process of data cleaning before analysis of data. A naive way
+of doing so will be correcting them by hand: Taking the Moody's 35 as an
+example, there is only a fixed set of 35 industry designations so we can
+manually reassign the correct industry tags (a textual label) based on the
+existing industry designation from the data source. This will be tedious but not
+a difficult task to a human being.
+
+In the following, we consider this simple task of normalizing the industry
+designation text label into its canonical form. We use a vector space model to
+find the corresponding canonical representation and alert if we are less
+certain. We evaluate the performance with real data.
+
+# Overview of the industry designation data
+
+We pick the Moody's industry designation as the testbed because it is a simple
+categorization and commonly used. Unlike some other standards such as the GICS,
+Moody's industry categories are not put into hierarchies and their granularity
+is not too coarse or fine for this study. The names of the 35 industries are
+listed as follows:
+
+```plaintext
+AEROSPACE & DEFENSE,
+AUTOMOTIVE,
+BANKING,
+BEVERAGE, FOOD, & TOBACCO,
+CAPITAL EQUIPMENT,
+CHEMICALS, PLASTICS, & RUBBER,
+CONSTRUCTION & BUILDING,
+CONSUMER GOODS: DURABLE,
+CONSUMER GOODS: NON-DURABLE,
+CONTAINERS, PACKAGING, & GLASS,
+ENERGY: ELECTRICITY,
+ENERGY: OIL & GAS,
+ENVIRONMENTAL INDUSTRIES,
+FIRE: FINANCE,
+FIRE: INSURANCE,
+FIRE: REAL ESTATE,
+FOREST PRODUCTS & PAPER,
+HEALTHCARE & PHARMACEUTICALS,
+HIGH TECH INDUSTRIES,
+HOTEL, GAMING, & LEISURE,
+MEDIA: ADVERTISING, PRINTING & PUBLISHING,
+MEDIA: BROADCASTING & SUBSCRIPTION,
+MEDIA: DIVERSIFIED & PRODUCTION,
+METALS & MINING,
+RETAIL,
+SERVICES: BUSINESS,
+SERVICES: CONSUMER,
+SOVEREIGN & PUBLIC FINANCE,
+TELECOMMUNICATIONS,
+TRANSPORTATION: CARGO,
+TRANSPORTATION: CONSUMER,
+UTILITIES: ELECTRIC,
+UTILITIES: OIL & GAS,
+UTILITIES: WATER,
+WHOLESALE
+```
+
+While the 35 industries are flat categorization (i.e., mutually exclusive,
+non-hierarchical), some are closely related and sometimes combined. An example
+is "FIRE" -- finance, insurance, and real estate. We occasionally see the
+designation `FIRE: BANKING, FINANCE, INSURANCE & REAL ESTATE` is used.
+
+Besides, we can also expect sensible variation being used as such designation is
+usually presented as a free-form text label. Examples include different
+abbreviations, capitalizations, punctuation, spaces, word order, or substitution of
+symbol '&' with the word 'AND'. Furthermore, we should not rule out the
+possibilities of wrong labeling. Such as using the GICS industry labels in place
+of the Moody's industry categorization while the latter is explicitly intended.
+
+# Algorithm
+
+With the different possibilities of labelling in mind, we intended to find an
+algorithm to fit the following goals:
+
+1. Match the different variations of an industry label to its canonical form
+2. Provide a confidence measure on the algorithm output; such measure should
+   give a higher score on minimal variations and lower if drastically different
+
+This problem is closely related to information retrieval if we consider each of
+the 35 industry labels as documents and words in the labels as terms. Matching a
+label with variation to its canonical form is like treating the input label as
+search terms and find the closest matched document. Therefore we can apply the
+established techniques of information retrieval in our algorithm:
+
+We remove punctuation and stop words from both the search terms. Then we use
+vector space model to find the cosine similarity of the search terms to the
+documents and report the one with highest similarity. Since cosine similarity
+is used as the confidence measure, the score is between 0 and 1.
+
+Because the set of documents and hence the corpus are both finite, we can model
+the query as a vector in $$\mathbb{R}^n$$, which an element $$v_k$$ of the
+vector $$\mathbf{v}$$ corresponds to term $$k$$ in the corpus, and the total size of
+corpus is $$n$$. A document is modeled by a vector of the same shape as well.
+In vector space model, the similarity of a query $$\mathbf{v}^{(q)}$$ to a document
+$$\mathbf{v}^{(d)}$$ is presented by the cosine formula:
+
+$$\cos\theta = \frac{\mathbf{v}^{(q)}\cdot \mathbf{v}^{(d)}}{\lVert \mathbf{v}^{(q)}\rVert_2 \lVert \mathbf{v}^{(d)}\rVert_2}$$
+
+Hence, for a given query (i.e., a label), we find the best matched one from the
+document set (i.e., canonical form) and the cosine similarity value is
+presented as the confidence measure.
+
+They value of element $$v_k$$ of a vector $$\mathbf{v}$$ is defined as follows.
+
+We assign a fixed order of the corpus, identified by subscripts 1 to $$n$$.
+Then we compare any term to every term in the corpus using the Levenshtein
+distance, which counts the edit distance between the two, and set the value
+$$v_k$$ as
+
+$$v_k = \frac{1}{1+L^2}$$
+
+The above formula is to normalize the similarity to the range of $$[0,1]$$
+which exact match would have similarity of 1. $$L$$ is the Levenshtein distance
+and we take it to the power 2 to penalize more on larger difference.
+
+Note that this is only for one term. For a particular query $$Q$$ of several terms,
+we calculate $$v_k$$ for each term against every vocabulary $$k$$ in the corpus
+and the vector for the whole query is created by picking the max $$v_k$$
+amongst the terms in $$Q$$. This method of converting a query into vector also
+applies to converting documents into vectors.
+
+## On TF-IDF
+
+Quite often when we use the vector space model, the vector is created such that
+each element $$v_k$$ is the tf-idf weight[^8] of term $$k$$. A common way of using
+tf-idf would be:
+
+$$\begin{align}
+\textrm{tf}(t,d) &= \log(1+f_{t,d}) \\
+\textrm{idf}(t,D) &= \log(1+N/n_t) \\
+\textrm{tf-idf} &= \textrm{tf}(t,d) \textrm{idf}(t,D)
+\end{align}$$
+
+However, the issue of misspelling and abbreviations is not addressed by the
+tf-idf model. We would need to apply a correction mechanism as a preprocessing
+step.
+
+# Evaluation and discussion
+
+The above algorithm is implemented as follows, in Julia:
+
+```julia
+using LinearAlgebra
+using DataFrames
+
+# Moody's 35 Industries
+MD35 = [
+    "AEROSPACE & DEFENSE",
+    "AUTOMOTIVE",
+    "BANKING",
+    "BEVERAGE, FOOD, & TOBACCO",
+    "CAPITAL EQUIPMENT",
+    "CHEMICALS, PLASTICS, & RUBBER",
+    "CONSTRUCTION & BUILDING",
+    "CONSUMER GOODS: DURABLE",
+    "CONSUMER GOODS: NON-DURABLE",
+    "CONTAINERS, PACKAGING, & GLASS",
+    "ENERGY: ELECTRICITY",
+    "ENERGY: OIL & GAS",
+    "ENVIRONMENTAL INDUSTRIES",
+    "FIRE: FINANCE",
+    "FIRE: INSURANCE",
+    "FIRE: REAL ESTATE",
+    "FOREST PRODUCTS & PAPER",
+    "HEALTHCARE & PHARMACEUTICALS",
+    "HIGH TECH INDUSTRIES",
+    "HOTEL, GAMING, & LEISURE",
+    "MEDIA: ADVERTISING, PRINTING & PUBLISHING",
+    "MEDIA: BROADCASTING & SUBSCRIPTION",
+    "MEDIA: DIVERSIFIED & PRODUCTION",
+    "METALS & MINING",
+    "RETAIL",
+    "SERVICES: BUSINESS",
+    "SERVICES: CONSUMER",
+    "SOVEREIGN & PUBLIC FINANCE",
+    "TELECOMMUNICATIONS",
+    "TRANSPORTATION: CARGO",
+    "TRANSPORTATION: CONSUMER",
+    "UTILITIES: ELECTRIC",
+    "UTILITIES: OIL & GAS",
+    "UTILITIES: WATER",
+    "WHOLESALE"
+]
+
+STOPWORDS = Set(["AND", "FIRE"])
+
+"""Remove all non-alphabet characters in string and then convert the string into set of tokens"""
+function tokenize(str)
+    return setdiff(Set(split(replace(uppercase(str), r"[^a-zA-Z]" => " "))), STOPWORDS)
+end
+
+
+"""Levenshtein distance to update str1 to str2"""
+function levenshtein(str1, str2)
+    # i==0; dist[j] = distance from str1[1:0] to str2[1:j-1]
+    dist = collect(0:length(str2))
+    # update iteratively (on i) to make dist[j] to reflect the dist from str1[1:i] to str2[1:j-1]
+    for i in 1:length(str1)
+        prev = dist[1]  # always hold the cost of str1[1:i-1] to str2[1:0]
+        dist[1] = i     # str1[:i] to str2[1:0] = delete i chars
+        for j in 1:length(str2)
+            prevsave = dist[j+1]  # prevsave = cost of str1[1:i-1] to str2[1:j]
+            subcost = (str1[i] == str2[j]) ? 0 : 1
+            # at this point:
+            # in dist[1:j]: dist[k] is the distance from str1[1:i] to str2[1:k-1]
+            # in dist[j+1:end]: dist[k] is the distance from str1[:i-1] to str2[:k-1]
+            dist[j+1] = min(
+                dist[j+1]+1, # delete: str1[:i] to str1[:i-1] to str2[:j]
+                dist[j]+1,   # insert: str1[:i] to str2[:j-1] to str2[:j]
+                prev+subcost # substitute: str1[:i] to str1[:i-1] to str2[:j-1] to str2[:j]
+            )
+            prev = prevsave
+        end
+    end
+    return dist[end]
+end
+
+
+"""similarity score of a two string, case insensitive"""
+function similarity(str1, str2)
+    1/(1+levenshtein(str1, str2)^2)
+end
+
+
+"""Return a vector representation of the industry string Length is len(CORPUS) and value of each element is in
+[0,1]
+"""
+function vector(industry)
+    # create columns of similarity to each of word in CORPUS
+    vec = hcat([[similarity(t, c) for c in CORPUS] for t in tokenize(industry)]...)
+    # find the max similarity for each word in CORPUS
+    vec, dims = findmax(vec, dims=2)
+    return vec
+end
+
+
+"""Find the cosine similarity between two vectors"""
+function cosine(vec1, vec2)
+    return dot(vec1, vec2) / (norm(vec1) * norm(vec2))
+end
+
+
+"""Push down something too small into zero"""
+function clip(vector, threshold)
+    vector[vector .<= threshold] .= 0
+    return vector
+end
+
+
+# Collect the corpus of industry names, then create the vector representation of
+# the standard names (with clipping)
+CORPUS = sort(collect(tokenize(join(MD35, " "))))
+MD35 = Dict(k => clip(vector(k), 0.001) for k in MD35)
+
+
+"""Return the similarity score and Moody's industry for the best match of input industry string"""
+function bestmatch(industry)
+    indvec = vector(industry)
+    score, indname = findmax(Dict(kv[1] => cosine(kv[2], indvec) for kv in MD35))
+    return score, titlecase(get(ALIASES, indname, indname))  # name in title-case
+end
+```
+
+
+We collected a list of Moody's industry designations from loan market, of
+637961 entries, in 115 distinct forms. Some typical examples and the number of
+occurrences are as follows:
+
+| designation | count |
+|-------------|-------|
+| Chemicals, Plastics & Rubber | 31096 |
+| Chemicals, Plastics and Rubber | 6 |
+| Chemicals, Plastics, & Rubber | 3 |
+| Chemicals | 1 |
+| Consumer Goods   Non-durable | 2 |
+| Consumer goods: Durable | 10459 |
+| Consumer goods: Non-durable | 13163 |
+| Drugs | 27 |
+| Ecological | 1 |
+| Prsnl & Non-Drbl Consmr Prdt | 5 |
+| Retail | 26704 |
+| Retail Stores | 4 |
+
+When we run the `bestmatch()` on theses designations, the score and result are as follows:
+
+| input                                                       | score    | output                                    |
+|-------------------------------------------------------------|----------|-------------------------------------------|
+| Chemicals, Plastics & Rubber                                | 1.0      | Chemicals, Plastics, & Rubber             |
+| Chemicals, Plastics and Rubber                              | 1.0      | Chemicals, Plastics, & Rubber             |
+| Chemicals, Plastics, & Rubber                               | 1.0      | Chemicals, Plastics, & Rubber             |
+| Chemicals                                                   | 0.595451 | Chemicals, Plastics, & Rubber             |
+| Consumer goods: Durable                                     | 1.0      | Consumer Goods: Durable                   |
+| Consumer Goods   Non-durable                                | 1.0      | Consumer Goods: Non-Durable               |
+| Consumer goods: Non-durable                                 | 1.0      | Consumer Goods: Non-Durable               |
+| Drugs                                                       | 0.445331 | Energy: Oil & Gas                         |
+| Ecological                                                  | 0.36658  | Energy: Oil & Gas                         |
+| Prsnl & Non-Drbl Consmr Prdt                                | 0.606927 | Consumer Goods: Non-Durable               |
+| Retail                                                      | 1.0      | Retail                                    |
+| Retail Stores                                               | 0.99868  | Retail                                    |
+
+We can see the result is quite reasonable: Simple variations are matched
+perfectly with a high score. It can even correctly match "Prsnl & Non-Drbl
+Consmr Prdt" (Personal & Non-durable consumer product) to "Consumer Goods:
+Non-Durable". For cases of incorrect mapping, such as "Ecological" to "Energy:
+Oil & Gas", it gives a low score. Hence we can safely disregard the matched
+result by imposing a threshold on the score, such as 0.6. All such input should
+be mapped manually. For instance, "Drugs" should be mapped to "Healthcare &
+Pharmaceuticals". This cannot be done by the our algorithm because we did not
+establish the ontological relationship between "drugs" and "pharmaceuticals".
+
+In fact, the threshold used depends on how we set the value $$v_k$$. If we use
+a different formula for $$v_k$$, the performance as well as the threshold would
+be changed.
+
+[^1]: <https://www.moodys.com/sites/products/ProductAttachments/MCO_35%20Industry%20Categories.pdf>
+[^2]: <https://en.wikipedia.org/wiki/Global_Industry_Classification_Standard>
+[^3]: <https://www.moodys.com/sites/products/AboutMoodysRatingsAttachments/MoodysRatingSymbolsandDefinitions.pdf>
+[^4]: <https://www.moodys.com/sites/products/ProductAttachments/corporates-credit-risk.pdf>
+[^5]: <https://en.wikipedia.org/wiki/Thomson_Reuters_Business_Classification>
+[^6]: <https://en.wikipedia.org/wiki/North_American_Industry_Classification_System>
+[^7]: <https://en.wikipedia.org/wiki/International_Standard_Industrial_Classification>
+[^8]: <https://en.wikipedia.org/wiki/Tf%E2%80%93idf>
