@@ -270,7 +270,7 @@
       };
       .arrow {
         position: fixed;
-        top: 50%;
+        top: 40%;
       };
     }
   }
@@ -327,7 +327,6 @@
     /* sitename at left corner */
     .navbar-brand {
       font-size: 18px;
-      padding: 20px;
       color: $colour_text_main;
       text-decoration: none !important;
     };
@@ -377,6 +376,11 @@
     display: none;
   }
 
+  /* smaller icon for small screens */
+  .navbar-toggler-icon {
+    height: 1em;
+  }
+
   /* screen size customization */
   @media only screen and (min-width: 768px) {
     .navbar {
@@ -413,11 +417,22 @@
         display: block;
       };
     };
+    .pager {
+      display: none;
+    }
   }
   @media only screen and (max-width: 991px) {
     .navbar .avatar-container {
       display: none;
     }
+    .navbar-brand {
+      padding: 10px;
+    };
+  }
+  @media only screen and (min-width: 992px) {
+    .navbar-brand {
+      padding: 20px;
+    };
   }
 
 
