@@ -500,6 +500,11 @@
           left: auto;
           top: 460px;
       }
+      img {
+          max-height: 500px;
+          max-width: none;
+          object-fit: cover;
+      }
     }
     .page-heading, .post-heading {
       padding: 100px 0;
@@ -533,6 +538,16 @@
       }
       .img-desc {
         font-size: 14px;
+      }
+    }
+  }
+  @media only screen and (min-width: 992px) {
+    .intro-header.banner {
+      .carousel-inner {
+        img {
+          max-height: none;
+          max-width: 100%;
+        }
       }
     }
   }
