@@ -1,0 +1,385 @@
+---
+layout: post
+title: "Hellerstein et al (1995) Generalized Search Trees for Database Systems"
+date: 2019-12-02
+category: paper
+bibtex:
+   type: inproceedings
+   title: Generalized Search Trees for Database Systems
+   author: Joseph M. Hellerstein and Jeffrey F. Naughton and Avi Pfeffer
+   booktitle: Proceedings of the 21st VLDB Conference
+   year: 1995
+   address: Zurich, Switzerland
+   url: http://db.cs.berkeley.edu/papers/UW-CS-TR-1274.pdf
+---
+
+GiST is implemented in PostgreSQL and found to have exceptional performance.
+This is the paper behind it.
+
+A search tree in database (e.g., B+ tree) is a balanced tree with high fanout.
+The leaf nodes of the tree contain pointers to actual data, usually as a linked
+list to allow scanning.
+
+We model a query predicate as $$q$$. Pointers on a node are entries $$E=(p,
+ptr)$$ which $$p$$ is the key of the entry. If $$p$$ matches $$q$$, we traverse
+the subtree below $$ptr$$ until all the matching data is found. The only
+requirement here is that the key $$p$$ must logically match all data stored
+below $$ptr$$. This is a generalization. In B+ tree, $$q$$ is a range predicate
+$$c_1 \le i \le c_2$$ and in R tree, $$q$$ is a region predicate such as
+$$(x_1, x_2, y_1, y_2)$$ overlaps $$i$$. Note that in R tree, keys on a node
+(i.e., regions) may overlap and hence the key $$p$$ does not require all data
+in the tree that matches to be under $$ptr$$.
+
+The paper models a database search tree as *a hierarchy of partitions of a dataset*, which
+- requires a Boolean method to tell if $$q$$ is consistent with a given search key
+- requires a node splitting algorithm to group data into categories
+
+GiST (generalized search tree) is proposed as balanced tree of variable fanout
+- root node has 2 to $$M$$ fanout, other nodes has $$kM$$ to $$M$$ fanout, with $$2/M \le k \le 1/2$$
+- $$k$$ is the minimum fill factor of the tree
+- Each fanout is a tuple $$(p, ptr)$$
+  - $$p$$ predicate as a search key
+  - $$ptr$$ pointer to some tuple in the database if it is a leaf node, or pointer to another tree node otherwise
+
+Properties in a GiST (invariants)
+1. every node contains between $$kM$$ and $$M$$ index entries unless it is the root
+2. in leaf node, $$(p, ptr)$$, $$p$$ holds for the tuple $$ptr$$
+3. in non-leaf node, $$(p, ptr)$$, $$p$$ holds for any tuple reachable from $$ptr$$
+4. root has at least two children unless it is a leaf
+5. all leaves appear on the same level
+
+Here an entry $$(p', ptr')$$ in a child node and an entry in its parent $$(p,
+ptr)$$ does not require $$p'\to p$ to allow a different classification on each
+level of the tree. This is the requirement in R tree (containment hierarchy)
+but relaxed in GiST.
+
+Implementation of GiST: It needs six primitive methods
+
+1. consistent($$E,q$$) \\
+    given entry $$E=(p, ptr)$$ and query predicate $$q$$ returns false only if
+    $$p \wedge q$$ is unsatisfiable. If consistent($$E,q$$) returns true while
+    $$p \wedge q$$ is unsatisfiable, there will be penalty in performance but
+    not correctness
+2. union($$P$$) \\
+    given a set $$P$$ of entries $$(p_k, ptr_k)$$ returns some predicates $$r$$
+    that holds for all tuples stored below $$ptr_1$$ through $$ptr_n$$.
+    Implementation includes but not limited to $$r = (p_1 \vee p_2 \vee \cdots \vee p_n)$$
+3. compress($$E$$) \\
+    given entry $$E=(p, ptr)$$ return entry $$(\pi, ptr)$$ which $$\pi$$ is a
+    compressed representation of $$p$$
+4. decompress($$E$$) \\
+    given $$E=(\pi, ptr)$$ where $$\pi=$$compress($$p$$), returns an entry
+    $$(r,ptr)$$ such that $$p \to r$$. We do not require $$p \leftrightarrow
+    r$$ to allow lossy compression. Compress and decompress can be simply an
+    identity function, or to make compress a function to simplify $$p$$.
+5. penalty($$E_1, E_2$$) \\
+    Given $$E_1=(p_1, ptr_1)$$ and $$E_2=(p_2, ptr_2)$$, returns a penalty for
+    inserting $$E_2$$ into the subtree pointed by $$ptr_1$$. This is to aid split
+    and insert algorithm.  Typical penalty metric is the increase of size from
+    $$E_1$$ to Union of $$E_1$$ and $$E_2$$. In case of R tree on $$\mathbb{R}^2$$,
+    this can be the area increase from $$p_1$$ to the $$p_1 \cup p_2$$
+6. picksplit($$P$$) \\
+    given a set $$P$$ of $$M+1$$ entries $$(p_k, ptr_k)$$, split $$P$$ into two
+    sets $$P_1$$ and $$P_2$$ each of size at least $$kM$$, optionally optimize
+    for some badness metric
+
+If linear order exists for keys, we further requires $$p_1 < p_2$$ defined.
+Then operations on the tree are described by the following functions
+
+Search: Given a GiST rooted at $$R$$, search predicate $$q$$, find all tuples
+that satisfy $$q$$
+
+```
+function Search(R, q)
+    if not is_leaf(R)
+        foreach E in entries_of(R)
+            if consistent(E, q)
+                Search(E.ptr, q)
+            end
+        end
+    else
+        if consistent(E, q)
+            emit(E.ptr)
+        end
+    end
+end
+```
+
+FindMin: Given a GiST rooted at $$R$$, search predicate $$q$$, find the minimum
+tuple in linear order that satisfies $$q$$. This works only if there is a
+linear order for the index
+
+```
+function FindMin(R, q)
+    if not is_leaf(R)
+        foreach E in entries_of(R)
+            # scan from left to right
+            if consistent(E, q)
+                return FindMin(E.ptr, q)
+            end
+        end
+    else
+        foreach E in entries_of(R)
+            # scan from left to right
+            if consistent(E, q)
+                return E
+            end
+        end
+        # if cannot find any entries satisfied q
+        return NULL
+    end
+end
+```
+
+Next: Given a GiST rooted at $$R$$, search predicate $$q$$, and an entry $$E$$,
+find the next entry in linear order that satisfies $$q$$. This works only if
+there is a linear order for the index
+
+```
+function Next(R, q, E)
+    # find next node N
+    if E != rightmost(entries_of(R))
+        N = right_of(E)
+    else
+        P = next node to the right of R on the same level of the tree
+        # find next node P by tree traversal of sideway pointers
+        if P == NULL
+            # not exists
+            return NULL
+        end
+        N = leftmost(entries_of(P))
+    end
+    # check next node N
+    if consistent(N, q)
+        return N
+    else
+        return NULL
+    end
+end
+```
+
+Insert: Given a GiST rooted at $$R$$, an entry $$E$$, and level $$l$$, modify
+$$R$$ to have $$E$$ inserted at level $$l$$
+
+```
+function Insert(R, E, l)
+    L = ChooseSubtree(R, E, l)
+    if there is room for E on L
+        insert E to node L
+    else
+        Split(R, L, E)
+    AdjustKeys(R, L)
+end
+```
+
+ChooseSubtree: Helper function to Insert. Given a GiST rooted at $$R$$, entry
+$$E=(p, ptr)$$, and level $$l$$, return the node at level $$l$$ that is best
+suited to hold entry with predicate $$E.p$$
+
+```
+function ChooseSubtree(R, E, l)
+    if level_of(R) == l
+        return R
+    else
+        F = arg min Penalty(F, E) for F=(q, ptr) in entries_of(R)
+        return ChooseSubtree(F.ptr, E, l)
+    end
+end
+```
+
+Split: Helper function to Insert. Given a GiST rooted at $$R$$, a node $$N$$ on
+the GiST, and a new entry $$E=(p, ptr)$$, update the tree with $$N$$ split into
+two and $$E$$ inserted into one of the split
+
+```
+function Split(R, N, E)
+    # update N, create new node N'
+    N, N' = PickSplit(Union(N, {E}))
+    # create new entry to point to node N'
+    q = Union(N')
+    ptr = pointer to N'
+    E_N' = (q, ptr')
+    if there is room for E_N' on parent_of(N):
+        insert E_N' to node parent_of(N)
+    else:
+        Split(R, parent_of(N), E_N')
+    F = entry that points to N
+    F.p = Union(N)
+end
+```
+
+AdjustKeys: Helper function to Insert. Given a GiST rooted at $$R$$ and a node
+$$N$$ on GiST, update the GiST with ancestors of $$N$$ contains correct and
+specific keys
+
+```
+function AdjustKeys(R, N)
+    if is_root(N)
+        return
+    end
+    E = entry that points to N
+    if E == Union(N)
+        # E is an already-accurate representation of Union of entries on N
+        return
+    else:
+        E.p = Union(N)
+        AdjustKeys(R, parent_of(N))
+    end
+end
+```
+
+Delete: Given a GiST $$R$$ and a leaf entry $$E=(p, ptr)$$ update $$R$$ to be a
+balanced GiST have $$E$$ removed
+
+```
+function Delete(R, E)
+    L = Search(R, E.p)  # find leaf node L contiains E
+    if L == NULL
+        # no-op: node L contains E not found
+        return R
+    end
+    Remove entry E from node L
+    CondenseTree(R, L)
+    if length(entries_of(R)) == 1:
+        R = child_of(R)
+    end
+    return R
+end
+```
+
+CondenseTree: Given a GiST $$R$$ containing leaf node $$L$$, modify the tree to
+maintain invariant properties. In particular, maintain node $$L$$ to have at
+least $$kM$$ entries.
+
+```
+function CondenseTree(R, L)
+    N = L
+    Q = {}  # set of eliminated nodes
+    while not is_root(N)
+        P = parent_of(N)
+        E_N = entry on P that points to N
+        if count(entries_of(N)) < kM
+            if tree is not ordered
+                Q.add(elements of N)
+                delete E_N from P
+                AdjustKeys(R, P)
+            else
+                N' = neighbor node of N in order
+                if count(entries_of(N')) + count(entries_of(N)) >= 2kM
+                    evenly split entries on N and N' between two nodes
+                else
+                    place entries from N into N'
+                    delete E_N from P
+                    AdjustKeys(R, N')
+                    AdjustKeys(R, P)
+                end
+            end
+        end
+        if E_N was not deleted from P
+            AdjustKeys(R, N)
+            break
+        else:
+            N = P
+        end
+    end if
+    if not is_empty(Q)
+        foreach E in entries_of(Q)
+            Insert(R, E, level_of(E))
+        end
+    end
+end
+```
+
+With this skeleton, we can implement various tree data structure. For example,
+B+ tree is a GiST over $$\mathbb{Z}$$, and a key is a range $$[x,y)$$ in
+$$\mathbb{Z}$$. B+ tree supports the following query predicates:
+
+1. Contains($$[x,y), v$$)\\
+    Return true iff $$x\le v < y$$
+2. Equal($$x, v$$) \\
+    Return true iff $$x=v$$
+
+And it implements the following:
+
+1. consistent($$E,q$$) \\
+    $$E=(p, ptr)$$ with $$p=[x_p, y_p)$$. If $$q=[x_q, y_q)$$ (contains query),
+    this returns true if $$(x_p < y_q) \wedge (x_q < y_p)$$.  If $$q=x_q$$
+    (equal query), this returns true if $$x_p \le x_q < y_p$$.
+2. union($$P$$) \\
+    for $$P$$ of entries $$([x_k,y_k), ptr_k)$$ returns $$[x,y)$$ which
+    $$x=\min(x_1,\cdots,x_n)$$ and $$y=\max(y_1,\cdots,y_n)$$
+3. compress($$E$$) \\
+    given $$E=([x,y), ptr)$$, if $$E$$ is the leftmost key on a non-leaf node,
+    return NULL; otherwise return $$x$$
+4. decompress($$E$$) \\
+    if $$E=(\pi,ptr)$$ is the leftmost key on a non-leaf node, set
+    $$x=-\infty$$ otherwise $$x=\pi$$. If $$E$$ is the rightmost key on a
+    non-leaf node, let $$y=\infty$$ otherwise $$y$$ to be the value returned by
+    Next($$E$$). If $$E$$ is a leaf node, set $$y=x+1$$. Return $$[x,y)$$
+5. penalty($$E_1, E_2$$) \\
+    If $$E_1$$ is the leftmost pointer on its node, return $$\max(y_2-y_1, 0)$$.
+    If $$E_1$$ is the rightmost pointer on its node, return $$\max(x_1-x_2,0)$$.
+    Otherwise return $$\max(y_2-y_1, 0) + \max(x_1-x_2, 0)$$
+6. picksplit($$P$$) \\
+    Left the first $$\lfloor \vert P\vert / 2\rfloor$$ entries in order go to
+    left group and the rest go in the right group. This guarantee a minimum
+    fill facto of $$M/2$$.
+
+Another example, R tree over $$\mathbb{R}^2$$. A key is
+$$(x_{ul}, y_{ul}, x_{lr}, y_{lr})$$ for a bounding rectangle. R tree supports
+the following query predicates:
+
+1. Contains($$(x_{ul}, y_{ul}, x_{lr}, y_{lr}), (x'_{ul}, y'_{ul}, x'_{lr}, y'_{lr})$$) \\
+   Return true iff $$(x_{lr} \ge x'_{lr}) \wedge (x_{ul} \le x'_{ul}) \wedge (y_{lr} \le y'_{lr}) \wedge (y_{ul} \ge y'_{ul})$$
+2. Overlap($$(x_{ul}, y_{ul}, x_{lr}, y_{lr}), (x'_{ul}, y'_{ul}, x'_{lr}, y'_{lr})$$) \\
+   Return true iff $$(x_{ul} \le x'_{lr}) \wedge (x'_{ul} \le x_{lr}) \wedge (y_{lr} \le y'_{ul}) \wedge (y'_{lr} \ge y_{ul})$$
+3. Equal($$(x_{ul}, y_{ul}, x_{lr}, y_{lr}), (x'_{ul}, y'_{ul}, x'_{lr}, y'_{lr})$$) \\
+   Return true iff $$(x_{lr} = x'_{lr}) \wedge (x_{ul} = x'_{ul}) \wedge (y_{lr} = y'_{lr}) \wedge (y_{ul} = y'_{ul})$$
+
+and the implementation in GiST as follows (with key expressed bounding box,
+i.e., contains query):
+
+1. consistent($$E,q$$) \\
+    $$E=(p, ptr)$$ with $$q$$ a contains, overlap, or equal query, return true
+    if Overlap($$p$$, $$q$$) is true
+2. union($$P$$) \\
+    for set $$P$$ of $$n$$ entries, return a new bounding box
+    $$(x_{ul}, y_{ul}, x_{lr}, y_{lr})$$, which $$x_{ul}=\min(x_{ul}^{(1)},\cdots,x_{ul}^{(n)})$$,
+    $$y_{ul}=\max(y_{ul}^{(1)},\cdots,y_{ul}^{(n)})$$, $$x_{lr}=\max(x_{lr}^{(1)},\cdots,x_{lr}^{(n)})$$,
+    $$y_{lr}=\min(y_{lr}^{(1)},\cdots,y_{lr}^{(n)})$$
+3. compress($$E$$) \\
+    given $$E=(p, ptr)$$ with $$p$$ as a polygon in the form of line segments, 
+    return $$\pi = (x_{ul}, y_{ul}, x_{lr}, y_{lr})$$, which $$x_{ul}=\forall_i\min x_{ul}^{(i)}$$,
+    $$y_{ul}=\forall_i\max y_{ul}^{(i)}$$, $$x_{lr}=\forall_i\max x_{lr}^{(i)}$$,
+    $$y_{lr}=\forall_i\min y_{lr}^{(i)}$$
+4. decompress($$E$$) \\
+    identity function
+5. penalty($$E_1, E_2$$) \\
+    compute $$q=$$Union($$\{E_1,E_2\}$$) then return $$\textrm{area}(q) - \textrm{area}(E_1.p)$$
+6. picksplit($$P$$) \\
+    See Guttman (1984) paper "R-trees: A dynamic index structure for spatial searching" for R-tree splitting algorithm
+
+Yet another example, RD-tree over $$\mathcal{P}(\mathbb{Z})$$. A key is a set and the following query predicates are supported:
+
+1. Contains($$S,T$$) \\
+    Return true iff $$S\supseteq T$$
+2. Overlap($$S,T$$) \\
+    Return true iff $$S\cap T\neq\varnothing$$
+3. Equal($$S,T$$) \\
+    Return true iff $$S=T$$
+
+The implementation in GiST is as follows: Predicate in an entry is $$p=\textrm{Contains}(S,v)$$
+
+1. consistent($$E,q$$) \\
+    $$E=(p, ptr)$$ and $$q=\textrm{Contains}(T,v)$$ (or overlap or equal), returns true
+    if Overlap($$S,T$$) is true
+2. union($$P$$) \\
+    for set $$P$$ of $$n$$ return $$E_1.p\cup\cdots\cup E_n.p$$
+3. compress($$E$$) \\
+    Return a range set equivalent. That is, find the disjoint ranges from the set
+4. decompress($$E$$) \\
+    Connvert the range set back to sets by enumerating the elements in the range
+5. penalty($$E_1, E_2$$) \\
+    Return $$\lvert E_1.p \cup E_2.p\rvert - \lvert E_1.p\rvert$$
+6. picksplit($$P$$) \\
+    See Guttman (1984) paper for the quadratic algorithm for R-tree split
