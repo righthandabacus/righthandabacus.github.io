@@ -1,0 +1,42 @@
+---
+layout: post
+title: keras port to tensorflow 2
+date: Thu, 04 Jun 2020 23:24:22 -0400
+tags: code
+---
+
+I am working on some keras code but seems it is better to use
+`tensorflow.keras` for some reasons. So my problem is how to port `keras.*`
+into `tensorflow.keras.*` quick and easy, assuming Tensorflow 2 of course.
+
+Surely, this is never error-free replacement. For example,
+`keras.optimizers.adam()` will become `tensorflow.keras.optimizers.Adam()` with
+uppercase "A", and `keras.initializers.normal()` is renamed to
+`tensorflow.keras.initializers.RandomNormal()`. But put these aside, how can I
+do a quick port with minimal code change?
+
+One easy way to do is to scan all Python code, and look for
+
+    import keras
+
+then replace all these into
+
+    from tensorflow import keras
+
+and this is done. However, this will need to scan through all code. This is a
+quick trick, works only if you execute this *before* any such keras code is
+imported:
+
+```python
+import sys
+import tensorflow
+for _name in [x for x in sys.modules.keys() if x.startswith("tensorflow.keras")]:
+	sys.modules[_name[len("tensorflow."):]] = sys.modules[_name]
+```
+
+This is to hack the python import system to manipulate its memory of modules
+`keras` and `keras.*`. After this is done, `keras.utils` will be identical to
+`tensorflow.keras.utils` as Python would remember it. If you happen to have a
+line of code `import keras.utils` executed afterwards, via another module for
+example, it will just expose it to the namespace without actually loading the
+module, as the system would believe it has already been loaded.
