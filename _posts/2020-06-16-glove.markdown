@@ -1,0 +1,67 @@
+---
+layout: post
+title: TF2 GloVe embedding layer
+date: Tue, 16 Jun 2020 11:02:49 -0400
+tags: code
+---
+
+This is how to create an word2vec embedding layer in Tensorflow 2.x, using the
+GloVe vectors. Assume we downloaded the [GloVe data from the
+web](https://nlp.stanford.edu/projects/glove/), for example `glove.6B.zip` of
+6B tokens, 400K vocab from Wikipedia data, then we can build a matrix of floats
+and a word mapping dictionary from it. The mapping is for transforming words
+into integer indices and the matrix translates the indices into vectors of
+floats. Here is the code:
+
+```python
+import zipfile
+import numpy as np
+import tensorflow as tf
+
+def make_glove(glovezip = 'glove.6B.zip', vectorfile='glove.6B.100d.txt'):
+    lookup = []
+    vectors = []
+    with zipfile.ZipFile(glovezip) as zfp, zfp.open(vectorfile) as fp:
+        for line in fp:
+            values = line.decode('utf8').split()
+            lookup.append(values[0])
+            vectors.append(np.asarray(values[1:], dtype='float32'))
+    return {w:i for i,w in enumerate(lookup)}, np.vstack(vectors)
+
+lookup, vectors = make_glove()
+vocabsize = len(lookup)       # how many words supported by this GloVe
+vectorlen = vectors.shape[1]  # size of each vector
+inputlen = 300                # arbitrary -- num of words per input sentence
+model = tf.keras.models.Sequential([
+    # This is the GloVe embedding layer, must be the first layer
+    tf.keras.layers.Embedding(vocabsize, vectorlen, input_length=inputlen, weights=[vectors], trainable=False),
+    # other layers below
+    tf.keras.layers.Conv1D(128, 5, activation='relu'),
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(100, activation='relu'),
+    tf.keras.layers.Dense(1, activation='sigmoid')
+])
+```
+
+The important thing about the GloVe embedding layer is the layer weights are
+provided as a numpy array and the layer is set as *not* trainable. Moreover,
+when we use the model, we have to transform the input text word-by-word into
+integers (with any out-of-vocabulary word replaced by a placeholder `<unk>`):
+
+```python
+def transform(text, lookup):
+    default = lookup['<unk>']
+    return [lookup.get(w.lower(), default) for w in nltk.tokenize.word_tokenize(text)]
+```
+
+The above TF2 model is not exactly on a bag-of-words model because the
+convolution layer is retaining collocation information. For a BoW model, we can
+add a global pooling:
+
+```python
+tf.keras.layer.GlobalAveragePooling1D()
+```
+
+right after the embedding layer. It will transform a 2D ouput from the
+embedding layer into 1D output by averaging (`GlobalAveragePooling1D`) or
+taking max values (`GlobalMaxPool1D`) across each vector offset.
