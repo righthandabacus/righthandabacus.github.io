@@ -1,0 +1,83 @@
+---
+layout: post
+title: "Akra & Bazzi (1998) On the solution of linear recurrence equations"
+date: Mon, 07 Sep 2020 01:12:07 -0400
+category: paper math
+bibtex:
+   type: article
+   title: "On the solution of linear recurrence equations"
+   author: Mohamad Akra and Louay Bazzi
+   journal: Computational Optimization and Applications
+   volume: 10
+   number: 2
+   pages: 195--210
+   month: May
+   year: 1998
+---
+
+This is a paper that extends the Master Theorem [^1] for more general use. To
+recap, the Master Theorem is about the complexity of a recurrence algorithm. It
+assumed the recurrence relation has the form
+
+$$
+T(n) = a T(n/b) + f(n)
+$$
+
+for $$T(n)$$ the complexity with input size $$n$$, which under
+divide-and-conquer will be broken down into $$a$$ pieces of subproblems of size
+$$n/b$$, and the cost of split-combine is $$f(n)$$. It requires $$a$$ and $$b$$
+are constants and $$T(1)=O(1)$$. This notation assumes parameter to $$T(n)$$
+are rounded to integer as well.
+
+The solution of such recurrence depends on whether the cost of split $$f(n)$$
+or the cost of subproblems $$aT(n/b)$$ are more expensive. If we define
+$$c_{\phi}=\log_b a$$, and
+
+- If $$f(n)=O(n^c)$$ with $$c<c_{\phi}$$, then $$T(n)=\Theta(n^{c_{\phi}})$$.
+  This is the case when the subproblem dominates the cost of split and the
+  complexity is only due to solving the subproblems.
+- If $$f(n)=\Theta(n^{c_\phi}\log^k n)$$ for $$k\ge 0$$, then
+  $$T(n)=\Theta(n^{c_\phi}\log^{k+1} n)$$. This is when the subproblems and the
+  cost of split are comparable.
+- If $$f(n)=\Theta(n^{c_\phi}\log^k n)$$ for $$k=-1$$, then $$T(n)=\Theta(n^{c_\phi}\log\log n)$$
+- If $$f(n)=\Theta(n^{c_\phi}\log^k n)$$ for $$k<-1$$, then
+  $$T(n)=\Theta(n^{c_\phi})$$. Indeed, this means $$f(n)=O(n^c)$$ with
+  $$c<c_\phi$$
+- If $$f(n)=\Omega(n^c)$$ with $$c>c_\phi$$, the cost of split dominates the
+  subproblems. Only in addition the regularity condition applies, i.e.,
+  $$af(n/b) \le kf(n)$$ for constant $$k<1$$ and when $$n$$ is fairly large,
+  then $$T(n)=\Theta(f(n))$$. The regularity condition means the cost of split
+  at the root problem dominates all cost of split at subproblems.
+
+The Master Theorem cannot apply if $$a$$ or $$b$$ is not constant, or $$a<1$$,
+or the cost of split $$f(n)$$ is negative. This is where the Akra & Bazzi paper
+emerges:
+
+The paper assumes a generalized recurrence relation of the form
+
+$$
+T(n) = g(n) + \sum_{i=1}^k a_i T(n/b_i + h_i(n))
+$$
+
+which $$a_i>0, b_i>1$$ are constants with $$g(n)$$ a positive non-decreasing
+function of the cost of split, and $$\mid h_i(n)\mid =O(x/log^2 x)$$ a small
+perturbation, for example to account for the rounding of $$n/b_i$$ to integers.
+
+The paper starts with the above relation with $$T(n)$$ substituted with $$u_n$$
+with $$u_0$$ a defined constant. Then it proves the continuous function
+$$T(x)$$ equals to $$u_{\lfloor x\rfloor}$$. Afterwards, the paper set up an
+*order transform* for any function $$f(x)$$ as
+
+$$
+F(s,p) = \int_1^s f(u) u^{-p-1} du
+$$
+
+and build up a relationship between $$f(x)$$ and $$f(x/a)$$ so that the latter
+can be expressed in terms of former. In this way, the theorem is established:
+
+$$T(n)=\Theta(n^p)+\Theta\left(n^p\int_1^n\frac{g(u)}{u^{p+1}}du\right))$$
+
+for $$p$$ the constant such that $$\sum_{i=1}^k a_ib_i^{-p}=1$$,
+
+[^1]: Jon L. Bentley, Dorothea Haken, and James B. Saxe. A general method for solving divide-and-conquer recurrences. SIGACT News, 12(3):6-44, 1980.
+
