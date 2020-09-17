@@ -1,0 +1,131 @@
+---
+layout: post
+title: Useful Google Colab snippets
+date: Thu, 17 Sep 2020 16:59:57 -0400
+tags: code
+---
+
+Google Colab is a Jupyter notebook serving on a Ubuntu machine with some
+customization. Following are some useful snippets:
+
+## Connect to Google drive
+
+Google provided the interface to do this in Colab:
+
+```python
+from google.colab import drive
+drive.mount('/content/drive')
+!ls /content/drive/My\ Drive/
+```
+
+The mount point cannot be changed, and it is named as "My Drive" after mount.
+But we can access to all files and directories under it afterwards.
+
+If outside of Colab, we need to use tools such as
+[PyDrive](https://gsuitedevs.github.io/PyDrive/docs/build/html/index.html) to
+do authentication and talk to Google Drive via API. See
+[examples](https://colab.research.google.com/notebooks/io.ipynb).
+
+## Upload and download
+
+```python
+from google.colab import files
+
+uploaded = files.upload()
+```
+
+This will provide a `dict` of uploaded filename maps to the file size in bytes.
+User may upload multiple files at once.
+
+The same interface can also provide a download features:
+
+```python
+from google.colab import files
+files.download(filepath)
+```
+
+Upon execution, a file will be downloaded at user's browser.
+
+## User input
+
+Some `#@magic` are introduced in Colab that will create a form:
+
+```python
+#@title Plot Charts
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import numpy as np
+
+title = 'My title' #@param {type: "string"}
+shape = 'linear' #@param ["linear", "quadratic", "exponential"]
+x = np.linspace(-5, 5, 100)
+if shape == 'linear':
+    plt.plot(x, x, 'r')
+elif shape == 'quadratic':
+    plt.plot(x, x**2, 'r')
+elif shape == 'exponential':
+    plt.plot(x, np.exp(x), 'r')
+plt.title(title)
+plt.show()
+```
+
+This will give the following:
+
+![](/img/colab-form.png)
+
+This is not an interactive form that will change the output immediately.
+Instead, any change in the form will update the code accordingly so that we can
+run it and generate a new output. It is merely a convenience over minor code change
+
+## Fonts for matplotlib
+
+This is something bothers some of my application. The default Ubuntu system
+does not have many fonts installed. Especially no CJK glyph is supported by
+any. To plot something using matplotlib but with CJK glyph on labels, we need
+to install the font package and make them available in matplotlib. This is the code:
+
+```python
+# Install font packages, alternative fonts: fonts-arphic-uming fonts-moe-standard-song
+! apt-get install -y fonts-noto-cjk
+
+# Optional: check to make sure the fonts are available after install
+! fc-list :lang=zh
+
+# Find fonts from system path and add to matplotlib
+import matplotlib.font_manager as fm
+for fontpath in fm.findSystemFonts()   # optionally provide arg: fontpaths=['/path/to/fonts']
+    fm.fontManager.addfont(fontpath)
+```
+
+After this we can use the font family. The list of all font families available
+under matplotlib can be checked using:
+
+```python
+print("\n".join(sorted(set([f.name for f in fm.fontManager.ttflist]))))
+```
+
+and the way to use a different font family as default:
+
+```python
+plt.rcParams['font.family']='Noto Sans CJK JP'
+plt.plot(x, y, 'r')
+plt.ylabel('y軸')
+plt.xlabel('x軸')
+plt.show()
+```
+
+An alternative way is to load the TTF directly without adding the font to the
+matplotlib font manager, using the `fontproperties` parameter in function calls:
+
+```python
+import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm
+
+path = '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc'
+fontprop = fm.FontProperties(fname=path, size= 15)
+
+plt.title('標題', fontproperties=fontprop)
+plt.ylabel('y軸', fontproperties=fontprop)
+plt.xlabel('x軸', fontproperties=fontprop)
+plt.show()
+```
