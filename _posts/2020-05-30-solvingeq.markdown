@@ -38,7 +38,8 @@ solution, i.e., a unique solution is found for this:
 But for many cases of similar type, we can also approach the problem with an
 iterative solution. If we think about it, the gradient descent is indeed an
 iterative solution technique. So if we try to solve the same problem with
-TensorFlow 2, with initial solution of all zero, we can do this:
+TensorFlow 2, with initial solution of all zero, and use squared error as the
+loss function, we can do this:
 
 ```python
 import tensorflow as tf
@@ -91,7 +92,7 @@ plt.show()
 ```
 
 The solution is close enough at merely 15 epochs, and the following is the
-chart of convergence, note the solution is $(A,B,C,D) = (3.5, 4.5, 9.5, 3.5)$
+chart of convergence, note the solution is $$(A,B,C,D) = (3.5, 4.5, 9.5, 3.5)$$
 
 ![](/img/solvingeq-tf2.png)
 
@@ -160,4 +161,4 @@ plt.show()
 The following shows the rate of convergence. I would say there is no obvious
 difference from that of TensorFlow.
 
-![](img/solvingeq-torch.png)
+![](/img/solvingeq-torch.png)
