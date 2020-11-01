@@ -7,7 +7,7 @@ tags: math
 
 Martingale is a stochastic process with the martingale property. If we have
 $$X_t$$ as the stochastic process, the martingale property says that
-$$\mathbf{E}[X_t\mid\mathcal{F}_s] = X_s$$, for $$s<t$$. Closely
+$$\mathbf{E}[X_t\mid\mathcal{F}_s] = X_s$$, for $$s\lt t$$. Closely
 related to this is the local martingale. However, the [Wikipedia
 page](https://en.wikipedia.org/wiki/Local_martingale) does not have it clearly
 explained. Here is my narrative.

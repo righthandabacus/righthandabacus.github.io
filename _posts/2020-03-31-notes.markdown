@@ -1,0 +1,69 @@
+---
+layout: post
+title: Note taking
+date: 2020-03-31
+tags: work
+---
+
+There is a post on [HackerNews](https://news.ycombinator.com/item?id=22473209)
+asking for note-taking skills. Below are some good points made:
+
+- 80% of value of notes is to write them. The act of writing them keeps you from distracting. It doesn't matter if you never read it again
+  - A [research](https://pdfs.semanticscholar.org/488e/c93cf68806bd8ac63fc7d00b1aba6207abd5.pdf) [^1] suggest typing it out might be more effective
+  - an issue of discipline vs distraction
+  - writing by hand force you to have more structure and summaries
+- Two step process: Write during class and make Anki deck from nots the next day for the material committed to memory
+- Cornell notes system? http://coe.jmu.edu/learningtoolbox/cornellnotes.html
+  - questions, notes, summary
+- No note in class system: (shorten the study time)
+  1. Pre-read, attempt a few problems, and make preliminary notes
+  2. Prepare list of questions for the class
+  3. Annotate questions during class
+  4. After class, revise preliminary notes into proper notes
+- "How to take smart notes" by Sönke Ahrens  -- highly recommended
+- Cambridge Jotter A5 Card Cover Wirebound Notebook Ruled 200 Pages / Date each page / Write everything / Multicolor pen
+- Feynman technique: Write the subject, skip a few lines, go through the steps to understand the subject, then summary on how I understand it
+- Rewrite notes as a revision cycle and help stay engaged
+- Shorthand notes in text file
+  - first line = subject and meeting date
+  - second line = attendees, etc
+  - every other line prefixed by symbols: * = someone to do something, X = I am to do something, - = things to remember, ? = questions to answer
+- Use colored pens, and color code the notes
+  - e.g., red = problems/WTF, green = questions, blue = fact/reference, black = thoughts/misc
+  - disadvantage: switching pens slows down writing
+- Note taking system for Emacs
+  - org-mode
+  - https://www.eliasstorms.net/zetteldeft/
+- Sketchbook and a box of uni-ball ONYX rollerball pens
+- For college level class
+  - before lecture: read the topic and highlight key points, transcribe highlight into handwritten notes (leave room for comments and more notes)
+  - bring notes to class
+  - before exam: transcribe handwritten notes into index cards, and quiz on them
+- Books:
+  - "How to be a straight A student" by Cal Newport -- tips in note taking and how to process the notes
+  - The Sketchnote Handbook by Mike Rohde
+- Bullet journals: https://bulletjournal.com/pages/learn
+- Quadrant method (Bill Gates): Notes, Questions, To-dos (actions taken by other), Assignments (for me)
+- Smart notes https://fortelabs.co/blog/how-to-take-smart-notes/ (Niklas Luhmann)
+  - ideas: write on index cards
+  - only one side of each card is used to avoid the need to flip over
+  - limit to one idea per card, but each card has a sequential number (1,2,3...)
+  - supplementary idea goes with suffix (1a, 1b, 1c,...)
+  - Save contradictory ideas
+  - Organize notes by context (like a writer) not topic (like a librarian)
+  - Note-taking system implemented by [Twinkle app](https://twinkle.app/intro.html)
+- vimwiki
+- Scratchpad note to ease the cognitive load for quick brainstorming without caring which folder/category/project to place it
+- Two pass process
+  1. Dump everything into notes
+  2. Capture each note as a short chunk of information, then reorganize by adding tags to categorize and reorder
+- Tree-based note-taking app: https://learnobit.com
+- mindmaps
+- PARA https://fortelabs.co/blog/para/
+  - Projects, Areas, Resources, Archives
+  - Project = series of tasks linked to a goal
+  - Areas of responsibility = activities to maintain, e.g., health, finance, travel, friends, direct reports, product development
+  - Resource = topic of ongoing interest, e.g., habit formation, project management, coffee, SEO
+  - Archive = inactive items from the three above, e.g., projects completed, area no longer committed to maintain, resources no longer interested in
+
+[^1]: Bui, D. C., Myerson, J., & Hale, S. (2012, October 8). Note-Taking With Computers: Exploring Alternative Strategies for Improved Recall. *Journal of Educational Psychology*. Advance online publication. doi: 10.1037/a0030367
