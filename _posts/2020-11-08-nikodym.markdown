@@ -1,0 +1,87 @@
+---
+layout: post
+title: A rough description of Radon-Nikodym derivative
+date: Sun, 08 Nov 2020 16:32:05 -0500
+tags: math
+---
+
+Radon-Nikodym theorem suggests, in simplified terms, that if we have two
+measures $$\mu,\lambda$$ of the same space with $$\mu$$ absolutely continuous
+with respect to $$\lambda$$ and  a function $$\phi$$ is $$\mu$$-integrable,
+then
+$$ \int_A \phi d\mu = \int_A \phi \frac{d\mu}{d\lambda} d\lambda $$
+which the term $$d\mu/d\lambda$$ is called the Radon-Nikodym derivative.
+
+The Radon-Nikodym derivative is commonly used as a tool for change-of-measure
+in probability. Girsanov theorem tells you how to find one in case of Brownian
+motion. However, we have something closely related in probability distribution
+called the variable transformation formula: If we have a function $$Y=\phi(X)$$
+and $$X$$ is a random variable with distribution function $$F_X(x)$$, then
+
+$$ f_Y(y)=f_X(\phi^{-1}(y))\left\lvert\frac{1}{\phi'(\phi^{-1}(y))}\right\rvert $$
+
+or
+
+$$ f_X(x)=f_Y(\phi(x))\lvert\phi'(x)\rvert. $$
+
+This can be derived from using the CDF of $$Y$$, assuming $$\phi(x)$$ is an
+increasing function:
+
+$$
+\begin{align}
+F_Y(y) &= \Pr[Y<y] = \Pr[\phi(X)<y] \\
+&= \Pr[X<\phi^{-1}(y)] \\
+&= F_X(\phi^{-1}(y)) \\
+f_Y(y) = \frac{d}{dy}F_Y(y) &= \frac{d}{dy}F_X(\phi^{-1}(y)) \\
+&= f_X(\phi^{-1}(y))\frac{d}{dy}\phi^{-1}(y) \\
+&= f_X(\phi^{-1}(y))\frac{1}{\phi'(g^{-1}(y))}. \\
+\end{align}
+$$
+
+which the above applied the inverse function theorem
+
+$$\frac{d}{dy}h^{-1}(y) = \frac{1}{\frac{d}{dx}h(x)} = \frac{1}{h'(h^{-1}(y))}.$$
+
+In case of $$\phi(x)$$ a descreasing function, we have
+$$\Pr[\phi(X)<y]=\Pr[X>\phi^{-1}(y)]=1-F_X(\phi^{-1}(y))$$ but the derivative
+$$\phi'(x)$$ is negative. Therefore the absolute value in the formula above.
+
+The variable transformation formula is useful to derive new distribution
+function. For example if $$X\sim N(\mu, \sigma^2)$$, we have
+$$f_X(x) = \frac{1}{\sqrt{2\pi\sigma^2}}\exp(-\frac{(x-\mu)^2}{2\sigma^2}),$$
+and with $$Y=\phi(X)=e^X$$, we get the distribution for log-normal as
+
+$$
+\begin{align}
+f_Y(y) &= f_X(x)\frac{1}{\phi'(x)} \\
+&= \frac{1}{\sqrt{2\pi\sigma^2}}\exp(-\frac{(x-\mu)^2}{2\sigma^2}) \frac{1}{e^x} \\
+&= \frac{1}{y\sqrt{2\pi\sigma^2}}\exp(-\frac{(\ln y-\mu)^2}{2\sigma^2}).
+\end{align}
+$$
+
+Radon-Nikodym derivative, however, is useful in reverse. Assume that we have
+two random variables, both in the domain of $$[0,1]$$, and with the distribution
+functions
+
+$$
+\begin{align}
+F_X(x) &= x\mathbb{I}_{0\le x\le 1} \\
+F_Y(y) &= \sqrt{y}\mathbb{I}_{0\le y\le 1}
+\end{align}
+$$
+
+then we can find the function $$Y=\phi(X)$$ according to the Radon-Nikodym
+theorem and the variable transformation formula:
+
+$$
+\begin{align}
+\frac{dF_Y}{dF_X} &= \left\lvert\frac{1}{\phi'(x)}\right\rvert \\
+\frac{1/(2\sqrt{y})}{1} &= \frac{1}{\lvert y'\rvert} \\
+y' &= 2\sqrt y \\
+y^{-1/2} dy &= 2dx
+\end{align}
+$$
+
+and the solution to the above separable differential equation is $$y=(x+c)^2$$.
+Plug in the boundary condition of $$X,Y\in[0,1]$$, we get $$c=0,-1$$. Hence 
+$$Y=X^2$$ or $$Y=(X-1)^2$$ will both have the same distribution function as above.
