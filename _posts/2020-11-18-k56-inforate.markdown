@@ -1,0 +1,72 @@
+---
+layout: post
+title: "Kelly (1956) A new interpretation of information rate"
+date: Wed, 18 Nov 2020 16:22:21 -0500
+category: paper
+bibtex:
+   type: article
+   author: "J. L. Kelly"
+   title: "A new interpretation of information rate"
+   journal: "Bell System Technical Journal"
+   volume: 35
+   number: 4
+   pages: "917--926"
+   year: 1956
+---
+
+Shannon defined the information rate as the number of bits transmitted per
+second, which bit is a unit for entropy, i.e., probability is involved. We can
+relate the information rate with $$R=rH$$, where $$r$$ is the rate that message
+is delivered and $$H$$ is the entropy of each message. So $$R$$ is the
+information rate. The paper by Kelly in 1956 is trying to find a physical
+example to the information rate and the gambler's ruin is the topic of the
+paper.
+
+In its simplest form, the paper consider the case of gamble which wins at a
+probability of $$q$$ and losts at $$p$$. Surely gambler's ruin will happen for
+$$p>0.5$$ and the expected value of the fortune will grow exponentially on
+every bet otherwise. If we consider we bet only $$\ell$$ fraction of the total
+fortune each time, and introduce a logarithmic *utility function* to the
+fortune, then the expected utility after each bet will become
+
+$$
+G = q\log(1+\ell) + p\log(1-\ell)
+$$
+
+which, we can find the optimal $$\ell$$ to maximize $$G$$ to be $$1+\ell=2q$$, or
+
+$$
+G_\max = 1 + p\log p + q\log q
+$$
+
+This is the information rate of a binary channel of probability $$p$$ as well.
+
+The paper later extended this binary channel example to $$n$$-ary channel.
+This solution to maximize the expected utility function is called the Kelly's
+criterion. To paraphrase, if the bet will win the odd of $$b$$ then the
+expected utility will be
+
+$$
+G = q\log(1+\ell b) + (1-q)\log(1-\ell)
+$$
+
+and we can find its maximum with
+
+$$
+\begin{align}
+\frac{dG}{d\ell} &= \frac{qb}{1+\ell b} - \frac{1-q}{1-\ell} = 0 \\
+\therefore \ell &= \frac{qb+q-1}{b}
+\end{align}
+$$
+
+If we choose a different utility function, the result will be different. For
+example, a linear utility $$f(x)=x$$ makes $$G$$ the expected return and the maximizer
+will be $$\ell=1$$ or $$\ell=0$$ depends on whether $$qb > 1-q$$.
+Alternatively, if we pick quadratic function $$f(x)=x^2$$ as the utility, we
+will have the maximizer to be $$\ell = \frac{1+q-qb}{1-b+qb^2}$$.
+
+In the case of risk management (such as in stock market investment), quite
+often we compute the return of a stock using $$\log(S_t/S_{t-1})$$, instead
+of the more intuitive $$(S_t-S_{t-1})/S_{t-1}$$. The above reveals why: We are
+applying a logarithmic utility function to the amount of money which exhibits
+the law of diminishing return and penalize loss more than the reward in profit.
