@@ -1,0 +1,305 @@
+---
+layout: post
+title: PXE boot Debian
+date: Tue, 24 Nov 2020 14:55:14 -0500
+tags: system
+---
+
+Diskless system is an old idea (remember Sun Ray 1?) but surprisingly coming
+back (Raspberry Pi cluster!). I have a system with PXE boot but no disk so it
+is perfect to try out a diskless system.
+
+# PXE background knowledge
+
+PXE stands for pre-execution environment. It is a stack on the network card,
+which upon start up will request for DHCP and from the DHCP reply, it will look
+for a *network boot program* (NBP) from a TFTP source to run the second stage
+boot. This is possible because
+[DHCP](https://en.wikipedia.org/wiki/Dynamic_Host_Configuration_Protocol) can
+carry options for data other than the standard IP addresses. For exampple, the
+option code 54 is the TFTP server to load, and code 67 is the boot file name.
+Domain name (code 15) and DNS server addresses (code 6) are also common options
+delivered by DHCP.
+
+https://networkboot.org/ has a tutorial on network booting. 
+
+# Server support
+
+Booting PXE needs a DHCP server running in the local network. Both DNSmasq or
+DHCP3 server can suppport delivering the options required by PXE. If using
+`dhcp3-server` in Debian, this is the example config (note the `next-server` and
+`filename` options):
+
+```
+default-lease-time 600;
+max-lease-time 7200;
+option domain-name "xephon";
+option domain-name-servers 192.168.1.1, 192.0.0.1, 194.2.0.50;
+option routers 192.168.1.1;
+subnet 192.168.1.0 netmask 255.255.255.0 {
+  range 192.168.1.50 192.168.1.99;
+  next-server 192.168.1.1;
+  filename "/tftpboot/pxelinux.0";
+}
+```
+
+PXE has a TFTP client to download a boot loader for second stage boot. For
+Linux, there is a `pxelinux.0` boot loader that has an interface very much like
+LILO. Subsequently, the kernel and initrd should also be shipped via TFTP before
+other files to be loaded elsewhere.
+
+If not `pxelinux.0` (which comes from syslinux project),
+[iPXE](https://ipxe.org) is an alternative, which supports to load files from
+internet.
+
+TFTP server for PXE is recommended to use tftpd-hpa. See
+[here](/2020-11-22-linksys) for the config if using together with xinetd. But
+we have to make the file in a correct structure. The `pxelinux.0` will depend
+on some other files, such as `ldlinux.c32`, and these files should be located
+at the root, or under `boot/isolinux/`. The config files that `pxelinux.0` will
+look for are under `pxelinux.cfg/`, which according to the [syslinux
+doc](https://wiki.syslinux.org/wiki/index.php?title=PXELINUX), the machine
+specific config are to be found based on the client UUID, then the MAC address,
+then the IP address according to longest prefix match, and finally the
+`default`. The example given by the doc says, if
+- client UUID is "b8945908-d6a6-41a9-611d-74a6ab80b83d"
+- MAC address is "88:99:AA:BB:CC:DD"
+- IP address is "192.168.2.91" which is "C0A8025B" in uppercase hexadecimal
+
+then the config files to load is in this order (note UUID and MAC are in
+lowercases and IP address are in uppercases):
+
+```
+ /tftproot/pxelinux.cfg/b8945908-d6a6-41a9-611d-74a6ab80b83d
+ /tftproot/pxelinux.cfg/01-88-99-aa-bb-cc-dd
+ /tftproot/pxelinux.cfg/C0A8025B
+ /tftproot/pxelinux.cfg/C0A8025
+ /tftproot/pxelinux.cfg/C0A802
+ /tftproot/pxelinux.cfg/C0A80
+ /tftproot/pxelinux.cfg/C0A8
+ /tftproot/pxelinux.cfg/C0A
+ /tftproot/pxelinux.cfg/C0
+ /tftproot/pxelinux.cfg/C
+ /tftproot/pxelinux.cfg/default
+```
+
+# Use cases
+
+These are some use cases of PXE and the corresponding configuration.
+
+## Debian PXE boot install
+
+This is to host a install server on the network and expects the client boots
+with a blank local disk. Then, the Debian installer is to be launched on those
+clients and populate a copy of Debian onto their local disks.
+
+Debian has a [PXE boot install guide](https://wiki.debian.org/PXEBootInstall)
+for this. What you have to do is to download the
+[`netboot.tar.gz`](http://ftp.debian.org/debian/dists/buster/main/installer-amd64/current/images/netboot/netboot.tar.gz)
+tarball ([mirrors available](https://www.debian.org/distrib/netinst#netboot)),
+then expand the whole tarball into the TFTP root directory, whiich the subdir
+`debian-installer` has all the files needed: `pxelinux.0` and `ldlinux.c32` as
+NBP (symlinked to `debian-installer` dir); the pxelinux.cfg dir with the config
+file `default`.
+
+If booting with UEFI, we should symlink grub into tftproot as well:
+
+```docker
+cd /opt/tftproot
+ln -s debian-installer/amd64/grubx64.efi .
+ln -s debian-installer/amd64/grub .
+```
+
+Then you will see the Debian installer right away with PXE boot
+
+## Diskless Debian install
+
+The stock kernel from Debian has a NFS client compiled with. So we can make a
+barebone Debian distribution for use with a diskless PXE client machine. First
+we prepare the NBP into TFTP:
+
+```
+apt-get install tftpd-hpa
+apt-get install pxelinux syslinux-common
+
+cd /opt/tftproot
+
+cp /usr/lib/PXELINUX/pxelinux.0 .
+
+# copy ldlinux.c32 and menu.c32
+mkdir -p boot/isolinux/
+cp /usr/lib/syslinux/modules/bios/* ./boot/isolinux
+
+# copy kernels
+cp /boot/initrd.img-4.19.0-12-amd64 .
+cp /boot/vmlinuz-4.19.0-12-amd64 .
+
+# rename: such a long name would not work
+ln -s initrd.img-4.19.0-12-amd64 initrd.img
+ln -s vmlinuz-4.19.0-12-amd64 vmlinuz
+```
+
+then create `pxelinux.cfg` dir and create the config file (e.g. `default`, or
+use MAC if client-specific config is preferred) as follows:
+
+```
+DEFAULT menu.c32
+
+PROMPT 1
+TIMEOUT 300
+ONTIMEOUT Debian x64 Diskless
+
+LABEL reboot
+    MENU LABEL reboot computer
+    COM32 reboot.c32
+
+LABEL local
+    MENU LABEL boot local drive
+    LOCALBOOT 0
+
+LABEL Debian
+    MENU LABEL Diskless Debian 4.9.0-12-amd64
+    KERNEL vmlinuz
+    APPEND vga=858 rw ip=dhcp initrd=initrd.img root=/dev/nfs nfsroot=192.168.1.1:/path/to/rootdisk
+```
+
+Here we assume there is a NFS server ready in the local network with the
+directory exposed that is good to be used as the root mount for the clients.
+This directory can be created with debootstrap:
+
+```
+apt-get install debootstrap
+cd /path/to/rootdisk
+
+# download buster, need some time to complete
+debootstrap buster .
+
+# add user, set password
+chroot .
+passwd  # set root password
+useradd -m -G adm,dialout,cdrom,sudo,dip,plugdev,users johndoe
+passwd johndoe
+
+# install other packages
+apt-get update
+apt-get install openssh-server openssh-client net-tools iw sudo vim python
+```
+
+then we have to add or modify a few `/etc` files into the barebone Debian installation:
+
+```
+cat > ./etc/network/intefaces <<END
+auto lo
+iface lo inet loopback
+
+allow-hotplug eth0
+iface eth0 inet dhcp
+END
+
+echo pxeclient > ./etc/hostname
+
+cat > ./etc/hosts <<END
+127.0.0.1       localhost
+127.0.1.1       pxeclient
+::1     localhost ip6-localhost ip6-loopback
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+END
+
+cat > ./etc/fstab <<END
+/dev/nfs   /          nfs    tcp,nolock  0   0
+proc       /proc      proc   defaults    0   1
+tmpfs      /tmp       tmpfs  defaults    0   0
+tmpfs      /var/log   tmpfs  defaults    0   0
+tmpfs      /var/tmp   tmpfs  defaults    0   0
+END
+```
+
+It is especially important for the `/etc/fstab` to make a few directory mounted
+as tmpfs so that they are not shared between concurrent PXE-boot clients.
+
+On the NFS server side, this directory should be shared with `no_root_squash`
+or otherwise the file permission will not look right. This is an example of
+`/etc/exports` at the NFS server:
+
+    /path/to/rootdisk 192.168.1.0/24(rw,async,no_subtree_check,no_root_squash)
+
+Note that this set up works because the initrd.img shipped with the Debian
+stock kernel contains the NFS module. If not, we have to build our own
+initrd.img or otherwise we cannot use the NFS share as root mount. To do so, we
+just need to create `/etc/initramfs-tools/initramfs.conf` and with the
+following one line
+
+    BOOT=nfs
+
+then create the initrd with the following command:
+
+    mkinitramfs -d /etc/initramfs-tools -o path/to/initrd.img
+
+if we need some other kernel modules for the boot, it should be added to
+`/etc/initramfs-tools/modules`.
+
+## Debian Live CD
+
+Live CD usually has a file as a disk in squashfs with all the software packages
+installed and configured well. Knoppix is usually known as the mother of all
+Live CD and Debian has its own [live+installer image](https://www.debian.org/CD/live/),
+for example, this one:
+
+https://cdimage.debian.org/debian-cd/current-live/amd64/iso-hybrid/debian-live-10.6.0-amd64-kde.iso
+
+While the live CD is supposed to be burned as a CD/DVD or create as a bootable
+USB, we can also serve the Live CD over the network as PXE boot. These are the
+steps:
+
+First, download the ISO image. Then use `p7zip` to extract the following three
+fles from it: `live/filesystem.squashfs` (2.4GB),
+`live/initrd.img-4.19.0-11-amd64` (37MB), and `live/vmlinuz-4.19.0-11-amd64`
+(5MB).
+
+Then we rename and move the initrd.img and vmlinuz into tftproot together with
+`pxelinux.0`, and make `filesystem.squashfs` available on a local HTTP server
+(e.g. use `python -m http.server 8088 .` to make one temporarily). Then this is
+the corresponding section in `pxelinux.cfg/default` file:
+
+```
+LABEL Live
+    MENU LABEL Debian Live 10.6.0
+    KERNEL vmlinuz-live
+    APPEND initrd=initrd.img-live dhcp ethdevice=eno1 components locales=en_US.UTF-8 boot=live fetch=http://192.168.1.92:8000/filesystem.squashfs
+```
+
+The key options here are:
+
+- the kernel should have a parameter `dhcp` and `ethdevice=eno1` (or other
+  devices, comma-separated, if appropriate) to initialize the network during
+  initrd time
+- `boot=live` should be provided to turn on "live CD" mode, and the squashfs
+  file is appointed by `fetch=` clause
+
+These boot time options are documented in the [`live-boot`
+manpage](https://manpages.debian.org/jessie/live-boot-doc/live-boot.7.en.html)
+from Deban. The ISO from Debian has `splash` for the splash screen and `quiet`
+to print nothing during boot. Both of these are not used here in case we need
+to debug the PXE boot process. The `fetch=` clause supports only HTTP (unless
+modified, such as in [Clonezilla](https://clonezilla.org/livepxe.php)). The
+flexibility of this set up is highly dependend on how the initrd.img is built.
+For example, a live Ubuntu can be [quite
+different](https://habr.com/en/post/513568/).
+
+An alternative is to serve the squashfs file over NFS (CIFS is also supported).
+The corresponding `pxelinux.cfg/default` file is as follows:
+
+```
+LABEL Live
+    MENU LABEL Debian Live 10.6.0
+    KERNEL vmlinuz-live
+    APPEND initrd=initrd.img-live dhcp ethdevice=eno1 components locales=en_US.UTF-8 boot=live netboot=nfs nfsroot=192.168.1.1:/mnt/sda3/Backup/DebianLive
+```
+
+which instead of `fetch=`, we use `netboot=nfs` and `nfsroot=` to point to a
+NFS path that the content of whole live CD is located, which the squashfs file
+is expected to be found under its subdirectory as `./live/filesystem.squashfs`.
+
+However, this method is booting slow as we need to ship the whole 2.4GB file
+from the server to the client.

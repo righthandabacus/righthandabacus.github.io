@@ -1,0 +1,129 @@
+---
+layout: post
+title: DD-WRT on Linksys
+date: Sun, 22 Nov 2020 21:31:55 -0500
+tags: system
+---
+
+I have been using a Linksys WRT3200ACM (with DD-WRT installed) for a while now
+and I decided to make a better use of such a high-end WiFi router. These are
+some notes that worth to write down:
+
+## DD-WRT as a NAS
+
+Such router goes with 512MB memory and 256MB flash in two partition. So
+theoretically each flash can be as big as 128MB. The DD-WRT in such size goes
+with a newer kernel and a better suite of software. Mine is running 4.9 kernel.
+Even the kernel has exfat module, it does not seem to work. The USB storage in
+exfat is recognized but cannot be mounted. If we try to mount it in command
+line, the terminal hangs (only the system blocks that command, but the router
+does not, you cann launch a new SSH session into it). Partitions formatted in
+ext4 works perfectly however.
+
+I make use of the external disk to install
+[Entware](https://wiki.dd-wrt.com/wiki/index.php/Installing_Entware), which is
+like an apt-get in the DD-WRT environment, but with limited number of packages
+available. Entware is mandatory to install to `/opt`. So I mounted the
+partition there. As the Linksys is running ARMv7, this is the command to 
+install:
+
+```
+cd /opt
+wget http://bin.entware.net/armv7sf-k3.2/installer/generic.sh
+sh generic.sh
+opkg update
+opkg upgrade
+```
+
+it is suggested to add these to the DD-WRT start-up script:
+
+    sleep 10; /opt/etc/init.d/rc.unslung start
+
+and this to the shutdown script:
+
+    /opt/etc/init.d/rc.unslung stop
+
+but what these seems to do is only to call the init scripts in case of any
+installed under Entware environment. Hence optional if no daemon is installed.
+
+For the USB disk connected to the router, we can share it using Samba (under
+service → NAS), as public share (no authenatication required) or
+username/password share.
+
+## PXE boot
+
+In a full featured system, there are way more options available. It is not the
+case under DD-WRT. The DHCP server in DD-WRT (DNSmasq) can send responses with
+boot options. While DNSmasq also goes with TFTP server, the version in DD-WRT
+is a stripped down one, so you need another TFTP daemon from from Entware. This
+is to install `tftpd-hpa` and launch it with `xinetd`:
+
+```
+opkg install xinetd
+opkg install tftpd-hpa
+mkdir /opt/tftproot
+mkdir /opt/tftproot/pxelinux.cfg
+```
+
+then make this into `/opt/etc/xinetd.d/tftp` so that `xinetd` can launch the
+TFTP server:
+
+```
+service tftp
+{
+    flags            = REUSE
+    socket_type      = dgram
+    protocol         = udp
+    instances        = 30
+    wait             = yes
+    user             = root
+    server           = /opt/sbin/tftpd-hpa
+    server_args      = -4 -B 1468 -s /opt/tftproot
+    cps              = 100 2
+    log_on_success   = HOST PID
+    log_on_failure   = HOST
+    disable          = no
+}
+```
+
+and this into `/opt/tftproot/pxelinux.cfg/default` as the boot menu:
+
+```
+DEFAULT menu.c32
+
+PROMPT 1
+TIMEOUT 300
+ONTIMEOUT Debian x64 Diskless
+
+LABEL reboot
+        MENU LABEL reboot computer
+        COM32 reboot.c32
+
+LABEL local
+        MENU LABEL boot local drive
+        LOCALBOOT 0
+
+LABEL Debian x64 Diskless
+        MENU LABEL Debian x64
+        KERNEL vmlinuz
+        APPEND vga=858 rw ip=dhcp initrd=initrd.img root=/dev/nfs nfsroot=192.168.1.1:/debianroot
+```
+
+Optionally, we can also install `vim` with Entware. To help editing files in
+console. Then we need to copy the files `pxelinux.0`, `ldlinux.c32`, `menu.c32`
+into the TFTP root directory (`/opt/tftproot/`), and prepare the installed OS
+at the NFS mount location.
+
+After all is done, add the following to the "Additional DNSMasq Options" in the
+DD-WRT webui, under Services → Services:
+
+    dhcp-boot=pxelinux.0,gateway,192.168.1.1
+
+
+Then the client who's booting with PXE will work.
+
+## SSH on DD-WRT
+
+The SSH server (as well as client) are dropbear, but only compiled with RSA
+(for size concern?). Therefore, we can only assign a RSA key for authentication
+if you prefer not to use password-based.
