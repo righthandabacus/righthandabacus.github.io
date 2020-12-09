@@ -2,6 +2,7 @@
 layout: post
 title: DD-WRT on Linksys
 date: Sun, 22 Nov 2020 21:31:55 -0500
+lastedit: Wed, 09 Dec 2020 18:20:35 -0500
 tags: system
 ---
 
@@ -120,7 +121,9 @@ DD-WRT webui, under Services → Services:
     dhcp-boot=pxelinux.0,gateway,192.168.1.1
 
 
-Then the client who's booting with PXE will work.
+Then the client who's booting with PXE will work. (Note: Because we add the
+DHCP option to DNSMasq, we have to make sure we are using it as DHCP server.
+This is configured at Setup → Network Setup → DHCP → Use DNSMasq for DHCP)
 
 ## SSH on DD-WRT
 
