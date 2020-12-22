@@ -2,6 +2,7 @@
 layout: post
 title: PXE boot Debian
 date: Tue, 24 Nov 2020 14:55:14 -0500
+lastedit: Mon, 30 Nov 2020 00:06:15 -0500
 tags: system
 ---
 
@@ -287,8 +288,11 @@ flexibility of this set up is highly dependend on how the initrd.img is built.
 For example, a live Ubuntu can be [quite
 different](https://habr.com/en/post/513568/).
 
-An alternative is to serve the squashfs file over NFS (CIFS is also supported).
-The corresponding `pxelinux.cfg/default` file is as follows:
+An alternative is to serve the squashfs file over NFS (CIFS is [not
+supported](https://gitlab.tails.boum.org/tails/tails/-/issues/16236) [by
+Debian](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=705748) but seems OK
+if using Ubuntu Live).  The corresponding `pxelinux.cfg/default` file is as
+follows:
 
 ```
 LABEL Live
