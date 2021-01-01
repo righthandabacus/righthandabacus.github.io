@@ -2,6 +2,7 @@
 layout: post
 title: Copying weight tensors from PyTorch to Tensorflow
 date: Thu, 31 Dec 2020 12:28:42 -0500
+lastedit: Fri, 01 Jan 2021 11:27:06 -0500
 tags: code
 ---
 
@@ -92,10 +93,15 @@ In other words, we can access to the weight tensors of a Tensorflow model with
 `tfmodel.layers[i].weights` and there may be multiple tensors in each layer
 (e.g. dense layer has a weight matrix and a bias vector). The Tensorflow
 weights are easy to manipulate as they are merely member variables of each
-layer. The PyTorch counterpart, however, are not so trivial. If we access the
-weights in each layers directly, the tensors are read-only. This is how we make
-a copy of the weights for the hidden states transformation on the first LSTM
-layer (layer 0):
+layer. An example of setting a weight tensor to zero is this:
+
+    model.layers[0].weights[0].assign(np.zeros((1,200)))
+
+we just need to make sure the numpy array assigned to the weight tensor is in
+the same shape.  The PyTorch counterpart, however, are not so trivial. If we
+access the weights in each layers directly, the tensors are read-only. This is
+how we make a copy of the weights for the hidden states transformation on the
+first LSTM layer (layer 0):
 
     torchmodel.lstm.weight_ih_l0.view(-1).detach().numpy()
 
