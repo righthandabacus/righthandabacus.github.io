@@ -1,0 +1,348 @@
+---
+layout: post
+title: Heat equation and Black-Scholes formula
+date: Sat, 16 Jan 2021 17:46:13 -0500
+tags: math
+---
+
+It is well known for a long time that the quant finance borrowed a lot of
+results from physics. The notable Feynman-Kac formula is one example. In the
+case of vanilla European option pricing, the Black-Scholes formula gives the
+following result:
+
+$$
+\begin{aligned}
+C &= Se^{rT}\Phi(d_1) - Ke^{-rT}\Phi(d_2) \\
+P &= -Se^{rT}\Phi(-d_1) + Ke^{-rT}\Phi(-d_2) \\
+\textrm{where}\qquad
+d_1 &= \frac{1}{\sigma\sqrt{T}}\left(\ln\frac{S}{K}+\left(r+\frac{\sigma^2}{2}\right)T\right) \\
+d_2 &= \frac{1}{\sigma\sqrt{T}}\left(\ln\frac{S}{K}+\left(r-\frac{\sigma^2}{2}\right)T\right) = d_1 - \sigma\sqrt{T}
+\end{aligned}
+$$
+
+This result can be derived using heat equation, which usually just mentioned
+but not provided in detail in the textbooks. Here I try to lay out the full
+derivation.
+
+## Heat equation
+
+The heat flow equation is to relate the temperature $$u(\vec{x},t)$$ at
+position $$\vec{x}$$ at time $$t$$ to the temperature of its neighbour
+positions and time:
+
+$$ \frac{\partial u}{\partial t} = k \nabla^2u $$
+
+The RHS is the heat flow from the neighbour and the LHS is the temporal rate of
+temperature change. Sometimes we will assume the scale $$k=1$$ and the equation
+becomes
+
+$$\frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2}.$$
+
+The heat flow equation has the boundary and initional conditions as follows:
+
+- as $$|x|\to\infty$$, $$|u(x,t)|\le \alpha_t e^{a|x|}$$ for some constant
+  $$a>0$$ and $$\alpha_t>0$$ which $$\alpha_t$$ is independent of $$x$$, i.e.,
+  $$u(x,t)$$ grow no faster than $$e^{a|x|}$$
+- assume temperate at time 0 is known, $$u(x,0)=u_0(x)$$ for all $$x$$
+
+and the solution is
+
+$$
+\begin{aligned}
+u_t &= ku_{xx} \\
+u(x,0) &= u_0(x) \\
+\implies u(x,t) &= \frac{1}{\sqrt{4\pi kt}}\int_{-\infty}^\infty u_0(s)\exp\left(-\frac{(x-s)^2}{4kt}\right)ds
+\end{aligned}
+$$
+
+## Option pricing by heat flow equation
+
+Assume the price follows $$dS=\mu S dt + \sigma S dW_t$$, the Black-Scholes PDE says
+
+$$
+\begin{aligned}
+\frac{\partial V}{\partial t}+\frac12\sigma^2 S^2\frac{\partial^2V}{\partial S^2}+rS\frac{\partial V}{\partial S}-rV &=0 \\
+V(S,T) &= f(S)
+\end{aligned}
+$$
+
+which $$V(S,t)$$ is the option price and $$f(S)$$ is the payoff function at
+maturity $$T$$. We need to transform the Black-Scholes PDE into the form of
+homogeneous heat equation (with $$k=1$$). First is to perform change of
+variables:
+
+$$
+\begin{aligned}
+S &= e^x \\
+t &= T-\frac{2\tau}{\sigma^2} \\
+V(S,t) &= v(x,\tau) = v\left(\ln S, \frac{\sigma^2}{2}(T-t)\right)
+\end{aligned}
+$$
+
+then
+
+$$
+\begin{aligned}
+\frac{\partial V}{\partial t}
+&= -\frac{\sigma^2}{2}\frac{\partial v}{\partial\tau} \\
+\frac{\partial V}{\partial S}
+&= \frac{1}{S}\frac{\partial v}{\partial x} \\
+\frac{\partial^2 V}{\partial S^2}
+&= -\frac{1}{S^2}\frac{\partial v}{\partial x}+\frac{1}{S}\frac{\partial v}{\partial x}\frac{\partial x}{\partial S} = -\frac{1}{S^2}\frac{\partial v}{\partial x}+\frac{1}{S^2}\frac{\partial^2 v}{\partial x^2} \\
+%
+\therefore
+\frac{\partial V}{\partial t}+\frac12\sigma^2 S^2\frac{\partial^2V}{\partial S^2}+rS\frac{\partial V}{\partial S}-rV
+&= -\frac{\sigma^2}{2}\frac{\partial v}{\partial\tau}+\frac{\sigma^2}{2} S^2\left(-\frac{1}{S^2}\frac{\partial v}{\partial x}+\frac{1}{S^2}\frac{\partial^2 v}{\partial x^2}\right)+rS\frac{1}{S}\frac{\partial v}{\partial x}-rv \\
+&= -\frac{\sigma^2}{2}\frac{\partial v}{\partial\tau}
+-\frac{\sigma^2}{2}\frac{\partial v}{\partial x}+\frac{\sigma^2}{2} \frac{\partial^2 v}{\partial x^2}
++r\frac{\partial v}{\partial x}
+-rv \\
+&= -\frac{\partial v}{\partial\tau}
+-\frac{\partial v}{\partial x}
++ \frac{\partial^2 v}{\partial x^2}
++\frac{2r}{\sigma^2}\frac{\partial v}{\partial x}
+-\frac{2r}{\sigma^2}v \\
+\therefore \frac{\partial v}{\partial\tau} &= \frac{\partial^2 v}{\partial x^2}
++\left(\frac{2r}{\sigma^2}-1\right)\frac{\partial v}{\partial x}
+-\frac{2r}{\sigma^2}v 
+\end{aligned}
+$$
+
+further substitute $$k=2r/\sigma^2$$,
+
+$$
+\begin{aligned}
+\frac{\partial v}{\partial\tau} &= \frac{\partial^2 v}{\partial x^2}
++(k-1)\frac{\partial v}{\partial x}
+-kv  \\
+v(x,0) &= V(e^x,T) = f(e^x)
+\end{aligned}
+$$
+
+The above is in the form of forward parabolic equation. To make the RHS has
+only the second derivative term, we substitute
+$$v(x,t)=e^{\alpha x+\beta t}u(x,t)=\phi u$$, which
+
+$$
+\begin{aligned}
+\frac{\partial v}{\partial \tau} &= \beta \phi u + \phi \frac{\partial u}{\partial \tau} \\
+\frac{\partial v}{\partial x} &= \alpha \phi u + \phi \frac{\partial u}{\partial x} \\
+\frac{\partial^2 v}{\partial x^2} &= \alpha^2 \phi u + 2\alpha\phi \frac{\partial u}{\partial x}+\phi\frac{\partial^2 u}{\partial x^2}
+\end{aligned}
+$$
+
+Then we can have
+
+$$
+\begin{aligned}
+\frac{\partial v}{\partial\tau} &= \frac{\partial^2 v}{\partial x^2}
++(k-1)\frac{\partial v}{\partial x}
+-kv  \\
+\implies \beta \phi u + \phi \frac{\partial u}{\partial\tau} &= (\alpha^2 \phi u + 2\alpha\phi \frac{\partial u}{\partial x}+\phi\frac{\partial^2 u}{\partial x^2})
++(k-1)(\alpha \phi u + \phi \frac{\partial u}{\partial x})
+-k\phi u  \\
+\frac{\partial u}{\partial\tau} &= \frac{\partial^2 u}{\partial x^2}
++(k-1+2\alpha)\frac{\partial u}{\partial x}
++(\alpha^2 +(k-1)\alpha-k-\beta)u  \\
+\textrm{with }\alpha &=-\frac12(k-1) \\
+\beta &= -\frac14(k+1)^2 \\
+\implies \frac{\partial u}{\partial\tau} &= \frac{\partial^2 u}{\partial x^2}
+\end{aligned}$$
+
+and with the initial conditions
+
+$$
+\begin{aligned}
+u(x,\tau)&=e^{-\alpha x - \beta \tau}v(x,\tau)\\
+u(x,0)&=e^{-\alpha x}v(x,0) = e^{\frac12(k-1)x}v(x,0) \\
+&=e^{(\frac{r}{\sigma^2}-\frac12)x}f(e^x)
+\end{aligned}
+$$
+
+In the above $$\tau$$ is measuring the time to maturity. Hence at $$\tau=0$$,
+it is the payoff that we know. The solution to the above is
+
+$$u(x,\tau) = \frac{1}{\sqrt{4\pi \tau}}\int_{-\infty}^\infty\exp\left(-\frac{(x-s)^2}{4\tau}\right)u(s,0)ds$$
+
+and we get the pricing formula by reversing all substitutions.
+
+## European call option as an example
+
+Step 1: Transform Black-Scholes equation into heat equation. Black-Scholes is
+
+$$\frac{\partial V}{\partial t}+\frac12\sigma^2 S^2\frac{\partial^2V}{\partial S^2}+rS\frac{\partial V}{\partial S}-rV=0$$
+
+and boundary conditions are:
+
+$$
+\begin{cases}
+V(0,t)=0 & \textrm{($V=0$ whenever $S_t=0$ for any $t$)}\\
+\displaystyle\lim_{S\to\infty}V(S,t)=S-Ke^{-r(T-t)} & \textrm{(discounted exercise price)}\\
+V(S,T) = (S-K)^+ & \textrm{(payoff at expiration)}
+\end{cases}
+$$
+
+Transformations
+
+$$\begin{aligned}
+S &= Ke^x \\
+t &= T-\frac{2\tau}{\sigma^2} \\
+V(S,t) &= Kv(x,\tau) = Kv\left(\ln S, \frac{\sigma^2}{2}(T-t)\right)
+\end{aligned}$$
+
+and we can derive
+
+$$\begin{aligned}
+\frac{\partial v}{\partial\tau} &= \frac1K\frac{\partial V}{\partial t}\frac{\partial t}{\partial\tau} = -\frac{2}{K\sigma^2}\frac{\partial V}{\partial t} \\
+\frac{\partial v}{\partial x} &= \frac1K\frac{\partial V}{\partial S}\frac{\partial S}{\partial x} = e^x \frac{\partial V}{\partial S} \\
+\frac{\partial^2 v}{\partial x^2} &= e^x\frac{\partial V}{\partial S} + e^x\frac{\partial}{\partial x}\frac{\partial V}{\partial S} = e^x\frac{\partial V}{\partial S} + e^x\frac{\partial^2 V}{\partial S^2}\frac{\partial S}{\partial x} = e^x\frac{\partial V}{\partial S} + Ke^{2x}\frac{\partial^2 V}{\partial S^2}
+\end{aligned}$$
+
+then substitute back to the Black-Scholes equation to get 
+
+$$\begin{aligned}
+\left(-\frac{K\sigma^2}{2}\frac{\partial v}{\partial\tau}\right) + \frac12\sigma^2S^2\left(\frac{1}{Ke^{2x}}(\frac{\partial^2v}{\partial x^2}-e^xe^{-x}\frac{\partial v}{\partial x})\right)+rS\left(e^{-x}\frac{\partial v}{\partial x}\right)-rKv &=0 \\
+\left(-\frac{K\sigma^2}{2}\frac{\partial v}{\partial\tau}\right) + \frac{\sigma^2S^2}{2Ke^{2x}}\left(\frac{\partial^2v}{\partial x^2}-\frac{\partial v}{\partial x}\right)+rSe^{-x}\frac{\partial v}{\partial x}-rKv &=0 \\
+-\frac{\partial v}{\partial\tau} + \frac{S^2}{K^2e^{2x}}\frac{\partial^2v}{\partial x^2}-\frac{S^2}{K^2e^{2x}}\frac{\partial v}{\partial x}+2r\sigma^{-2}\frac{S}{Ke^{-x}}\frac{\partial v}{\partial x}-2r\sigma^{-2}v &=0 \\
+-\frac{\partial v}{\partial\tau} + \frac{\partial^2v}{\partial x^2}-\frac{\partial v}{\partial x}+2r\sigma^{-2}\frac{\partial v}{\partial x}-2r\sigma^{-2}v &=0 \\
+-\frac{\partial v}{\partial\tau} + \frac{\partial^2v}{\partial x^2}+(2r\sigma^{-2}-1)\frac{\partial v}{\partial x}-2r\sigma^{-2}v &=0 \\
+\end{aligned}$$
+
+with $$k=2r\sigma^{-2}$$, we have (forward parabolic equation)
+
+$$\frac{\partial v}{\partial\tau} = \frac{\partial^2v}{\partial x^2}+(k-1)\frac{\partial v}{\partial x}-kv$$
+
+If we further substitute
+
+$$v(x,\tau)=e^{\alpha x+\beta\tau}u(x,\tau)$$
+
+then the forward parabolic equation becomes
+
+$$\begin{aligned}
+e^{\alpha x+\beta\tau}\frac{\partial u}{\partial\tau}+\beta e^{\alpha x+\beta\tau}u &= \left(e^{\alpha x+\beta\tau}\frac{\partial^2 u}{\partial x^2}+\alpha e^{\alpha x+\beta\tau}\frac{\partial u}{\partial x}+\alpha^2 e^{\alpha x+\beta\tau}u+\alpha e^{\alpha x+\beta\tau} \frac{\partial u}{\partial x}\right)\\
+&\qquad
++(k-1)\left(e^{\alpha x+\beta\tau}\frac{\partial u}{\partial x}+\alpha e^{\alpha x+\beta\tau} u\right)-ke^{\alpha x+\beta\tau}u \\
+%
+\frac{\partial u}{\partial\tau}+\beta u &= \left(\frac{\partial^2 u}{\partial x^2}+\alpha\frac{\partial u}{\partial x}+\alpha^2u+\alpha \frac{\partial u}{\partial x}\right)
++(k-1)\left(\frac{\partial u}{\partial x}+\alpha u\right)-ku \\
+\frac{\partial u}{\partial\tau}+\beta u &= \left(\frac{\partial^2 u}{\partial x^2}+2\alpha\frac{\partial u}{\partial x}+\alpha^2u\right)
++(k-1)\left(\frac{\partial u}{\partial x}+\alpha u\right)-ku \\
+\frac{\partial u}{\partial\tau} &= \frac{\partial^2 u}{\partial x^2}+2\alpha\frac{\partial u}{\partial x}+(k-1)\frac{\partial u}{\partial x}+\alpha^2u
++(k-1)\alpha u-ku-\beta u
+\end{aligned}$$
+
+to make this become the heat equation, we need
+
+$$\begin{aligned}
+& \begin{cases}
+2\alpha+(k-1) = 0 \\
+\alpha^2+(k-1)\alpha-k-\beta = 0
+\end{cases} \\
+\therefore&
+\begin{cases}
+\alpha = -\frac{k-1}{2} \\
+\beta = \alpha^2+(k-1)\alpha-k = \frac{(k-1)^2}{4}-\frac{(k-1)^2}{2}-k = -\frac{(k+1)^2}{4}
+\end{cases}
+\end{aligned}$$
+
+i.e., to substitute
+
+$$v(x,\tau)=e^{-\frac12(k-1)x-\frac14(k+1)^2\tau}u(x,t)$$
+
+The boundary conditions become:
+
+$$\begin{cases}
+\displaystyle\lim_{x\to-\infty}v(x,\tau)=0 & \textrm{($V=0$ whenever $S_t=0$ for any $t$)}\\
+\displaystyle\lim_{x\to\infty}v(x,\tau)=e^x-e^{-r\tau} & \textrm{(discounted exercise price)}\\
+v(x,0) = (e^x-1)^+ & \textrm{(payoff at expiration)}
+\end{cases}$$
+
+or in terms of $$u(x,\tau)$$:
+
+$$u(x,0) = e^{\frac12(k-1)x}(e^x-1)^+ = (e^{\frac12(k+1)x}-e^{\frac12(k-1)x})^+$$
+
+which $$u(x,0)>0$$ when $$x > 0$$
+
+Step 2: Using the solution of heat equation
+
+$$\begin{aligned}
+u_t &= u_{xx} \\
+u(x,0) &= u_0(x) \\
+\implies u(x,t) &= \frac{1}{\sqrt{4\pi t}}\int_{-\infty}^\infty u_0(s)\exp\left(-\frac{(x-s)^2}{4t}\right)ds
+\end{aligned}$$
+
+therefore
+
+$$\begin{aligned}
+u(x,\tau)
+&= \frac{1}{\sqrt{4\pi\tau}}\int_{-\infty}^\infty (e^{\frac12(k+1)s}-e^{\frac12(k-1)s})^+\exp\left(-\frac{(x-s)^2}{4\tau}\right)ds \\
+&= \frac{1}{\sqrt{2\pi}}\int_{-\infty}^\infty (e^{\frac12(k+1)(\sqrt{2\tau}y+x)}-e^{\frac12(k-1)(\sqrt{2\tau}y+x)})^+e^{-\frac12y^2}dy & (\textrm{Sub. }y=\frac{s-x}{\sqrt{2\tau}})\\
+&= \frac{1}{\sqrt{2\pi}}\int_{-x/\sqrt{2\tau}}^\infty (e^{\frac12(k+1)(\sqrt{2\tau}y+x)}-e^{\frac12(k-1)(\sqrt{2\tau}y+x)}) e^{-\frac12y^2}dy\\
+&= \frac{1}{\sqrt{2\pi}}\int_{-x/\sqrt{2\tau}}^\infty e^{\frac12(k+1)(\sqrt{2\tau}y+x)-\frac12y^2}dy-\frac1{\sqrt{2\pi}}\int_{-x/\sqrt{2\tau}}^\infty e^{\frac12(k-1)(\sqrt{2\tau}y+x)-\frac12y^2}dy
+\end{aligned}$$
+
+for the first integral, we perform completing square to get 
+
+$$\begin{aligned}
+\frac12\left[(k+1)(\sqrt{2\tau}y+x)-y^2\right]
+& = -\frac12\left[y^2-(k+1)\sqrt{2\tau}y-(k+1)x\right]\\
+& = -\frac12\left[\left(y-\frac12(k+1)\sqrt{2\tau}\right)^2-\frac12(k+1)^2\tau-(k+1)x\right]\\
+\end{aligned}$$
+
+therefore
+
+$$\begin{aligned}
+& \frac{1}{\sqrt{2\pi}}\int_{-x/\sqrt{2\tau}}^\infty e^{\frac12(k+1)(\sqrt{2\tau}y+x)-\frac12y^2}dy \\
+=&\frac{1}{\sqrt{2\pi}}\int_{-x/\sqrt{2\tau}}^\infty e^{-\frac12\left[\left(y-\frac12(k+1)\sqrt{2\tau}\right)^2-\frac12(k+1)^2\tau-(k+1)x\right]}dy \\
+=& e^{\frac14(k+1)^2\tau+\frac12(k+1)x}\frac{1}{\sqrt{2\pi}}\int_{-x/\sqrt{2\tau}}^\infty e^{-\frac12\left(y-\frac12(k+1)\sqrt{2\tau}\right)^2}dy \\
+=& e^{\frac14(k+1)^2\tau+\frac12(k+1)x}\frac{1}{\sqrt{2\pi}}\int_{-x/\sqrt{2\tau}-\frac12(k+1)\sqrt{2\tau}}^\infty e^{-\frac12z^2}dz \\
+=& e^{\frac14(k+1)^2\tau+\frac12(k+1)x}\Phi(\frac{x}{\sqrt{2\tau}}+\frac12(k+1)\sqrt{2\tau}) \\
+=& e^{\frac14(k+1)^2\tau+\frac12(k+1)x}\Phi(d_1)
+\end{aligned}$$
+
+and for the second integral, completing square to get
+
+$$\begin{aligned}
+\frac12\left[(k-1)(\sqrt{2\tau}y+x)-y^2\right]
+& = -\frac12\left[y^2-(k-1)\sqrt{2\tau}y-(k-1)x\right]\\
+& = -\frac12\left[\left(y-\frac12(k-1)\sqrt{2\tau}\right)^2-\frac12(k-1)^2\tau-(k-1)x\right]\\
+\end{aligned}$$
+
+therefore 
+
+$$\begin{aligned}
+& \frac1{\sqrt{2\pi}}\int_{-x/\sqrt{2\tau}}^\infty e^{\frac12(k-1)(\sqrt{2\tau}y+x)-\frac12y^2}dy \\
+=& \frac1{\sqrt{2\pi}}\int_{-x/\sqrt{2\tau}}^\infty e^{-\frac12\left[\left(y-\frac12(k-1)\sqrt{2\tau}\right)^2-\frac12(k-1)^2\tau-(k-1)x\right]}dy \\
+=& e^{\frac14(k-1)^2\tau+\frac12(k-1)x}\frac1{\sqrt{2\pi}}\int_{-x/\sqrt{2\tau}}^\infty e^{-\frac12\left(y-\frac12(k-1)\sqrt{2\tau}\right)^2}dy \\
+=& e^{\frac14(k-1)^2\tau+\frac12(k-1)x}\frac1{\sqrt{2\pi}}\int_{-x/\sqrt{2\tau}-\frac12(k-1)\sqrt{2\tau}}^\infty e^{-\frac12z^2}dz \\
+=& e^{\frac14(k-1)^2\tau+\frac12(k-1)x}\Phi(\frac{x}{\sqrt{2\tau}}+\frac12(k-1)\sqrt{2\tau}) \\
+=& e^{\frac14(k-1)^2\tau+\frac12(k-1)x}\Phi(d_2)
+\end{aligned}$$
+
+Step 3: The pricing formula can be obtained by reversing all substitutions back to $$V(S,t)$$
+
+$$\begin{aligned}
+v(x,\tau)
+&=e^{-\frac12(k-1)x-\frac14(k+1)^2\tau}u(x,t) \\
+&= e^{-\frac12(k-1)x-\frac14(k+1)^2\tau}\left(e^{\frac14(k+1)^2\tau+\frac12(k+1)x}\Phi(d_1)-e^{\frac14(k-1)^2\tau+\frac12(k-1)x}\Phi(d_2)\right) \\
+&= e^{-\frac12(k-1)x+\frac12(k+1)x}\Phi(d_1)-e^{-\frac14(k+1)^2\tau+\frac14(k-1)^2\tau}\Phi(d_2) \\
+&= e^{x}\Phi(d_1)-e^{-k\tau}\Phi(d_2) \\
+&= \frac{S}{K}\Phi(d_1)-e^{-2r\sigma^{-2}(\frac12\sigma^2(T-t))}\Phi(d_2) \\
+&= \frac{S}{K}\Phi(d_1)-e^{-r(T-t)}\Phi(d_2) \\
+V(S,t) &= Kv(x,\tau) \\
+&= S\Phi(d_1)-Ke^{-r(T-t)}\Phi(d_2)
+\end{aligned}$$
+
+with
+
+$$\begin{aligned}
+d_1 &= \frac{x}{\sqrt{2\tau}}+\frac12(k+1)\sqrt{2\tau} \\
+&= \frac{\ln(S/K)}{\sqrt{2\frac{\sigma^2}{2}(T-t)}}+\frac12(\frac{2r}{\sigma^2}+1)\sqrt{2\frac{\sigma^2}{2}(T-t)}\\
+&= \frac{\ln(S/K)}{\sqrt{\sigma^2(T-t)}}+(\frac{r}{\sigma^2}+\frac12)\sqrt{\sigma^2(T-t)}\\
+&= \frac{\ln(S/K)+(r+\frac12\sigma^2)(T-t)}{\sqrt{\sigma^2(T-t)}}\\
+%
+d_2 &= \frac{x}{\sqrt{2\tau}}+\frac12(k-1)\sqrt{2\tau} \\
+&= \frac{\ln(S/K)}{\sqrt{2\frac{\sigma^2}{2}(T-t)}}+\frac12(\frac{2r}{\sigma^2}-1)\sqrt{2\frac{\sigma^2}{2}(T-t)} \\
+&= \frac{\ln(S/K)}{\sqrt{\sigma^2(T-t)}}+(\frac{r}{\sigma^2}-\frac12)\sqrt{\sigma^2(T-t)} \\
+&= \frac{\ln(S/K)+(r-\frac12\sigma^2)(T-t)}{\sqrt{\sigma^2(T-t)}} \\
+\end{aligned}$$

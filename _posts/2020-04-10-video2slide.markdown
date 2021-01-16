@@ -61,7 +61,7 @@ import pandas as pd
 import av
 
 def genweights(frame: np.ndarray) -> np.ndarray:
-    """Creqte a meshgrid for weights as exp(-z^2)"""
+    """Create a meshgrid for weights as exp(-z^2)"""
     ymax, xmax = frame.shape
     normfactor = ymax // 2
 	# y is -1 to 1; x is in same scale but only on rightmost 2/3
