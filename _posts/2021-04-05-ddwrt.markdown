@@ -1,0 +1,78 @@
+---
+layout: post
+title: Converting a DD-WRT router to OpenWRT
+date: Tue, 06 Apr 2021 00:00:20 -0400
+tags: system
+category: blog
+---
+
+I have an old WiFi router (not my gateway, but that doesn't matter) that used
+to be running DD-WRT and I am experimenting with the WiFi mesh or 802.11r
+roaming at home. Unfortunately the DD-WRT version is too old to do either of
+these -- it was a Linux 2.4 kernel on a Netgear WNR3500L.  There seems to be a
+K3X build that works with it, and there is definitely a working OpenWRT version
+too. The problem is, both of them are provided as a `.chk` file while, if you
+have DD-WRT already installed, you can only refresh the firmware using `.bin`
+file.
+
+It doesn't seem to be any way out. I tried to use the DD-WRT web interface to
+flash a `.chk` file anyway but it doesn't seem to do anything. Similarly, try
+to use `write` command when you ssh into the router also does nothing.
+[TFTP](https://wiki.dd-wrt.com/wiki/index.php/Tftp_flash) seems to be the last
+resort.
+
+I am not sure for other routers, but this particular model seems to have a boot
+cycle as follows. When the router is powered on, in a few second it will pick
+up the IP address of 192.168.1.1/24 in its first phrase of boot cycle. Then it
+will try to load the firmware from its flash memory and start the second phrase
+of boot. When the ownership is transitioned, the IP address of the router will
+be reset. This can be observed by a computer connected to one of its LAN port,
+carrying a 192.168.1.0/24 address, and keep pinging to 192.168.1.1 while the
+router is power cycled. We will see a "no route to host" when it powered on,
+then responding with TTL of 100 after a few seconds, then not responding again,
+and finally responding with TTL of 64 when the router successfully boot from
+the firmware.
+
+Sources from the web tells that the router will check for TFTP and load
+firmware from it at the first phrase of boot cycle, namely, at the time when
+ping is responding with TTL 100. It is **not correct**. Firmware will be loaded
+from TFTP **only if** the router is bricked! That is, the router must not be
+able to load firmware from its flash storage, then TFTP path will be taken.
+
+Therefore, my way of loading a OpenWRT onto a DD-WRT run of Netgear WNR3500L is
+the following:
+
+1. Prepare the OpenWRT firmware. Mine is downloaded as
+   `openwrt-19.07.7-brcm47xx-mips74k-netgear-wnr3500l-v1-na-squashfs.chk`
+2. Unplug all cables except the one connecting a Mac to its LAN port. Reset the
+   DD-WRT on the WNR3500L, so that it takes 192.168.1.1 address as default and
+   no funny thing is running over there. But I turned on the SSH from it.
+3. ssh into the router, then run `/sbin/mtd erase linux`; this will take around
+   1 minute to complete. Afterwards, the router will brick if power cycled.
+4. Turn off the router
+5. On a Mac, keep it connected to the router through a Ethernet cable to its
+   LAN port. Set the Mac to a 192.168.1.0/24 address.
+6. On the Mac, open two terminal window. One is `cd` into the directory of the
+   downloaded firmware then run `tftp` and leave the prompt open. Another
+   terminal simply run `ping 192.168.1.1`. Keep the two terminals side by side
+7. Open TextEdit in Mac and type the following
+
+        connect 192.168.1.1
+        binary
+        rexmt 1
+        timeout 60
+        put openwrt-19.07.7-brcm47xx-mips74k-netgear-wnr3500l-v1-na-squashfs.chk
+
+   Then copy the whole 5 lines into clipboard
+8. Power on the router, set focus to the `tftp` terminal, and keep an eye on the ping terminal
+9. If the ping terminal start to respond (with TTL 100), then paste the
+   clipboard onto the tftp terminal. If successfully, the ping terminal will
+   keep responding with TTL 100 until the tftp terminal says transmit
+   completed. But `tftp` will fail if the router is not brick, i.e., if the
+   firmware can still be found.
+10. If the previous step is successful, keep the ping window until you see it
+    stop responding and back on again. This will take a few minutes to appear.
+    Or you may also power cycle the router, but still you need to wait for a
+    few minutes as a new firmware is being used.
+11. Open up a browser to 192.168.1.1, and wait for the LuCI interface of OpenWRT to appear
+
