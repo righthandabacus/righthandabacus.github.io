@@ -170,8 +170,9 @@ q_t = \psi_{t+1}(q_{t+1}) &&\textrm{for }1\le t\le T-1
 
 ## Solution to $$\lambda = \arg\max\mathbb{P}[O\mid\lambda]$$
 
-By local maximization using expectation-maximization (EM) method: Define the
-probability of transition from $$i$$ to $$j$$ at time $$t$$ to $$t+1$$ as
+By local maximization using expectation-maximization (EM) method (**Baum-Welch
+algorithm**): Define the probability of transition from $$i$$ to $$j$$ at time
+$$t$$ to $$t+1$$ as
 
 $$\begin{align}
 \xi_t(i,j) &= \mathbb{P}[q_t=i, q_{t+1}=j\mid O,\lambda] \\

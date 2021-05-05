@@ -2,7 +2,7 @@
 layout: post
 title: Threshold linear regression
 date: Mon, 12 Apr 2021 14:41:53 -0400
-tags: code, math
+tags: code math
 ---
 
 Threshold regression means to do regression separately in different segments,
@@ -40,7 +40,7 @@ Its model is as follows:
 
 $$
 \begin{aligned}
-y &= \sum_{i=1}^m \beta_i^T x \mathbb{I}\{c_{i-1}<q<=c_i\} + \epsilon \\
+y &= \sum_{i=1}^m \beta_i^T x \mathbb{I}\{c_{i-1}<q\le c_i\} + \epsilon \\
 &= \sum_{i=1}^m \beta'^T_i x \mathbb{I}\{c_{i-1}<q\} + \epsilon
 \end{aligned}
 $$
@@ -50,7 +50,7 @@ number of segments in the model. In order to perform regression, we can
 introduce the following loss metric[^3] to be minimized:
 
 $$
-L(\beta,c) = \frac{1}{n}\sum_{i=1}^n\Big[y_i - \sum_{j=1}^m \beta'^T_j x_i\mathbb{I}\{c_{i-1}<q_i\}\Big]^2 + \sum_{j=2}^m p_\lambda(\Vert \beta'_j\Vert_1)
+L(\beta,c) = \frac{1}{n}\sum_{i=1}^n\Big(y_i - \sum_{j=1}^m \beta'^T_j x_i\mathbb{I}\{c_{i-1}<q_i\}\Big)^2 + \sum_{j=2}^m p_\lambda(\Vert \beta'_j\Vert_1)
 $$
 
 This is defined as the mean squared error plus some penalty metric. The penalty
@@ -71,7 +71,7 @@ and its first-order derivative is correspondingly
 $$
 p'_\lambda(\omega)=\begin{cases}
 \lambda & \omega\le\lambda \\
-\frac{a\lambda-\omega}{a-1} & \lambda<\omega\le a\lambda\\
+\dfrac{a\lambda-\omega}{a-1} & \lambda<\omega\le a\lambda\\
 0 & a\lambda<\omega
 \end{cases}
 $$
@@ -95,7 +95,7 @@ for some small value $$h$$. This is the standard normal CDF and runs from 0 to
 function turning from 0 to 1 at $$c_{j-1}$$. Hence the smoothed loss metric is
 
 $$
-Q(\beta,c) = \frac{1}{n}\sum_{i=1}^n\Big[y_i - \sum_{j=1}^m \beta'^T_j x_i\Phi\left(\frac{q_i-c_{j-1}}{h}\right)\Big]^2 + \sum_{j=2}^m p_\lambda(\Vert \beta'_j\Vert_1)
+Q(\beta,c) = \frac{1}{n}\sum_{i=1}^n\Big(y_i - \sum_{j=1}^m \beta'^T_j x_i\Phi\left(\frac{q_i-c_{j-1}}{h}\right)\Big)^2 + \sum_{j=2}^m p_\lambda(\Vert \beta'_j\Vert_1)
 $$
 
 and $$\partial Q/\partial c_i$$ and $$\partial Q/\partial \beta'_i$$ are well
@@ -319,14 +319,14 @@ with np.printoptions(precision=4, suppress=True):
     print("Reference MSE: {}".format(mean_squared_error(y, ref_model.predict(x,x[:,0]))))
 ```
 
-This code, surprisingly, does not always reproduce the parameters of the
-original model. Depends on the particular structure of the data, sometimes a
-slightly different threshold partition and hence a slightly different model
-would be found that produces a smaller MSE or $$R^2$$ score. But this is a very
-slow search trying out half a million combinations of threshold partitions.
-I can find several factors that impact the accuracy of regression: The
-imbalanced number of samples in each segment, the magnitude of the noise, and
-the similarity of linear models of neighbouring segments.
+This code often gives good result, but surprisingly, not always reproduce the
+parameters of the original model. Depends on the particular structure of the
+data, sometimes a slightly different threshold partition and hence a slightly
+different model would be found that produces a smaller MSE or higher $$R^2$$
+score. But this is a very slow search trying out half a million combinations of
+threshold partitions.  I can find several factors that impact the accuracy of
+regression: The imbalanced number of samples in each segment, the magnitude of
+the noise, and the similarity of linear models of neighbouring segments.
 
 Introducing a test set or using k-fold validation may improve the search result
 in both code. But this is sufficient to show that threshold regression, despite

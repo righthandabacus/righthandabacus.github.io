@@ -2,7 +2,7 @@
 layout: post
 title: Collinearlity, degrees of freedom and LSTM networks
 date: Tue, 22 Dec 2020 14:57:03 -0500
-tags: code, math
+tags: code math
 ---
 
 There are many code samples on using LSTM networks for time series prediction.

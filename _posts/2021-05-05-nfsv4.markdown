@@ -1,0 +1,152 @@
+---
+layout: post
+title: Correct ways of deploying NFSv4
+date: Wed, 05 May 2021 10:10:57 -0400
+tags: system
+---
+
+NFS is old. Its root can trace back to the remote file system in System V R3
+while the first release of NFS (version 2) is in 1985 on SunOS 2.0. It must not
+be considered as a counterpart of Samba or CIFS, since NFS does not do user
+authentication while CIFS is created with user credentials.
+
+Traditionally NFS is communicated using UDP --- for it can be run stateless.
+One concern is the resilence of clients after server reboot. If we connect NFS
+over TCP, the stream protocol will never be recovered if server died. However,
+even if NFS is over UDP, the client will hang until the server respond back,
+which may take a few minutes, and in the meantime the client program that reads
+the NFS mount will look like a zombie process. This failure recovery behavior
+at the client side can be tuned using the following options during NFS mount:
+
+    mount -t nfs -o soft,intr,timeo=600,retrans=3 host:/path /mountpoint
+
+where `timeo` is the response timeout in deciseconds and `retrans` is the
+number of retransmissions before the client determined that the server is not
+responding.
+
+The issue of reliable communication between NFS server and client is profound,
+especially when the mount is writable. There are questions of whether the
+written data are committed at the server, issues of detecting data corruption
+in the channel, acknowledgement and retransmission of requests, cache
+consistency, file locking, and even quotas management. These are the problems
+addressed by the
+[2006 paper](https://www.kernel.org/doc/ols/2006/ols2006v2-pages-59-72.pdf)
+
+The latest version of NFS is v4.2 (RFC 7862) but mostly we identify NFS by its
+major version. Besides security measures (e.g., Kerberos 5) support, NFSv4
+distinguished from its predecessor versions that a distinguished filesystem
+root is identified. It is identified with `fsid=0` option in `/etc/exports` and
+we cannot avoid that. Depends on how the server side is configurated, sometimes
+we will see the error message "`exportfs: Warning: /mnt does not support NFS
+export.`" This is what I encountered in exporting `/mnt` in OpenWRT. It turns
+out that a NFS kernel server will not see everything we see in the userland. If
+we are not going to use NFS user server (such as unfs daemon), we need to make
+share the NFSv4 root is not on a FUSE mount or anything special, such as an
+overlay mount in the case of OpenWRT:
+
+```
+root@openwrt:~# mount
+/dev/root on /rom type squashfs (ro,relatime)
+proc on /proc type proc (rw,nosuid,nodev,noexec,noatime)
+sysfs on /sys type sysfs (rw,nosuid,nodev,noexec,noatime)
+tmpfs on /tmp type tmpfs (rw,nosuid,nodev,noatime)
+/dev/ubi0_1 on /overlay type ubifs (rw,noatime,ubi=0,vol=1)
+overlayfs:/overlay on / type overlay (rw,noatime,lowerdir=/,upperdir=/overlay/upper,workdir=/overlay/work)
+ubi1:syscfg on /tmp/syscfg type ubifs (rw,relatime,ubi=1,vol=0)
+tmpfs on /dev type tmpfs (rw,nosuid,relatime,size=512k,mode=755)
+devpts on /dev/pts type devpts (rw,nosuid,noexec,relatime,mode=600,ptmxmode=000)
+debugfs on /sys/kernel/debug type debugfs (rw,noatime)
+```
+
+In my case of OpenWRT, I make the mount point under `/tmp` (which is on a
+tmpfs) and NFS root under tmpfs instead of the overlay file system. Whether you
+can export a directory under NFS can be checked right away with `exportfs -ra`,
+which should print nothing if no issues. Afterwards, we can check at remote to
+see what the NFS server exported using `showmount -e hostname`.
+
+One may see that such implementation in NFSv4 is restrictive. If we want to
+share `/path1/dir1` and `/path2/dir2`, we must export the root directory in NFS
+as it is the first common parent directory. But then, everything under the root
+directory would technically be shared too (access control can still be set up,
+but files and directories not supposed to be exported are still visible). That
+is why an alternative set up is to create dedicated NFS root directory to
+export and bind mount the exportable paths under it. Below is an example from
+the Ubuntu NFSv4 how-to:
+
+```sh
+mkdir /export
+mkdir /export/users 
+mount --bind /home/users /export/users 
+```
+
+then the corresponding `/etc/exports` is
+
+```
+/export       192.168.1.0/24(rw,fsid=0,no_subtree_check,sync)
+/export/users 192.168.1.0/24(rw,nohide,insecure,no_subtree_check,sync)
+```
+
+On client side, mounting NFSv4 is using the command:
+
+    mount -t nfs -o vers=4,soft serverhost:/users /mountpoint
+
+which the server's export to mount are provided as paths under the root export
+instead of the absolute path at the server as in NFSv3.
+
+## OpenWRT example
+
+I am exporting NFSv4 mounts in OpenWRT (`opkg install kmod-fs-nfs-v4
+nfs-kernel-server`). There are a few points that are quite different from other
+systems. First is the `fstab`. Instead of `/etc/fstab`, the one honoured by
+OpenWRT is indeed `/etc/config/fstab`, which can be initialized with the stdout
+of `block detect` command. The mount points specified over there will be
+automatically created. So we can safely point it to a tmpfs directory. If any
+more complicated set up is required, we probably need to create a new init
+script in `/etc/init.d`.
+
+The second is the `fsid` option for NFSv4. It is required to say `fsid=0` for
+the root directory in NFSv4 but the other should be automatically detected.
+However, I found that we still need to specify `fsid` in OpenWRT. So my `/etc/exports` now looks like this:
+
+```
+/tmp	*(rw,all_squash,insecure,no_subtree_check,sync,fsid=0)
+/tmp/dir1	*(rw,all_squash,insecure,no_subtree_check,sync,fsid=1)
+/tmp/dir2	*(rw,all_squash,insecure,no_subtree_check,sync,fsid=2)
+```
+
+## MacOS issues
+
+While MacOS shipped with NFSv4 client, the NFS server only supports v2 and v3.
+One issue common in MacOS is the //insecure mount//, which the client is using
+high ports instead of ports below 1024 as expected by most NFS servers by
+default. Therefore the NFS servers need to say `insecure` in `/etc/exports`.
+
+The NFS server in MacOS, however, expects clients using low port numbers unless
+launched with the `-N` option. We can either use `launchctl stop
+com.apple.nfsd` and then run `/sbin/nfsd -N`, or modify
+`/System/Library/LaunchDaemons/com.apple.nfsd.plist` to add the `-N` option by adding a row:
+
+```xml
+<array>
+   <string>/sbin/nfsd</string>
+   <string>-N</string>
+</array>
+```
+
+However, in MacOS 10.11+, we need to override the system integrity protection
+(SIP) before anything under `/System` can be modified (which is to use
+`Command+R` at boot to start recovery mode and run `/usr/bin/csrutil disable`
+in terminal and then boot back to normal MacOS; and we should do this again to
+re-enable SIP after modification).
+
+The MacOS implementation is also using BSD syntax for `/etc/exports`. It looks like this:
+
+```
+/path/to/export -ro -alldirs -mapall=nobody -32bitclients -network 192.168.0.0 -mask 255.255.255.0
+```
+
+## References
+
+- Olaf Kirch. Why NFS Sucks. In Proceedings of the Ottawa Linux Symposium, pp.59-72, 2006. <https://www.kernel.org/doc/ols/2006/ols2006v2-pages-59-72.pdf>
+- Ubuntu NFSv4 how-to <https://help.ubuntu.com/community/NFSv4Howto>
+- RHEL Storage Administration Guide, sec 8.6 Configuring the NFS server <https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/storage_administration_guide/nfs-serverconfig>

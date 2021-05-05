@@ -8,7 +8,7 @@ tags: code
 In plain TeX, there is a macro `\bordermatrix` but I am not very satisfied with
 it. The problem of that is, the "border" is always at the leftmost and topmost,
 but not any other combinations. For some unknown reason, I am surprised that no
-one has any problem with it and no one has every develop a new package to
+one has any problem with it and no one has ever developed a new package to
 remediate this problem. Thus I do my own.
 
 ## Dissection of the legacy bordermatrix macro
