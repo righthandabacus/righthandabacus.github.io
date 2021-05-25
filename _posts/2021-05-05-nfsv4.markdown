@@ -44,7 +44,7 @@ we are not going to use NFS user server (such as unfs daemon), we need to make
 share the NFSv4 root is not on a FUSE mount or anything special, such as an
 overlay mount in the case of OpenWRT:
 
-```
+```text
 root@openwrt:~# mount
 /dev/root on /rom type squashfs (ro,relatime)
 proc on /proc type proc (rw,nosuid,nodev,noexec,noatime)
@@ -81,7 +81,7 @@ mount --bind /home/users /export/users
 
 then the corresponding `/etc/exports` is
 
-```
+```text
 /export       192.168.1.0/24(rw,fsid=0,no_subtree_check,sync)
 /export/users 192.168.1.0/24(rw,nohide,insecure,no_subtree_check,sync)
 ```
@@ -108,7 +108,7 @@ The second is the `fsid` option for NFSv4. It is required to say `fsid=0` for
 the root directory in NFSv4 but the other should be automatically detected.
 However, I found that we still need to specify `fsid` in OpenWRT. So my `/etc/exports` now looks like this:
 
-```
+```text
 /tmp	*(rw,all_squash,insecure,no_subtree_check,sync,fsid=0)
 /tmp/dir1	*(rw,all_squash,insecure,no_subtree_check,sync,fsid=1)
 /tmp/dir2	*(rw,all_squash,insecure,no_subtree_check,sync,fsid=2)

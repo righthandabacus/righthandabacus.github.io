@@ -1,0 +1,14 @@
+---
+layout: post
+title: htop cheatsheet
+date: 2021-05-25
+tags: system
+---
+
+`htop` is useful and bring forth very rich information on one screen. Here is the cheatsheet to understand it:
+
+![htop cheatsheet](/img/htop.png)
+
+The source [Keynote file is available](/img/htop.key). Of course, there are
+[more detailed explanation](https://peteris.rocks/blog/htop/) as well as
+pressing `h` for help screen.
