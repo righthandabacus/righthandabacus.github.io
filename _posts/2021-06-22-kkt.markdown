@@ -1,0 +1,354 @@
+---
+layout: post
+title: Lagrangians and Portfolio Optimization
+date: Tue, 22 Jun 2021 12:04:14 -0400
+tags: math code
+---
+
+A portfolio optimization problem in Markowitz style looks like the following
+
+$$
+\begin{aligned}
+\min && f(w) &= \frac12 w^T\Sigma w\\
+\textrm{subject to} && w^Tr &= R \\
+&& w^T e &= 1 \\
+&& w & \succeq b_L \\
+&& w & \preceq b_U
+\end{aligned}
+$$
+
+which the last two are to bound the weight of each asset in the portfolio. This
+is a nicely formulated optimization problem and one way to analytically solve
+it is to use Lagrange multipliers.
+
+## Shadow price
+
+Assume we do not have the last two inequality constraints, the Lagrangian for
+the above problem would be
+
+$$
+L(w,\lambda) = \frac12w^T\Sigma w - \lambda_1(w^Tr-R) - \lambda_2(w^Te-1)
+$$
+
+The Lagrangian has the property that for the optimal solution $$w^*$$ to the
+original problem, $$L(w^*,\lambda) = f(w^*)$$, namely the Lagrangian function
+attained the same value as the objective function. This is trivial as we know
+that the optimizer must satisfy the equality constraints and hence the two
+extra terms in the Lagrangian always reduced to zero.
+
+Mathematically, we can also make the Lagrangian having two Lagrange multiplier
+terms added to the objective function instead of subtraction. In doing so, we
+reversed our solution to $$\lambda_1$$ and $$\lambda_2$$ above. But if we
+consider that
+
+$$
+\frac{\partial L(w^*,\lambda)}{\partial R} = \lambda_1
+$$
+
+we see that it bears a physical meaning for subtraction, i.e., $$\lambda_1$$
+indicates how much it changes to the objective function if we marginally
+increased the boundary value $$R$$ on the constraint. In this particular
+equality constraint, we are pushing the expected portfolio return $$R$$ to a
+higher level and $$\lambda_1$$ is the amount of variance increased. Hence the
+Lagrange multiplier $$\lambda_1$$ is called the *shadow price* for the return
+$$R$$.
+
+## Inequality constraints and activeness
+
+A similar Lagrangian can be created when there are inequality constraints, but
+their Lagrange multiplier is no longer arbitrary:
+
+$$
+L(w, \lambda, \theta, \phi)
+=\frac12 w^T\Sigma w
+-\lambda_1(w^Tr-R) - \lambda_2(w^Te-1)
+-\theta^T(w-b_L) + \phi^T(w-b_U)
+$$
+
+The way to think of what sign should a Lagrange multiplier carry is to consider
+the dual. As we are doing a minimization here, the dual is a maximization
+problem, namely,
+
+$$
+g(\lambda,\theta,\phi) = \inf_w L(w,\lambda,\theta,\phi)
+$$
+
+and according to the max-min inequality we have the weak-duality property
+
+$$
+\sup_{\lambda,\theta,\phi}\inf_w L(w,\lambda,\theta,\phi)
+\le 
+\inf_w \sup_{\lambda,\theta,\phi}L(w,\lambda,\theta,\phi)
+$$
+
+and the equality holds if we have strong duality. The RHS is the solution to
+the optimization problem and the LHS is the dual problem. Therefore the dual
+must be less than the optimal solution in the original problem
+
+$$
+g(\lambda,\theta,\phi) \le \inf_w\sup_{\lambda,\theta,\phi} L(w,\lambda,\theta,\phi)
+$$
+
+If we consider the Lagrange multipliers associated with inequality constraints
+$$\theta$$ and $$\phi$$ to be positive (there is no restriction for equality
+constraints), we must augment the objective function into
+$$L(w,\lambda,\theta,\phi)$$ with negative values. Hence for $$w-b_L\succeq 0$$,
+we augment it with $$-\theta(w-b_L)$$, and for $$w-b_U\preceq 0$$, we augment
+it with $$+\phi(w-b_U)$$.
+
+Why we need it in this way? Let us denote the feasible domain as $$\mathcal{D}$$
+and the optimal solution to the problem as $$w^*\in\mathcal{D}$$. An inequality
+constraint at $$w^*$$ shall either has the equality holds (which we call the
+constraint is *active*) or not (*inactive*).  An constraint is inactive iff its
+removal does not change the optimal solution.  The boundary of $$\mathcal{D}$$
+is defined by the constraints as if they are active (which the equality
+constraints can be assumed always active).
+
+The solution $$w^*$$ is a point on this boundary. As we are studying a
+minimization problem, $$f(w^*)$$ is increasing into $$\mathcal{D}$$ and
+decreasing way from $$\mathcal{D}$$. Similarly, if $$w-b_L\succeq 0$$ is
+active, $$w^*-b_L=0$$ and it is increasing into $$\mathcal{D}$$ and decreasing
+away from it (and similarly for $$w-b_U\preceq 0$$). In summary, we have
+
+|          | $$w^*+\delta\in\mathcal{D}$$ | $$w^*+\delta \notin\mathcal{D}$$ |
+| -------- | -------- | -------- |
+| $$f(w^*)$$ | $$f(w^*+\delta)\ge f(w^*)$$ |  $$f(w^*+\delta)\le f(w^*)$$  |
+| $$w^*-b_L = 0$$ | $$w^*+\delta-b_L\succeq 0$$ | $$w^*+\delta-b_L\preceq 0$$ |
+| $$w^*-b_U = 0$$ | $$w^*+\delta-b_U\preceq 0$$ | $$w^*+\delta-b_U\succeq 0$$ |
+
+and we need to make
+$$L(w^*+\delta,\lambda,\theta,\phi)\ge L(w^*,\lambda,\theta,\phi)$$
+for $$w^*+\delta\in\mathcal{D}$$ so that we can find the optimal solution
+$$w^* = \arg\min L(w,\lambda,\theta,\phi)$$ as a saddle point.
+
+## Karush-Kuhn-Tucker conditions
+
+The KKT conditions state that
+
+1. $$\nabla L(w^*,\lambda,\theta,\phi)=0$$ at the optimal solution $$w^*$$
+2. Primal constraints are satisfied for $$w^*$$
+3. Dual constraints $$\theta\ge 0$$ and $$\phi\ge 0$$ are satisfied, i.e. the
+   Lagrange multipliers for inequality constraints are non-negative
+4. Complementary slackness: $$\theta\odot(w^*-b_L)=0$$ and
+   $$\phi\odot(w^*-b_U)=0$$, i.e., the Lagrange multiplier will be zero if the
+   corresponding inequality constraint is inactive
+
+## Solution
+
+We can use the KKT conditions to solve for the above optimization problem. Since
+
+$$
+L(w, \lambda, \theta, \phi)
+=\frac12 w^T\Sigma w
+-\lambda_1(w^Tr-R) - \lambda_2(w^Te-1)
+-\theta^T(w-b_L) + \phi^T(w-b_U)
+$$
+
+The first condition states that
+
+$$
+\nabla_w L(w, \lambda, \theta, \phi)
+= \Sigma w
+-\lambda_1r - \lambda_2 e
+-\theta + \phi = 0
+$$
+
+the second condition states that
+
+$$
+\begin{aligned}
+w^Tr - R = -\nabla_{\lambda_1} L(w, \lambda, \theta, \phi) &=0 \\
+w^Te - 1 = -\nabla_{\lambda_2} L(w, \lambda, \theta, \phi) &=0 \\
+w - b_L & \succeq 0 \\
+w - b_U & \preceq 0
+\end{aligned}
+$$
+
+the third condition states that
+
+$$
+\theta \ge 0;\qquad\phi \ge 0
+$$
+
+and the fourth condition states that
+
+$$
+\theta\odot(w-b_L)=0;\qquad\phi\odot(w-b_U)=0.
+$$
+
+Assume $$w$$ is a vector of $$n$$ elements, we have $$3n+2$$ unknowns
+($$w,\theta,\phi$$ are $$n$$-vectors and $$\lambda$$ is 2-vector),
+$$n+2+0+2n=3n+2$$ equalities from the four conditions, and $$0+2n+2n+0=4n$$
+inequalities. This should sufficient to provide a solution, but note that the
+equations from fourth condition are nonlinear as it includes $$\theta\odot w$$
+and $$\phi\odot w$$ terms. To make it a system of linear equations, we can
+consider various combination of activeness of inequality constraints to
+simplify it. It would be tremendously easier if none of the inequality
+constraints are active (e.g., when $$b_L=-\infty$$ and $$b_U=\infty$$, which
+for sure $$\theta=\phi=\mathbf{0}$$ based on the complementart slackness), in
+this case we have
+
+$$
+\begin{aligned}
+\Sigma w - \lambda_1r-\lambda_2e &=0 \\
+w &= \Sigma^{-1}(\lambda_1r+\lambda_2e) \\
+&= \lambda_1\Sigma^{-1}r+\lambda_2\Sigma^{-1}e
+\end{aligned}
+$$
+
+substitute:
+
+$$
+\begin{aligned}
+w^Tr - R &=
+\lambda_1 r^T\Sigma^{-1}r + \lambda_2 e^T\Sigma^{-1}r - R = 0 \\
+w^Te - 1 &= \lambda_1r^T\Sigma^{-1}e+\lambda_2e^T\Sigma^{-1}e - 1 = 0
+\end{aligned}
+$$
+
+therefore
+
+$$
+\begin{aligned}
+\begin{bmatrix}r^T\Sigma^{-1}e & r^T\Sigma^{-1}e\\ r^T\Sigma^{-1}e & e^T\Sigma^{-1}e\end{bmatrix}
+\begin{bmatrix}\lambda_1\\ \lambda_2\end{bmatrix} &=
+\begin{bmatrix}R\\ 1\end{bmatrix} \\
+\begin{bmatrix}\lambda_1\\ \lambda_2\end{bmatrix} &=
+\begin{bmatrix}r^T\Sigma^{-1}e & r^T\Sigma^{-1}e\\ r^T\Sigma^{-1}e & e^T\Sigma^{-1}e\end{bmatrix}^{-1}\begin{bmatrix}R\\ 1\end{bmatrix}
+\end{aligned}
+$$
+
+and substitute back to above for $$w^*$$. But the solution under this condition
+must not violate the second conditions, namely, $$b_L \preceq w^* \preceq b_U$$.
+In fact we can also solve for both $$w$$ and $$\lambda$$ together in a matrix
+form equation of
+
+$$
+\begin{aligned}
+\Sigma w -\lambda_1 r - \lambda_2 e &= 0 \\
+w^Tr - R &=0 \\
+w^Te - 1 &=0 \\
+\implies\quad
+\begin{bmatrix}\Sigma & r & e\\ r^T & 0 & 0\\ e^T & 0 & 0\end{bmatrix}
+\begin{bmatrix}w\\ -\lambda_1\\ -\lambda_2\end{bmatrix} &= \begin{bmatrix}0\\ R\\ 1\end{bmatrix} \\
+\therefore\quad
+\begin{bmatrix}w\\ -\lambda_1\\ -\lambda_2\end{bmatrix} &= \begin{bmatrix}\Sigma & r & e\\ r^T & 0 & 0\\ e^T & 0 & 0\end{bmatrix}^{-1}\begin{bmatrix}0\\ R\\ 1\end{bmatrix}.
+\end{aligned}
+$$
+
+But the essence of using Karush-Kuhn-Tucker conditions to solve an optimization
+problem with inequality constraints is to make it combinatorial. Assume
+$$b_L\prec b_U$$ and in some reasonable finite range (e.g. $$b_L=\mathbf{0}$$
+and $$b_U=e$$), to solve this we need to test all combinations of activeness of
+inequality constraints. In above, we have $$2n$$ inequalities from the second
+KKT condition and there are $$2^{2n}$$ combinations of activeness. When an
+inequality is active, its equality holds and the corresponding Lagrange
+multiplier can be non-zero. Hence a new set of linear equations are created and
+we can solve for $$w$$ and other Lagrange multipliers, but we need to validate
+the solution not violating the KKT conditions, especially that of
+$$b_L \preceq w \preceq b_U$$, and check the objective function. For example,
+if all inequality constraints are active, the optimization problem has its
+solution presented as
+
+$$
+\begin{aligned}
+\begin{bmatrix}\Sigma & r & e & I & I\\ r^T & 0 & 0 & 0 & 0\\ e^T & 0 & 0 & 0 & 0 \\I & 0 & 0 & 0 & 0\\ I & 0 & 0 & 0 & 0\end{bmatrix}
+\begin{bmatrix}w\\ -\lambda_1\\ -\lambda_2\\ -\theta\\ \phi\end{bmatrix} &= \begin{bmatrix}0\\ R\\ 1\\ b_L\\ b_U\end{bmatrix} \\
+\therefore\quad
+\begin{bmatrix}w\\ -\lambda_1\\ -\lambda_2\\ -\theta\\ \phi\end{bmatrix} &= 
+\begin{bmatrix}\Sigma & r & e & I & I\\ r^T & 0 & 0 & 0 & 0\\ e^T & 0 & 0 & 0 & 0 \\I & 0 & 0 & 0 & 0\\ I & 0 & 0 & 0 & 0\end{bmatrix}^{-1}
+\begin{bmatrix}0\\ R\\ 1\\ b_L\\ b_U\end{bmatrix}
+\end{aligned}
+$$
+
+and if some constraints are inactive, some of the rows and columns above shall
+be removed.  After checking all combinations of activeness, the best solution
+based on the objective function are selected.
+
+## Implementation
+
+The function below shows how the above optimization can be solved numerically.
+It try out all combinations of activeness and find the solution using the
+matrix equation described above. The best solution is then returned.
+
+```python
+import numpy as np
+
+def markowitz(ret, cov, r, lb=np.nan, ub=np.nan):
+    """Markowitz minimizer with bounds constraints for a specified portfolio return
+
+    Args:
+        ret: A vector of N asset returns
+        cov: NxN matrix of covariance of asset returns
+        r (float): portfolio return to achieve
+        lb, ub (float or vector): lowerbound and upperbound for the portfolio weights,
+              if float, all weights are subject the same bound
+    Returns:
+		A (N+2) vector of portfolio weights and the Lagrange multipliers or
+		None if no solution can be found
+    """
+    # Sanitation
+    ret = np.array(ret).squeeze()
+    cov = np.array(cov).squeeze()
+    r = float(r)
+    N = len(ret)
+    if ret.shape != (N,):
+        raise ValueError("Asset returns `ret` should be a vector")
+    if cov.shape != (N,N):
+        raise ValueError("Covariance matrix `cov` should be in shape ({},{}) to match the return vector".format(N,N))
+    if isinstance(lb, (float,int)):
+        lb = np.ones(N) * lb
+    if isinstance(ub, (float,int)):
+        ub = np.ones(N) * ub
+    lb = lb.squeeze()
+    ub = ub.squeeze()
+    if lb.shape != (N,):
+        raise ValueError("Lowerbound `lb` should be in shape (%d,) to match the return vector" % N)
+    if ub.shape != (N,):
+        raise ValueError("Upperbound `ub` should be in shape (%d,) to match the return vector" % N)
+    if (lb > ub).any():
+        raise ValueError("Lowerbound must no greater than upperbound")
+    # Construct matrices as templates for the equation AX=B
+    A = np.zeros((N+2+N+N,N+2+N+N))
+    A[:N, :N] = cov
+    A[:N, N] = A[N, :N] = ret
+    A[:N, N+1] = A[N+1, :N] = np.ones(N)
+    A[:N, N+2:N+N+2] = A[N+2:N+N+2, :N] = A[:N, N+N+2:] = A[N+N+2:, :N] = np.eye(N)
+    b = np.zeros((N+2+N+N,1))
+    b[N:N+2, 0] = [r, 1]
+    b[N+2:N+N+2, 0] = lb
+    b[N+N+2:, 0] = ub
+    # Try all activeness combinations and track the best result to minimize objective
+    bitmaps = 2**(2*N)
+    best_obj = np.inf
+    best_vector = None
+    for bitmap in range(bitmaps):
+        # constraints 0 to N-1 are for lowerbound and N to 2N-1 are for upperbound
+        # row/column N+2+i corresponds to the constraint i
+        inactive = [N+2+i for i in range(2*N) if bitmap & (2**i)]
+        active = [N+2+i for i in range(2*N) if i not in inactive]
+        # verify no conflicting active constraints
+        if any(N+i in active for i in active):
+            continue # conflicting activeness found, skip this one
+        # Delete some rows and columns from the template for this activeness combination
+        A_ = np.delete(np.delete(A, inactive, axis=0), inactive, axis=1)
+        b_ = np.delete(b, inactive, axis=0)
+        # Solve and check using matrix algebra
+        try:
+            x_ = (np.linalg.inv(A_) @ b_).squeeze()
+            w = x_[:N]
+            if (w < lb).any() or (w > ub).any():
+                continue # solution not in feasible domain, try next one
+            obj_val = w @ cov @ w # compute the covariance, i.e., objective function * 2
+            if obj_val < best_obj:
+                # Lower variance found, save the solution vector
+                best_obj = obj_val
+                x = np.zeros(N+2+N+N)
+                x[:N+2] = x_[:N+2]    # w and negative lambda 
+                x[active] = x_[N+2:]  # negative theta and phi
+                x[N:N+2+N] *= -1      # lambda and theta are negated
+                best_vector = x
+        except np.linalg.LinAlgError:
+            pass # no solution found for this combination
+    return best_vector
+```
