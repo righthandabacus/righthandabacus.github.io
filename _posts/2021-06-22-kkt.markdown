@@ -106,7 +106,7 @@ constraints can be assumed always active).
 
 The solution $$w^*$$ is a point on this boundary. As we are studying a
 minimization problem, $$f(w^*)$$ is increasing into $$\mathcal{D}$$ and
-decreasing way from $$\mathcal{D}$$. Similarly, if $$w-b_L\succeq 0$$ is
+decreasing away from $$\mathcal{D}$$. Similarly, if $$w-b_L\succeq 0$$ is
 active, $$w^*-b_L=0$$ and it is increasing into $$\mathcal{D}$$ and decreasing
 away from it (and similarly for $$w-b_U\preceq 0$$). In summary, we have
 
