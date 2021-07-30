@@ -17,7 +17,7 @@ bibtex:
 ---
 
 The renowned article to describe hidden Markov models (HMMs). I may not have
-enough background knowledge to a:ppreciate the speech recognition part but this
+enough background knowledge to appreciate the speech recognition part but this
 is very clear and easy to follow to understand the HMM mechanics.
 
 For some background: A Markov chain is to model an autonomous system with state

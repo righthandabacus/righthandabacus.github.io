@@ -119,7 +119,7 @@ The second section: Coefficients determined by the regression.
   interval, approximately mean value of the coefficient ±2 standard error
 
 The third section: Normality of the residuals. Linear regression is built based
-on the assumption that $\epsilon$ is normally distributed with zero mean.
+on the assumption that $$\epsilon$$ is normally distributed with zero mean.
 
 - Omnibus: D'Agostino's $$K^2$$ test, based on skew and kurtosis. Perfect normality will produce 0
 - Prob(Ominbus): Probability that the residuals are normally distributed according to omnibus statistic
