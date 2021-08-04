@@ -2,6 +2,7 @@
 layout: post
 title: QQ-plot and PP-plot
 date: Fri, 23 Jul 2021 17:43:54 -0400
+lastedit: Wed, 04 Aug 2021 08:24:07 -0400
 tags: math code
 ---
 
@@ -285,7 +286,7 @@ case of QQ-plot, the data should be scaled according to the input data to
 match the mean and standard deviation. The plot will be as follows:
 
 ```python
-sns2.pairplot(df_data, diag_kind="pp", kind="pp",
+sns.pairplot(df_data, diag_kind="pp", kind="pp",
              plot_kws={'line_kws':{'color':'red', 'alpha':0.2}, 'scatter_kws': {'alpha': 0.2, 's':4}},
              diag_kws={'line_kws':{'color':'red', 'alpha':0.2}, 'scatter_kws': {'alpha': 0.2, 's':4}})
 plt.show()
@@ -294,7 +295,7 @@ plt.show()
 ![PPplot from seaborn](/img/qqplot-07.png)
 
 ```python
-sns2.pairplot(df_data, diag_kind="qq", kind="qq",
+sns.pairplot(df_data, diag_kind="qq", kind="qq",
              plot_kws={'line_kws':{'color':'red', 'alpha':0.2}, 'scatter_kws': {'alpha': 0.2, 's':4}},
              diag_kws={'line_kws':{'color':'red', 'alpha':0.2}, 'scatter_kws': {'alpha': 0.2, 's':4}})
 plt.show()
@@ -303,3 +304,156 @@ plt.show()
 ![QQplot from seaborn](/img/qqplot-08.png)
 
 Of course, if you just want one PP-plot, you can use `sns.ppplot()` directly.
+
+## Better solution by PairGrid
+
+The `pairplot()` function in seaborn is built with the
+[`PairGrid` object](https://seaborn.pydata.org/generated/seaborn.PairGrid.html).
+We can use it directly to make the pair plots but it would not be a single
+function to achieve that. However, there would be more flexibility. This is an
+example from the seaborn documentation that allows you to show different chart
+above and below the diagonal:
+
+```python
+# Fancier correlogram
+g = sns.PairGrid(df)
+g.map_upper(sns.scatterplot)
+g.map_lower(sns.kdeplot)
+g.map_diag(sns.kdeplot)
+plt.show()
+```
+
+![pairgrid from seaborn](/img/qqplot-09.png)
+
+There can be `PairGrid.map()` for all charts in the grid, `map_diag()` and
+`map_offdiag()` for on- and off-diagonal charts, or `map_upper()` and
+`map_lower()` for the upper- and lower-triangular charts of the grid.
+We can also provide a custom function to the family of `PairGrid.map()`. The
+the exception of `map_diag()`, this custom function to provide should take the
+$$x$$ and $$y$$ data as positional arguments, while `map_diag()` takes only $$x$$
+data. With this, we can define a few functions to be used:
+
+```python
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+from scipy.stats import norm
+
+def qqplot(x, y=None, **kwargs):
+    """Create Q-Q plot, for use with PairGrid.map()
+    Args:
+        x, y: Passed as positional arguments, will be pandas series
+        kwargs: Can be "color" (tuple of 3 floats) and "label" (str), or other
+                keyword arguments passed by user
+    """
+    # Find scatter locations
+    _, xs = stats.probplot(x, fit=False)
+    if y is None:
+        # set it to normal distribution scaled according to x
+        ys = norm.ppf(np.linspace(0,1,len(xs)+2)[1:-1])
+        ys = ys * xs.std() + xs.mean()
+    else:
+        _, ys = stats.probplot(y, fit=False)
+    # Find regression line
+    p = np.polyfit(xs, ys, 1)
+    xr = np.linspace(np.min(xs), np.max(xs), 2)
+    yr = np.polyval(p, xr)
+    # Plot options
+    line_kws = kwargs.pop('line_kws', dict(c="r", ls="--", alpha=0.5))
+    scatter_kws = kwargs.pop('scatter_kws', {})
+    scatter_kws.update(kwargs) # all remaining keyword arg assumed for scatter
+    # Plot
+    plt.axline(xy1=(xr[0],yr[0]), xy2=(xr[1],yr[1]), **line_kws)
+    sns.scatterplot(x=xs, y=ys, **scatter_kws)
+
+def ppplot(x, y=None, **kwargs):
+    """Create P-P plot, for use with PairGrid.map()
+    Args:
+        x, y: Passed as positional arguments, will be pandas series
+        kwargs: Can be "color" (tuple of 3 floats) and "label" (str), or other
+                keyword arguments passed by user
+    """
+    # Find scatter locations
+    xs = np.linspace(0, 1, len(x))
+    if y is None:
+        # set it to normal distribution scaled according to x
+        y = norm.ppf(np.linspace(0,1,len(xs)+2)[1:-1])
+    ys = np.interp(np.sort(x), np.sort(y), xs)
+    # Find regression line
+    p = np.polyfit(xs, ys, 1)
+    xr = np.linspace(np.min(xs), np.max(xs), 2)
+    yr = np.polyval(p, xr)
+    # Plot options
+    line_kws = kwargs.pop('line_kws', dict(c="r", ls="--", alpha=0.5))
+    scatter_kws = kwargs.pop('scatter_kws', {})
+    scatter_kws.update(kwargs) # all remaining keyword arg assumed for scatter
+    # Plot
+    plt.axline(xy1=(xr[0],yr[0]), xy2=(xr[1],yr[1]), **line_kws)
+    sns.scatterplot(x=xs, y=ys, **scatter_kws)
+
+def tukeyplot(x, y, **kwargs):
+    """Create Tukey mean-difference plot, for use with PairGrid.map()
+    Args:
+        x, y: Passed as positional arguments, will be pandas series
+        kwargs: Can be "color" (tuple of 3 floats) and "label" (str), or other
+                keyword arguments passed by user
+    """
+    # Find locations
+    xs = (x+y)/2
+    ys = x-y
+    mean = np.mean(ys)
+    sd = np.std(ys)
+    # Plot options
+    line_kws = kwargs.pop('line_kws', dict(ls="--", alpha=0.5))
+    scatter_kws = kwargs.pop('scatter_kws', {})
+    scatter_kws.update(kwargs) # all remaining keyword arg assumed for scatter
+    # Plot the mean and 95% ci lines
+    xl = np.linspace(np.min(xs), np.max(xs), 4)
+    plt.axhline(y=mean, c="b", **line_kws)
+    plt.axhline(y=mean+1.96*sd, color="r", **line_kws)
+    plt.axhline(y=mean-1.96*sd, color="r", **line_kws)
+    sns.scatterplot(x=xs, y=ys, **scatter_kws)
+```
+
+and we can produce a PP-plot with them:
+
+```python
+g = sns.PairGrid(df)
+g.map_diag(ppplot, line_kws=dict(c="r", alpha=0.3, ls="--"), scatter_kws=dict(alpha=0.5, s=5))
+g.map_offdiag(ppplot, scatter_kws=dict(alpha=0.5, s=5))
+g.tight_layout()
+plt.show()
+```
+
+![PPplot using PairGrid](/img/qqplot-11.png)
+
+and a QQ-plot:
+
+```python
+g = sns.PairGrid(df)
+g.map_diag(qqplot, scatter_kws=dict(alpha=0.5, s=5))
+g.map_offdiag(qqplot, scatter_kws=dict(alpha=0.5, s=5))
+g.tight_layout()
+plt.show()
+```
+
+![QQplot using PairGrid](/img/qqplot-10.png)
+
+and also Tukey mean-difference plot with PP-plot on diagonal, but we need to
+detach the shared axis for the diagonal plots due to different scale:
+
+```python
+from itertools import product
+
+g = sns.PairGrid(df)
+g.map_offdiag(tukeyplot, scatter_kws=dict(alpha=0.5, s=5))
+# Remove shared axis only for diagonal
+for i,j,k in product(range(len(df.columns)), repeat=3):
+    g.axes[i, i].get_shared_x_axes().remove(g.axes[j, k])
+    g.axes[i, i].get_shared_y_axes().remove(g.axes[j, k])
+g.map_diag(ppplot, line_kws=dict(alpha=0.3))
+g.tight_layout()
+plt.show()
+```
+
+![Tukey mean-difference plot using PairGrid](/img/qqplot-12.png)

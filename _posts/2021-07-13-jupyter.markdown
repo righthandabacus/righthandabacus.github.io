@@ -217,7 +217,8 @@ works for both jupyter-notebooks and jupyterlab. Bokeh allows to change the
 data of the data source but the x and y dimension must be consistent. If we
 change the curve entirely, we can either use `data_source.data.update(x=x, y=y)`
 to do the update in one shot, or reassign the data with `data_source.data =
-newdata`. What necessary in using Bokeh interactively are
+newdata`, where `newdata` can be a python dictionary. What necessary in using
+Bokeh interactively are
 
 - after we set up the figure, we show it with `show(plot, notebook_handle=True)` and remember the handle
 - in the update function, after we update the data, we need to invoke

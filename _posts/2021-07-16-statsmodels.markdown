@@ -109,12 +109,15 @@ The second section: Coefficients determined by the regression.
 - Std Err: Estimate of the standard deviation of the coefficient,
   $$\hat\sigma^2_j = \hat\sigma^2[Q_{xx}^{-1}]_{jj}$$ with $$Q_{xx}=X^TX$$ and
   $$\hat\sigma^2=\dfrac{\epsilon^T\epsilon}{N}$$
-- t: the t statistic, with the null hypothesis that this particular coefficient
-  is zero. It is used as a measurement of whether theh coefficient is
-  significant. A coefficient is significant if its magnitude is large with
-  small standard error
+- t: Coef divided by Std Err, i.e., the t statistic, with the null hypothesis
+  that this particular coefficient is zero. It is used as a measurement of
+  whether theh coefficient is significant. A coefficient is significant if its
+  magnitude is large with small standard error
+  - the t statistic with the null hypothesis that the coefficient $$\beta$$
+    equals to $$k$$ is $$t=(\beta-k)/SE$$, here we took $$k=0$$
 - P>|t|: the p-value of the t test, i.e., the probability that the variable has
   no effect on the dependent variable as the null hypothesis is true
+  - degree of freedom for the t test is $$n-2$$ for $$n$$ the number of observations
 - 0.025 and 0.975: The two boundaries of the coefficient at 95% confidence
   interval, approximately mean value of the coefficient ±2 standard error
 
@@ -136,7 +139,8 @@ on the assumption that $$\epsilon$$ is normally distributed with zero mean.
 Knowing what each of these elements measures, we can see how well the model
 fits. Here we try to change the code to give a different summary:
 
-If we use fewer regressor in the input, we should see a lowered AIC and BIC:
+If we use fewer regressor in the input, we should see a lowered AIC and BIC
+because the omitted regressors did not really involved:
 
 ```python
 model = sm.OLS(df["Y"], sm.add_constant(df[["X1","X2","X3"]]), missing="drop").fit()
