@@ -327,11 +327,11 @@ plt.show()
 
 There can be `PairGrid.map()` for all charts in the grid, `map_diag()` and
 `map_offdiag()` for on- and off-diagonal charts, or `map_upper()` and
-`map_lower()` for the upper- and lower-triangular charts of the grid.
-We can also provide a custom function to the family of `PairGrid.map()`. The
-the exception of `map_diag()`, this custom function to provide should take the
-$$x$$ and $$y$$ data as positional arguments, while `map_diag()` takes only $$x$$
-data. With this, we can define a few functions to be used:
+`map_lower()` for the upper- and lower-triangular charts of the grid.  We can
+also provide a custom function to the family of `PairGrid.map()`. The exception
+of `map_diag()` is to expect the custom function to take the $$x$$ and $$y$$
+data as positional arguments, while `map_diag()` takes only $$x$$ data. With
+this, we can define a few functions to be used:
 
 ```python
 import matplotlib.pyplot as plt

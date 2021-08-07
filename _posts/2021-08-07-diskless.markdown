@@ -1,0 +1,209 @@
+---
+layout: post
+title: Diskless Debian
+date: Sat, 07 Aug 2021 15:41:23 -0400
+tags: system
+---
+
+This documents my attempt to create a diskless, PXE boot, NFS-supported Debian
+system. The device is an Intel NUC and it is served by OpenWRT routers. There
+are posts about [PXE](/2020-11-24-pxeboot) previously. But in summary, the
+workflow of such system is
+
+1. Client boot with PXE stack on network card, which requests for DHCP
+2. DHCP server respond with IP address and the location of the boot program
+3. Client, according to the DHCP reply, request for the network boot program (NBP) from TFTP
+4. Client pass the ownership to the NBP for the next stage of boot, which in
+   case of pxelinux, will show boot menu and load kernel
+
+My previous attempt using DD-WRT does not work well. OpenWRT however, has a
+better kernel to support NFS to make everything smooth.
+
+## DHCP set up
+
+In OpenWRT, the DHCP server is [dnsmasq](https://openwrt.org/docs/guide-user/base-system/dhcp),
+which its configuration are located at `/etc/config/dhcp` (OpenWRT specific)
+and `/etc/dnsmasq.conf` (dnsmasq default). When we run it as a daemon, OpenWRT
+will create a new config at `/var/etc` that loads the latter and apply the
+attributes from the former. Hence it is better to modify at `/etc/config/dhcp`.
+Below should be a new section appended to the end:
+
+```text
+config boot linux
+       option filename 'pxelinux.0'
+       option serveraddress '192.168.0.2'
+       option servername 'tftpserver'
+```
+
+The above will be converted into a line
+`dhcp-boot=pxelinux.0,tftpserver,192.168.0.2` in the `dnsmasq.conf`, and
+delivered as DHCP option 66 (TFTP server address) and option 67 (boot filename)
+in the reply. In fact, we can make this more specific to one host, for example,
+the below will be host-based configuration based on MAC address:
+
+```text
+config host 'myhost'
+        option ip '192.168.0.123'
+        option mac '01:23:45:ab:cd:ef'
+        option tag 'NOPXE'
+```
+
+## TFTP set up
+
+TFTP is also supported in dnsmasq. What we needed to do is to add these two
+lines into `/etc/dnsmasq.conf`:
+
+```text
+enable-tftp
+tftp-root=/path/to/tftproot
+```
+
+or equivalently, add to `/etc/config/dhcp`:
+
+```text
+
+config dnsmasq
+	# ...
+	option enable_tftp '1'
+	option tftp_root '/path/to/tftproot'
+
+config dhcp 'lan'
+	option interface 'lan'
+	option dhcp_range '192.168.0.1,proxy'
+	option start '100'
+	option leasetime '12h'
+	option limit '150'
+	option dynamicdhcp '0'
+```
+
+The above configuration is for using a OpenWRT device to serve TFTP other than
+the one responding to DHCP. Otherwise, we do not need to modify the `lan`
+section to set the `dhcp_range` and `dynamicdhcp` option. But we must ensure
+that dnsmasq is listening to the interface that serves TFTP. It will not work
+if we ignored the interface for DHCP. If we set ths up in web interface in LuCI:
+
+- in Network → Interface → LAN → DHCP server → General setup, uncheck "Ignore interface"
+- in Network → Interface → LAN → DHCP server → Advanced settings, uncheck "Dynamic DHCP" and uncheck "Force"
+- in Network → DHCP and DNS → General settings, uncheck "Authoritative"
+- in Network → DHCP and DNS → TFTP settings, check "Enable TFTP server", enter the full path for "TFTP server root"
+
+To test, run "tftp <address>" and then try to "get <filename>" for the filename
+(or path) relative to the tftp root.
+
+## NFS system
+
+We used NFSv4 under OpenWRT. Kernel server is used, as it seems more robust
+than the user server in the case of OpenWRT systems. The disks are mounted
+externally as OpenWRT device usually would not have enough built-in storage. We
+need to set up the mount in `/etc/config/fstab` with the following:
+
+```text
+config global automount
+        option from_fstab 1
+        option anon_mount 1
+
+config global autoswap
+        option from_fstab 1
+        option anon_swap 0
+
+config mount
+        option target   /tmp/extstorage
+        option device   /dev/sda1
+        option enabled  1
+        option enabled_fsck 0
+		option options 'noexec,noatime,nodiratime,nodev'
+```
+
+and for USB storage, we will also need to
+
+    opkg install usbutils kmod-usb-storage block-mount
+
+For NFS then, we need to do
+
+    opkg install nfs-kernel-server
+
+and then edit `/etc/exports` with
+
+```text
+/tmp	*(ro,all_squash,insecure,no_subtree_check,sync,fsid=0)
+/tmp/extstorage	*(rw,all_squash,insecure,no_subtree_check,nohide,sync,fsid=1)
+/tmp/extstorage/diskless *(rw,no_root_squash,insecure,no_subtree_check,nohide,sync,fsid=3)
+```
+
+Note here that the external drive are mounted under a mount point under `/tmp`,
+not the usual `/mnt`. It is because in OpenWRT, the `/mnt` is at an overlay
+mount and mounting something under there will raise an error. In `/tmp`,
+however, is a tmpfs which does not have such problem.
+
+Usually NFS will do root squash to make all files accessed through NFS to be
+owned by nobody (exact user ID depends on system). However, we do not want this
+for our diskless systems so that different users, root included, can still be
+distinguished.
+
+## PXElinux configuration
+
+In the TFTP server, under the tftp root, we should make a copy of `pxelinux.0`
+from syslinux and put the `*.c32` file (e.g. 32-bit BIOS version) under
+`boot/isolinux/`. Then we can set up, for example, the below config at `pxelinux.cfg/default`:
+
+```text
+DEFAULT menu.c32
+
+PROMPT 1
+TIMEOUT 30
+ONTIMEOUT Debian
+
+LABEL reboot
+  MENU LABEL reboot computer
+  COM32 reboot.c32
+
+LABEL local
+  MENU LABEL boot local drive
+  LOCALBOOT 0
+
+LABEL Debian
+  MENU LABEL Debian Buster
+  KERNEL vmlinuz
+  APPEND vga=858 rw ip=dhcp initrd=initrd.img root=/dev/nfs nfsroot=192.168.0.2:/tmp/extstorage/diskless/NUC ipv6.disable=1
+```
+
+Then we also need to copy the kernel (`vmlinuz`) and init ramdisk
+(`initrd.img`) to the tftp root. Which can be easily done if we have installed
+a system in another machine.
+
+## Boot disk set up
+
+The easiest way to create a boot disk is to get a separate computer, install
+Debian, then create a tarball out of the root mount. Or otherwise, we can also use
+
+    debootstrap --no-merge-usr bullseye /path/install http://ftp2.us.debian.org/debian
+
+to create a barebone Debian install. After we copy over all files into the NFS
+server under a dedicated directory (e.g., `/tmp/extstorage/diskless/NUC` in my
+case), we still need to make sure the kernel and the init ram disk are
+accessible from TFTP. A symbolic link of the two files into the tftp root
+should be suffice.
+
+The next thing is to prepare the copied file to be usable in the diskless
+environment. One dedicated copy for one machine would be the best. But at
+least, we need to update `/etc/hostname` and the `/etc/network/interfaces` if
+not using DHCP. Chroot to `apt-get install openssh-server` would also be
+necessary if the diskless device is also headless.
+
+One key thing for the kernel: It will be delivered via TFTP and the root would
+be mounted as NFS. Hence the kernel should support NFS access. If not, we need
+to create a init ram disk with those modules. In debian, what we need is to add
+`BOOT=nfs` into `/etc/initramfs-tools/initramfs.conf` and then run `mkinitramfs
+-d /etc/initramfs-tools -o path/to/initrd.img`.
+
+## First boot
+
+After all these are done, the diskless device should be able to boot with the
+root mounted via NFS. To test run (which fails in DD-WRT but works in OpenWRT)
+is to sudo and run `apt-get update; apt-get dist-upgrade`. This will test
+whether NFS can handle the permission correctly. Also we should check `/proc`
+and `/dev` to make sure the procfs and device fs are mounted correctly (local,
+not related to NFS)
+
+Cavet: Diskless system over Ethernet is slow because Ethernet is way slower
+than SATA connection.
