@@ -1,0 +1,84 @@
+---
+layout: post
+title: "Time Management for System Administrators"
+subtitle: "Thomas A. Limoncelli / 2006"
+date: Sat, 11 Sep 2021 14:44:37 -0400
+category: book
+bibtex:
+  type: book
+  title: "Time Management for System Administrators"
+  author: "Thomas A. Limoncelli"
+  year: 2006
+  publisher: "O'Reilly"
+  address: "Sebastopol, CA"
+  isbn: 978-0-596-00783-6
+---
+
+This is a book I read 15 years ago. It is still very insightful re-reading it today. Perhaps because of the examples are more relevant, I found the time management advices are more useful. The theme of this book is "do not trust your brain" and therefore, we should offload stuff from our brain.
+
+The reason system administrators have time management problem is because of the constant interruptions from user requests. There are several ways to tackle this: set up a mutual interruption sheild with a coworker to catch all interruptions for another at one's project time, or delegate requests to a junior tier 1 helpdesk so 80% of the interruption would be solved there. Interruptions undermine focus during project time and we will get nothing done. Doing tasks as they arrive is to let interrupters manage your time.
+
+Avoiding interruptions is the best way to reduce their impact. Measure twice and cut once can avoid accidents, which cause interruptions to put off the fire. So make backup before change. If accident may still occur, plan for a better time to do it so you can get help or have room to fix it, such as changing tapes in the morning, not at last hour of work. Also to plan project time at personal or company rhythms to get best result (e.g., peak time for mental activities, quieter, months of less busy).
+
+The principles of time management is layed out in chapter 1:
+
+- one database for all information (e.g. an organizer)
+- conserve your brain power for what's important
+- develop routines: reuse code libraries, stop reinventing the wheel
+- develop habits and mantras (replace calculations with precomputed decisions, e.g., always yes for these type of questions)
+- maintain focus during project time
+- manage social life with the same tools as work life
+
+These principles are mostly to "conserve brain power", or I call it *to reduce congnitive load*. The core of the book is the "Cycle" system but there are many useful tips that can relief our brains too:
+
+- Use a window manager with virtual screens, so we use one for email, one for monitoring, etc. So we do not look around where is our window (Ch.2)
+    - i.e., declutter your work environment
+- Habit to put windows the same way, e.g., document to read on left and editor on right (Ch.2)
+- Use Nagio for monitoring, so you get a dashboard of everything (Ch.2)
+- Set up routines to fill gas on Sunday, weekly meeting with boss, etc. (Ch.3)
+- Routine to clean up things, e.g. meet with delegates every Thursday to troubleshoot their problems and remove roadblocks (Ch.3)
+    - e.g., unsubscribe mailing lists weekly, revise schedules first day every month
+- Always say "yes" to something, such as "should I write this down" (Ch.3)
+- Set up protocol for managing events, e.g. outages (Ch.3)
+    - who reports, how frequent to update reports, who to focus on fixing problems
+    - so we do not think when we're in hurry
+- Set up automatic checks (Ch.3), for example
+    - make it a habit to verify airflow of cooling fans whenever you pass by
+    - always keep key card in pocket
+    - run continous ping before plugging/unplugging cables
+- Set up filters for email, touch each email only once (Ch.10)
+- Use procmail for server-side filtering (Ch.10)
+- Set up "pickled email" folder to put old email at rest (Ch.10)
+- Do not use email as todo list, as it is ephemeral (Ch.10)
+- Use bash alias, set up host in ssh/config, use Makefile to automate tasks (Ch.13)
+
+The Cycle system proposed by the book is the following:
+- Use a combined to-do list and schedule
+- get an organizer, either a PDA, or a PAA
+    - it has to be portable, reliable, with calendar, daily to-do list and daily schedule, and some blank pages for long term tasks/goals
+- Write to-do list and schedule daily, block time for appointments of the day
+    - unfinished to-do items are copied from yesterday, and adding new from a request tracking system
+    - then prioritize or reschedule some item
+    - to-do items should be manageable small chunks and with a time estimate; priority are assigned for short time and high impact tasks
+- Long term appointments mark in calendar of the month or year, until a day is set for it
+
+The key to make this works:
+- there should be a single calendar for personal and work lifes (or merged calendar views)
+    - reason: reduce cognitive load, and easier to confirm time
+- need a request tracker, not to be confused with the to-do list
+    - example: RT from Best Practical (or Trello?)
+    - "delegate, record, do": When issue comes, we try to delegate someone to do it, record in tracker if not urgent, or do it immediately if urgent
+    - tracker should write down the exact deadline up to the minute (EOD, or 9am)
+    - multitask are for "hurry up and wait", e.g. download a large file, but when you wait, remember to put it down on to-do list so not forget to come back
+- tasks are prioritized by return of investments (ROI): do those that give biggest impact with least time involved first
+
+Some other ideas that not fit into anything above:
+- high self-esteem allows you to take risks and give yourself the opportunity to win
+- manage your boss: make sure your boss knows your goals and work together with them
+- don't solve a political issue with technology
+- sometimes your boss is measured in a way that unintentionally promotes bad behavior. They should either learn how to make better metrics or not manage using metrics
+- a person with martyr complex assumes that because she is paying such a great price to keep the company running, everyone owes her something. This is toxic
+- long vacation helps check if documentation is good and complete
+- smokers are relaxed at work, because they take breaks every couple hours
+- there are status meetings (report status) and work meetings (get things done), make it clear what people should expect to prepare for the right mindset, also helps facilitators to cut off inappropriate discussions
+- set meeting at strange time like 1:54pm so people will be curious to arrive on time to check out why

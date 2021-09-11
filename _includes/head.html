@@ -121,7 +121,34 @@
       tex: {
         inlineMath: [ ['$$','$$'], ["\\(", "\\)"] ],
         displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
-        processEscapes: true
+        processEscapes: true,
+        macros: {
+            R: "{\\mathbb R}",
+            N: "{\\mathbb N}",
+            C: "{\\mathbb C}",
+            Z: "{\\mathbb Z}",
+            Q: "{\\mathbb Q}",
+            SL: "{\\operatorname {SL}}",
+            SO: "{\\operatorname {SO}}",
+            GL: "{\\operatorname {GL}}",
+            id: "{\\mathbb {id}}",
+            tr: "{\\operatorname {tr}}",
+            trans: "{\\mathrm T}",
+            Span: "{\\operatorname {Span}}",
+            Hom: "{\\operatorname {Hom}}",
+            Rep: "{\\operatorname {Rep}}",
+            Aut: "{\\operatorname {Aut}}",
+            End: "{\\operatorname {End}}",
+            Repart: "{\\operatorname {Re}}",
+            Impart: "{\\operatorname {Im}}",
+            im: "{\\operatorname {im}}",
+            rk: "{\\operatorname {rank}}",
+            nullity: "{\\operatorname {null}}",
+            Stab: "{\\operatorname {Stab}}",
+            Zmod: ["{\\mathbb Z / #1 \\mathbb Z}",1],
+            bold: ["{\\bf #1}",1],
+            Abs: ['\\left\\lvert #2 \\right\\rvert_{\\text{#1}}', 2, ""]
+        }
       },
       loader: {
         load: ['input/tex', 'output/chtml']
