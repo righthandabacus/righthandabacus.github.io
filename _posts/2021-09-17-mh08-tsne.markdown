@@ -1,0 +1,360 @@
+---
+layout: post
+title: "van der Maaten & Hinton (2008) Visualizing data using t-SNE"
+date: Fri, 17 Sep 2021 20:14:51 -0400
+category: paper
+bibtex:
+  type: article
+  title: "Visualizing Data using t-SNE"
+  author: "Lauren van der Maaten and Geoffrey Hinton"
+  journal: "Journal of Machine Learning Research"
+  volume: 9
+  number: 86
+  year: 2008
+  pages: 2579--2605
+---
+
+t-SNE is often used as a better alternative than PCA in terms of visualization.
+This paper is the one that proposed it. It is an extension to SNE (stochastic
+neighbor embedding), which the first few page of the paper outlined it:
+
+## SNE
+
+Assume we have points $$x_1, \cdots, x_N$$ in high dimensional coordinates. The
+*similarity* of points $$x_i$$ and $$x_j$$ is defined as
+
+$$
+p_{j\mid i} = \frac{\exp(-\Vert x_i - x_j\Vert^2 / 2\sigma_i^2)}{\sum_{k\ne i}\exp(-\Vert x_i - x_k\Vert^2 / 2\sigma_i^2)}
+$$
+
+where the $$\sigma_i^2$$ is the scale parameter to the Gaussian density
+function, and it is specific to $$x_i$$. The similarity of a point to itself is
+defined to be zero, i.e., $$p_{i\mid i}=0$$.
+
+If we have a low-dimensional mapping $$y_i$$ for each point $$x_i$$, we can do
+the same to calculate similarity $$q_{j\mid i}$$ (but the paper suggest to use
+a constant $$\sigma_i^2=\frac12$$ to simplify the case in low dimension.
+
+The idea of SNE is that, if the mapping from $$x_i$$ to $$y_i$$ are perfect,
+then $$p_{j\mid i}=q_{j\mid i}$$ for all $$i,j$$ and we can use the
+Kullback-Leiber divergence as the measure of mismatch. We should find $$y_i$$
+to minimize the sum of all K-L divergence, i.e. use the following as cost function:
+
+$$
+C = \sum_i KL(P_i\Vert Q_i) = \sum_i\sum_j p_{j\mid i}\log\frac{p_{j\mid i}}{q_{j\mid i}}
+$$
+
+we can seek for the minimizer $$y_i$$ using gradient descent, where
+
+$$
+\frac{\partial C}{\partial y_i} = 2\sum_j (p_{j\mid i} - q_{j\mid i} + p_{i\mid j} - q_{i\mid j})(y_i - y_j)
+$$
+
+The variance in $$p_{j\mid i}$$ is set such that points $$x_i$$ at denser
+regions would use smaller $$\sigma_i^2$$, as Shannon entropy $$H$$ increases with
+$$\sigma_i^2$$:
+
+$$
+H(P_i) = -\sum_k p_{j\mid i}\log_2 p_{j\mid i}
+$$
+
+Hence we define perplexity as $$2^{H(P_i)}$$, which is a measure of effective
+number of neighbors for point $$x_i$$. A typical value of perplexity, as suggested by the
+paper, is between 5 and 50. The variance $$\sigma_i^2$$ should be set such that
+the perplexity are equal for all the points. This can be found by binary search
+(seems like the perplexity is a monotonic function of variance).
+
+From the partial derivative $$\partial C/\partial y_i$$ we can see that it is a
+force in the direction of $$y_i - y_j$$, i.e., point $$y_i$$ are subject to
+forces toward each other points $$y_j$$. The magnitude of the force is
+proportional to the *stiffness* $$(p_{j\mid i} - q_{j\mid i} + p_{i\mid j} -
+q_{i\mid j})$$, which $$p_{j\mid i}+p_{i\mid j}$$ is positive and
+$$q_{j\mid i}+q_{i\mid j}$$ is negative. This means if the similarity is too
+close in lower dimension $$y_i$$ compared to higher dimension $$x_i$$, there
+will be a net force to push the point away, and vice versa. Equalibrium will be
+attained when the attraction and repulsion magnitudes are equal.
+
+The paper suggested to use gradient descent with momentum, i.e.,
+
+$$
+y^{(t)} = y^{(t-1)} + \eta \frac{\partial C}{\partial y} + \alpha(t)\big(y^{(t-1)} - y^{(t-2)}\big)
+$$
+
+## t-SNE
+
+The SNE above is using *Gaussian kernels*, as $$p_{j\mid i}$$ and $$q_{j\mid
+i}$$ are both using Gaussian density function.  The t-SNE is to use Cauchy
+distribution (i.e., t distribution with dof=1) for $$q_{j\mid i}$$, and
+normalized over all pairs $$y_i,y_j$$:
+
+$$
+q_{ij} = \frac{(1+\Vert y_i - y_j\Vert^2)^{-1}}{\sum_{k\ne\ell}(1+\Vert y_k - y_{\ell}\Vert^2)^{-1}}
+$$
+
+and the similarity in high dimension is symmetrizied:
+
+$$
+p_{ij} = \frac{p_{i\mid j}+p_{j\mid i}}{2}
+$$
+
+and normalized over the row (i.e. $$p_{ij}$$ normalized across all $$j$$).
+
+With the cost function defined in the same way, the gradient is now:
+
+$$
+\begin{aligned}
+C &= KL(P\Vert Q) = \sum_i \sum_j p_{ij} \log\frac{p_{ij}}{q_{ij}} \\
+\frac{\partial C}{\partial y_i} &= 4\sum_j (p_{ij} - q_{ij})(y_i - y_j)(1+\Vert y_i - y_j\Vert^2)^{-1}
+\end{aligned}
+$$
+
+The reason for the t-distribution for $$q_{ij}$$ and Gaussian for $$p_{ij}$$ is
+that t-distribution is heavytailed and there is a unique sweet spot of
+separation. Therefore, it will maintain a reasonable scale in low dimension for
+$$q_{ij}$$.
+
+## Implementation
+
+The reference implementation is from the author: <https://github.com/lvdmaaten/bhtsne/blob/master/tsne.cpp>
+and below is how I ported it into Python.
+
+```python
+import datetime
+import sys
+import numpy as np
+
+def tSNE(X, no_dims=2, perplexity=30, seed=0, max_iter=1000, stop_lying_iter=100, mom_switch_iter=900):
+    """The t-SNE algorithm
+
+	Args:
+		X: the high-dimensional coordinates
+		no_dims: number of dimensions in output domain
+    Returns:
+        Points of X in low dimension
+    """
+    momentum = 0.5
+    final_momentum = 0.8
+    eta = 200.0
+    N, _D = X.shape
+    np.random.seed(seed)
+
+    # normalize input
+    X -= X.mean(axis=0) # zero mean
+    X /= np.abs(X).max() # min-max scaled
+
+    # compute input similarity for exact t-SNE
+    P = computeGaussianPerplexity(X, perplexity)
+    # symmetrize and normalize input similarities
+    P = P + P.T
+    P /= P.sum()
+    # lie about the P-values
+    P *= 12.0
+    # initialize solution
+    Y = np.random.randn(N, no_dims) * 0.0001
+    # perform main training loop
+    gains = np.ones_like(Y)
+    uY = np.zeros_like(Y)
+    for i in range(max_iter):
+        # compute gradient, update gains
+        dY = computeExactGradient(P, Y)
+        gains = np.where(np.sign(dY) != np.sign(uY), gains+0.2, gains*0.8).clip(0.1)
+        # gradient update with momentum and gains
+        uY = momentum * uY - eta * gains * dY
+        Y = Y + uY
+        # make the solution zero-mean
+        Y -= Y.mean(axis=0)
+        # Stop lying about the P-values after a while, and switch momentum
+        if i == stop_lying_iter:
+            P /= 12.0
+        if i == mom_switch_iter:
+            momentum = final_momentum
+        # print progress
+        if (i % 50) == 0:
+            C = evaluateError(P, Y)
+            now = datetime.datetime.now()
+            print(f"{now} - Iteration {i}: Error = {C}")
+    return Y
+
+def computeExactGradient(P, Y):
+    """Gradient of t-SNE cost function
+
+	Args:
+        P: similarity matrix
+        Y: low-dimensional coordinates
+    Returns:
+        dY, a numpy array of shape (N,D)
+	"""
+    N, _D = Y.shape
+    # compute squared Euclidean distance matrix of Y, the Q matrix, and the normalization sum
+    DD = computeSquaredEuclideanDistance(Y)
+    Q = 1/(1+DD)
+    sum_Q = Q.sum()
+    # compute gradient
+    mult = (P - (Q/sum_Q)) * Q
+    dY = np.zeros_like(Y)
+    for n in range(N):
+        for m in range(N):
+            if n==m: continue
+            dY[n] += (Y[n] - Y[m]) * mult[n,m]
+    return dY
+
+def evaluateError(P, Y):
+    """Evaluate t-SNE cost function
+
+    Args:
+        P: similarity matrix
+        Y: low-dimensional coordinates
+    Returns:
+        Total t-SNE error C
+    """
+    DD = computeSquaredEuclideanDistance(Y)
+    # Compute Q-matrix and normalization sum
+    Q = 1/(1+DD)
+    np.fill_diagonal(Q, sys.float_info.min)
+    Q /= Q.sum()
+    # Sum t-SNE error: sum P log(P/Q)
+    error = P * np.log( (P + sys.float_info.min) / (Q + sys.float_info.min) )
+    return error.sum()
+
+def computeGaussianPerplexity(X, perplexity):
+    """Compute Gaussian Perplexity
+
+    Args:
+        X: numpy array of shape (N,D)
+        perplexity: double
+    Returns:
+        Similarity matrix P
+    """
+    # Compute the squared Euclidean distance matrix
+    N, _D = X.shape
+    DD = computeSquaredEuclideanDistance(X)
+    # Compute the Gaussian kernel row by row
+    P = np.zeros_like(DD)
+    for n in range(N):
+        found = False
+        beta = 1.0
+        min_beta = -np.inf
+        max_beta = np.inf
+        tol = 1e-5
+
+        # iterate until we get a good perplexity
+        n_iter = 0
+        while not found and n_iter < 200:
+            # compute Gaussian kernel row
+            P[n] = np.exp(-beta * DD[n])
+            P[n,n] = sys.float_info.min
+            # compute entropy of current row
+            # Gaussians to be row-normalized to make it a probability
+            # then H = sum_i -P[i] log(P[i])
+            #        = sum_i -P[i] (-beta * DD[n] - log(sum_P))
+            #        = sum_i P[i] * beta * DD[n] + log(sum_P)
+            sum_P = P[n].sum()
+            H = beta * (DD[n] @ P[n]) / sum_P + np.log(sum_P)
+            # Evaluate if entropy within tolerance level
+            Hdiff = H - np.log2(perplexity)
+            if -tol < Hdiff < tol:
+                found = True
+                break
+            if Hdiff > 0:
+                min_beta = beta
+                if max_beta in (np.inf, -np.inf):
+                    beta *= 2
+                else:
+                    beta = (beta + max_beta) / 2
+            else:
+                max_beta = beta
+                if min_beta in (np.inf, -np.inf):
+                    beta /= 2
+                else:
+                    beta = (beta + min_beta) / 2
+            n_iter += 1
+        # normalize this row
+        P[n] /= P[n].sum()
+    assert not np.isnan(P).any()
+    return P
+
+def computeSquaredEuclideanDistance(X):
+    """Compute squared distance
+    Args:
+        X: numpy array of shape (N,D)
+    Returns:
+        numpy array of shape (N,N) of squared distances
+    """
+    N, _D = X.shape
+    DD = np.zeros((N,N))
+    for i in range(N-1):
+        for j in range(i+1, N):
+            diff = X[i] - X[j]
+            DD[j][i] = DD[i][j] = diff @ diff
+    return DD
+
+def main():
+    import tensorflow as tf
+    (X_train, y_train), (X_test, y_test) = tf.keras.datasets.mnist.load_data()
+    print("Dimension of X_train:", X_train.shape)
+    print("Dimension of y_train:", y_train.shape)
+    print("Dimension of X_test:", X_test.shape)
+    print("Dimension of y_test:", y_test.shape)
+    n = 200
+    rows = np.random.choice(X_train.shape[0], n, replace=False)
+    X_data = X_train[rows].reshape(n, -1).astype("float")
+    X_label = y_train[rows]
+    Y = tSNE(X_data, 2, 30, 0, 1000, 100, 900)
+    np.savez("data.npz", X=X_data, Y=Y, label=X_label)
+
+if __name__ == "__main__":
+    main()
+```
+
+From the code, we see a few tweaks that are not mentioned in the paper:
+
+In `tSNE()`, the main algorithm:
+- The initial points of $$y_i$$ are randomized using
+  $$N(\mu=0,\sigma=10^{-4})$$. The small standard deviation will make the
+  initial points closely packed.
+- Gradient descent used in the algorithm is not exactly like that shown in the
+  formula above. There is a *gain* factor multiplied to the gradient descent.
+  It started as 1 and updated according to the sign of $$\partial C/\partial
+  y_i$$ and $$(y_i^{(t-1)} - y_i^{(t-2)})$$. It will increase by 0.2 if signs
+  differ and decrease to its 80% if signs agree, with the lowerbound of 0.1;
+  this is to make the gradient descent do larger steps if we are moving in the
+  right direction
+- Initially the values of $$p_{ij}$$ are multiplied by 12 and this amplified
+  version of $$P$$ matrix is used to calculate the gradient in the beginning,
+  then scaled back to the original values of $$P$$
+- The momentum used in gradient descent will be switched from 0.5 to 0.8 at later stage
+
+In `computeExactGradient()`
+- We first compute the multiplier $$(p_{ij}-q_{ij})(1+\Vert y_i-y_j\Vert^2)^{-1}$$
+  as matrix `mult` to make it computationally more efficient
+- While the gradient formula above carried a coefficient 4, it is not used.
+  Instead, we use a bigger (200) $$\eta$$ in `tSNE()` to compensate
+
+In `computeGaussianPerplexity()`:
+- The binary search is using a tolerance $$10^{-5}$$, which the entropy
+  calculated would have at most this much of error from the log of the target
+  perplexity
+- Instead of doing bisection search on $$\sigma_i^2$$, it is searching on
+  $$\beta=1/2\sigma_i^2$$. Hence $$\beta$$ is larger for a smaller entropy
+  $$H$$. The search will reduce $$\beta$$ for overshot $$H$$.
+- The matrix $$P$$ is normalized by row, but the diagonal entries are using
+  `sys.float_info.min` which is the smallest positive float in the system. This
+  is essentially zero but avoids division-by-zero error in corner cases.
+
+## Remark:
+
+The PDF of t-distribution with dof $$\nu>0$$ is defined for $$x\in(-\infty,\infty)$$:
+
+$$
+f(x) = \frac{\Gamma(\frac{\nu+1}{2})}{\sqrt{\nu\pi}\Gamma(\frac{\nu}{2})} \left(1+\frac{x^2}{\nu}\right)^{-\frac{\nu+1}{2}}
+$$
+
+which $$\nu=1$$ gives Cauchy distribution with location $$x_0=0$$ and scale $$\gamma=1$$:
+
+$$
+\begin{aligned}
+f(x) &= \frac{\Gamma(1)}{\sqrt{\pi}\Gamma(\frac12)} (1+x^2)^{-1} \\
+&= \frac{1}{\sqrt{\pi}\sqrt{\pi}} (1+x^2)^{-1} \\
+&= \frac{1}{\pi (1+x^2)}
+\end{aligned}
+$$

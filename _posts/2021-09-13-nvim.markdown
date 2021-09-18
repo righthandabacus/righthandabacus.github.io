@@ -1,0 +1,98 @@
+---
+layout: post
+title: Using neovim
+date: Mon, 13 Sep 2021 16:23:13 -0400
+tags: system
+category: blog
+---
+
+Have been using neovim for a few years now and I don't feel a thing! To
+remember what should be done in case of reinstallation from scratch, it is
+better to write down some tips and configuration.
+
+Install: You can apt-get, or brew install. The configuration is at `~/.config/nvim/` but for compatibility with vim, I do this:
+
+```
+cd ~
+ln -s .vim .config/nvim
+ln -s .vimrc .vim/init.vim
+```
+
+and to make it default,
+
+```
+alias vi=nvim
+alias vimdiff='nvim -d'
+```
+
+Plug-in management is recommended to use [vim-plug](https://vi.stackexchange.com/questions/388/) and see [here for examples of using it with neovim](https://www.linode.com/docs/guides/how-to-install-neovim-and-plugins-with-vim-plug/). Simply speaking, to install vim-plug:
+
+```
+curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+```
+
+and to install plug-ins, use `:PlugInstall` command inside vim or
+`:PlugUpgrade` to upgrade vim-plug. To update the installed packages, use
+`:UpdateRemotePlugins`. The list of plugins used are entered in
+`~/.config/nvim/init.vim` as:
+
+```
+" https://github.com/junegunn/vim-plug
+call plug#begin(stdpath('data'). '/plugged')
+	" tabular plugin is used to format tables
+	" select lines, then `:Tab /<regex>` will look for the delimiter and tabularize
+	Plug 'godlygeek/tabular'
+	" JSON front matter highlight plugin
+	Plug 'elzr/vim-json'
+	" markdown plugin
+	Plug 'plasticboy/vim-markdown', { 'branch':'master' }
+call plug#end()
+```
+
+which the `Plug` command accepts full URL to git repository (e.g.,
+`https://github.com/junegunn/vim-github-dashboard.git`) or a shorthand,
+`junegunn/vim-github-dashboard`. And you can choose the git tag or branch like
+the last example above.
+
+and this is my other config in `init.vim`:
+
+```
+set mouse=a                 " mouse in normal, visual, and insert mode
+"set expandtab               " converts tabs to white space
+set nocompatible            " disable compatibility to old-time vi
+set showmatch               " show matching brackets.
+set ignorecase              " case insensitive matching
+set hlsearch                " highlight search results
+set tabstop=4               " number of columns occupied by a tab character
+set softtabstop=4           " see multiple spaces as tabstops so <BS> does the right thing
+set shiftwidth=4            " width for autoindents
+set autoindent              " indent a new line the same amount as the line just typed
+"set number                  " add line numbers
+set wildmode=longest,list   " get bash-like tab completions
+set cc=100                  " set an 100 column border for good coding style
+"set nowrapscan				" search stop at end of file
+set cursorline
+filetype plugin indent on   " allows auto-indenting depending on file type
+syntax on                   " syntax highlighting
+
+" mouse release send selection to clipboard
+vmap <LeftRelease> "*ygv
+
+" terminal mode: Use ESC to back to normal mode
+tnoremap <Esc> <C-\><C-n>
+
+" toggle spell check by <F11>, [s and ]s for prev/next spell error, z= for suggestions
+" https://jdhao.github.io/2019/04/29/nvim_spell_check/
+set spelllang=en,cjk
+nnoremap <silent> <F11> :set spell!<cr>
+inoremap <silent> <F11> <C-O>:set spell!<cr>
+"set spell    " turn on spell check by default
+set spelllang=en_us
+
+" https://stackoverflow.com/questions/597687/changing-variable-names-in-vim
+" For local replace
+nnoremap gr gd[{V%::s/<C-R>///gc<left><left><left>
+" For global replace
+nnoremap gR gD:%s/<C-R>///gc<left><left><left>
+```
