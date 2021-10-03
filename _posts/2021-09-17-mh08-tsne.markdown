@@ -33,7 +33,8 @@ defined to be zero, i.e., $$p_{i\mid i}=0$$.
 
 If we have a low-dimensional mapping $$y_i$$ for each point $$x_i$$, we can do
 the same to calculate similarity $$q_{j\mid i}$$ (but the paper suggest to use
-a constant $$\sigma_i^2=\frac12$$ to simplify the case in low dimension.
+a constant $$\sigma_i^2=\frac12$$ to remove the denominators in exponential
+functions, to simplify the case in low dimension).
 
 The idea of SNE is that, if the mapping from $$x_i$$ to $$y_i$$ are perfect,
 then $$p_{j\mid i}=q_{j\mid i}$$ for all $$i,j$$ and we can use the
