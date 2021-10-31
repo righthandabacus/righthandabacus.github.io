@@ -1,0 +1,141 @@
+---
+layout: post
+title: "Glorot & Bengio (2010) Understanding the difficulty of training deep feedforward neural networks"
+date: 2021-10-15
+category: paper
+bibtex:
+  type: inproceedings
+  title: "Understanding the difficulty of training deep feedforward neural networks"
+  author: "Xavier Glorot and Yoshua Bengio"
+  booktitle: "Proceedings of the 13th International Conference on Artificial Intelligence and Statistics"
+  year: 2010
+  pages: 249--256
+---
+
+This is the paper that explains what caused the gradient vanishing or exploding
+problem in training neural networks. The approach was to experiment with some
+fabricated image datasets as well as ImageNet datasets for multi-class
+classifications. Then some theoretical derivation is provided to support the
+argument.
+
+The setting is a neural network iwht 1-5 hidden layers, with 1000 units per
+layer and softmax logistic regression for output, i.e.,
+$$\textrm{softmax}(Wh+b)$$. The cost function in training is average
+log-likelihood over a minibatch, i.e.,
+
+$$
+- (y_i \log p_i + (1-y_i)\log (1-p_i)) = -\log \Pr[y\mid x]
+$$
+
+and the minibatch size is 10. The paper explored different types of activation
+function in the hidden layer; sigmoid $$(1+\exp(-x))^{-1}$$, hyperbolic tangent
+$$\tanh(x)$$, and softsign $$x/(1+\lvert x\rvert)$$. The initialization of
+weight follows the uniform distribution
+
+$$
+w_{ij} \sim U[-\tfrac{1}{\sqrt{n}}, \tfrac{1}{\sqrt{n}}]
+$$
+
+for $$n$$ the number of columns of $$W$$, i.e., number of unit in the previous
+layer.
+
+Experimental findings: Sigmoid activation has the activation value at the last
+hidden layer quickly pushed to zero while the other layers' value with mean
+above 0.5 for a long time. Hence the neurons are difficult to escape from the
+local satuation regime. If the weights are initialized by some pretraining, it
+doesn't exhibut the saturation behavior.
+
+The paper suggested the problem of using the sigmoid function as the following:
+The softmax output depends on $$b+Wh$$, which $$b$$ is updated faster than
+$$Wh$$. Hence the error gradient will push $$h$$ towards zero. A zero $$h$$
+means the output of the previous layer was in the saturated regime (which is
+specific to sigmoid but not the case of tanh). And at that regime, the slope of
+sigmoid function is flat, makes it difficult to escape.
+
+Compared to log-likelihood, the paper also claimed the use of quadratic cost
+function (i.e., $$\sum_i (y_i-d_i)^2$$ for all output $$y_i$$ and desired state
+$$d_i$$) can contribute to the vanishing gradient problem because
+log-likelihood has steeper slope.
+
+Bradley (2009) studied the gradient as back-propagated from output layer towards the input layer has the variance getting smaller.
+
+Assume a dense network with symmetric activation function with unit derivative at 0, i.e.,
+
+$$
+z^{(i)} = f(W^{(i)}z^{(i-1)}+b^{(i)}) = f(s^{(i)})
+$$
+
+and with input as $$z^{(0)}=x$$. With the cost $$C$$, we have
+
+$$
+\begin{aligned}
+\frac{\partial C}{\partial s^{(i)}_k} &= \frac{\partial C}{\partial s^{(i+1)}}\cdot\frac{\partial s^{(i+1)}}{\partial s^{(i)}_k}
+= f'(s^{(i)}_k)W^{(i+1)}_{k\,\bullet}\cdot\frac{\partial C}{\partial s^{(i+1)}}
+\\
+\frac{\partial C}{\partial w_{jk}^{(i)}} &= z_j^{(i)}\frac{\partial C}{\partial s_k^{(i)}}
+\end{aligned}
+$$
+
+We also denote the size of layer $$i$$ as $$n_i$$.
+
+Since for independent random varables $$X$$ and $$Y$$, we have
+
+$$
+Var(XY)=Var(X)Var(Y)+Var(X)\bar{Y}^2+Var(Y)\bar{X}^2,
+$$
+
+or for $$X_1,X_2,\cdots,X_k$$ we have
+
+$$
+Var(X_1X_2\cdots X_k)=\prod_i (Var(X_i)+\bar{X}_i^2) - \prod_i \bar{X}_i^2
+$$
+
+(ref: <https://stats.stackexchange.com/questions/52646/>). Hence if $$\bar{W}=0$$ and $$\bar{z}^{i-1}=0$$, and assume $$f'(s^{(i)}_k)\approx 1$$. 
+
+$$
+Var(z^{(i)}) \approx Var(W^{(i)}z^{(i-1)}) \approx n_iVar(W^{(i)})Var(z^{(i-1)})
+$$
+
+Applying to all $$i$$ layers,
+
+$$
+Var(z^{(i)}) \approx Var(x)\prod_{j=0}^{i-1} n_j Var(W^{(j)}).
+$$
+
+Similarly, the variance of the gradient (which $$d$$ is the number of layers in the network),
+
+$$
+\begin{aligned}
+Var(\frac{\partial C}{\partial s^{(i)}}) &\approx Var(\frac{\partial C}{\partial s^{(d)}})\prod_{j=i}^d n_{j+1}Var(W^{(j)}) \\
+Var(\frac{\partial C}{\partial w^{(i)}}) &\approx Var(x)Var(\frac{\partial C}{\partial s^{(d)}})\prod_{j=0}^{i-1}n_j Var(W^{(j)})\prod_{j=i}^{d-1}n_{j+1}Var(W^{(j)})
+\end{aligned}
+$$
+
+The goal is to make
+
+$$
+\begin{aligned}
+Var(z^{(i)}) &=Var(z^{(j)}) \\
+Var(\frac{\partial C}{\partial s^{(i)}}) &= Var(\frac{\partial C}{\partial s^{(j)}})
+\end{aligned}
+$$
+
+for all layers $$i$$ and $$j$$ (hence the variance is not exploding nor vanishing). Which the solution is
+
+$$
+n_i Var(W^{(i)}) = n_{i+1} Var(W^{(i)}) = 1
+$$
+
+There is a solution only if all layers are of the same size $$n_i=n$$ but the paper propose a compromised solution:
+
+$$
+Var(W^{(i)})=\frac{2}{n_i+n_{i+1}}
+$$
+
+Uniform distribution $$U[a,b]$$ has variance $$\frac{1}{12}(b-a)^2$$. Therefore with the uniform initializer $$U[-1/\sqrt{n},1/\sqrt{n}]$$, the variance is $$1/(3n)$$. Hence $$nVar(W)=\frac13$$. This will cause the variance of $$z^{(i)}$$ diminish toward the output and gradient $$\partial C/\partial s^{(i)}$$ explode toward output. The paper's proposal is to initialize with
+
+$$
+W^{(i)} \sim U[-\frac{\sqrt{6}}{\sqrt{n_i+n_{i+1}}}, \frac{\sqrt{6}}{\sqrt{n_i+n_{i+1}}}]
+$$
+
+which the variance will be $$2/(n_i+n_{i+1})$$.

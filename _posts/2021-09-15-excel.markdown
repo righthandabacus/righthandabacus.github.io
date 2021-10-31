@@ -1,0 +1,84 @@
+---
+title: Excel conventions
+tags: work
+date: 2021-09-15
+---
+
+Excel is quite ubiquitous but not many people use it well. The finance industry
+use it a lot and there are some good practices created. The key to use Excel
+(or other spreadsheet) well is to remember that there are two layers in it, the
+formula and the result, and it encourage people to edit it as they read it.
+
+The first rule is never start from A1 cell. Keep two rows and two columns empty
+so you can easily add something, be it a temporary calculation to try out
+something, or allow some empty space so you can right click on and do something
+else. Besides, a spreadsheet allows you to set the size, you can simply make
+the rows and columns very narrow to conserve screen real estates.
+
+The next rule is to make the worksheet easier to read. Unifying the font and
+row height, all numbers in the same format (e.g., 2 d.p. with thousand
+separator), text cells all aligned to left while numbers aligned to right, are
+some of the trivial ones. But I think the most eye-opening is the color
+conventions, which you can easily spot whether a cell is a constant or a
+formula:
+
+^ Type                            ^ Example                             ^ Color    ^
+| Hard-coded input                | `=12.34`                            | Blue     |
+| Formula                         | `=D3*2`                             | Black    |
+| Link to other worksheet         | `=Sheet2!C3`                        | Green    |
+| Link to other files             | `=[Book2]Sheet1!C3`                 | Red      |
+| Link to external data providers | `=BDP("GOOG US Equity", "PX_LAST")` | Dark red |
+
+We color the text and leave the background and border color for other use
+(e.g., different sections, or mark alternative rows in a table, or even use it
+for heatmap so we can visually easier to identify some interesting spot). Also,
+to make the sheet less messy, try not to use borders at all but use horizontal
+rules at strategic location, refer to LaTeX booktabs package for what a
+publish-quality table should look like.
+
+Also try not to hide rows and columns, but group them and collapse them. It
+would be easier to toggle the visibility.
+
+These should make the most impact already. Of course, there are some other tips
+learned from software engineering:
+
+- keep number constants off the formula, use a cell to hold it so you are
+  easier to modify and eaiser to understand what those numbers are
+- comments, to explain the numbers and explain the formula, and put down
+  references for such decision
+- avoid link to other files, since this will be easily broken
+- keep the model and view separate, i.e., put the detailed calculation in one
+  sheet and executive summary at another
+- elevator jump: Keep one column or row empty and put a placeholder (e.g., "x")
+  at strategic location. Then we can use this row or column to quickly move
+  around, using Ctrl-Arrow key
+
+For the hot keys, these should be productive:
+- Mouse click on cells while holding Ctrl to select multiple cells; then type something with Ctrl-Enter to populate to all cells
+- Shift-Space to select entire row; Ctrl-Space to select entire column
+- Ctrl-Plus to add row/column/cell and Ctrl-Minus to delete row/column/cell (mac use Cmd instead of Ctrl); it will automatically add/delete row or column if the entire row/column is already selected
+- F4 is to repeat last action (e.g., set color/font/format, etc.)
+- Holding Ctrl or Shift while selecting multiple sheet will create a group of worksheets, then entering on one cell will apply to the same cell on all sheets
+- Find cells with formula: F5 will pop-up to "Go To" dialog, click on "Special" button at bottom corner and select "Formula" will select all cells with formula
+  - similarly, can select all cells that are blank, entered a constant, with an object, etc.
+- Ctrl-; to enter today's date
+- Ctrl-Arrow to move to the end on that direction
+- Ctrl-Shift-L to toggle filtering of the selected cells
+	- Then at header row Alt+down will show the filter menu
+- Ctrl-9 to hide rows; Ctrl-Shift-9 to unhide
+- Ctrl-0 to hide columns; Ctrl-Shift-0 to unhide
+- Selected entire rows/columns, then Shift-Alt-Right will create a group of rows/columns; Shift-Alt-Left will ungroup (mac use Cmd-Shift-K and Cmd-Shift-J)
+
+Finally, index and match (which is the modern alternative to VLOOKUP):
+
+`=INDEX(A1:Z10, 3, 5)` gives E3. We can think of `=INDEX(array, i, j)` as
+`array[i][j]` with row-major array and indices start at 1.
+
+`=MATCH(needle, haystack, 0)` is to find exact match of "needle" in vector
+"haystack". The vector must either be a row array or a column array. The third
+parameter can be -1 or 1 for "less than or equal to" or "greater than or equal
+to" look up, but this would imply the vector to be sorted in ascending order or
+descending order respectively. If doing exact match, the search term "needle"
+can be a wildcard, e.g. `abc*`.
+
+Combine together, we may write a formula such as `=INDEX(F3:P11, MATCH("foo",A3:A11,0), 2)`
