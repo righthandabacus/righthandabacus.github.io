@@ -18,7 +18,7 @@ fabricated image datasets as well as ImageNet datasets for multi-class
 classifications. Then some theoretical derivation is provided to support the
 argument.
 
-The setting is a neural network iwht 1-5 hidden layers, with 1000 units per
+The setting is a neural network with 1-5 hidden layers, with 1000 units per
 layer and softmax logistic regression for output, i.e.,
 $$\textrm{softmax}(Wh+b)$$. The cost function in training is average
 log-likelihood over a minibatch, i.e.,

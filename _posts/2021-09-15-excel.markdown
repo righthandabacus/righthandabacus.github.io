@@ -22,7 +22,8 @@ some of the trivial ones. But I think the most eye-opening is the color
 conventions, which you can easily spot whether a cell is a constant or a
 formula:
 
-^ Type                            ^ Example                             ^ Color    ^
+| Type                            | Example                             | Color    |
+|---------------------------------|-------------------------------------|----------|
 | Hard-coded input                | `=12.34`                            | Blue     |
 | Formula                         | `=D3*2`                             | Black    |
 | Link to other worksheet         | `=Sheet2!C3`                        | Green    |

@@ -1,0 +1,101 @@
+---
+layout: post
+title: "Taylor & Letham (2018) Forecasting at Scale"
+date: Mon, 08 Nov 2021 15:08:19 -0500
+category: paper
+bibtex:
+  type: article
+  title: "Forecasting at Scale"
+  author: "Sean J. Taylor and Benjamin Letham"
+  journal : "The American Statistician"
+  volume: 72
+  number: 1
+  year: 2018
+  pages: 37--45
+  doi: "10.1080/00031305.2017.1380080"
+---
+
+This is the paper for [Facebook Prophet](https://facebook.github.io/prophet/).
+It considers time series $$y(t)$$ as a composition of trend, seasonality, and
+holidays under generalized additive model (GAM):
+
+$$
+y(t) = g(t) + s(t) + h(t) + \epsilon_t
+$$
+
+which the trend $$g(t)$$ is non-periodic, the seasonality $$s(t)$$ is periodic,
+and holiday $$h(t)$$ is the effect of holidays which occur irregularly. The
+error term $$\epsilon_t$$ is assumed Gaussian. Fitting new components in GAM
+can be done using L-BFGS.  Prophet is a curve-fitting model; in contrary to
+ARIMA which is a generative one. Hence data needd not to be regularly spaced
+and we do not need interpolation for missing data.
+
+
+Prophet allows trend $$g(t)$$ to be nonlinear and satuating. The basic form is
+
+$$
+g(t) = \frac{C}{1+\exp(-k(t-m))}
+$$
+
+which the growth rate is $$k$$, time offset is $$m$$, and growth ceiling is $$C$$ (i.e., the
+capacity). The extension is a piecewise logistic growth model
+
+$$
+g(t) = \frac{C(t)}{1+\exp(-(k+\mathbf{a}(t)^T\mathbf{\delta})(t-(m+\mathbf{a}(t)^T\mathbf{\gamma})))}
+$$
+
+where $$C(t)$$ is to model the non-constant capacity, and $$\mathbf{a}(t)$$ is
+to model the change points at which the growth rate updated. In detail, it is a vector that
+
+$$
+a_j(t) = \begin{cases}1 & \text{if }t\ge s_j\\ 0 & \text{otherwise}\end{cases}
+$$
+
+and at time $$s_j$$ the growth rate change by $$\delta_j$$, hence at any time, the growth rate is given by
+
+$$
+k + \sum_{j: t> s_j} \delta_j
+$$
+
+and the time offset should be changed accordingly, which
+
+$$
+\gamma_j = \big(s_j - m - \sum_{i<j} \gamma_i\big)\big(1-\frac{k+\sum_{i<j}\delta_i}{k+\sum_{i\le j}\delta_i}\big)
+$$
+
+For a linear trend, it can be simplified into (with $$\gamma_j = -s_j\delta_j$$):
+
+$$
+g(t) = (k+\mathbf{a}(t)^T\mathbf{\delta})t + (m+\mathbf{a}(t)^T\mathbf{\gamma})
+$$
+
+The model of rate change has an implication in forecasting. The paper suggested
+a prior of $$\delta_j \sim \text{Laplace}(0,\tau)$$ and the parameter $$\tau$$
+is fitted with data. Then the change and change point will be forecasted as a
+simulated stochastic process.
+
+The seasonality is approximated using Fourier series model:
+
+$$
+s(t) = \sum_{n=1}^N \big( a_n \cos \frac{2\pi nt}{P} + b_n \sin \frac{2\pi nt}{P}\big)
+$$
+
+in the paper, it is proposed to fit the Fourier model by using a seasonality vector:
+
+$$
+\begin{aligned}
+X(t) &= \big[\cos\frac{2\pi(1)t}{365.25}, \cdots, \sin\frac{2\pi(10)t}{365.25}\big] \\
+\mathbf{\beta} &= [a_1, b_1, \cdots, a_10, b_10] \\
+s(t) &= X(t)^T \mathbf{\beta}
+\end{aligned}
+$$
+
+The paper claimed that $$N=10$$ as above performs well for yearly seasonality
+while $$N=3$$ is good for weekly. This design choice can be confirmed using
+AIC, for example.
+
+Holiday terms are simple, just a binary function that injects impulse
+$$\kappa$$ to $$y(t)$$ whenever $$t$$ is a holiday (as defined by a custom
+list). The impulse $$\kappa\sim\text{Normal}(0,\sigma^2)$$.
+
+With the model defined, then Prophet will run L-BFGS to fit the paramters.

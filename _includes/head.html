@@ -97,65 +97,20 @@
     <meta name="twitter:image" content="{{ site.url }}{{ site.avatar }}" />
   {%- endif -%}
   
-  {%- comment %} mathjax in style of math.stackexchange {% endcomment -%}
-   <script>
-   window.MathJax = {
-      options: {
-        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-        ignoreHtmlClass: 'tex2jax_ignore',
-        processHtmlClass: 'tex2jax_process',
-        renderActions: {
-          find_script_mathtex: [10, function(doc) {
-            for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
-              const display = !!node.type.match(/; *mode=display/);
-              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
-              const text = document.createTextNode('');
-              node.parentNode.replaceChild(text, node);
-              math.start = {node: text, delim: '', n: 0};
-              math.end = {node: text, delim: '', n: 0};
-              doc.math.push(math);
-            }
-          }, '']
-        }
-      },
-      tex: {
-        inlineMath: [ ['$$','$$'], ["\\(", "\\)"] ],
-        displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
-        processEscapes: true,
-        macros: {
-            R: "{\\mathbb R}",
-            N: "{\\mathbb N}",
-            C: "{\\mathbb C}",
-            Z: "{\\mathbb Z}",
-            Q: "{\\mathbb Q}",
-            SL: "{\\operatorname {SL}}",
-            SO: "{\\operatorname {SO}}",
-            GL: "{\\operatorname {GL}}",
-            id: "{\\mathbb {id}}",
-            tr: "{\\operatorname {tr}}",
-            trans: "{\\mathrm T}",
-            Span: "{\\operatorname {Span}}",
-            Hom: "{\\operatorname {Hom}}",
-            Rep: "{\\operatorname {Rep}}",
-            Aut: "{\\operatorname {Aut}}",
-            End: "{\\operatorname {End}}",
-            Repart: "{\\operatorname {Re}}",
-            Impart: "{\\operatorname {Im}}",
-            im: "{\\operatorname {im}}",
-            rk: "{\\operatorname {rank}}",
-            nullity: "{\\operatorname {null}}",
-            Stab: "{\\operatorname {Stab}}",
-            Zmod: ["{\\mathbb Z / #1 \\mathbb Z}",1],
-            bold: ["{\\bf #1}",1],
-            Abs: ['\\left\\lvert #2 \\right\\rvert_{\\text{#1}}', 2, ""]
-        }
-      },
-      loader: {
-        load: ['input/tex', 'output/chtml']
-      }
-    };
-  </script>
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  {%- comment %} KaTeX related includes {% endcomment -%}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css" integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js" integrity="sha384-z1fJDqw8ZApjGO3/unPWUPsIymfsJmyrDVWC8Tv/a1HeOtGmkwNd/7xUS0Xcnvsx" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+  <script>
+  window.WebFontConfig = {
+    custom: {
+      families: ['KaTeX_AMS', 'KaTeX_Caligraphic:n4,n7', 'KaTeX_Fraktur:n4,n7',
+        'KaTeX_Main:n4,n7,i4,i7', 'KaTeX_Math:i4,i7', 'KaTeX_Script',
+        'KaTeX_SansSerif:n4,n7,i4', 'KaTeX_Size1', 'KaTeX_Size2', 'KaTeX_Size3',
+        'KaTeX_Size4', 'KaTeX_Typewriter'],
+    },
+  };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.js" integrity="sha256-4O4pS1SH31ZqrSO2A/2QJTVjTPqVe+jnYgOWUVr7EEc=" crossorigin="anonymous"></script>
 
 </head>
