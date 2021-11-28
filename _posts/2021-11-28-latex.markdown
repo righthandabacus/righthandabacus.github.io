@@ -1,0 +1,119 @@
+---
+title: Solutions to LaTeX out of memory
+tags: system
+date: Sun, 28 Nov 2021 17:11:05 -0500
+---
+
+LaTeX as a decades old system should not use too much memory. But sometimes, we
+will see it run out of memory. There are various solutions to this. Here are
+what I tried.
+
+My recent experience in making LaTeX run out of memory is to use `pgfplots` ---
+with a complicated function and a lot of data points, it will eat up all the
+memory inside the LaTeX stack. However, it doesn't mean your system failed to
+malloc. Rather, it just means the TeX stack has overflown.
+
+In the old time, I remember LaTeX allows to allocate more memory at run. If we
+run latex command with an extra options:
+
+    latex -extra_mem_top=10000000 -extra_mem_bot=10000000 file.tex
+
+it should run with a bigger stack (hence more elements per page is allowed).
+However, as I can confirm with the TeX memory usage statistic upon out of
+memory error, it seems to me that these options are not having any effect. They
+are simply ignored. As far as in TeXLive 2021 on mac.
+
+The other way to get more memory is specific to MiKTeX. This is the command
+line that provided by Chapter 6 of the pgfplots manual:
+
+```
+pdflatex
+	--stack-size=n --save-size=n
+	--main-memory=n --extra-mem-top=n --extra-mem-bot=n
+	--pool-size=n --max-strings=n
+```
+
+For TeXLive, we have to modify the `texmf.cnf` file for configurations. The
+exact path can be found by `kpsewhich texmf.cnf` and this is what we can add to
+the file:
+
+```
+% newly created file ~/texmf/mytexcnf/texmf.cnf:
+% If you want to change some of these sizes only for a certain TeX
+% variant, the usual dot notation works, e.g.,
+% main_memory.hugetex = 20000000
+main_memory = 230000000 % words of inimemory available; also applies to inimf&mp
+extra_mem_top = 10000000 % extra high memory for chars, tokens, etc.
+extra_mem_bot = 10000000 % extra low memory for boxes, glue, breakpoints, etc.
+save_size = 150000 % for saving values outside current group
+stack_size = 150000 % simultaneous input sources
+% Max number of characters in all strings, including all error messages,
+% help texts, font names, control sequences. These values apply to TeX and MP.
+pool_size = 1250000
+% Minimum pool space after TeX/MP's own strings; must be at least
+% 25000 less than pool_size, but doesn't need to be nearly that large.
+string_vacancies = 90000
+% Maximum number of strings.
+max_strings = 100000
+% min pool space left after loading .fmt
+pool_free = 47500
+% Extra space for the hash table of control sequences (which allows 10K
+% names as distributed).
+hash_extra = 200000
+```
+
+We should run `sudo texhash` or `sudo fmtutil-sys --all` after the `texmf.cnf`
+is updated.
+
+A final method is to use luatex instead of pdflatex, for luatex will expand
+memory automatically. This can be simply done by replacing the executable
+`pdflatex` with `lualatex`. It may run slower sometimes but it will allocate
+memory automatically without the need to specify the size before start.
+
+Specific to pgfplots, we can also *externalize* the plots to save memory. It
+works sometimes when the page itself is competeing with pgfplots for the
+memory. It will not work if the pgfplots itself is large enough to blow up the
+memory usage. To use externalization, add this to the preamble:
+
+```tex
+\usepgfplotslibrary{external}
+\tikzexternalize[prefix=path/to/tempfiles/,shell escape=-enable-write18]
+\tikzset{external/system call= {pdflatex -save-size=80000 
+                           -pool-size=10000000 
+                           -extra-mem-top=50000000 
+                           -extra-mem-bot=10000000 
+                           -main-memory=90000000 
+                           \tikzexternalcheckshellescape 
+                           -halt-on-error 
+                           -interaction=batchmode
+                           -jobname "\image" "\texsource"}}
+```
+
+which the `prefix=` at `tikzexternalize` is a path to prepend to figure files
+that the externalize is to generate. Externalization works because it ask the
+pgfplots to save the file into separate PDF first and include them in the final
+output. Hence a separate stack and LaTeX process is launched for each figure.
+
+A final note: It is extremely easy to blow up memory with pgfplots if making a
+3D parametric plot. The reason is for a sample of $$N$$, it expects for a
+sample on variables `x` and `y`, hence a total of $$N^2$$ sample points are
+generated for each plot. If you did not use `y` as a parameter, still $$N^2$$
+sample points are generated. Therefore it is crucial to specify the `y domain`
+in case no `y` has used. Below is an example:
+
+```tex
+\begin{tikzpicture}
+	\begin{axis}[
+		xmin=-6,xmax=6,ymin=-6,ymax=6,zmin=-1,zmax=1,
+		view={20}{60},
+		grid,
+		samples=300
+	]
+		\addplot3[domain=-180:180, y domain=0:0, blue] (
+			{(4+sin(20*x))*cos(x)},
+			{(4+sin(20*x))*sin(x)},
+			{cos(20*x)}
+		);
+	\end{axis}
+\end{tikzpicture}
+```
