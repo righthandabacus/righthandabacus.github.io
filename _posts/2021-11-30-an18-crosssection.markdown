@@ -43,7 +43,7 @@ out is applied. So as in 3-layer network, the paper also tried with 244 to 399
 neurons in hidden layer and applied 50% dropout. The networks are using tanh
 activation. SVR are using RBF kernel with all combinations of $$C=0.1,1,10$$
 and $$\gamma=10^{-4}, 10^{-3}, 10^{-2}, 10^{-1}$$ and
-$$\epsiloon=10^{-2},10^{-1}$$. Random forest are to tried with 5 to 35 features
+$$\epsilon=10^{-2},10^{-1}$$. Random forest are to tried with 5 to 35 features
 andd 3 to 20 depth. Both SVR and RF are using sklearn while neural network is
 using Tensorflow.
 

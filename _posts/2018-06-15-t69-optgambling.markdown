@@ -4,11 +4,13 @@ title: Thorp (1969) Optimal gambling systems for favorable games
 date: Fri, 15 Jun 2018 20:17:37 -0400
 tags: math
 category: paper
+highlightjs:
+  - latex
 ---
 
 There are two papers of the same title:
 
-```bibtex
+```tex
 @inproceedings{
     title = "Optimal gambling systems for favorable games",
     author = "L. Breiman",

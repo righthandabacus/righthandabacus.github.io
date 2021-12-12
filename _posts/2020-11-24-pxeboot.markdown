@@ -105,7 +105,7 @@ file `default`.
 
 If booting with UEFI, we should symlink grub into tftproot as well:
 
-```docker
+```bash
 cd /opt/tftproot
 ln -s debian-installer/amd64/grubx64.efi .
 ln -s debian-installer/amd64/grub .
@@ -119,7 +119,7 @@ The stock kernel from Debian has a NFS client compiled with. So we can make a
 barebone Debian distribution for use with a diskless PXE client machine. First
 we prepare the NBP into TFTP:
 
-```
+```bash
 apt-get install tftpd-hpa
 apt-get install pxelinux syslinux-common
 
@@ -168,7 +168,7 @@ Here we assume there is a NFS server ready in the local network with the
 directory exposed that is good to be used as the root mount for the clients.
 This directory can be created with debootstrap:
 
-```
+```bash
 apt-get install debootstrap
 cd /path/to/rootdisk
 
@@ -188,7 +188,7 @@ apt-get install openssh-server openssh-client net-tools iw sudo vim python
 
 then we have to add or modify a few `/etc` files into the barebone Debian installation:
 
-```
+```bash
 cat > ./etc/network/intefaces <<END
 auto lo
 iface lo inet loopback

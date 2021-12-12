@@ -4,6 +4,8 @@ title: Beta distribution
 date: 2018-03-28 16:54:00 -0400
 lastedit: Thu, 05 Apr 2018 10:51:45 -0400
 tags: math code
+highlightjs:
+  - julia
 ---
 
 If we have a coin, how do we know it is fair? Indeed we never know for sure. But

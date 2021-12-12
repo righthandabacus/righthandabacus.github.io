@@ -8,7 +8,7 @@ tags: code
 ## Script loading
 Load a JavaScript by JavaScript:
 
-```JavaScript
+```javascript
 var jsObj = document.createElement("script");
 jsObj.src = "/path/to/my.js";
 document.body.appendChild(jsObj);
@@ -17,7 +17,7 @@ document.body.appendChild(jsObj);
 ## Loading image and do relevant action
 
 To load an image dynamically through JavaScript, we can always use the `createElement()`:
-```JavaScript
+```javascript
 var imgObj = document.createElement("img");
 imgObj.src = "/path/to/image.png";
 imgObj.onload = myfunc;
@@ -28,14 +28,14 @@ The image starts download once the `src` attributed is assigned. It will call th
 ## Functions
 
 Two ways to assign functions as event handlers: Firstly, using unnamed function, such as
-```JavaScript
+```javascript
 object.onclick = function() {
     // code here ...
 }
 ```
 
 Another way is to use function object:
-```JavaScript
+```javascript
 object.onclick = new Function(
     // code here ...
 );
@@ -59,7 +59,7 @@ The function `funcName()` is called when the event triggers. When it is called, 
 ## Extra property
 
 Extra property of an DOM object can be stored by putting another attribute into an element, for example:
-```JavaScript
+```javascript
 // Store
 $('element').setAttribute("newAttribute","data");
 

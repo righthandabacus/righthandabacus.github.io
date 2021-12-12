@@ -28,7 +28,7 @@ The 1-2-3 skiplist is a skip list with arbitrary levels, but at each level, the 
 
 To make use of the cache line, and since 1-2-3 skiplist has only 2-3 elements in the level beneath between two adjacent nodes, we can make an array of 3 elements, each holding a value and a pointer:
 
-``` c
+```c
 struct sTreeNode {
   int value[3];
   struct sTreeNode* down[3];

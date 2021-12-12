@@ -3,14 +3,19 @@
     <script src="{{ js }}"></script>
   {%- endfor -%}
 {%- endif -%}
-
 {%- if layout.foot_js -%}
   {%- for js in layout.foot_js -%}
     <script src="{{ js }}"></script>
   {%- endfor -%}
 {%- endif -%}
+{%- if page.highlightjs -%}
+  {%- for lang in page.highlightjs -%}
+	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/languages/{{ lang }}.min.js"></script>
+  {%- endfor -%}
+{%- endif -%}
 
-<script>hljs.initHighlightingOnLoad()</script>
+
+<script>hljs.highlightAll()</script>
 
 {%- if site.google_analytics -%}
 <script async src="https://www.googletagmanager.com/gtag/js?id={{ site.google_analytics }}"></script>

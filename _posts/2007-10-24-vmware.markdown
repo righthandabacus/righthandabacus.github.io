@@ -18,7 +18,7 @@ simply a problem of kernel code change since the VMware modules are programmed
 (this happens a lot in the history). After some kernel code hacking, the
 solutions are:
 
-``` diff
+```diff
 diff -uwr vmmon-only/linux/driver.c.old vmmon-only/linux/driver.c
 --- vmmon-only/linux/driver.c.old   2007-09-06 17:59:54.000000000 -0400
 +++ vmmon-only/linux/driver.c       2007-10-24 10:39:15.000000000 -0400
@@ -38,7 +38,7 @@ diff -uwr vmmon-only/linux/driver.c.old vmmon-only/linux/driver.c
 
 and also
 
-``` diff
+```diff
 diff -uwr vmnet-only/driver.c.old vmnet-only/driver.c
 --- vmnet-only/driver.c.old   2007-09-06 17:59:55.000000000 -0400
 +++ vmnet-only/driver.c       2007-10-24 10:39:37.000000000 -0400

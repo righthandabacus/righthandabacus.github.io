@@ -3,6 +3,8 @@ layout: post
 title: Enhancing parsing expression grammar
 date: Sat, 13 Jan 2018 09:40:06 -0500
 tags: code
+highlightjs:
+  - ruby
 junktext:
   - Top-down parsing languages / Recursive descent parser / context free grammars / Earley algorithm: a CFG algorithm / LL(k) and LR(k) parsing algorithm / CYK algorithm
   - <https://math.stackexchange.com/questions/170902/why-cant-we-use-memoization-to-parse-unambiguous-context-free-grammars-in-linea>

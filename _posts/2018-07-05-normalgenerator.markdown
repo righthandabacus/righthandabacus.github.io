@@ -3,6 +3,8 @@ layout: post
 title: "Generating Multivariate Gaussian Distribution"
 date: Thu, 05 Jul 2018 17:04:31 -0400
 tags: math
+highlightjs:
+  - julia
 ---
 
 Multivariate normal distribution has the following p.d.f.:

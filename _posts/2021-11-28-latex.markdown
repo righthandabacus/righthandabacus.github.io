@@ -2,6 +2,8 @@
 title: Solutions to LaTeX out of memory
 tags: system
 date: Sun, 28 Nov 2021 17:11:05 -0500
+highlightjs:
+  - latex
 ---
 
 LaTeX as a decades old system should not use too much memory. But sometimes, we
@@ -75,7 +77,7 @@ works sometimes when the page itself is competeing with pgfplots for the
 memory. It will not work if the pgfplots itself is large enough to blow up the
 memory usage. To use externalization, add this to the preamble:
 
-```tex
+```latex
 \usepgfplotslibrary{external}
 \tikzexternalize[prefix=path/to/tempfiles/,shell escape=-enable-write18]
 \tikzset{external/system call= {pdflatex -save-size=80000 

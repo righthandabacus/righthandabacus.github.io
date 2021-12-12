@@ -11,6 +11,8 @@ bibtex:
   pages: "63--74"
   howpublished: ASPLOS
   year: 1991
+highlightjs:
+  - delphi
 ---
 Blocking/Tiling is a well-known way to make program faster by leveraging the properties of memory hierarchy.
 

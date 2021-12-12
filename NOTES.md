@@ -559,3 +559,6 @@ You might not need JS:
 
 Better tag cloud using heavier JS+CSS:
   - <http://mistic100.github.io/jQCloud/demo.html>
+
+Highlight.js CDN: For uncommon languages, need to load another js
+  - <https://cdnjs.com/libraries/highlight.js>

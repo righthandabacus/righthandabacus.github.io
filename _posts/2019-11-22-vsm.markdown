@@ -3,6 +3,8 @@ layout: post
 title: VSM for text normalization
 date: 2019-11-22
 tags: code
+highlightjs:
+  - julia
 ---
 
 In many occasions we have textual labels in structured data. The case we

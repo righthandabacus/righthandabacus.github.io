@@ -13,6 +13,8 @@ bibtex:
   year: 2017
   month: January
   url: https://www.kinokuniya.co.jp/f/dsg-01-9784797388381
+highlightjs:
+  - latex
 ---
 
 ## 第１章　世界より速く動くための仕事術
@@ -111,7 +113,7 @@ bibtex:
 
 Chinese translation:
 
-```coffeescript
+```latex
 @book{
   title = {Google神速工作術: 全世界最聰明的Google菁英如何創造10倍的工作成果?},
   author = {彼優特．菲利克斯．吉瓦奇 Piotr Feliks Grzywacz},

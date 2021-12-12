@@ -4,6 +4,8 @@ title: Linear regression and confidence
 date: Fri, 25 May 2018 22:05:25 -0400
 lastedit: Fri, 01 Jun 2018 12:39:39 -0400
 tags: math
+highlightjs:
+  - julia
 ---
 
 Linear regression assumes a set of coordinates $$(x_i, y_i),\ i=1,\cdots,N$$ fits

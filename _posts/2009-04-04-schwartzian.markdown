@@ -16,7 +16,7 @@ remove the key after finished. This makes less call to `f(x)`.
 
 Seems trivial, but what is beautiful about Schwartzian transform is in perl:
 
-``` perl
+```perl
 @sorted =
   map  { $_->[0] }
   sort { $a->[1] <=> $b->[1] }

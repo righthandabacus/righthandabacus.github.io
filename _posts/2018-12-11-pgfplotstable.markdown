@@ -3,6 +3,8 @@ layout: post
 title: Using pgfplotstable in LaTeX
 date: Tue Dec 11, 2018 12:20 PM
 tags: code
+highlightjs:
+  - latex
 ---
 
 `pgfplotstable` allows you to typeset a table in LaTeX without really typing out

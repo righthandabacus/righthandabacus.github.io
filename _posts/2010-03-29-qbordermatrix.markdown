@@ -3,6 +3,8 @@ layout: post
 title: "LaTeX package: qbordermatrix"
 date: 2010-03-29 23:58:53 -0400
 tags: code
+highlightjs:
+  - latex
 ---
 
 In plain TeX, there is a macro `\bordermatrix` but I am not very satisfied with

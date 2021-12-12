@@ -4,6 +4,8 @@ title: Using neovim
 date: Mon, 13 Sep 2021 16:23:13 -0400
 tags: system
 category: blog
+highlightjs:
+  - vim
 ---
 
 Have been using neovim for a few years now and I don't feel a thing! To

@@ -23,7 +23,7 @@ Similarly for the case $$y>x$$, we must have $$x<0.5$$ and $$0.5<y<0.5+x$$, and 
 
 To verify the result, below is the Python code:
 
-``` python
+```python
 import random
 
 def triangle():

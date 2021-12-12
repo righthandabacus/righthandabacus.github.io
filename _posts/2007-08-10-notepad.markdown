@@ -3,6 +3,8 @@ layout: post
 title: "Random notes about N1200"
 date: 2007-08-10 12:11:31 +0800
 tags: system
+highlightjs:
+  - sql
 ---
 
 ## CPU et al

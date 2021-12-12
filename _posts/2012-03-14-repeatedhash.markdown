@@ -16,7 +16,7 @@ Denote $$M_k$$ to be the input space for $$k$$ repetitions, i.e. $$M_0 = \infty$
 
 To numerically verify the reduction of output space, run the following Python code:
 
-``` python
+```python
 #!/usr/bin/env python
 from math import exp, log
 K, N = 100000, 2**128

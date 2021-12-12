@@ -2,6 +2,9 @@
 title: "FORTRAN Premier"
 date: 2007-04-02 01:52:02 +0800
 tags: code
+highlightjs:
+  - fortran
+  - latex
 ---
 FORTRAN (or Fortran) has three major favors currently, Fortran 77, Fortran 90
 and Fortran 95. Fortran 77 is the most popular one and de-facto. Fortran 90
@@ -430,7 +433,7 @@ In case the file is with extension `.f90` or free-format is specified, the follo
 
 ## Reference
 
-```bibtex
+```tex
 @BOOK{p87,
     author = {Clive G. Page},
     year = 1987,
@@ -451,7 +454,7 @@ In case the file is with extension `.f90` or free-format is specified, the follo
 
 Further reading for Fortran 90:
 
-```bibtex
+```tex
 @MISC{
     author = {Clive G. Page},
     year = 2001,

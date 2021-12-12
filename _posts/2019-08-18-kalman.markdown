@@ -4,6 +4,8 @@ title: "Use of Kalman filter in finance and estimation of value-at-risk"
 date: Sun, 18 Aug 2019 01:20:17 -0400
 lastupdate: Sat, 07 Sep 2019 08:31:04 -0400
 category: paper
+highlightjs:
+  - latex
 ---
 
 Kalman filter is, in certain sense, a way to give the moving average of a time
@@ -22,7 +24,7 @@ cheatsheet](http://www.swarthmore.edu/NatSci/echeeve1/Ref/Kalman/MatrixKalman.ht
 
 ## Arnold et al (2008) A simplified approach to understanding the Kalman filter technique
 
-```bibtex
+```tex
 @article{
   author = {Tom Arnold and Mark J. Bertus and Jonathan Godbey},
   title = {A simplified approach to understanding the Kalman filter technique},
@@ -118,7 +120,7 @@ as $$S_t$$ is assumed not available).
 
 ## Xu & Zhang (2015) Application of Kalman filter in prediction of stock price
 
-```bibtex
+```tex
 @inproceedings{
   author = {Yan Xu and Guosheng Zhang},
   title = {Application of Kalman Filter in the Prediction of Stock Price},
@@ -175,7 +177,7 @@ $$\dot{x}_t$$ in the state variable in this sort of use case.
 
 ## Bassett et al (1991) Kalman filter estimation for valuing nontrading securities
 
-```bibtex
+```tex
 @article{
   author = {Gilbert W. Bassett, Jr and Virginia G. France and Stanley R. Pliska},
   title = {Kalman Filter Estimation for Valuing Nontrading Securities, with Applications to the MMI Cash-Future Spread on October 19 and 20, 1987},
@@ -206,7 +208,7 @@ dispersion over past non-trading minutes, variance $$P_0$$ is computed.
 
 ## Cortazar et al (2003) Term structure estimation in low-frequency transaction markets
 
-```bibtex
+```tex
 @techreport{
   author = {Gonzalo Cortazar and Eduardo S. Schwartz and Lorenzo Naranjo},
   title = {Term Structure Estimation in Low-Frequency Transaction Markets: A Kalman Filter Approach with Incomplete Panel-Data},
@@ -260,7 +262,7 @@ Indeed, we skip the update step in Kalman algorithm in case of missing data.
 
 ## Nkomo & Kabundi (2013) Kalman filtering and online learning algorithms for portfolio selection
 
-```bibtex
+```tex
 @techreport{
   title = {Kalman filtering and online learning algorithms for portfolio selection},
   author = {Raphael Nkomo and Alain Kabundi},
@@ -371,7 +373,7 @@ $$\mathrm{cov}_{i,j} = \frac{1}{w-1}\left(LX_1(i)-\mu_1(i)\right)^T\left(LX_2(j)
 and the cross-correlation matrix:
 
 $$\mathrm{corr}_{i,j} = \begin{cases}
-  \dfrac{cov_{i,j}}{\sigma_1(i)\sigma_2(j)} & \textrm{if $\sigma_1(i),\sigma_2(j)\ne 0$} \\
+  \dfrac{cov_{i,j}}{\sigma_1(i)\sigma_2(j)} & \textrm{if $\sigma_1(i),\sigma_2(j)\ne 0} \\
   0 & \textrm{otherwise}
 \end{cases}$$
 
@@ -383,7 +385,7 @@ $$\mathrm{corr}_{i,j} + \max(-\mathrm{corr}_{i,i}, 0) + \max(-\mathrm{corr}_{j,j
 
 ## Berardi et al (2002) Estimating value at risk with the Kalman filter
 
-```bibtex
+```tex
 @techreport{
   author = {Andrea Berardi and Stefano Corradin and Cristina Sommacamagna},
   title = {Estimating Value at Risk with the Kalman Filter},
@@ -426,7 +428,7 @@ expectation-maximization.
 
 ## Date & Bustreo (2016) Value-at-risk for fixed-income portfolios
 
-```bibtex
+```tex
 @article{
   author = {P. Date and R. Bustreo},
   title = {Value-at-Risk for fixed-income portfolios: a Kalman filtering approach},
@@ -455,7 +457,7 @@ hypothesis $$H_0$$ is $$p=n/N$$ and
 
 $$LR=-2\log\left(\frac{(1-p)^{N-n}p^n}{(1-\frac{n}{N})^{N-n}(\frac{n}{N})^n}\right)\sim\chi^2$$
 
-which for 1 DoF, 95% CI, we reject null hypothesis if $LR>3.841$.
+which for 1 DoF, 95% CI, we reject null hypothesis if $$LR>3.841$$.
 
 ## Idea of using Kalman filter for VaR calculation
 

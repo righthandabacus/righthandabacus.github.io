@@ -3,6 +3,8 @@ layout: post
 title: "Manual of playing with NS2"
 date: 2006-02-14 14:13:47 +0800
 tags: code
+highlightjs:
+  - tcl
 ---
 
 So far, I played with NS2 for so many months. This is the time to write a guide to let my fellow collegues know about how to play with this nifty animal. Things will be added to improve it continuously.

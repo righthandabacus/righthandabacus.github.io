@@ -5,6 +5,8 @@ date: Wed, 26 Sep 2018 12:30 PM
 lastedit: 2019-03-01
 tags: code
 category: blog
+highlightjs:
+  - sql
 ---
 
 This is to demonstrate the similarity between pandas and SQL. The same post as

@@ -3,6 +3,8 @@ layout: post
 title: "Patricia Tree (PAT tree)"
 date: 2007-04-17 03:09:38 +0800
 tags: code
+highlightjs:
+  - latex
 ---
 
 [Patricia tree](http://en.wikipedia.org/wiki/Patricia_tree) is a tree that implements the idea of:
@@ -533,13 +535,12 @@ int main()
 	return 0;
 };
 #endif
-
 ```
 
 PS: The earlier version of the above program was in plain C. You can obtain the
 tarball of the code [here](/img/patricia.tgz).
 
-```bibtex
+```tex
 @ARTICLE{
     author = {Donald R. Morrison},
     title = {PATRICIA --- Practical Algorithm to Retrieve Information Coded in Alphanumeric},

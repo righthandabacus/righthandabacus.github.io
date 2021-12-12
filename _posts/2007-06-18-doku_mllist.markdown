@@ -3,6 +3,8 @@ layout: post
 title: "DokuWiki plug-in: Multi-line lists"
 date: 2007-06-18 22:37:54 +0800
 tags: code
+highlightjs:
+  - markdown
 ---
 
 DokuWiki supports lists using the following syntax:

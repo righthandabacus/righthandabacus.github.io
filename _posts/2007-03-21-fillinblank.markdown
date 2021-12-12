@@ -4,6 +4,8 @@ title: "LaTeX Package: Fill in Blanks"
 date: 2007-03-21 21:34:58 +0800
 lastedit: Fri, 26 Jan 2018 20:40:21 -0500
 tags: code
+highlightjs:
+  - latex
 ---
 
 LaTeX package file [`fillinblank.sty`](/img/fillinblank.sty).

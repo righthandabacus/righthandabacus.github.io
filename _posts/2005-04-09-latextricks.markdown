@@ -4,6 +4,8 @@ title: "LaTeX tricks"
 lastedit: 2007-03-30 04:20:25 +0800
 date: 2005-04-09 02:59:20 +0800
 tags: reference
+highlightjs:
+  - latex
 ---
 
 [Text, style, and grammar](#text-style-and-grammar), [fonts](#fonts), [figures](#figures),
@@ -59,21 +61,25 @@ Setting style:
 
 To adjust font size by "zooming", use this:
 
-    \usepackage{scalefnt}
-    
-    Normal size - \scalefont{2}Linear double - \scalefont{0.5} Normal -
-    \scalefont{1.414}Double size (area) - \scalefont{0.707} Normal
-    
-    {\scalefont{2}Double size} - Normal again
+```latex
+\usepackage{scalefnt}
+
+Normal size - \scalefont{2}Linear double - \scalefont{0.5} Normal -
+\scalefont{1.414}Double size (area) - \scalefont{0.707} Normal
+
+{\scalefont{2}Double size} - Normal again
+```
 
 If the scaling is in terms of "levels", use this:
 
-    \usepackage{relsize}
-    
-    Normal size - \relsize{1}Linear double - \relsize{-1} Normal -
-    \relsize{2}Double size (area) - \relsize{-2} Normal
-    
-    {\relsize{1}Double size} - Normal again
+```latex
+\usepackage{relsize}
+
+Normal size - \relsize{1}Linear double - \relsize{-1} Normal -
+\relsize{2}Double size (area) - \relsize{-2} Normal
+
+{\relsize{1}Double size} - Normal again
+```
 
 ### Complicated Matrix
 

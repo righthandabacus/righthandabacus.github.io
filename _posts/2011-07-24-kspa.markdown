@@ -3,6 +3,8 @@ layout: post
 title: "The k-Shortest Path Algorithms"
 date: 2011-07-24 23:40:57 -0400
 tags: code math
+highlightjs:
+  - latex
 ---
 
 That is, to find $$k$$ paths between a pair of nodes in a graph that *are* the shortest.
@@ -97,7 +99,7 @@ A neat algorithm developed by David Eppstein in [his paper](../2011-05-24-e98-sh
 
 Then a path between nodes $$s$$ and $$t$$ can be expressed implicitly by the set of sidetrack edges used. For example, an empty set represents the shortest path according to the shortest path tree $$T$$. By computing the additional cost incurred by traversing a sidetracked edge, we can find the $$k$$ shortest paths by looking for $$k$$ valid subsets of $$G$$ of minimum total cost.
 
-```bibtex
+```tex
 @article{
     title = {Iterative Methods for Determining the k Shortest Paths in a Network},
     author = {D. R. Shier},

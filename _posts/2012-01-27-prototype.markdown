@@ -110,7 +110,7 @@ var transportRequest = Try.these(
 
 ## AJAX support
 By example:
-```JavaScript
+```javascript
 var myAjax = new Ajax.Request(
     ajaxhandler.php,    // The URL
     { method: 'post',    // default if not specified
@@ -160,7 +160,7 @@ OOP: Create a class can be done by using the `Class` object, e.g.
     var myClass = Class.create();
 
 and defining a class is done by using `prototype`, e.g.
-```JavaScript
+```javascript
   myClass.prototype = {
        initialize : function(foo) {
            // constructor

@@ -3,6 +3,8 @@ layout: post
 title: Outlier removal by slope bound
 date: Mon, 12 Mar 2018 18:28:06 -0400
 tags: math code
+highlightjs:
+  - julia
 ---
 
 The Lipschutz continuity definition inspired me on how to distort a curve

@@ -6,13 +6,13 @@ tags: code
 ---
 When you make a string in Python, but the string shall look like multiple lines in the source code, the following doesn't work:
 
-``` python
+```python
 id = "line1 "
      "and line2"
 ```
 
 But we can do this trick to make it work:
-``` python
+```python
 id = (
      "line1 "
      "and line2 "

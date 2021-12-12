@@ -11,7 +11,7 @@ He used an example, destutter, to show the benefit of OCaml. The destutter simpl
 
 For this, he wrote
 
-``` python
+```python
 def destutter(list): 
     l = [] 
     for i in range(len(list)): 
@@ -22,13 +22,13 @@ def destutter(list):
 
 It works, but not compact. At 2011, we can use Python 2.5's if-else construct to do the same thing. Taking a functional perspective, I would do in this way:
 
-``` python
+```python
 destutter = lambda l : l if len(l) < 2 else destutter(l[0:1]+l[2:]) if l[0]==l[1] else l[0:1]+destutter(l[1:])
 ```
 
 That's just one line, and you can test it in the following:
 
-``` python
+```python
 a = [1,1,2,3,3,4]
 b = [1,1,1,2,2,3,3,3,4,5]
 

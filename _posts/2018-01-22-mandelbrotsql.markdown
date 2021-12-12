@@ -4,6 +4,8 @@ title: Mandelbrot set SQL
 subtitle: using common table expressions in SQLite
 date: Mon, 22 Jan 2018 19:34:34 -0500
 tags: code math
+highlightjs:
+  - sql
 ---
 There is a recent change in [SQLite
 documentation](http://www.sqlite.org/lang_with.html), that depicts the use of

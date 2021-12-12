@@ -28,7 +28,7 @@ $$  Rel(G) = p_e Rel(G.e) + (1-p_e) Rel(G-e) $$
 
 where $$G.e$$ denotes the graph $$G$$ with edge $$e$$ contracted and $$G-e$$ denotes the graph $$G$$ with edge $$e$$ removed. By using the factor theorem, we can have the following algorithm to find all spanning trees on a network:
 
-```C
+```c
 Graph G=(V,E)
 Root node s∈V
 X = {s}  /* Nodes covered by this spanning tree */
@@ -56,7 +56,7 @@ function Tree_Gen(X, T, C)
 
 Similarly, we can enumerate all loop-free paths from node $$s$$ to node $$t$$:
 
-```C
+```c
 Graph G=(V,E)
 Nodes s,t∈V
 X = {s}  /* Nodes traversed in this path */

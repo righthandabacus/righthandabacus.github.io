@@ -18,7 +18,7 @@ because dictionary of words do not have repeated words, but some words (e.g. art
 
 Consider hacking a hangman game, we should use the latter frequency instead of the former because we are dealing with words regardless its common-ness. However, we should also take the length of word into account, because e.g. one-letter word in English can only be "a" or "I" but not others. So we should have the frequency order of letters *subject to the condition* of word length. The table is given in the article above, copied here:
 
-``` csv
+```csv
 ,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20     
 #1,A,A,A,A,S,E,E,E,E,E,E,E,I,I,I,I,I,I,I,I      
 #2,I,O,E,E,E,S,S,S,S,I,I,I,E,E,E,E,E,S,E,O      

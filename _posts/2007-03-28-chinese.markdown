@@ -3,6 +3,8 @@ layout: post
 title: "Chinese Language Processing"
 date: 2007-03-28 13:40:40 +0800
 tags: code work
+highlightjs:
+  - latex
 ---
 
 This is part of CUPIDE (http://cupide.cse.cuhk.edu.hk).
@@ -132,7 +134,7 @@ POS tagging in English text is commonly done by HMM.
   * A long list of
     [English stopwords](http://www.dcs.gla.ac.uk/idom/ir_resources/linguistic_utils/stop_words)
 
-```bibtex
+```tex
 @INPROCEEDINGS{cl92,
     title = {Word Identification for Mandarin Chinese Sentences},
     author = {Keh-Jiann Chen and Shing-Huan Liu},
@@ -155,7 +157,7 @@ Lau and King (2005) proposes a two-stage training to avoid a very large corpus: 
 
 I think it is OK for problems (1)-(3) exist. However, problem (4) means the system is not tagging correctly (in the sense that it is illogical to have such tagging result). Any solution for this? May be we should build a Markov chain to tell that R→M is impossible.
 
-```bibtex
+```tex
 @INPROCEEDINGS{lng05,
     title = {A Maximum Entropy Approach to Chinese Word Segmentation},
     author = {Jin Kiat Low and Hwee Tou Ng and Wenyuan Guo},
@@ -266,7 +268,7 @@ Put it simple, assume two characters $$C_1$$ and $$C_2$$ are both very common in
 Smoothing $$n$$-gram means to fill-in the probabilities of unseen entries besides those evaluated from the training data.
 
 References:
-```bibtex
+```tex
 @ARTICLE{k87,
     author = {Katz, S. M.},
     year = 1987,

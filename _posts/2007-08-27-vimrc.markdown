@@ -3,6 +3,8 @@ layout: post
 title: "My ~/.vimrc file"
 date: 2007-08-27 01:04:05 +0800
 tags: reference
+highlightjs:
+  - vim
 ---
 
 ```vim
