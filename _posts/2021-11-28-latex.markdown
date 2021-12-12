@@ -26,7 +26,7 @@ are simply ignored. As far as in TeXLive 2021 on mac.
 The other way to get more memory is specific to MiKTeX. This is the command
 line that provided by Chapter 6 of the pgfplots manual:
 
-```
+```shell
 pdflatex
 	--stack-size=n --save-size=n
 	--main-memory=n --extra-mem-top=n --extra-mem-bot=n
@@ -37,7 +37,7 @@ For TeXLive, we have to modify the `texmf.cnf` file for configurations. The
 exact path can be found by `kpsewhich texmf.cnf` and this is what we can add to
 the file:
 
-```
+```tex
 % newly created file ~/texmf/mytexcnf/texmf.cnf:
 % If you want to change some of these sizes only for a certain TeX
 % variant, the usual dot notation works, e.g.,

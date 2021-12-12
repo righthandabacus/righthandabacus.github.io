@@ -16,7 +16,7 @@ $$J_{\mathbf{f}}
 = \begin{bmatrix}
 \dfrac{\partial f_1}{\partial x_1} & \cdots & \dfrac{\partial f_1}{\partial x_n} \\
 \vdots & \ddots & \vdots \\
-\dfrac{\partial f_1}{\partial x_1} & \cdots & \dfrac{\partial f_1}{\partial x_n}
+\dfrac{\partial f_m}{\partial x_1} & \cdots & \dfrac{\partial f_m}{\partial x_n}
 \end{bmatrix}$$
 
 A use of the Jacobian is when $$n=m$$, the matrix is square and its determinant is used
