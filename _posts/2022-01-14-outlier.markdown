@@ -1,0 +1,178 @@
+---
+layout: post
+title: "Multivariate Outlier Detection"
+date: 2022-01-14
+category: math
+---
+
+For an observation of multidimensional variable $$x_i$$ and the set of
+observations $$X$$, the Mahalanobis distance tells how far $$x_i$$ is from the
+center of the data with the shape of the dataset considered (i.e., far from
+center but with multiple samples in the proximity of Euclidean space is fine,
+but if it is alone in the proximity is an outlier). The Mahalanobis distance is
+defined as
+
+$$
+\text{MD}_i = \sqrt{(x_i-\bar{x})^\top V^{-1} (x_i - \bar{x})}
+$$
+
+where $$V$$ is the sample covariance matrix and $$\bar{x}$$ is the sample mean.
+Euclidean distance will consider only $$\bar{x}$$, but it is the covariance
+matrix $$V$$ to tell how much variation you have on each dimension. The
+Mahalanobis distance is scale-invariant. It roughly tells how many standard
+deviations the point $$x_i$$ is from the center $$\bar{x}$$. For
+$$p$$-dimensional observations, we can set the cutoff for outlier to be
+$$\text{MD}_i^2 > \chi_{p,1-\alpha/2}^2$$ where $$\chi_{p,v}^2$$ is the inverse
+CDF at value $$v$$ of $$\chi^2$$ distribution with dof $$p$$.
+
+The Mahalanobis distance will suffer from masking effect, i.e. multiple
+outliers may not produce large distance. To solve this, we need sample mean and
+sample covariance matrix to be robust in case of adding outliers.  Rousseeuw
+and Zomeren (1990) proposed minimum volume ellipsoid (MVE), which replaced
+$$\bar{x}$$ and $$V$$ with a vector $$T$$ and positive semidefinite matrix
+$$C$$ and define the *robust distnace*,
+
+$$
+\text{RD}_i = \sqrt{(x_i-T)^\top C^{-1} (x_i - T)}
+$$
+
+The vector $$T$$ and matrix $$C$$ is found such that
+
+$$
+\begin{aligned}
+\min\quad & \text{det} C \\
+\text{subject to } &
+\big\lvert \big\{i : (x_i - T)^\top C^{-1} (x_i - T) \le a^2 \big\}\big\rvert \ge \frac{n+p+1}{2}
+\end{aligned}
+$$
+
+where $$a^2$$ is a constant chosen to be $$\chi_{p,0.5}^2$$ if assuming majority
+of the data are from normal distribution. The observation is $$p$$ dimensional
+and the dataset has $$n$$ observations. The MVE has breakdown point
+approximately at 50%, as the above optimization problem is constrained by half
+of the data points are with short robust distance.
+
+Solving the above optimization problem can be computationally expensive. Hence
+Gao et al (2005) proposed Max-Eigen difference (MED). The algorithm is as follows:
+
+1. For dataset $$X$$, find the sample mean $$\bar{x}$$ and covariance matrix
+   $$V$$, then define $$\lambda_1\ge \cdots \ge \lambda_p$$ as the eigenvalues of
+   $$V$$ and their corresponding eigenvectors are $$v_1,\cdots,v_p$$
+2. Define $$X^{(i)}$$ as the dataset with observation $$x_i$$ removed. We find
+   covariance matrix $$V^{(i)}$$ of $$X^{(i)}$$ its eigenvalues
+   $$\lambda_1^{(i)}\ge \cdots \ge\lambda_p^{(i)}$$ and eigenvectors $$v_1^{(i)},\cdots,v_p^{(i)}$$
+3. Define distance
+   \\[ d_i = \lVert \lambda_1^{(i)} v_1^{(i)} - \lambda_1 v_1\rVert \Big(1-\prod_{j=1}^p \mathbb{I}[ y_{ij}^2 \lt \lambda_j]\Big) \\]
+   where $$y_{ij} = (x_i - \bar{x})^\top v_j$$ and $$\mathbb{I}[\cdot]$$ is
+   the indicator function. Then the MED is $$d_i$$ normalized,
+
+$$ \text{MED}_{i} = \frac{d_i}{ \sum_{j=1}^n d_j} $$
+
+This works because the outliers will deeply influence the first eigenvalue and
+eigenvector.
+
+These are not the only way to find outliers. Kannan and Manoj (2015) provided a
+survey of some other method as well. For example, the Cook's distance is to
+consider a linear regression setting $$y_i \sim x_i$$ and asks how one point
+can influence the least square estimate. This distance can be written in
+different ways:
+
+$$
+\begin{aligned}
+D_i &= \frac{1}{pMSE} \sum_{j=1}^n (\hat{y}_i - \hat{y}_{j(i)} \\
+D_i &= \frac{e^2}{pMSE}\left(\frac{h_{ii}}{(1-h_{ii})^2}\right) \\
+D_i &= \frac{(\hat{\beta}-\hat{\beta}^{-i})^\top (X^\top X) (\hat\beta - \hat\beta^{-i})}{(1+p)s^2}
+\end{aligned}
+$$
+
+where the model is $$y = \beta^\top x$$ and $$\hat\beta$$ is the least square
+estimate of $$\beta$$. The $$\hat\beta^{-i}$$ is the same estimate with
+observation $$x_i$$ removed. Similarly $$\hat{y}_j = \hat\beta^\top x_j$$ and
+$$\hat{y}_{j(i)} = \hat\beta^{-i\top} x_j$$. The quantity $$h_{ii}$$ is the
+$$i$$-th diagonal element of the hat matrix
+
+$$ H = X(X^\top X)^{-1} X^\top $$
+
+In fact, $$h_{ii}$$ is the leverage score in which it is high if $$x_i$$ is an
+outlier. $$h_{ii}\in[0,1]$$ and we can use the cutoff $$h_{ii}>3p/n$$ to
+determine an outlier.
+
+DFFITS is another measure similar to Cook's distance. Consider the same linear
+regression setting, it tells how much the regression function changes if
+observation $$x_i$$ is removed. The metric is
+
+$$ \text{DFFITS}_i = \frac{\hat{y}_i - \hat{y}_{i(i)}}{\sigma_{(i)}\sqrt{h_ii}} $$
+
+This metric should less than 1 for small samples and it should be less than
+$$2\sqrt{p/n}$$ for large samples. Otherwise the points should be check for
+outlier.
+
+### Univariate case
+
+The case of identifying outliers in univariate samples are much easier as there
+is only one dimension to consider. Manoj and Kannan (2013) has another survey.
+
+The simplest one is the quantile method, which defines the outlier as those with
+value below $$Q_1 - 1.5 \text{IQR}$$ and those above $$Q_3 + 1.5\text{IQR}$$.
+
+Grubbs test is for the hypothesis ($$H_1$$) that the dataset has at least one
+outlier against the null hypothesis ($$H_0$$) that there are no outlier. The
+statistic depends on the sample mean $$\bar{x}$$ and sample standard deviation
+$$s$$:
+
+$$ G = \frac{\max_i \vert x_i - \bar{x}_i\vert}{s} $$
+
+Bernard Rosner (1983) take this one step further to define the *generalized
+extreme studentized deviate (ESD) test*. It is a test comparing the null
+hypothesis of no outlier against the hypothesis of up to $$r$$ outliers. Define
+the statistic similar to Grubbs':
+
+$$ R_i = \frac{\max_i \vert x_i - \bar{x}_i\vert}{s} $$
+
+and find the observation $$x_i$$ that maximized $$R_i$$ and remove it from the
+dataset. Repeat this process for $$r$$ times to remove the top $$r$$
+observations. The corresponding statistics are denoted as $$R_1,\cdots,R_r$$.
+The test is then defining the critical region:
+
+$$
+\lambda_i = \frac{(n-i)t_{p,n-i-1}}{\sqrt{n-i-1+t^2_{p,n-i-1}}(n-i+1)}
+$$
+
+where $$i=1,2,\cdots,r$$ and $$t_{p,v}$$ is the inverse CDF at value $$p$$ of
+the $$t$$ distribution with $$v$$ dof. We set
+
+$$ p = 1-\frac{\alpha}{2(n-i-1)} $$. The removed observation $$x_i$$ is an
+outlier if $$R_i > \lambda_i$$.
+
+For an easier test, Doxin (1950) proposed the following: Arrage the
+observations in order $$x_1\le x_2 \le \cdots \le x_n$$, and depends on the
+size $$n$$, define
+
+$$
+\begin{aligned}
+R_{10} &= \frac{x_n - x_{n-1}}{x_n - x_1} & \text{for }&3\le n\le 7 \\
+R_{11} &= \frac{x_n - x_{n-1}}{x_n-x_2} && 8\le n\le 10\\
+R_{21} &= \frac{x_n-x_{n-1}}{x_n-x_2} && 11\le n\le 13 \\
+R_{22} &= \frac{x_n-x_{n-2}}{x_n-x_3} && 14\le n\le 30
+\end{aligned}
+$$
+
+and this value will exceed some critical value if $$x_n$$ is an outlier (too
+large). Apply the same formula with the order $$x_1\ge x_2 \ge \cdots \ge x_n$$
+will find if $$x_n$$ is an outlier at the lower end (too small).
+
+Finally, the Hampel method uses the median instead of mean. Denote the median
+of the dataset as $$M_x$$ and the deviation from median as $$r_i = x_i - M_x$$,
+then the median of the absolute deviation is denoted as $$M_{\vert r\vert}$$.
+The observation $$x_i$$ is an outlier if we found $$\vert r_i\vert \ge 4.5
+M_{\vert r\vert}$$.
+
+### References
+
+- Peter J. Rousseeuw and Bert C. van Zomeren (1990) Unmasking Multivariate Outliers and Leverage Points. Journal of the American Statistical Association, 85(411):633-639
+- Shaogen Gao, Guoying Li, and Dongqian Wang (2005) A New Approach for Detecting Multivariate Outliers. Communications in Statistics --- Theory and Models, 34:1857-1865
+- K. Senthamarai Kannan and K. Manoj (2015) Outlier Detection in Multivariate Data. Applied Mathematical Sciences, 9(47):2317-2324
+- K. Senthamarai Kannan and K. Manoj (2013) Comparison of methods for detecting outliers. International Journal of Scientific & Engineering Research, 4(9):709-714
+- F. E. Grubbs (1969) Procedures for detecting outlying observations in samples. American Statistical Association and American Society for Quality. Technometrics, 11:1-21
+- Bernard Rosner (1983) Percentage Points for a Generalized ESD many-outlier procedure. Technometrics 25(2):165-172
+- W. J. Doxin (1950) analysis of extreme values. Annual Mathematical Statistics, 21(4):488-506

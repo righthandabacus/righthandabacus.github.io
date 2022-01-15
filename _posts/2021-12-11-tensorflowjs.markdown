@@ -168,7 +168,7 @@ uses HTML5 canvas for the handwritten digit:
 
 	<script>
 	// Load tensorflow model
-	tf.loadLayersModel("lenet5model/model.json").then(function(model) {
+	tf.loadLayersModel("lenetjsmodel/model.json").then(function(model) {
 		window.model = model;
 	});
 	var predict = function(input) {
