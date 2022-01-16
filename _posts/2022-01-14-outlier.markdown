@@ -2,7 +2,7 @@
 layout: post
 title: "Multivariate Outlier Detection"
 date: 2022-01-14
-category: math
+tags: math
 ---
 
 For an observation of multidimensional variable $$x_i$$ and the set of
@@ -175,4 +175,4 @@ M_{\vert r\vert}$$.
 - K. Senthamarai Kannan and K. Manoj (2013) Comparison of methods for detecting outliers. International Journal of Scientific & Engineering Research, 4(9):709-714
 - F. E. Grubbs (1969) Procedures for detecting outlying observations in samples. American Statistical Association and American Society for Quality. Technometrics, 11:1-21
 - Bernard Rosner (1983) Percentage Points for a Generalized ESD many-outlier procedure. Technometrics 25(2):165-172
-- W. J. Doxin (1950) analysis of extreme values. Annual Mathematical Statistics, 21(4):488-506
+- W. J. Doxin (1950) Analysis of extreme values. The Annals of Mathematical Statistics, 21(4):488-506
