@@ -1,19 +1,15 @@
 ---
 layout: post
 title: "LaTeX tricks"
-lastedit: 2007-03-30 04:20:25 +0800
+lastedit: 2021-01-27
 date: 2005-04-09 02:59:20 +0800
 tags: reference
 highlightjs:
   - latex
 ---
 
-[Text, style, and grammar](#text-style-and-grammar), [fonts](#fonts), [figures](#figures),
-[spacing](#spacing), [presentations](#presentations), and [other](#other)
 
-
-Text, style, and grammar
-========================
+# Text, style, and grammar
 
 ### Grammar check
 
@@ -133,8 +129,8 @@ Herbert Voss with 130+ pages. Very detail and contains almost everything you
 need for typesetting equations.
 
 
-Fonts
-=====
+# Fonts
+
 ### Beautiful CM Fonts
 
 To use a much better CM font for LaTeX, get cm-super package (optionally for
@@ -179,9 +175,38 @@ So if you are using `mathptmx` package, but want to get back the old script font
 
     \DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
 
+### FdSymbols
 
-Figures
-=======
+A lot of symbols are defined in FdSymbols but if we use
+`\usepackage{fdsymbol}`, some pre-existing symbols will be overwritten
+(integral sign and summation sign, for example). To introduce just one symbol
+at a time from FdSymbol, we use the following
+
+```latex
+\DeclareFontFamily{U}{FdSymbolE}{}
+\DeclareFontShape{U}{FdSymbolE}{m}{n}{<-> s * FdSymbolE-Book}{}
+\DeclareSymbolFont{fdbigsign}{U}{FdSymbolE}{m}{n}
+\DeclareMathSymbol{\divslash}{\mathrel}{fdbigsign}{"87}
+```
+
+There are font families `FdSymbolA` to `FdSymbolE` and the code number (87 in
+above) is the hex code for the symbol on that family. To find which is which,
+we can print out all symbols using the following document:
+
+```latex
+\documentclass{article}
+\usepackage{fdsymbol}
+\usepackage{fonttable}
+\begin{document}
+\xfonttable{U}{FdSymbolA}{m}{n}
+\xfonttable{U}{FdSymbolB}{m}{n}
+\xfonttable{U}{FdSymbolC}{m}{n}
+\xfonttable{U}{FdSymbolD}{m}{n}
+\xfonttable{U}{FdSymbolE}{m}{n}
+\end{document}
+```
+
+# Figures
 
 ### Side-by-side figures
 
@@ -249,8 +274,7 @@ Yet another way: using subfigure package
 ```
 
 
-Spacing
-=======
+# Spacing
 
 ### Setting paper margin
 
@@ -287,10 +311,24 @@ But sometimes, it is a bit larger than A5, the following is what I will use (I g
 
     pstops -pa4 '2:0L@.87(24cm,-1.5cm)+1L@.87(24cm,13.35cm)' onepage.ps twopages.ps
 
+### Spacing around display equations
 
+Two set of skip length for normal and short lines.
 
-Presentations
-=============
+	\setlength{\abovedisplayskip}{11pt}
+	\setlength{\abovedisplayshortskip}{0pt}
+	\setlength{\belowdisplayskip}{11pt}
+	\setlength{\belowdisplayshortskip}{11pt}
+
+To find the default of these values, we can use this LaTeX document:
+
+	\documentclass{article}
+	\begin{document}
+	\the\abovedisplayskip{}\\
+	\the\belowdisplayskip
+	\end{document}
+
+# Presentations
 
 ### BibTeX
 
@@ -327,8 +365,8 @@ Template for "seminar" slides:
     \end{document}
 
 
-Other
-=====
+# Other
+
 ### Fancy headers
 
 Look for the fancy header package
@@ -423,8 +461,7 @@ If your printer cannot create zero-margin, you may need to change the shift
 amount to cover those lost margin.
 
 
-Packages to note
-================
+# Packages to note
 
  * Fancy chapter titles: [fncychap](http://www.ctan.org/tex-archive/help/Catalogue/entries/fncychap.html)
  * Nice figure captions: [caption](http://www.ctan.org/tex-archive/help/Catalogue/entries/caption.html)

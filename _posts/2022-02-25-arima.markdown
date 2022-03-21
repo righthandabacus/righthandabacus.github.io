@@ -1,0 +1,59 @@
+---
+layout: post
+title: Different models of ARIMA
+date: 2022-02-25
+tags: math
+---
+
+In statsmodels, there are several different but similar functions to fit an
+ARIMA model to the data. We have the `ARIMA`, `SARIMAX` and `AutoReg` classes.
+While they are all usable, and they are all fit using OLS, the model they
+produced are slightly different and hence the fitted parameters are not
+comparable.
+
+ARIMA (AR(1) as example)
+
+$$
+\begin{aligned}
+y_t &= \bar{y} + \epsilon_t \\
+\epsilon_t &= \rho \epsilon_{t-1} + \eta_t
+\end{aligned}
+$$
+
+SARIMAX model
+
+$$
+\begin{aligned}
+y_t &= \phi + \rho y_{t-1} + \eta_t
+\end{aligned}
+$$
+
+hence $$\phi = \bar{y}(1-\rho)$$ as we can see $$\bar{y}$$ in ARIMA() is related to $$\phi$$ in SARIMAX() by the sum of G.P.,
+
+$$
+\frac{\phi}{1-\rho} = \bar{y}
+$$
+
+If we have exogeneous variable, the SARIMAX model is
+
+$$
+y_t - \beta x_t = \delta \rho (y_{t-1} - \beta x_{t-1}) + \eta_t
+$$
+
+but ARIMA model is
+
+$$
+\begin{aligned}
+y_t &= \delta + \beta x_t + \epsilon_t \\
+\epsilon_t &= \rho \epsilon_{t-1} + \eta_t
+\end{aligned}
+$$
+
+and AutoReg version is
+
+$$
+y_t = \phi + \rho y_{t-1} + \beta x_t + \eta_t
+$$
+
+which in the AutoReg model, $$y_t$$ depends on the entire history of $$x_t$$,
+while in SARIMAX model, only depends on $$x_t$$ but not any other lags.

@@ -1,0 +1,49 @@
+---
+layout: post
+title: Upgrading OpenWRT
+date: 2022-03-04
+tags: system
+---
+
+At the time when I bought my Linksys WiFi routers, OpenWRT was in the version
+19.x and now we have version 21.x. I replaced DD-WRT to OpenWRT in the past and
+I would not expect the DD-WRT config can be port to OpenWRT. But for upgrading
+the versions of OpenWRT, however, it is natural to expect the config can be
+ported. Except it is not seamless in my case.
+
+It has been
+[reported](https://www.reddit.com/r/openwrt/comments/qmeb17/trying_to_update_from_openwrt_19078_to_21021_on/)
+that upgrading OpenWRT to 21.x is not trivial. The reason probably lies in the
+use of [DSA](https://openwrt.org/docs/guide-user/network/dsa/dsa-mini-tutorial)
+that changed the philosophy in handling switch interface in the kernel. While
+in OpenWRT, there is a `sysupgrade` command that allows us to flash the
+firmware *without* retaining the config, i.e.,
+
+    sysupgrade -n <image>
+
+But it won't work for the 19.x to 21.x upgrade on any of my Linksys WRT
+devices. It gives out the reason as "Image version mismatch: image 1.1, device
+1.0". That is not an issue of the config retained or not. Simply the image's
+version triggered the safety logic of `sysupgrade`.
+
+However, it would work if we use the `-F` (force) option. But we need the
+"factory" image, i.e., the one with extension `.img` and for flashing OpenWRT
+from the factory firmware. For example, the WRT3200ACM device, we can first,
+scp the image to the device (e.g., put it in `/tmp` as it is a tmpfs large
+enough to host a few MB), and then, run the following command:
+
+    sysupgrade -F -n openwrt-21.02.2-mvebu-cortexa9-linksys_wrt3200acm-squashfs-factory.img
+
+This will flash the firmware and reset the machine. And after that, the device
+will return to the default config, i.e., no WiFi turned on and LAN IP set to
+192.168.1.1. (This is also the method to flash the factory firmware on OpenWRT)
+
+In OpenWRT, the config files are mostly in `/etc/config` (`/etc/ethers` and
+`/etc/hosts` may the the only exceptions for user contents). Therefore those
+unrelated to network (e.g., dropbear, or anything except `/etc/config/network`)
+should be able to copy over if you got the backup.
+
+How's OpenWRT 21.x?
+
+One noticable caveat: Some older iOS device are not supporting WPA3. Hence we
+have to fall back to use WPA2 even OpenWRT supports it.

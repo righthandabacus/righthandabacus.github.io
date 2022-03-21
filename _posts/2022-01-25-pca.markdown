@@ -1,0 +1,84 @@
+---
+layout: post
+title: "PCA for asset allocation"
+date: 2022-01-25
+tags: math
+---
+
+Assume we have a family of $$n$$ assets whose daily return is vector $$\mu$$
+and the covariance matrix is $$\Sigma$$. If we make a portfolio whose asset
+weight is $$w_k$$ for asset $$k$$ and the vector of all weights is $$w$$, then
+the portfolio's volatility is $$\sigma = (w^\top\Sigma w)^{1/2}$$.
+
+Now, for matrix $$\Sigma$$, we can have spectral decomposition
+
+$$
+\Sigma V = V \Lambda
+$$
+
+where $$V$$ is matrix of columns of eigenvectors and $$\Lambda$$ is a diagonal
+matrix of eigenvalues (in descending order), both of $$\Sigma$$. Hence we can
+write $$\Sigma = V \Lambda V^\top$$. Substitute this into the formula for the
+square of volatility, we have
+
+$$
+\begin{aligned}
+\sigma^2 &= w^\top \Sigma w \\
+&= w^\top (V\Lambda V^\top) w \\
+&= (w^\top V) \Lambda (V^\top w)
+\end{aligned}
+$$
+
+if we substitute $$u = V^\top w$$, we have
+
+$$
+\begin{aligned}
+\sigma^2 &= (w^\top V) \Lambda (V^\top w) \\
+&= u^\top \Lambda u
+\end{aligned}
+$$
+
+Now since $$\Lambda$$ is diagonal,
+
+$$
+\Lambda = \text{diag}\begin{pmatrix}\lambda_1 & \lambda_2 & \dots & \lambda_n\end{pmatrix}
+$$
+
+with $$\lambda_1 \ge \lambda_2 \ge \dots \ge \lambda_n$$, therefore
+
+$$
+\sigma^2 = \sum_{k=1}^n u_k^2\lambda_k
+$$
+
+This is significant because normally the variance $$\sigma^2$$ is not additive
+but we can make it so by looking at the eigenvector dimensions. Also,
+if $$\Sigma$$ is positive definite ([usually the case for covariance matrix](https://stats.stackexchange.com/questions/52976/))
+then $$\lambda_k > 0$$ for all $$k$$. This is a useful information on the
+problem of finding the minimal $$\sigma^2$$ subject to some constraint on
+$$u$$. Assume we have the condition that $$\sum_k u_k=C$$ for some
+constant $$C>0$$, it is trivial to see that the way to minimize $$\sigma^2$$ is
+to make $$u_k=0$$ for $$k=1,\dots,n-1$$ and $$u_n=C$$. In this case,
+the portfolio volatility is $$\sigma = u_n\sqrt{\lambda_n} = C\sqrt{\lambda_n}$$.
+In this case, $$C$$ is just a scaling factor for the size of the portfolio.
+If we have $$u$$, it is easy to reverse it to get
+
+$$
+w = V u.
+$$
+
+Since $$V$$ and $$\Lambda$$ are the eigenvector and eigenvalues of $$\Sigma$$, 
+we can consider the mutually orthogonal eigenvectors are different "risk
+dimensions" and a portfolio is constructed so as to distribute the total risk
+to these different dimensions. In this case, we can write
+$$R=\begin{pmatrix}r_1 & r_2 & \dots & r_n\end{pmatrix}$$ as a vector of risk
+proportions to each dimension and the risk distribution satisfies
+
+$$
+\begin{aligned}
+r_k &= \frac{u_k^2 \lambda_k}{\sigma^2} \\
+u_k &= \sqrt{\frac{r_k\sigma^2}{\lambda_k}} = \sigma\sqrt{\frac{r_k}{\lambda_k}}
+\end{aligned}
+$$
+
+Hence we can construct a portfolio with arbitrary allocation of risk to each
+dimensions.
