@@ -65,8 +65,8 @@ def genweights(frame: np.ndarray) -> np.ndarray:
     ymax, xmax = frame.shape
     normfactor = ymax // 2
 	# y is -1 to 1; x is in same scale but only on rightmost 2/3
-    y = np.arange(-ymax//2, ymax-ymax//2) / normfactor
-    x = np.arange(-xmax*2//3, xmax-xmax*2//3) / normfactor
+    y = np.linspace(-ymax//2, ymax-ymax//2, ymax) / normfactor
+    x = np.linspace(-xmax*2//3, xmax-xmax*2//3, xmax) / normfactor
     xx, yy = np.meshgrid(x, y)
     weights = np.exp(-(xx**2 + yy**2))
     weights[:, :xmax//3] = 0  # left one-third = ignore
@@ -78,11 +78,11 @@ def penalty(prev, this, weight) -> np.ndarray:
     prev = np.square(prev > 128)
     return np.square(this - prev) * weights
 
-MOVIE = "screen.mov"
-next_t = 2
-incr = 2
-prev = weight = None
-threshold = 1e-3
+MOVIE = "screen.mov"   # movie file to read by av.open()
+next_t = 2             # time to capture next frame
+incr = 2               # time increment per frame capture
+prev = weight = None   # variables to hold a frame/frame mask
+threshold = 1e-3       # score threshold for saving the frame
 
 files = []
 container = av.open(MOVIE)
