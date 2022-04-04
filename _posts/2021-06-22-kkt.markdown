@@ -326,7 +326,7 @@ def markowitz(ret, cov, r, lb=np.nan, ub=np.nan):
         # constraints 0 to N-1 are for lowerbound and N to 2N-1 are for upperbound
         # row/column N+2+i corresponds to the constraint i
         inactive = [N+2+i for i in range(2*N) if bitmap & (2**i)]
-        active = [N+2+i for i in range(2*N) if i not in inactive]
+        active = [N+2+i for i in range(2*N) if N+2+i not in inactive]
         # verify no conflicting active constraints
         if any(N+i in active for i in active):
             continue # conflicting activeness found, skip this one
