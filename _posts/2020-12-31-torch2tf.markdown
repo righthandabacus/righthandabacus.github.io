@@ -2,7 +2,7 @@
 layout: post
 title: Copying weight tensors from PyTorch to Tensorflow
 date: Thu, 31 Dec 2020 12:28:42 -0500
-lastedit: Fri, 01 Jan 2021 11:27:06 -0500
+lastedit: Sun, 03 Apr 2022 21:45:47 -0400
 tags: code
 ---
 
@@ -181,3 +181,27 @@ torchmodel.load_state_dict(torchparam)
 
 After we load the state dict back to the PyTorch model, it will behave exactly
 as the Tensorflow model.
+
+**Note:** I notice the title of this post means reverse of the content. Indeed
+setting weights in Tensorflow model is much easier. Assume you already get the
+weights (e.g., from PyTorch model) and converted it into numpy, you can
+manipulate the weights of each layer with `set_weights()` function.
+
+As a proof-of-concept, you can try the following:
+
+```python
+import tensorflow as tf
+
+# Load model (Keras HDF5 assumed)
+model = tf.keras.models.load_model("mymodel.h5")
+# Extract weights of one layer as a list of numpy arrays
+weights = model.layers[0].get_weights()
+# Modify one element in one of the array, or other manipulation
+weights[0][0] = 0.1
+# Overwrite the weights
+model.layers[0].set_weights(weights)
+```
+
+Of course, you need to make sure each and every weight arrays are in the right
+shape that the layer expects it. If you obtain the weights from PyTorch,
+it means that usually you need to transpose.
