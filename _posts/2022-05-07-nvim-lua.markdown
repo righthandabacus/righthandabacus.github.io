@@ -1,0 +1,476 @@
+---
+layout: post
+title: Porting neovim config to lua
+date: Sat, 07 May 2022 11:47:07 -0400
+lastedit: Tue, 10 May 2022 08:22:24 -0400
+tags: system
+category: blog
+highlightjs:
+  - lua
+  - vim
+---
+
+In a [previous post](/2021-09-13-nvim/) I mentoned about bringing the old vim
+config to neovim by making symlinks between `~/.vim` to `~/.config/nvim` as
+well as `~/.vimrc` to `~/.config/nvim/init.vim`. But as I see neovim getting
+mature, seems I don't need to care about vim config any more. While the `.vim`
+files are in vim's own syntax, neovim comes with lua as the alternative
+configuration language.
+
+## Lua the language
+
+Lua is simply an embeddeding langauge. It has simple syntax that fits as a
+scripting language. And there are lua libraries to help a program written in C
+to export internal data structure to lua and run a lua script that uses them.
+Hence it is a way to let user config something without recompiling. It is
+therefore a perfect way to let a program add plugins.
+
+The best reference to using lua with neovim seems to be the series
+[Learn neovim the practical way](https://alpha2phi.medium.com/learn-neovim-the-practical-way-8818fcf4830f).
+Then the pointers for more advanced use, such as writing a neovim plugin using
+lua, can be found in <https://github.com/nanotee/nvim-lua-guide>. 
+
+## Neovim config and plugins
+
+Neovim has the config located at `~/.config/nvim` and the plugins, undo file,
+and so on located at `~/.local/share/nvim`. Indeed those are the paths under
+the environment variables `$XDG_CONFIG_HOME` and `$XDG_DATA_HOME` as specified
+by FreeDesktop, which neovim honours.
+
+We can make a default neovim config file in lua by naming the file `init.lua`
+instead of `init.vim` in `~/.config/nvim`. All other lua scripts that loaded
+from `init.lua` should be placed at `lua/` subdirectory.
+
+Following the design of the series above, below is my
+`~/.config/nvim/init.vim`, with only one line, and defer everything else to
+`~/.config/nvim/lua/plugins.lua`:
+
+```lua
+require("plugins").setup()
+```
+
+Now *Packer* seems to be a better plugin management system for neovim. Below
+are the content of `~/.config/nvim/lua/plugins.lua`, containing my selection of
+plugins:
+
+```lua
+local M = {}
+
+function M.setup()
+  -- Indicate first time installation
+  local packer_bootstrap = false
+
+  -- packer.nvim configuration
+  local conf = {
+    profile = {
+      enable = true,
+      threshold = 1, -- the amount in ms that a plugins load time must be over for it to be included in the profile
+    },
+    display = {
+      open_fn = function()
+        return require("packer.util").float { border = "rounded" }
+      end,
+    },
+  }
+
+  -- Check if packer.nvim is installed
+  -- Run PackerCompile if there are changes in this file
+  local function packer_init()
+    local fn = vim.fn
+    local install_path = fn.stdpath "data" .. "/site/pack/packer/start/packer.nvim"
+    if fn.empty(fn.glob(install_path)) > 0 then
+      packer_bootstrap = fn.system {
+        "git",
+        "clone",
+        "--depth",
+        "1",
+        "https://github.com/wbthomason/packer.nvim",
+        install_path,
+      }
+      vim.cmd [[packadd packer.nvim]]
+    end
+    vim.cmd "autocmd BufWritePost plugins.lua source <afile> | PackerCompile"
+  end
+
+  -- Plugins
+  local function plugins(use)
+    use { "wbthomason/packer.nvim" }
+
+    -- load plugins only when needed
+    use { "nvim-lua/plenary.nvim", module = "plenary" }
+
+    -- precompile plugins to bytecode to speed up neovim start
+    use { "lewis6991/impatient.nvim" }
+
+    -- Better Comment
+    use {
+      "numToStr/Comment.nvim",
+      opt = true,
+      keys = { "gc", "gcc", "gbc" },
+      config = function()
+        require("Comment").setup {}
+      end,
+    }
+
+    -- Markdown
+    use {
+      "iamcco/markdown-preview.nvim",
+      run = function()
+        vim.fn["mkdp#util#install"]()
+      end,
+      ft = "markdown",
+      cmd = { "MarkdownPreview" },
+    }
+
+    -- Git
+    use {
+      "TimUntersberger/neogit",
+      requires = "nvim-lua/plenary.nvim",
+      config = function()
+        require("config.neogit").setup()
+      end,
+    }
+
+    -- Better icons
+    use {
+      "kyazdani42/nvim-web-devicons",
+      module = "nvim-web-devicons",
+      config = function()
+        require("nvim-web-devicons").setup { default = true }
+      end,
+    }
+
+    -- Status line
+    use {
+      "nvim-lualine/lualine.nvim",
+      event = "VimEnter",
+      config = function()
+        require("config.lualine").setup()
+      end,
+      requires = { "nvim-web-devicons" },
+    }
+
+    -- Treesitter
+    use {
+      "nvim-treesitter/nvim-treesitter",
+      run = ":TSUpdate",
+      config = function()
+        require("config.treesitter").setup()
+      end,
+    }
+    use {
+      "SmiteshP/nvim-gps",
+      requires = "nvim-treesitter/nvim-treesitter",
+      module = "nvim-gps",
+      config = function()
+        require("nvim-gps").setup()
+      end,
+    }
+
+    -- neorg for org-mode
+    use {
+      "nvim-neorg/neorg",
+      -- tag = "latest",
+      ft = "norg",
+      after = "nvim-treesitter", -- You may want to specify Telescope here as well
+      config = function()
+        require('neorg').setup {
+          -- Tell Neorg what modules to load
+          load = {
+            ["core.defaults"] = {}, -- Load all the default modules
+            ["core.norg.concealer"] = {}, -- Allows for use of icons
+            ["core.norg.dirman"] = { -- Manage your directories with Neorg
+              config = {
+                workspaces = {
+                  work = "~/_neorg"
+                }
+              }
+            }
+          },
+        }
+      end
+    }
+
+    -- Terminal
+    use {
+      "akinsho/toggleterm.nvim",
+      keys = { [[<C-\>]] },
+      cmd = { "ToggleTerm", "TermExec" },
+      config = function()
+        require("config.toggleterm").setup()
+      end,
+    }
+
+    -- AI completion
+    use { "github/copilot.vim", event = "InsertEnter" }
+
+    -- Bootstrap Neovim
+    if packer_bootstrap then
+      print "Restart Neovim required after installation!"
+      require("packer").sync()
+    end
+  end
+
+  packer_init()
+
+  local packer = require "packer"
+  packer.init(conf)
+  packer.startup(plugins)
+end
+
+return M
+```
+
+The Packer system allows you to run `:PackerCompile`, `:PackerSync`, and
+`:PackerClean` for maintenance, or `:PackerInstall` to install new plugins
+added to, or uninstall old plugins that removed from this config. So after
+this, we simply load up neovim, do `:PackerInstall` and then `:PackerCompile`
+to finish the set up.
+
+The other part that is important for neovim is the subdirectory,
+`~/.config/nvim/after/plugins/`, which all lua scripts there will be run after
+the `init.lua` is executed. My old vim config is like the following:
+
+```vim
+set mouse=a                 " mouse in normal, visual, and insert mode
+set expandtab               " converts tabs to white space
+set nocompatible            " disable compatibility to old-time vi
+set showmatch               " show matching brackets.
+set ignorecase              " case insensitive matching
+set hlsearch                " highlight search results
+set tabstop=4               " number of columns occupied by a tab character
+set softtabstop=4           " see multiple spaces as tabstops so <BS> does the right thing
+set shiftwidth=4            " width for autoindents
+set autoindent              " indent a new line the same amount as the line just typed
+set number                  " add line numbers
+set cursorline
+set spelllang=en_us
+syntax on                   " syntax highlighting
+
+" mouse release send selection to clipboard
+vmap <LeftRelease> "*ygv
+```
+
+and therefore I make the following into `~/.config/nvim/after/plugin/defaults.lua`:
+
+```lua
+local api = vim.api
+local g = vim.g
+local opt = vim.opt
+local cmd = vim.cmd
+
+-- mouse release = send selection to clipboard
+-- nvim_set_keymap() help: see https://github.com/nanotee/nvim-lua-guide
+local default_opts = { noremap = true, silent = true }
+api.nvim_set_keymap("v", "<LeftRelease>", '"*ygv', default_opts)
+
+opt.termguicolors = true   -- Enable colors in terminal
+opt.hlsearch = true        -- Set highlight on search
+opt.number = true          -- Make line numbers default
+opt.relativenumber = true  -- Make relative number default
+opt.mouse = "a"            -- Enable mouse mode
+opt.breakindent = true     -- Enable break indent
+opt.undofile = true        -- Save undo history
+opt.ignorecase = true      -- Case insensitive searching unless /C or capital in search
+opt.smartcase = true       -- Smart case
+opt.updatetime = 250       -- Decrease update time
+opt.signcolumn = "yes"     -- Always show sign column
+-- opt.clipboard = "unnamedplus" -- Access system clipboard
+opt.expandtab = true       -- use space instead of tab by default
+opt.showmode = false       -- Do not need to show the mode. We use the statusline instead.
+opt.showmatch = true       -- highlight matching brackets
+opt.cursorline = true      -- show cursor line
+opt.cursorcolumn = true    -- show cursor column
+opt.joinspaces = false     -- No double spaces with join after a dot
+opt.list = true            -- show space and tabs chars
+opt.listchars = "eol:⏎,tab:▸·,trail:×,nbsp:⎵"  -- make tab, etc visible
+opt.spelllang = "en_us"
+opt.sessionoptions = "buffers,curdir,folds,help,tabpages,winsize,winpos,terminal"
+
+-- prefer `industry` color scheme
+cmd [[
+  colorscheme industry
+]]
+```
+
+which in lua, the `:set` command becomes `vim.opt` and if we need to type some
+`:` commands, we wrap it inside `vim.cmd`. There are some more goodies from the
+Medium series following the link above. One useful item is the enhanced status
+line, which depends on the plugin `lualine`. The following is the config
+`~/.config/nvim/lua/config/lualine.lua`:
+
+```lua
+local M = {}
+
+function M.setup()
+  local gps = require "nvim-gps"
+
+  require("lualine").setup {
+    options = {
+      icons_enabled = true,
+      theme = "auto",
+      component_separators = { left = "", right = "" },
+      section_separators = { left = "", right = "" },
+      disabled_filetypes = {},
+      always_divide_middle = true,
+      globalstatus = false, -- global line = shared across all window
+    },
+    sections = {
+      lualine_a = { "mode" },
+      lualine_b = { "branch", "diff", "diagnostics" },
+      lualine_c = {
+        { "filename" },
+        {
+          gps.get_location,
+          cond = gps.is_available,
+          color = { fg = "#f3ca28" },
+        },
+      },
+      lualine_x = { "encoding", "fileformat", "filetype" },
+      lualine_y = { "progress" },
+      lualine_z = { "location" },
+    },
+    inactive_sections = {
+      lualine_a = {},
+      lualine_b = {},
+      lualine_c = { "filename" },
+      lualine_x = { "location" },
+      lualine_y = {},
+      lualine_z = {},
+    },
+    tabline = {},
+    extensions = {},
+  }
+end
+
+return M
+```
+
+Since it is to make a fancy status line, some unicode characters are used here.
+Part of it is from the [Powerline](https://github.com/powerline/powerline) for
+vim, which are used in the separators specified above. The other are the
+[web devicons](https://github.com/kyazdani42/nvim-web-devicons), that are less
+commonly used. I am using iTerm2, which can emulate Powerline fonts by checking
+"Use built-in Powerline glyphs" in Preferences→Profiles→Text. But the devicons
+really need a font to support. There are some nerdfonts that we can download
+from <https://www.nerdfonts.com/font-downloads> but not all have the full set
+of icons. The one I tried that works is DejaVuSansMono.
+
+## Using OpenSSL automatically
+
+This is the interesting part. Copied from <https://vim.fandom.com/wiki/Encryption>,
+in the VIM script we can do the following to automatically run a command upon
+open and close of a buffer to edit a password-encrypted file:
+
+```vim
+augroup CPT
+  au!
+  au BufReadPre  *.cpt setl bin viminfo= noswapfile
+  au BufReadPost *.cpt let $CPT_PASS = inputsecret("Password: ")
+  au BufReadPost *.cpt silent 1,$!ccrypt -cb -E CPT_PASS
+  au BufReadPost *.cpt set nobin
+  au BufWritePre *.cpt set bin
+  au BufWritePre *.cpt silent! 1,$!ccrypt -e -E CPT_PASS
+  au BufWritePost *.cpt silent! u
+  au BufWritePost *.cpt set nobin
+augroup END
+```
+
+the following is my version in Lua script for neovim, which uses OpenSSL for
+encryption:
+
+```lua
+local api = vim.api
+
+-- encryption file
+--    dec command: openssl enc -in "$1" -out $TXTFILE -k "$PW" -d -aes-256-cbc
+--    enc command: openssl enc -in $TXTFILE -out "$1" -k $PW -e -aes-256-cbc
+local cryptGrp = api.nvim_create_augroup("EncryptFile", { clear = true })
+api.nvim_create_autocmd("BufReadPre", {
+  pattern = '*.enc',
+  command = [[setl bin viminfo= noswapfile]],
+  group = cryptGrp,
+})
+api.nvim_create_autocmd("BufReadPost", {
+  pattern = '*.enc',
+  command = [[
+    let $ENC_PASS = inputsecret("Password: ")
+    silent 1,$!openssl enc -k $ENC_PASS -d -aes-256-cbc
+    if v:shell_error > 0
+      bdelete!
+      throw "Bad decryption"
+    endif
+    set nobin
+  ]],
+  group = cryptGrp,
+})
+api.nvim_create_autocmd("BufWritePre", {
+  pattern = '*.enc',
+  command = [[
+    set bin
+    silent 1,$!openssl enc -k $ENC_PASS -e -aes-256-cbc
+  ]],
+  group = cryptGrp,
+})
+api.nvim_create_autocmd("BufWritePost", {
+  pattern = '*.enc',
+  command = [[
+    silent 1,u
+    set nobin
+  ]],
+  group = cryptGrp,
+})
+```
+
+This lua script is saved in `~/.config/nvim/after/plugin/`. Those are hooked to
+files with the extension `enc`. We used the vi function `inputsecret()` to get
+a password and assign to a variable (persistent until end of session). Then
+invoking `openssl` command to transcode the current buffer from ciphertext to
+plaintext. If the command failed, which usually is caused by bad password, we
+close the buffer automatically to prevent accidental damage to the original
+file. Similarly before we write, we use the command to transcode plaintext into
+ciphertext, reusing the password we opened the file. Then after we write, we
+undo the transcode (`u`). This should show enough for how the old vim script
+correspond to the lua script in neovim.
+
+If you use this, be careful the password is saved in `$ENC_PASS` environment
+variable. This will be a security risk as well as it can be overwritten when
+you opened another encrypted buffer (i.e., you're going to mess the files if
+you want to edit multiple encrypted files with different password)
+
+An improvement would be to make some edit:
+
+```lua
+api.nvim_create_autocmd("BufReadPost", {
+  pattern = '*.enc',
+  command = [[
+    let b:enc_pass = inputsecret("Password: ")
+    let $ENC_PASS = b:enc_pass
+    silent 1,$!openssl enc -k $ENC_PASS -d -aes-256-cbc
+    let $ENC_PASS = ""
+    if v:shell_error > 0
+      bdelete!
+      throw "Bad decryption"
+    endif
+    set nobin
+  ]],
+  group = cryptGrp,
+})
+api.nvim_create_autocmd("BufWritePre", {
+  pattern = '*.enc',
+  command = [[
+    set bin
+    let $ENC_PASS = b:enc_pass
+    silent 1,$!openssl enc -k $ENC_PASS -e -aes-256-cbc
+    let $ENC_PASS = ""
+  ]],
+  group = cryptGrp,
+})
+```
+
+This way, we create a neovim internal variable *in each buffer*, `b:enc_pass`,
+to host the encryption password and set it to an environment variable only when
+we invoke OpenSSL command. It is not perfect, but at least allows different
+password for different buffer. We may avoid the environment variable by using
+`execute` command in vim but we may nedd to escape the passsword to make a
+valid command string.
