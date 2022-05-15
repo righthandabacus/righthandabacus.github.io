@@ -46,7 +46,7 @@ modified the Flask app for that it needs. But SocketIO app is different and
 more complicated to set up, which we can't get it run other way round.
 Otherwise this is the error you will see:
 
-```
+```text
 RuntimeError: You need to use the gevent-websocket server. See the Deployment section of the documentation for more information.
 ```
 
