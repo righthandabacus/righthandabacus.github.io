@@ -2,7 +2,7 @@
 layout: post
 title: Copying weight tensors from PyTorch to Tensorflow
 date: Thu, 31 Dec 2020 12:28:42 -0500
-lastedit: Sun, 03 Apr 2022 21:45:47 -0400
+lastedit: Sat, 21 May 2022 14:55:39 -0400
 tags: code
 ---
 
@@ -12,6 +12,8 @@ platform to another. While there may be issue arose from the floating point
 precisions mismatch between the two platforms, I believe the effect is usually
 not material. What I want to achieve is to copy the weight tensors from one
 model to another given we have the same architectures built.
+
+(**Note:** Please see a [rewrite of this](/2022-05-21-torch2tf) for more detailed code)
 
 Tensorflow save its model in HDF5 format while PyTorch has its own `.pth`
 format (which is a ZIP file of pickled model and other data). However, the
