@@ -110,7 +110,8 @@ footer_links_active:
 disqus: "righthandabacus"
 
 # Fill in your Google Analytics ID to track your website using GA
-google_analytics: "UA-1542635-4"
+#google_analytics: "UA-1542635-4"
+google_analytics: "G-XPW46GDHLQ"
 
 #############################
 # All others
