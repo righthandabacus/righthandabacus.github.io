@@ -1,0 +1,24 @@
+---
+layout: post
+title: Color PCL in macOS
+date: Wed, 10 Aug 2022 10:46:02 -0400
+tags: system
+category: blog
+---
+
+It is quite a surprise that if you have a HP color laser printer, and you're
+trying to use the PCL protocol to print, you will only print in black and
+white. If it is print using PostScript language, you can get the color. There
+is not an option for the PCL driver to choose between outputing mono and color,
+although the printer supports both. To fix, there is an instruction on github gist:
+
+<https://gist.github.com/mrmanc/0182c6b86d68361c6e35>
+
+Basically the steps are the following:
+
+1. Get a PPD file from http://www.openprinting.org/driver/pxlcolor
+2. Turn on CUPS web interface by the command `cupsctl WebInterface=yes`
+3. Use the CUPS web interface, instead of the System Preferences dialog, to add a printer. Only from there, you can provide a PPD file for the printer.
+4. Viola
+
+Always, `lpstat` is your friend to see the printers in command line.

@@ -1,0 +1,267 @@
+---
+layout: post
+title: Diskless Debian with NBD
+date: 2022-09-30
+tags: system
+---
+
+A previous post about [diskless Debian setup](/2021-08-07-diskless) was using
+NFS. This is an attempt to try network block device. This can solve some
+problem caused by NFS, for example, running a docker daemon on such a system
+that uses overlay storage driver, which only supports a few underlying file
+systems.
+
+Network block device is a block device over network. On the server side, a
+daemon is running to deliver blocks and write the updates. On client side, a
+device is created in `/dev` and then we can mount it to another mount point.
+Hence from the user application's perspective, it seems like a piece of
+hardware and we can format it to any file system.
+
+The following documents the workflow from start to finish. In a very much
+similar way as [the previous one](/2021-08-07-diskless). The workflow of the
+final system is:
+
+1. Client boot with PXE stack on network card, which requests for DHCP
+2. DHCP server respond with IP address and the location of the boot program
+3. Client, according to the DHCP reply, request for the network boot program (NBP) from TFTP
+4. Client pass the ownership to the NBP for the next stage of boot, which in
+   case of pxelinux, will show boot menu and load kernel
+5. The Linux kernel will work according to the parameters passed, which
+   includes running nbd client and mount a nbd device as root.
+6. Everything afterward is as usual, except all access to the "disk" is indeed
+   going over the network to the nbd daemon.
+
+## DHCP set up
+
+In OpenWRT, the DHCP server is [dnsmasq](https://openwrt.org/docs/guide-user/base-system/dhcp),
+which its configuration are located at `/etc/config/dhcp` (OpenWRT specific)
+and `/etc/dnsmasq.conf` (dnsmasq default). When we run it as a daemon, OpenWRT
+will create a new config at `/var/etc` that loads the latter and apply the
+attributes from the former. Hence it is better to modify at `/etc/config/dhcp`.
+Below should be a new section appended to the end:
+
+```text
+config boot linux
+       option filename 'pxelinux.0'
+       option serveraddress '192.168.0.2'
+       option servername 'tftpserver'
+```
+
+The above will be converted into a line
+`dhcp-boot=pxelinux.0,tftpserver,192.168.0.2` in the `dnsmasq.conf`, and
+delivered as DHCP option 66 (TFTP server address) and option 67 (boot filename)
+in the reply. In fact, we can make this more specific to one host, for example,
+the below will be host-based configuration based on MAC address:
+
+```text
+config host 'myhost'
+        option ip '192.168.0.123'
+        option mac '01:23:45:ab:cd:ef'
+        option tag 'NOPXE'
+```
+
+## TFTP set up
+
+TFTP is also supported in dnsmasq. What we needed to do is to add these two
+lines into `/etc/dnsmasq.conf`:
+
+```text
+enable-tftp
+tftp-root=/path/to/tftproot
+```
+
+or equivalently, add to `/etc/config/dhcp`:
+
+```text
+
+config dnsmasq
+	# ...
+	option enable_tftp '1'
+	option tftp_root '/path/to/tftproot'
+
+config dhcp 'lan'
+	option interface 'lan'
+	option dhcp_range '192.168.0.1,proxy'
+	option start '100'
+	option leasetime '12h'
+	option limit '150'
+	option dynamicdhcp '0'
+```
+
+The above configuration is for using a OpenWRT device to serve TFTP other than
+the one responding to DHCP. Otherwise, we do not need to modify the `lan`
+section to set the `dhcp_range` and `dynamicdhcp` option. But we must ensure
+that dnsmasq is listening to the interface that serves TFTP. It will not work
+if we ignored the interface for DHCP. If we set ths up in web interface in LuCI:
+
+- in Network → Interface → LAN → DHCP server → General setup, uncheck "Ignore interface"
+- in Network → Interface → LAN → DHCP server → Advanced settings, uncheck "Dynamic DHCP" and uncheck "Force"
+- in Network → DHCP and DNS → General settings, uncheck "Authoritative"
+- in Network → DHCP and DNS → TFTP settings, check "Enable TFTP server", enter the full path for "TFTP server root"
+
+To test, run "tftp <address>" and then try to "get <filename>" for the filename
+(or path) relative to the tftp root.
+
+## Create NBD virtual disk
+
+Conceptually, NBD is as simple as running a daemon and pass through all block
+device operations to a block device in hardware. But I don't have a physical
+hard disk to spare so I use an image file instead.
+
+On a separate computer, with the most updated Debian, run
+
+    apt-get install nbd-client
+
+The installation of `nbd-client` will trigger `initramfs-tools` to create a nbd
+kernel module, which then will run `update-initramfs` to create
+`/boot/initrd.img`. This image, together with the corresponding kernel, will be
+copied to TFTP for PXE booting. Usually I will copy over the files
+`/boot/initrd.img-5.10.0-18-amd64` and `/boot/vmlinuz-5.10.0-18-amd64` to the
+tftproot and make symlinks `initrd.img` and `vmlinuz` to them, which the
+symlinks are referred in PXELinux config. Should I need more kernel modules for
+the diskless system at boot time, I do the similar: install it on another
+computer and rerun `update-initramfs` to generate a new `initrd.img`, then
+replace the one in TFTP and reboot the diskless system. If overwriting the
+`initrd.img` on the helper system is not desirable, use the following instead
+to create one in a different path:
+
+    mkinitramfs -d /etc/initramfs-tools -o path/to/initrd.img
+
+**Note:** In my Debian installation of `nbd-client`, there is an issue on the
+initramfs script for using nbd as root. Two scripts are installed from
+`nbd-client` package, namely `/usr/share/initramfs-tools/hooks/nbd` and
+`/usr/share/initramfs-tools/scripts/local-top/nbd`. The latter is a script to
+reside in `initrd.img` and run at early phase of boot. The last few lines read:
+
+```bash
+# This should be removed once the cfq scheduler no longer deadlocks nbd
+# devices
+if grep -q '\[cfq\]' /sys/block/$nbdbasedev/queue/scheduler
+then
+	echo deadline > /sys/block/$nbdbasedev/queue/scheduler
+fi
+```
+
+which depends on `grep`. The former script ends with the line
+
+    copy_exec /sbin/nbd-client /sbin
+
+which copies the `nbd-client` executable to `/sbin`. Booting from nbd will not
+success unless we remove the `if` block in the latter script or add another
+`copy_exec` to the former. Commenting out the `if` block is easier. Do this,
+and rerun `update-initramfs -u`.
+
+Now, let's create a disk of 8GB.  To make an image of 8GB, we use `truncate`
+from `coreutils` or otherwise, using `dd` also works. Then format it, mount it,
+and install base Debian.
+
+    truncate -s 8G /server/FAKEDISK.img   # truncate is from coreutils
+    mkfs.ext4 /server/FAKEDISK.img
+    mount -t ext4 -o loop /server/FAKEDISK.img /mnt/point
+    debootstrap bullseye /mnt/point http://deb.debian.org/debian
+
+Then we need some more basic set up on top of this barebone Debian. Since it
+will be mounted after PXE boot, the main network should already be set up (any
+driver required should be provided in initrd). But everything else is not. So
+we need to create user, set up SSH for remote access, allow sudo, and update
+hostname:
+
+    chroot /mnt/point
+    # now inside the chroot jail of a base debian system
+    adduser <yourname>
+    apt-get update
+    apt-get -y dist-upgrade
+    apt-get -y install openssh-server sudo
+    adduser <yourname> sudo
+    echo <disklesshost> > /etc/hostname
+
+Finally, unmount the loopback image and start to serve it
+
+    exit
+    # left the chroot jail
+    umount /mnt/point
+
+
+## NBD server
+
+The NBD server needs a daemon to serve:
+
+    apt-get install nbd-server
+
+and this will create the user and group `nbd`. Since the daemon need to access
+to the image we created, we need:
+
+    chown nbd.nbd /server/FAKEDISK.img
+
+The main cofig file for nbd server is `/etc/nbd-server/config` which will load
+everything in `/etc/nbd-server/conf.d/*.conf`. The man page for the config is `man 5 nbd-server`.
+We create one `/etc/nbd-server/conf.d/diskless.conf`:
+
+```
+[diskless]
+exportname = /server/FAKEDISK.img
+#authfile = /etc/nbd-server/allow
+```
+
+by default, port 10809 will be used but you can modify it in
+`/etc/nbd-server/config`. Here we export a name `diskless` and that links to
+the image file.
+
+## PXElinux configuration
+
+In the TFTP server, under the tftp root, we should make a copy of `pxelinux.0`
+from syslinux and put the `*.c32` file (e.g. 32-bit BIOS version) under
+`boot/isolinux/`. Then we can set up, for example, the below config at
+`pxelinux.cfg/default` or `pxelinux.cfg/C0A80003` (address 192.168.0.3 in hex):
+
+```text
+DEFAULT menu.c32
+
+PROMPT 1
+TIMEOUT 30
+ONTIMEOUT Debian
+
+LABEL reboot
+  MENU LABEL reboot computer
+  COM32 reboot.c32
+
+LABEL local
+  MENU LABEL boot local drive
+  LOCALBOOT 0
+
+LABEL Debian
+  MENU LABEL Debian Buster
+  KERNEL vmlinuz
+  APPEND vga=858 rw ip=dhcp initrd=initrd.img root=/dev/nbd0 nbdroot=192.168.0.2:diskless ipv6.disable=1
+```
+
+what to specify as kernel parameters is indeed platform-dependent and not found
+in nbd source code. Behind the scene in Debian, it is a shell script in initrd
+to parse them as command line parameters, which looks for `nbdroot=` and
+`root=/dev/nbd*`. Debian supports `nbdroot=192.168.0.2,diskless,nbd0` as
+equivalent to above. Or we can put a port number as
+`192.168.0.2:10809/diskless`. These parameters will translate into a
+`nbd-client` command (which resides in `/sbin` in `initrd.img`) to establish a
+connection.
+
+Keep a copy of `vmlinuz` and `initrd.img` at the TFTP root. Start the nbd
+server at 192.168.0.2 as specified in the `nbdroot` option above. Then we are
+ready to boot.
+
+## Final touch
+
+The Debian system installed in this way will not come with kernel in the disk.
+Your `/boot` is empty but it is fine, until you need to load any additional
+kernel module and found `modprobe` failed. You may want to
+`apt-get install linux-image-amd64`.
+
+Since the root is mounted by initramfs, you will have an empty `/etc/fstab`.
+You may want to remount the root with additional parameters, e.g., 
+
+    /dev/nbd0	/		ext4	remount,noatime,nodiratime	0	0
+
+Using ext4 is not a requirement. See, for example
+<https://wiki.archlinux.org/title/diskless_system>, which uses btrfs instead of
+ext4 (but you will need to apt-get install some more packages to use it). It is
+reported that with compression support in btrfs, using nbd can be faster than
+nfs.
