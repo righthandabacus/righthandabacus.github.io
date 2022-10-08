@@ -8,7 +8,7 @@ tags: system
 A previous post about [diskless Debian setup](/2021-08-07-diskless) was using
 NFS. This is an attempt to try network block device. This can solve some
 problem caused by NFS, for example, running a docker daemon on such a system
-that uses overlay storage driver, which only supports a few underlying file
+that uses overlay storage driver, which only supports a few backing file
 systems.
 
 Network block device is a block device over network. On the server side, a
