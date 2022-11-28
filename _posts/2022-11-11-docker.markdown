@@ -1,0 +1,370 @@
+---
+layout: post
+title: Docker Tutorial
+date: 2022-11-11
+tags: system
+---
+
+The following is a short tutorial to use Docker, aimed at only the essentials.
+
+## Terms
+
+- Docker: the daemon
+- Container: an virtualization environment that has its own disk and process
+- Layers: docker image are created as union file system of layers, which the layer on top add/delete some files of the layer beneath
+- Volume: writable persistent storage for containers
+- States: a container can be in any of the following states: created, running, paused, restarting, dead, stopped
+
+## Workflow
+
+Pull an image from docker hub and start a container
+
+    docker run -d --name container_name repo:tag
+
+Go into a container and launch a shell
+
+    docker exec -it container_name /bin/bash
+
+Run a command in a container
+
+    docker exec container_name command arg1 arg2
+
+Clean up (stop=SIGTERM, kill=SIGKILL)
+
+    docker stop container_name   # SIGTERM container
+    docker kill container_name   # SIGKILL container
+    docker rm container_name     # remove from docker memory
+
+Advanced use of `docker run`:
+
+```
+docker run --rm \                                    # remove container when exits
+           --name pgdocker \                         # container name
+           -e POSTGRES_PASSWORD=letmein \            # env var for the container
+           -c 512 \                                  # limit to 50% CPU (1024=100%)
+           -m 500M \                                 # limit to 500M memory
+           -d \                                      # detach
+           -p 2345:5432 \                            # map container port 5432 as host port 2345
+           -v /opt/pgdata:/var/lib/postgresql/data   # volume binding
+```
+
+## Inspection
+
+Show running containers (`-a` to show stopped ones as well)
+
+    docker ps -a
+    docker container ls -a
+
+Show processes running in a container
+
+    docker top container_name
+
+Continuously show resources in a container (CPU, RAM, I/O, network)
+
+    docker stats container_name
+
+Show exposed ports from a container
+
+    docker port container_name
+
+Show logs from the container
+
+    docker logs container_name
+    docker logs -f container_name    # continuosly while it is running
+    docker logs -t container_name    # prepend timestamp
+
+Show docker daemon system information:
+
+    docker info
+
+Show downloaded images
+
+    docker images
+    docker image ls
+
+Show layers of an image
+
+    docker history repo:tag
+    docker image history repo:tag
+
+Show image detail in JSON
+
+    docker image inspect repo:tag
+
+Inspect a running container
+
+    docker constainer inspect container_name
+    docker inspect container_name
+
+
+## Images
+
+Download an image only
+
+    docker pull repo:tag
+    docker image pull repo:tag
+
+Dump an image into tarball
+
+    docker image save repo:tag filename.tar
+    docker save --output filename.tar repo:tag
+
+Save a container as new image
+
+    docker commit container_name new_repo:new_tag
+
+Create an image from `Dockerfile` or a tarball (path can be URL)
+
+    docker build -t repo:tag path_to_Dockerfile
+    docker import path_to_tarball.tar
+
+Load an image file from tarball
+
+    docker load path_to_image.tar
+
+Tag an image
+
+    docker tag image_hash repo:tag
+
+Remove image
+
+    docker image rm repo:tag
+    docker rmi repo:tag
+
+Remove dangling images
+
+    docker rmi -f $(docker images -q -f dangling=true)
+
+Remove all images
+
+    docker rmi $(docker images -aq)
+
+## Networking
+
+Docker networking is created using `libnetwork`, providing independent network
+stacks for each containers
+
+Native docker network drivers:
+- bridge: created on host using Linux bridge, for containers to talk to each other
+    - default device `docker0`, can be found in `ifconfig` in host. With default address assigned (by docker IPAM) to 172.17.0.0/16
+- host: container use host’s network namespace
+- none: network inside container but no connection to outside word (completely isolated)
+- overlay: create a network for multi-hosts, using Linux bridge and VXLAN. Containers communicate over network infrastructure
+- macvlan: using MACVLAN bridge in Linux, joining the same L2 network as host
+
+Create networks
+
+    docker network create --driver bridge net_name
+    docker network create --driver macvlan \
+       --subnet 192.168.8.0/24 --gateway 192.168.8.1 \
+       -o parent=enp6s0 vlan_net_name
+
+Show networks
+
+    docker network ls
+
+Create a container using a network (afterwards, a veth device is created at host)
+
+    docker run -d --net net_name repo:tag
+
+- at docker start up, `bridge`, `host`, and `none` networks are created; by
+  default containers are connected to the `bridge` network
+
+Create a container (e.g., on macvlan) with a specific IP address
+
+    docker run -d --network vlan_net_name --ip=192.168.8.123 repo:tag
+
+Create container with direct connection to another container (i.e., entry added to `/etc/hosts` in container)
+
+    docker run -d --name redis redis:3.2.0
+    docker run -d -p 8888:8000 --link redis --name myapp repo:tag
+
+Connect and disconnect an existing container:
+
+    docker network connect net_name container_name
+    docker network disconnect net_name container_name
+
+
+## Volume
+
+Create and remove volume
+
+    docker volume create --name=vol_name
+    docker volume rm vol_name
+
+- volume is created under `/var/lib/docker/volumes/<vol_name>`
+- files are in `/var/lib/docker/volumes/<vol_name>/_data`, can be modified directly from host
+
+Mount a volume at container creation (create if not exist)
+
+    docker run -v vol_name:/mount_point repo:tag
+    docker run --mount source=vol_name,target=/mount_point repo:tag
+
+Mount a host directory to container
+
+    docker run -v /hostpath:/mountpoint repo:tag
+    docker run --mount type=bind,source=/host_path,target=/mountpoint repo:tag
+
+Check volume mounts in a container
+
+    docker inspect -f '{{ .Mounts }}' container_name
+
+Copy files from host to container and vice versa
+
+    docker cp hostpath container_name:path
+    docker cp container_name:path hostpath
+
+Create tarball from a container
+
+    docker export -o /hostpath/tarball.tar container_name
+
+Create tarball from volume and save to local, and then restore
+
+    docker run --rm --volumes-from vol_name -v $(pwd):/backup repo:tag tar cvf /backup/backup.tar /vol_name
+    docker run --rm --volumes-from vol_name -v $(pwd):/backup repo:tag tar xvf /backup/backup.tar
+    docker run --rm --volumes-from vol_name -v $(pwd):/backup repo:tag bash -c "cd /vol_name && tar xvf /backup/backup.tar --strip 1"
+
+- the `--volumes-from` volume will be mounted at root with the same name
+- the tarball created will contain the full path, hence we can extract with
+  `tar xvf`; otherwise we can `cd` to the target directory and extract with
+  option `--strip 1`
+
+Remove all volumes
+
+    docker volume prune
+
+Remove dangling volumes
+
+    docker volume rm $(docker volume ls -q -f dangling=true
+    docker volume ls -q -f dangling=true | xargs -r docker volume rm
+
+
+## Storage
+
+Docker daemon storage drivers:
+- overlay2 (default, requires ext4 or xfs)
+- aufs (requires ext4 or xfs)
+- devicemapper (using direct-lvm)
+- btrfs, zfs
+- vfs (generic for all file systems, slowest and no copy-on-write)
+
+May need kernel modules to support, e.g., `modprobe overlay`
+
+Storage driver can be verified with `docker info`; change at `/etc/docker/daemon.json`.
+If using `overlay2`, the image layers are stored in `/var/lib/docker/overlay2`
+(and the `l` subdir contains symlinks to layers)
+
+
+## Corner cases
+
+Create a container and run iteractively a different command
+
+    docker run -it repo:tag command arg1 arg2
+
+- `-i` is for interactive and `-t` is to get a TTY
+- to detach from the container, hit Ctrl-P Ctrl-Q
+- to attach from the container again, do `docker attach container_name`
+
+Pause and resume a container
+
+    docker container pause container_name
+    docker container unpause container_name
+
+Rename a container
+
+    docker rename container_name new_name
+
+Create a container but not run
+
+    docker container create container_name repo:tag
+
+Stop (SIGTERM) a container and restart it:
+
+    docker stop container_name       # SIGTERM a container
+    docker start container_name      # start a stopped container
+    docker restart container_name    # stop, wait, and start a container
+
+- use case for restart: editing a config file in container and need to apply the change
+
+Block until a container stopped
+
+    docker wait container_name
+
+Kill all running containers (`docker ps -q` to show only the container names)
+
+    docker rm $(docker ps -a -q)
+
+Remove all containers
+
+    docker container prune
+
+Remove everything
+
+    docker system prune -f --all
+
+## Dockerfile
+
+Dockerfile is to create an image using `docker build .`, filename is case sensitive. Example:
+
+```
+FROM python:3.5
+RUN pip install Flask==0.11.1 redis==2.10.5
+RUN useradd -ms /bin/bash admin
+USER admin
+COPY app /app
+WORKDIR /app
+CMD ["python", "app.py"] 
+```
+
+Build from docker:
+
+    docker build -t repo:tag [-f path/to/Dockerfile] directory
+
+where the `directory` is the build context, where the commands in Dockerfile is run
+
+Dockerfile instructions:
+
+- `FROM`: based on which image
+- `LABEL`: just some key-value pair as metadata to the image (optional)
+- `ENV`: environment variables set when the container launched
+- `RUN`: commands to run to build the image, must not interactive; each RUN creates a layer
+    - to avoid creating too many layers, chain the commands with `&&` and add line continuation with `\\`
+- `ADD` or `COPY`: copy file from host to the image’s file system; copy from URL also allowed
+    - with `ADD`, a local tarball will be extracted to the image destination, but `COPY` will copy as-is
+    - when copied a directory, files specified in `BUILDDIR/.dockerignore` are skipped
+- `EXPOSE`: which ports the container will listen at runtime; for information only
+- `WORKDIR`: set the working dir for any RUN, CMD, ENTRYPOINT, COPY, ADD to follow
+- `CMD`: commands to run when launching the container
+- `ENTRYPOINT`: similar to CMD; but not overridable
+    - e.g., `docker run <image> <command>` will run the image but override the command at CMD. But if the command is specified as `ENTRYPOINT` instead of `CMD`, you run `docker run <image> <args>` will have `<args>` *appended* to the entrypoint command
+    - if *both* `CMD` and `ENTRYPOINT` are given, the default command to run will be `ENTRYPOINT` with `CMD` appended; which only the `CMD` part can be overridden
+        - e.g., `ENTRYPOINT "sleep"` and `CMD 5`
+    - both `CMD` and `ENTRYPOINT` can be in *shell form*, i.e., `CMD command arg1 arg2` or in *exec form*, i.e., `CMD ["commnad", "arg1", "arg2"]`
+- `USER`: set the UID (and optionally GID) to be used for any RUN, CMD, ENTRYPOINT to follow
+- `VOLUME`: creates a mount point with the specified name, new volume will be created at docker run
+
+Multistage build example:
+
+```
+# build environment
+FROM node:13.12.0-alpine as build
+WORKDIR /app
+ENV PATH /app/node_modules/.bin:$PATH
+COPY package.json ./
+COPY package-lock.json ./
+RUN npm ci --silent
+RUN npm install react-scripts@3.4.1 -g --silent
+COPY . ./
+RUN npm run build
+
+# production environment
+FROM nginx:stable-alpine
+COPY --from=build /app/build /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+The `as build` in the first `FROM` instruction created the container for build
+environment which files are created from it. The second `FROM` instruction
+creates a deployment environment, which the `COPY` instruction will refer to
+the file created from the build environment.

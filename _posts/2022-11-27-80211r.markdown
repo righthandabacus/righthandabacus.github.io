@@ -1,0 +1,119 @@
+---
+layout: post
+title: 802.11r on OpenWRT
+date: 2022-11-27
+tags: system
+---
+
+Normally, Wi-Fi connections does not need any explicit set up for roaming. When
+a station moved away from the access point, it will notice about that and find
+another AP and reconnect. The 802.11r (fast basic service set transition),
+however, is to help make this transition faster. Hence it is called the *fast
+transition* (FT) extension.
+
+## Mechanism of 802.11r
+
+In a 802.11 network, we have access points (APs) that announces the SSID and
+its BSSID. The SSID is the name of the network. The BSSID is the MAC address of
+the AP. The address is announced so the station can address the frame to the AP.
+If there are multiple APs sharing the same SSID, we call it the ESS.
+Conceptually, the ESS is the set of all BSSID of teh same SSID.
+
+The 802.11r introduced some other parameters in addition to these identifiers:
+First we have the *mobility domain* assigned to APs, which declares the subset
+of ESS that allows station to roam around. A station knows it can transit from
+one AP to another if they share the same mobility domain. While station-AP
+association in Wi-Fi is done using four-way handshake, the FT depends on the
+*pairwise transit key* (PTK) for this. The PTK, in turn, is derived from the
+*pairwise master keys* (PMKs). There are PMK-R0 which is supposed to be derived
+from the master session key (MSK) and stored in the wireless LAN controller,
+and there are PMK-R1 which is supposed to be derived from PMK-R0 and stored in
+all APs. It is the PMK-R1 that creates the PTK. The MSK comes from 802.11x/EAP,
+which if you're not using the RADIUS server for Wi-Fi authentication, you
+probably hard-coded the R0 and R1 key instead of deriving them.
+
+Hence, in the wireless LAN, we have the controller as the PMK-R0 key holder
+(R0KH). The APs as the PMK-R1 key holder (R1KH). And the station are the PMK-S0
+key holder and PMK-S1 key holder (S0KH and S1KH, S for supplicant). Supplicants
+are to receive the PMK-R0 and derives PMK-R1, or receives the PMK-R1 and
+derives the PTK. Each key holder is identified by an ID, e.g., R0KH-ID.
+
+Here is how the transition actually works in 802.11r, pictures from https://www.cwnp.com/uploads/802-11_rsn_ft.pdf
+
+First is FT over the distribution system (DS). This is when the APs are
+connected in wire so they can talk to each other out-of-band. It operates as
+follows:
+
+![](/img/80211r-over-the-ds.png)
+
+Fast transition is a Wi-Fi extension that needs *both* the AP and the station to
+support it. It is the station to determine if transition is needed, where to
+transit, and to initiate the transition.
+
+If it is FT over-the-DS, the FT request is sent to the *current AP* with all
+required information elements (IEs), including the mobility domain, R0 name,
+and the R0KH-ID. Then this request is relayed to the target AP by the current
+AP, and the response, also relayed by the current AP, will arrive the station.
+Then the station can start the reassociation request directly to the target AP,
+which will include the R1 name and R1KH-ID. Network connection is transited to
+the new AP after the reassociation request completed.
+
+The other way is FT over the air. This does not require the APs can talk to
+each other.
+
+![](/img/80211r-over-the-air.png)
+
+In this protocol, once the station decided that transition is needed, it
+initiate the authentication with the target AP, which includes the FT option
+with the mobility domain, the R0 name, and the R0KH-ID. The authentication
+response will carry the similar information elements to confirm about the FT.
+Then the station can start the reassociation request after it authenticated with
+the new target AP. This part is same as the case of over-the-DS.
+
+## 802.11r with OpenWRT
+
+OpenWRT has built-in 802.11r support, given that the device supports it. To set
+it up, we simply need to:
+
+- check the checkbox on the LuCI to turn on 802.11r FT
+- set up the mobility domain (a 4-hex-digit same for all APs of the same ESS)
+- set up the NAS ID (a string to uniquely identify this AP, usually recommended to use the AP's MAC address)
+- check the checkbox for "Generate PMK locally"
+
+This is in case of PSK used. In case of using an authentication server such as
+RADIUS, the set up would be more complicated. Most important is to set up the
+R0KH list and R1KH list. In OpenWRT, the R0KH list is assumed to be multiple
+lines of:
+
+    <MAC address>,<NAS ID>,<128-bit key>
+
+which the MAC address and NAS ID is supposed to be of the controller. The R1KH
+list, however, is multiple lines of:
+
+    <MAC address>,<R1KH-ID>,<128-bit key>
+
+which the MAC address and the R1KH-ID is supposed to be of the APs. The R1KH-ID
+should be same as MAC address in format of 6-octets with colons. The 128-bit
+keys in both cases should be all identical but can be generated randomly (e.g.,
+MD5 of /dev/random).
+
+OpenWRT defaults to use over-the-DS. I found this to be problematic in some
+devices (most notably iOS devices) but the root cause is not known. However,
+over-the-air can work well.
+
+Another OpenWRT default is the "reassociation deadline". This is the time limit
+between the FT request and the reassociation request. It is set to 1000 (i.e.,
+1.024 seconds) but seems too short for some devices. This will fail the FT if
+the reassociation request cannot be made on time.
+
+Therefore, it seems it is more robust if we set OpenWRT to use over-the-air (on
+all APs), and set the reassociation deadline to larger (e.g, 10000 for 10.24
+seconds). The longer deadline just raise the upperbound and it should not hurt
+the performance.
+
+One consequence of doing over-the-air FT is that the original AP may not know
+the station disassociated with it. It will be a problem if the station FT to a
+new AP and then FT back, because the original AP would not expect any need to
+update the key. To mitigate this, we should tune down the *station inactivity
+limit*, which specifies the number of seconds the AP should heartbeat the
+station and disassociate it if not found.
