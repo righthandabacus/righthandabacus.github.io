@@ -1,0 +1,114 @@
+---
+layout: post
+title: "Bengio et al (2003) A Neural Probabilistic Language Model"
+date: 2022-04-08
+lastedit: 2022-12-02
+category: paper
+bibtex:
+  type: article
+  title: "A Neural Probabilisitc Language Model"
+  author: "Yoshua Bengio and Réjean Ducharme and Pascal Vincent and Christian Jauvin"
+  booktitle: "J. Machine Learning Research"
+  volume: 3
+  pages: "1137--1155"
+  year: 2003
+---
+
+Language model has the *curse of dimensionality*, namely, if we want to model
+the joint distribution of 10 words in a vocabulary of $$10^5$$, there are
+$$10^{5\times 10} = 10^{50}$$ parameters. But if the variables are continuous,
+we can use fewer parameters.
+
+The goal of this paper is to find a conditional probability model. If $$w_i^j$$
+is the sequence of words $$(w_i,w_{i+1},\dots,w_j)$$, then the probability of a
+sentence of $$T$$ is a product of conditional probabilities:
+
+$$
+P(w_1^T) = \prod_{i=1}^T P(w_i\mid w_1^{i-1})
+$$
+
+The simplest of such is the $$n$$-gram model, which $$T=n$$ considered only the
+combination of observed successive words. New combinations should not be
+assigned zero probability but difficult to find the correct value.
+
+In this paper, the proposal is to assign each word a feature vector in
+$$\mathbb{R}^m$$ (e.g., $$m=30$$), then the probability function of word
+sequences is same as the probability function of the feature vectors, which
+both the vectors and the probability function can be *learned* simultaneously.
+The learning is to maximize the log-likelihood of the training data. And the
+conditional probability function in the formula above can be implemented as
+a neural network of predicting the next word based on the previous ones.
+
+Notations:
+
+- words $$w_1,\cdots,w_T$$ are from vocabulary $$V$$, which $$\mid V\mid$$ is large
+- matrix $$C$$ is a $$\mid V\mid \times m$$ matrix, which row $$t$$ maps word $$w_t$$ to $$\mathbb{R}^m$$. Denote the vector as $$C(w_t)$$.
+- $$n$$-gram prediction function $$g(i, C(w_{t-1}), \cdots, C(w_{t-n+1}))$$ gives the probability $$P(w_t = i\mid w_{t-n+1}^{t-1})$$; which can be implemented as a neural network
+- log-likelihood, with regularization function $$R(\theta)$$:
+
+$$
+L = \frac{1}{T}\sum_t \log g(w_t, C(w_{t-1}), \cdots C(w_{t-n+1})) + R(\theta)
+$$
+
+The function $$g(\cdot)$$ is implemented as a neural network:
+
+$$
+\begin{aligned}
+P(w_t\mid w_{t-n+1}^{t-1}) = y &= \text{softmax}(b + Wx + U\tanh(d + Hx)) \\
+x &= [C(w_{t-1}), \cdots, C(w_{t-n+1})]
+\end{aligned}
+$$
+
+with:
+
+- the word feature layer $$C$$
+- a hidden layer with tanh activation
+- softmax output layer
+
+and in this network:
+
+- the direct connection from input $$x$$ to output $$y$$ is optional, i.e., $$W=0$$
+- the input bias $$b$$ is a vector of $$\mid V\mid$$ elements
+- the hidden layer bias $$d$$ is a vector of $$h$$ elements and weight $$H$$ is a $$h\times (n-1)m$$ matrix, where $$h$$ is the number of units in this layer, e.g. 50
+- output weight $$U$$ for hidden layer is a $$\mid V\mid\times h$$ matrix
+- output weights $$W$$ for input, if not omitted, is a $$\mid V\mid\times (n-1)m$$ matrix
+
+Overall, the parameters are $$b, d, W, U, H, C$$. In this model, the total
+number of parameters scales linearly with $$\mid V\mid$$ and $$n$$, hence not
+subject to the curse of dimensionality.
+
+The direction connection is found to double the speed of convergence, with cost
+of slightly less perplexity (i.e., geometric average of $$1/P(w_t\mid w_1^{t-1})$$).
+
+Once the weight matrix $$C$$ and the network is trained, the out-of-vocabulary
+word can be assigned the vector
+
+$$
+\sum_{i\in V} C(i)P(i\mid w_{t-n+1}^{t-1})
+$$
+
+The paper has a picture for the proposed neural network. The Keras code for the
+equivalent should be as follows:
+
+```python
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Embedding, Concatenate, Dense, Input
+
+vocab_size = 100_000  # size of vocab, after lemmatization
+embed_dim = 30        # embedding vector dimension
+n = 10                # n as in n-gram
+hidden_dim = 50       # num of hidden units
+
+# input is a vector of integers
+inputs = Input(shape=(n,), name="input")
+embedding = Embedding(input_dim=vocab_size,
+                      output_dim=embed_dim,
+                      mask_zero=True, # input value 0 is a mask
+                      input_length=n,
+                      name="embed")(inputs)
+hidden = Dense(hidden_dim, activation="tanh", name="hidden")(embedding)
+concat = Concatenate()([embedding, hidden])
+outputs = Dense(vocab_size, activation="softmax", name="prob")(concat)
+
+model = Model(inputs=inputs, outputs=outputs, name="NPLM")
+```
