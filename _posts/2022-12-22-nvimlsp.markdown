@@ -1,0 +1,115 @@
+---
+layout: post
+title: Language Server Protocol in neovim
+date: Thu, 22 Dec 2022 09:14:36 -0500
+tags: system
+category: blog
+highlightjs:
+  - lua
+  - vim
+---
+
+My favorite editor is always vim and even better is its recent revamp, the
+neovim. When comparing neovim to a modern IDE, there are a lot of programming
+support features missing but none of the IDEs can run over SSH in text screen.
+To make neovim one step closer to IDEs, we can add languages server protocol
+support to it. Then 80% of the time you won't find any need for other IDE
+features.
+
+[Language server protocol](https://langserver.org/) is simply speaking a
+language-agnostic syntax analyzer. An editor supporting LSP can manage all
+languages the same way. A new language to support simply means to get another
+backend plugin for the LSP server.
+
+Setting up LSP for neovim is only a few steps:
+
+1. Install lspconfig to neovim from https://github.com/neovim/nvim-lspconfig
+2. Install a LSP server locally
+3. Connect them
+
+In detail.
+
+First install Python LSP server with
+
+    pip install 'python-lsp-server[all]'
+
+there are other LSP server as well, e.g., Node.js or C++. See https://langserver.org/
+
+The `[all]` part is to get all options, including rope, pylint, flake8, etc. By
+default this package only use Jedi.
+
+Next, edit neovim config to load the LSP plugin. For example, I am using Packer
+so in `~/.config/nvim/lua/plugins.lua`, add
+
+```lua
+local function plugins(use)
+    ...
+    -- add this
+    use { "neovim/lsp-config" }
+    ...
+end
+...
+package.startup(plugins)
+```
+
+After that, we should run `:PackerInstall` in neovim to get this installed. And then, set up the init to load the LSP, e.g., at `~/.config/nvim/init.lua`,
+
+```lua
+require("lspconfig").pylsp.setup()
+```
+
+That's all you need.
+
+But to make good use of the LSP server, we need to hook up some vi key bindings
+to LSP functions. Some suggested key bindings are available on the readme of
+<https://github.com/neovim/nvim-lspconfig> and the below is what I did, editing
+`~/.config/nvim/after/plugin/autocmds.lua`, and limited them to buffers editing
+Python files:
+
+```lua
+  local api = vim.api
+
+  -- ......
+
+  -- for LSP
+  local function lspkeys()
+    -- C-X C-O for completion
+    vim.opt_local.omnifunc = "v:lua.vim.lsp.omnifunc"
+    -- gq to format code
+    vim.opt_local.formatexpr = "v:lua.vim.lsp.formatexpr"
+    -- C-], C-W ], C-W } for jump to definitions
+    vim.opt_local.tagfunc = "v:lua.vim.lsp.tagfunc"
+    api.nvim_buf_set_keymap(0, "n", "gD",       "<cmd>lua vim.lsp.buf.declaration()<CR>",     { silent = true })
+    api.nvim_buf_set_keymap(0, "n", "gd",       "<cmd>lua vim.lsp.buf.definition()<CR>",      { silent = true })
+    api.nvim_buf_set_keymap(0, "n", "K",        "<cmd>lua vim.lsp.buf.hover()<CR>",           { silent = true })
+    api.nvim_buf_set_keymap(0, "n", "gi",       "<cmd>lua vim.lsp.buf.implementation()<CR>",  { silent = true })
+    api.nvim_buf_set_keymap(0, "n", "<C-k>",    "<cmd>lua vim.lsp.buf.signature_help()<CR>",  { silent = true })
+    api.nvim_buf_set_keymap(0, "n", "<space>D", "<cmd>lua vim.lsp.buf.type_definition()<CR>", { silent = true })
+    api.nvim_buf_set_keymap(0, "n", "<space>rn","<cmd>lua vim.lsp.buf.rename()<CR>",          { silent = true })
+    api.nvim_buf_set_keymap(0, "n", "<space>ca","<cmd>lua vim.lsp.buf.code_action()<CR>",     { silent = true })
+    api.nvim_buf_set_keymap(0, "n", "gr",       "<cmd>lua vim.lsp.buf.references()<CR>",      { silent = true })
+    api.nvim_buf_set_keymap(0, "n", "<space>f", "<cmd>lua vim.lsp.buf.format({async=true})<CR>", { silent = true })
+    api.nvim_buf_set_keymap(0, "n", "gS",       "<cmd>lua vim.lsp.buf.document_symbol()<CR>", { silent = true })
+    api.nvim_buf_set_keymap(0, "n", "gW",       "<cmd>lua vim.lsp.buf.workspace_symbol()<CR>",{ silent = true })
+  end
+  api.nvim_create_autocmd("FileType", { pattern = "python", callback = lspkeys })
+```
+
+The function name should tell you what the keys are doing.
+
+Moreover, I usually use line width of 100 characters. I would fine-tune the LSP
+set up in `init.lua` to as follows to suppress premature long line warnings:
+
+```lua
+require("lspconfig").pylsp.setup{
+  settings = {
+    pylsp = {
+      plugins = {
+        pycodestyle = {
+          maxLineLength = 100
+        },
+      },
+    }
+  }
+}
+```

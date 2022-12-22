@@ -1,0 +1,156 @@
+---
+layout: post
+title: Mutex lock in bash shell
+date: Fri, 09 Dec 2022 11:33:14 -0500
+tags: system
+---
+
+Implementing a mutex lock is a difficult problem for any parallel computation
+model. Leslie Lamport's [bakery algorithm](https://en.wikipedia.org/wiki/Lamport%27s_bakery_algorithm)
+is probably something we should use. But if the goal is merely to run a script
+in bash shell but not allowing duplicated parallels, there are some simple
+techniques that we can use.
+
+
+## flock
+
+The easiest way is to invoke the shell script via `flock` command. This comes
+from the `util-linux` package in Debian. The syntax is
+
+    flock -x -n $LOCKFILE -c "command_line_here"
+
+which the lockfile will be created at start and removed at exit. If it already
+exists, the `flock` command will terminate immediately. The `-n` option is for
+*non-blocking*. If omitted, `flock` will wait until the lockfile can be
+created. A compromise is to add `-w 10` for a 10 second timeout. The `-x`
+option is for exclusive lock.
+
+If in a shell script, this can be done too (from the flock manpage):
+
+```bash
+#!/bin/bash
+
+(
+    flock -x -n 99 || exit 1
+
+    # work is done here
+    sleep 10
+
+) 99>/var/lock/myscript.lock
+```
+
+which the number 99 is used as the file descriptor.
+
+
+## pgrep
+
+Not a robust way but works. The syntax is
+
+    pgrep -f <keyword> || command_line_here
+
+The `-f` means to match the entire command line rather than just the executable
+name. The `pgrep` command will print all PID that matched the search but return
+exit code 1 if nothing is found. Hence this can invoke a command only when the
+search failed.
+
+
+## mkdir
+
+In UNIX, there are only two atomic operations, `mkdir` and symlink. Therefore
+the only robust way to make a mutex lock in shell script is the following:
+
+```bash
+#!/bin/bash
+
+if ! mkdir /var/lock/myscript.lock 2>/dev/null; then
+    exit 1
+fi
+
+# work is done here
+sleep 10
+
+rmdir /var/lock/myscript.lock
+```
+
+But there would be a problem of stale lock.
+
+
+## pid file
+
+A script from [stackoverflow](https://stackoverflow.com/questions/185451/):
+
+```bash
+LOCKFILE=/var/run/myscript.pid
+if [ -e ${LOCKFILE} ] && kill -0 `cat ${LOCKFILE}`; then
+    exit 1
+fi
+
+# make sure the lockfile is removed when we exit and then claim it
+trap "rm -f ${LOCKFILE}; exit" INT TERM EXIT
+echo $$ > ${LOCKFILE}
+
+# do stuff
+sleep 10
+
+rm -f ${LOCKFILE}
+```
+
+It keeps the current process PID `$$` in a file and register `trap` to remove
+it so mitigated the stale lock issue. If the lock is found, and `kill` command
+cannot find the corresponding PID, then the lock will be overwritten. But this
+may have race condition issue because the test and set is not atomic.
+
+There is a way to make this atomic by leveraging the bash's capability of
+"noclobber", namely:
+
+```bash
+#!/bin/bash
+
+set -C   # set noclobber
+LOCKFILE=/var/run/myscript.pid
+if echo $$ > ${LOCKFILE}; then
+    set +C    # unset noclobber
+    trap "rm -f ${LOCKFILE}; exit" INT TERM EXIT
+    # work here
+    sleep 10
+
+    rm -f ${LOCKFILE}
+else
+    exit 1
+fi
+```
+
+The `set -C` or `set -o noclobber` at the beginning will make `echo $$ >
+${LOCKFILE}` fail if the file already exsits.
+
+
+## Side note: Template for robust bash script
+
+```bash
+#!/usr/bin/env bash
+
+set -o errexit    # same as `set -e`; script exists on command fail
+set -o nounset    # same as `set -u`; fail the script whenever reading an unset variable
+set -o pipefail   # either side of the pipe fail is the entire command fail
+if [[ "${TRACE-0}" == "1" ]]; then
+   set -o xtrace  # same as `set -x`; print each command before execute
+fi
+
+if [[ "${1-}" =~ ^-*h(elp)?$ ]]; then
+    echo 'Usage: ./script.sh arg-one arg-two
+
+This is the help screen for your script.
+'
+    exit
+fi
+
+# move workdir to this script's directory
+cd "$(dirname "$0")"
+
+main() {
+    local x="do awesome stuff"    # variables should be declared with `local`
+    echo $x
+}
+
+main "$@"
+```
