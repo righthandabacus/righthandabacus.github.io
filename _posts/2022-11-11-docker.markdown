@@ -207,7 +207,9 @@ Mount a host directory to container
 
 Check volume mounts in a container
 
+{% raw %}
     docker inspect -f '{{ .Mounts }}' container_name
+{% endraw %}
 
 Copy files from host to container and vice versa
 
