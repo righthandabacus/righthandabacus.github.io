@@ -1,0 +1,141 @@
+---
+layout: post
+title: "Shelhamer, Long, and Darrell (2017) Fully Convolutional Networks for Semantic Segmentation"
+date: 2023-03-02
+category: paper
+bibtex:
+  type: article
+  title: "Fully Convolutional Networks for Semantic Segmentation"
+  author: "Evan Shelhamer and Jonathan Long and Trevor Darrell"
+  journal: "IEEE Transactions on Pattern Analysis and Machine Intelligence"
+  volume: 39
+  number: 4
+  pages: 640--651
+  month: Apr
+  year: 2017
+  note: "also in Proc CVPR 2015, arXiv:1411.4038, and arXiv:1605.06211"
+---
+
+This journal paper and its 2015 conference paper is to propose a solution for
+semantic segmentation, i.e., classification of pixels on an image to objects.
+It is more refined than a bounding box. The paper proposed a solution that
+involves only convolutional layers but not fully connected layers so that
+spatial information is preserved throughout the network.
+
+## Fully Convolutional Networks
+
+Convolutional layers are translation invariant. Input and output are arrays of
+size $$h\times w\times d$$ which $$h$$ and $$w$$ are spatial dimensions and
+$$d$$ is the feature of channel dimension. A convolutional layer of kernel size
+$$k$$ and stride $$s$$ can be modeled as a function
+
+$$
+y_{ij} = f_{ks}(\{x_{si+\delta i,sj+\delta j\}_{0\le\delta i,\delta j<k})
+$$
+
+which this form is maintained under composition,
+
+$$
+f_{ks}\circ g_{k's'} = (f\circ g)_{k'+(k-1)s',ss'}
+$$
+
+and therefore, stack of convolutional layers (i.e., fully convolutional
+network) is a deep nonlinear filter.
+
+Furthermore, if the loss function is sum over the spatial dimensions of the
+output array, the gradient is also a sum over the gradients of each spatial
+components. Thus we can consider the receptive fields of each spatial component
+at the output as a mini-batch.
+
+Classification networks such as AlexNet takes fixed-size input and produce
+non-spatial outputs. With fully convolutional network, arbitrary sized input
+can be taken.
+
+This paper proposed a model using *upsampling layer* or *deconvolution layer*
+to produce output that match the size of input. Essentially it is just a
+convolutional layer (with trainable filter) with factional input stride, i.e.,
+dilation on the input tensor by inserting zeros while the kernel is not
+dilated. The segmentation is achieved using per-pixel classification. The
+network is trained with per-pixel softmax loss and evaluated with mean pixel
+IoU over all classes, including background, but excluding pixels that are
+masked out.
+
+## FCN-VGG16 for Classification
+
+The paper considered AlexNet, VGG-16, and GoogLeNet backbones and found VGG-16
+achieved the best IoU (also the slowest inference and most parameters, at 134M).
+
+First, the paper convert VGG-16 into a classification model with fully
+convolutional networks. It is a conversion that can bring the pretrained VGG-16
+weight into the new model.
+
+The VGG-16 starts with a sequence of convolutional and pooling layers. Then
+after 5 blocks, the output is flattened and passed through 2 hidden dense
+layers and an output dense layer for 1000-way softmax. The conversion
+decapitated the VGG-16 network right before the flattening, and replaced the
+three dense layers with three conv layers (of kernel 7×7, 1×1, and 1×1, all with
+stride 1), and two dropout layers in between them. The weights will be the same:
+The three replaced dense layers at VGG-16 are having weights 25088×4096,
+4096×4096, and 4096×1000 respectively. These weights are merely *reshaped* into
+7×7×512×4096 (because the max pooling output from the preceding layer has 512
+channels), 1×1×4096×4096, and 1×1×4096×1000. The first two conv layers are using
+ReLU activation while the last one is softmax.
+
+Such network can accept image of any size. But the output shape would depend on
+the input shape. Classification can be based on one of the patch in the output
+(e.g., the one at the center in spatial dimensions).
+
+## FCN-VGG16 for Segmentation
+
+Since the modified VGG-16 network is producing classification on a spatial
+tensor, segmentation needs only to map the classification tensor back to each
+pixel. The output tensor usually has coarser resolution than the input. We need
+to upsample them.
+
+Firstly, the FCN-VGG16 for ImageNet classification has 1000-way softmax while
+the segmentation dataset for PASCAL VOC has only 20 foreground classes and 1
+background class. Thus the final convolutional layer is replaced to 21 channels
+(i.e., the weight tensor of shape 1×1×4096×21). And this layer is using linear
+activation.
+
+Then, to convert the feature map from this 1x1 conv layer back to pixels, an
+transposed convolutional layer (aka deconvolution layer) is used. In such
+FCN-VGG16 model, the output receptive field is 32×32, hence the transposed
+convolution layer has stride of 32×32, to map the classification from *each
+coarse location* to pixels using bilinear upsampling.
+
+The training runs for 175 epochs, with 20 images per batch, and learning rate of
+1e-4, momentum 0.9, weight decay 0.0016 or 0.0625. Loss metric are not
+normalized, which each pixel has the same weight.
+
+## Skip connections
+
+To improve segmentation quality, skip connections are added to *fuse layer
+outputs* from shallower layers with finer strides.
+
+Consider the modification of FCN-VGG16 for segmentation, the output of VGG-16 is
+modified to create 21-way classification with a 1×1 conv layer, then it is
+upsampled to the original image size with *one* deconvolution layer. In VGG-16,
+there are 5 blocks of convolutional layers, each with 2 conv and 1 max pooling.
+The spatial size is reduced in each block.
+
+The previous segmentation model applied 1×1 conv on the output of the 5th block,
+then upsample to the input image size. Instead, we can upsample that to the size
+of the output of 4th block, and also apply 1×1 conv on the output of 4th block,
+then add these two outputs together, then upsample again to the input image
+size.
+
+This process can repeat for each block, but the paper stopped at 2 skip
+connections using the output of 3 blocks. It upsample the added output from
+block 5 and block 4 to the size of block 3 and add the 1x1 conv output of block
+3, then upsample again to the input image size.
+
+Essentially, this means the output from different scales (5th,
+4th, and 3rd block) are sumed up before the semantic segmentation computation.
+
+Based on the size of the receptive field (strides) at the final upsampling
+layer, the paper call them FCN32 (the one without skip connections), FCN16, and
+FCN8.
+
+The paper found that FCN32 gives mean IOU score at 52, but FCN16 gives 65 while
+FCN8 brings it up to 65.5.

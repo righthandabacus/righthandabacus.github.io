@@ -1,0 +1,70 @@
+---
+layout: post
+title: "Lin et al (2017) Feature Pyramid Networks for Object Detection"
+date: 2023-03-03
+category: paper
+bibtex:
+  type: inproceedings
+  title: "Feature Pyramid Networks for Object Detection"
+  author: "Tsung-Yi Lin and Piotr Dollár and Ross Girshick and Kaiming He and Bharath Hariharan and Serge Belongie"
+  booktitle: "Proc CVPR"
+  pages: "2117--2125"
+  year: 2017
+  note: "arXiv:1612.03144"
+---
+
+This paper proposed feature pyramid network to find scale invariant object
+detection, i.e., a model that can detect objects of different scales. One way
+to tackle scale invariant problem is to form an image pyramid of different
+scale and process each with the same model. This is a brute-force approach.
+Another is to form feature hierarchy from same image and scan the feature
+hierarchy level by level. This paper says that ConvNet inherently generating the
+feature pyramid, hence we can build a FPN to leverage the features obtained.
+
+It is found that with FPN, the bounding box proposal has 8.0 point increase on
+average recall (AR), and object detection has 2.3 point improvement on average
+precision (AP) on COCO and 3.8 point on PASCAL.
+
+FPN is created with the bottom-up pathway, top-down pathway, and lateral
+connections (see Fig.3 in the paper). The bottom-up pathway is the feed-forward
+computation of the ConvNet. Often in the ConvNet, multiple consecutive layers
+produces output feature maps of the same size and they are grouped in the same
+stage. The bottom-up pathway takes the last map from each stage as usually it
+contains the strongest features.
+
+ResNet, for example, the bottom-up pathway
+takes feature maps from C2, C3, C4, and C5 which have strides 4, 8, 16, and 32
+pixels respectively w.r.t. input image.
+
+The top-down pathway hallucinates higher resolution features by upsampling
+spatially coarser but semantically stronger feature maps from higher pyramid
+levels. The upsampling is using nearest neighbor for simplicity.
+
+Lateral connection enhances the feature map from top-down pathway with that from
+bottom-up pathway. The bottom-up map goes through a 1×1 conv to match the
+channel dimension, then elementwise-add with the top-down map. The result are
+called P2, P3, P4, and P5 to match C2 to C5 of the same spatial size.
+
+All the outputs P2 to P5 are processed by the same classifier and regressor,
+hence they should be in the same shape. The paper set their depth to $$d=256$$
+channels, by adding extra convolution layers without non-linearities to
+normalize the depth.
+
+There are several applications proposed by the paper:
+
+- RPN: Instead of a single feature map, RPN head (3×3 conv then two sibling 1×1
+  convs) can be attached to the each level of FPN. This way, the anchors on each
+  level has only one size, namely, pixel area of $$32^2, 64^2, 128^2, 256^2,
+  512^2$$ for P2, P3, P4, P5, and P6 respectively (but multiple aspect ratio is
+  allowed). The anchors are labeled according to the same rule with the
+  ground-truth, e.g., based on IoU over 0.7 to be positive and below 0.3 to be
+  negative. The size of ground-truth bounding box is not related to the level in
+  FPN, but rather, the size of inferred anchor is easier to match a particular
+  size of ground-truth due to the labelling rule. The RPN heads are shared to
+  all level of FPN output.
+- Fast R-CNN: object detection is performed on single-scale feature map. With
+  FPN, the RoI pooling is performed on one particular output $$P_k$$, which
+  $$k=\lfloor k_0 + \log_2(\sqrt{wh}/224)\rfloor$$ for the RoI proposal of size
+  $$w\times h$$ and $$k_0=4$$ to match the ResNet-based Faster R-CNN system that
+  uses C4 as feature map. If the RoI is small, a finer-resolution level will be
+  used.

@@ -1,0 +1,120 @@
+---
+layout: post
+title: "He et al (2016) Deep Residual Learning for Image Recognition"
+date: 2023-03-03
+category: paper
+bibtex:
+  type: inproceedings
+  title: "Deep Residual Learning for Image Recognition"
+  author: "Kaiming He and Xiangyu Zhang and Shaoqing Ren and Jian Sun"
+  booktitle: "Proc CVPR"
+  pages: "770--778"
+  year: 2016
+  note: "arXiv:1512.03385"
+---
+
+This is the ResNet paper. Not only this proposed the shortcut connection
+architecture, but also give the architecture for image classification and
+object detection.
+
+This paper answers the question of why deeper network does not always work
+better. It is not about overfitting, because higher training error is observed.
+It is because a deeper network is more difficult to train. The key idea is to
+use residual learning building block, illustrated in figure 2 in the paper.
+Given a layer learns a function $$F(x)$$, and with shortcut connection
+effectively the output of the block will be $$H(x) = F(x)+x$$. The paper argues
+that it is easier to learn the residual $$F(x)$$ than the unreferenced mapping
+$$H(x)$$.
+
+Specifically, the building block is
+
+$$
+\begin{aligned}
+y &= \sigma( F(x) + x ) \\
+  &= \sigma( W_2 \cdot \sigma( W_1 x ) + x )
+\end{aligned}
+$$
+
+where $$\sigma()$$ is the activation function (usually ReLU) and $$W_i$$ is the
+kernel of the layer (bias is omitted for simplicity). The shortcut connection is
+usually skipping two layers. But if the depth is different, we may need to
+transform by a linear projection before add:
+
+$$
+y = \sigma( W_2 \cdot \sigma( W_1 x ) + W_s x )
+$$
+
+## ImageNet classification network
+
+The paper constructed a ResNet-34 network with 34 weighted layers. The design
+is inspired by VGG: mostly conv layers are using 3×3 filters, and for the same
+output spatial size, the layers have the same output depth but if the output
+spatial size is halved, the number of filter on the layer is doubled to preserve
+the time complexity.
+
+VGG-19 operates in 19.6 GFLOPs (multiply-adds), but ResNet-34 only needs 3.6
+GFLOPs.
+
+The ResNet-34 model is trained with ImageNet, with 224×224 random crop on the
+input image with random horizontal flip and pixels are mean-subtracted. And
+batch normalization is applied after each convolution and before activation. The
+model is trained with SGD with mini-batch size of 256, for 600K steps. Learning
+rate of starts at 0.1 and divided by 10 whenever error plateaus. Weight decay of
+1e-4 and momentum 0.9 are used, but no dropout is used. Evaluation is using
+10-crop testing according to the AlexNet paper.
+
+The paper provided alternative model designs, namely, ResNet-18, ResNet-34,
+ResNet-50, ResNet-101, and ResNet-152. All of them has 5 stages, with 2 to 36
+residual blocks in each stage, and each residual blocks has 2 to 3 convolutional
+layers. These architectures uses 1.8 GFLOPs to 11.3 GFLOPs.
+
+It is found that with shortcuts, the network converge faster even if the result
+are comparable (between ResNet-18 with and without shortcut connections). The
+paper advocates for a parameter-free identity shortcuts (i.e., no $$W_s$$
+projection) to reduce computation.
+
+In ResNet-50 to ResNet-152, the residual blocks are with 3 conv layers, and
+ResNet-18 to ResNet-34 are with 2 conv layers. The 2 conv layer block are
+two 3×3×N layers with ReLU only on the first layer. The 3 conv layer block,
+however, is 1×1×N - ReLU - 3×3×N - ReLU - 1×1×4N with the number of channels cut
+to a quarter at the first conv layer. This is called the *bottleneck*
+architecture.
+
+In section 4.2 of the paper, there are also ResNet of 20 to 1202 layers proposed
+for 32×32 images of CIFAR-10 dataset.
+
+## PASCAL and MS COCO detection
+
+Section 4.3 and appendix of the paper proposed to modify Faster R-CNN to replace
+VGG-16 with ResNet-101. It is found to have 6% increase in COCO's mAP@[.5, .95]
+metric, or 28% relative improvement by merely changing this backbone.
+
+According to the appendix, the implementation is as follows:
+
+- ResNet has no hidden FC layers (VGG-16 has 3 FC layers at the output, hence 2
+  of the FC layers are hidden). The VGG conv feature maps have total stride of
+  16 pixels w.r.t. input image, and ResNet up to the *4th block* also has stride
+  of 16. Thus the feature map right before the 5th block is shared between a RPN
+  and the Fast R-CNN detection network.
+- The RPN generates 300 proposals
+- On the Fast R-CNN side, RoI pooling layer is applied to the output of 4th
+  block, then the RoI pooled feature map is processed by the 5th block of
+  ResNet, playing the role of the two hidden FC layers in VGG-16, then the
+  output is sent to the two sibling classification and box regression layer
+- Batch normalization statistics for each layer is collected on ImageNet
+  training set during *pretraining*. Then they are fixed during fine-tuning for
+  object detection
+
+Object detection is evaluated using PASCAL VOC metric (mAP@IoU=0.5) and COCO
+metric (mAP@IoU=.5:.05:.95), using 80K/40K images on the training/validation
+set. The RPN step has mini-batch size of 8 images and Fast R-CNN step has bathc
+size of 16 images. The training runs for 240K iterations with learning rate of
+1e-3 and another 80K iterations with learning rate of 1e-4.
+
+At inference, the model first take a proposed box and obtain the regressed box
+from Faster R-CNN output. Then this regressed box runs through the model again
+to obtain a new classification and new regressed box. With 300 RoI proposed by
+the RPN, we obtained 300 first step predictions and another 300 second step
+predictions. Non-maximum suppression is applied on these 600 predictions with
+IoU threshold of 0.3 and box voting. This two-step process is found to improve
+mAP by 2 points.

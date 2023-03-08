@@ -47,6 +47,7 @@ These are the steps (for OpenWRT):
    - at peer tab, add each peer: You will need,
      - the public key (private key is optional, if you want to generate QR code for easier connection)
      - assign "Allowed IPs" as the IP address for this peer, e.g., 192.168.0.123/32
+     - check the box "Route Allowed IPs" for adding host route for this peer
      - suggested to set the "Persistent keepalive" to 25 seconds, especially if the server is behind NAT
    - assign this interface to LAN domain
 4. Set firewall rule to allow all incoming packets from WAN to the WireGuard UDP port

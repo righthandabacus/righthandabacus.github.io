@@ -1,0 +1,106 @@
+---
+layout: post
+title: "Girshick et al (2014) Rich feature hierarchies for accurate object detection and semantic segmentation"
+date: 2023-02-04
+category: paper
+bibtex:
+  type: inproceedings
+  title: "Rich feature hierarchies for accurate object detection and semantic segmentation"
+  author: "Ross Girshick and Jeff Donahue and Trevor Darrell and Jitendra Malik"
+  booktitle: "Proc. CVPR"
+  month: Oct
+  year: 2014
+  note: "arXiv:1311.2524"
+---
+
+This is the R-CNN paper. It is a multi-stage process to take an image as input and produces bounding
+boxes and classification softmax vector as output. This is called *localization* of object within an
+image. The paper is based on Pascal VOC dataset (20 classes). Most of the technical details are on
+the Appendix.
+
+There are different ways of localization. We can pose this as a regression problem, or build a
+sliding window detector. But it is found that regression has low mAP metric and as the CNN is deep,
+the receptive field is large, sliding window also becomes imprecise. The approach in this paper is
+*recognition using regions*.
+
+This paper also demonstrated transfer learning is useful. It shows a supervised pre-training on
+ILSVRC dataset followed by domain-specific fine-tuning on a smaller (PASCAL) dataset.
+
+The entire system has three modules, namely
+
+1. Region proposals: Regions are category-independent
+2. Feature extraction: Using AlexNet to create 4096-dim feature vectors from a 227×227 RGB image.
+   Each region is dilated and wrapped to fit the fixed size for AlexNet input.
+3. Classification: Using SVM and non-maximum suppression.
+
+Region proposals are created using selective search's fast mode. It generates around 2000 region
+proposals.
+
+The region proposal are arbitrary rectangles but the CNN requires 227×227 pixels. To transform the
+proposal into input format, the *tightest square with context* method is to enclose the proposal into
+the tightest square and isotropically scale the square to input size. On the other hand,
+*tightest square without context* method just take the region rectangle and scale the largest edge to
+227 pixels and centred to the input. In both method, grey background (image pixel mean) is filled
+in the input as placeholder if appropriate. Another method is *wrap*, which anisotropically scale
+the rectangle to square input size. Optionally the original region rectangle may inflate for p=16
+pixels to include additional context for the CNN input. Additional context is found to increase the
+mAP by 3 to 5 percentage points.
+
+The system is built as follows: The CNN is first pretrained using ImageNet-2012 dataset for
+classification. No bounding box is used. The paper used Caffe library and achieved same error rate
+as Krizhevsky et al (2012). Then the ImageNet's 1000-class classification layer is replaced to a
+randomly-initialized (N+1)-way classification layer (for N object classes and 1 background). For
+Pascal VOC, N=20 or for ILSVRC-2013, N=200. Background class are those with IoU overlap with the
+ground-truth below 0.5. The training is using SGD with learning rate of 0.001, and each iteration
+step has a batch size of 128, with 32 positive windows (among all classes) and 96 background
+windows. The positive windows are rare compared to the background, hence this composition is biased
+towards positive windows. Besides AlexNet, the paper also evaluated on VGG-16.
+
+The classification label of a region to a category is based on IoU. Given a ground-truth bounding
+box, a region is positive if its overlap IoU is above a threshold (0.5) and has the maximum overlap
+to that ground-truth among all proposals. A region is negative (background) if the IoU is
+below another threshold (0.3). The classification is using linear SVM, one SVM per class. The SVM is
+trained using standard hard negative mining method. SVM is used rather than using the CNN as
+classifier is found to improve the mAP (from 50.9% to 54.2%). But the paper also conjecture that
+some additional tweaks can eliminate the SVM classifier.
+
+With the proposal boxes classified, the final box selected are from the *non-maximum suppression*
+algorithm, i.e., among the proposed regions of the same class, if two regions are overlapped (based
+on IoU) the one with lower classified score are rejected.
+
+The output bounding box is obtained with regression. After the class detection from SVM, the
+bounding box is found from the features computed by the CNN. The regression is trained with pairs of
+proposal and ground-truth boxes. Each box is $$(P_x, P_y, P_w, P_h)$$ in which they are
+pixel coordinates of the centre of the box and the width and height in pixels.
+
+The output from CNN from proposal $$P$$ is denoted by $$\phi(P)$$ and the regression are modelled as
+linear functions $$d_\ast(P) = w_\ast^\top\phi(P)$$ with $$\ast=x,y,h,w$$.
+While the proposal box is known, the regression output gives adjustment to the
+proposal compared to the ground-truth, namely,
+
+$$
+\begin{aligned}
+\hat{G}_x &= P_w d_x(P) + P_x \\
+\hat{G}_y &= P_h d_y(P) + P_y \\
+\hat{G}_w &= P_w \exp d_w(P) \\
+\hat{G}_h &= P_h \exp d_h(P)
+\end{aligned}
+$$
+
+That is, $$d_\ast(P)$$ for $$\ast=x,y$$ is the adjustment of $$P_x$$ or $$P_y$$ in fraction scale of
+$$P_w$$ or $$P_h$$, whereas for $$\ast=w,h$$ is the log scale adjustment of $$P_w$$ and $$P_h$$. The
+weights $$w_\ast$$ are trained using ridge regression, over box pairs $$i$$
+
+$$
+\begin{aligned}
+w_\ast &= \argmin_{\hat{w}_\ast} \sum_i (t_\ast^i - \hat{w}_\ast^\top \phi(P^i))^2 + \lambda \Vert
+\hat{w}_ast\Vert^2 \\
+\text{where}\qquad
+t_x &= (G_x - P_x) / P_w \\
+t_y &= (G_y - P_y) / P_h \\
+t_w &= \log(G_w / P_w) \\
+t_h &= \log(G_h / P_h)
+\end{aligned}
+$$
+
+Where $$\lambda=1000$$ (since $$\phi(P)$$ is 4096-dim).

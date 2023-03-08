@@ -1,0 +1,164 @@
+---
+layout: post
+title: "Girshick (2015) Fast R-CNN"
+date: 2023-02-08
+category: paper
+bibtex:
+  type: inproceedings
+  title: "Fast R-CNN"
+  author: "Ross Girshick"
+  booktitle: "Proc ICCV"
+  month: Sep
+  year: 2015
+  note: "arXiv:1504.08083"
+---
+
+This is the Fast R-CNN paper. It improves over R-CNN. It is a single-stage
+training model (i.e., only one model to train) on the Pascal VOC 2012 dataset.
+It is faster than R-CNN by using the RoI pooling layer.
+
+Fast R-CNN architecture is as follows:
+
+1. The input is the entire image and a set of object proposals. The entire
+   image is first processed by some convolutional layer and max pooling layers
+   to produce a conv feature map
+2. RoI pooling: Each proposal is a *region of interest* (RoI). The RoI is
+   matched to the conv feature map to extract a fixed-length feature vector
+3. Feature vector is feed into a sequence of fully connected layers
+4. The layers then branch into two sibling output layers, one for softmax
+   probability estimate over $$K$$ object classes + 1 background class, and
+   another for regression of $$4K$$ refined bounding box positions
+
+The RoI pooling layer is the key to Fast R-CNN. It uses max pooling to convert
+each channel of a feature map into size $$H\times W$$ (e.g., 7×7). The RoI is
+defined by the pixel coordinate of the top-left corner $$(r,c)$$ and its size
+$$(h,w)$$. It first divided the $$h\times w$$ pixel grid of the RoI into
+windows of size $$h/H\times w/W$$, then max-pooling the values in each
+sub-window. The output would be a tensor of fixed size $$(H, W, C)$$. This is
+inspired by spatial pyramid pooling, but with only one pyramid level.
+
+Fast R-CNN network uses a pre-trained network such as VGG-16, but
+
+1. the last max pooling layer of the network is replaced by a RoI pooling layer
+   with parameter $$H$$ and $$W$$ (e.g., 7×7).
+2. the network's last fully connected layer and softmax layer are replaced with
+   two sibling layers for $$K+1$$ category classification and category-specific
+   bounding box regression
+3. the network takes two inputs: a batch is a list of images and a list of RoIs
+
+R-CNN is slow because the ConvNet forward pass is run once per proposal, even
+on the same image. Fast R-CNN mitigated this by allowing the output of ConvNet
+reused for multiple RoI.
+
+## Training
+
+Each sample of input to the model is one RoI but we can design to train the
+model faster by taking the advantage of shared feature map.
+
+The model is trained with SGD with mini-batches are sampled *hierarchically*. A
+mini-batch of size $$R=128$$ is from $$N=2$$ images, each image contributes
+$$R/N=64$$ RoIs. Therefore RoIs from the same image can share the feature map
+computation in both forward and backward passes, and the training can be speedup
+by 64x. The RoIs for training are selected IoU $$ge 0.5$$ as positive samples
+and IoU $$\in[0.1, 0.5)$$ as negative samples. The threshold 0.1 is selected as
+heuristic for *hard example mining*. As augmentation, the input image may be
+flipped horizontally with probability of 0.5.
+
+The output of the network, for each RoI, is a propability distribution per RoI
+$$p=(p_0, p_1, \dots, p_K)$$ (which class 0 is conventionally for *background
+class*) and $$K$$ bounding box regression offsets $$t^k=(t_x^k, t_y^k, t_w^k, t_h^k)$$
+for $$k=1,\dots,K$$. The regression offset uses the same encoding as in R-CNN.
+
+For a ground-truth class $$u$$ and ground-truth bounding box regression target
+$$v$$, there is a single loss function for training
+
+$$
+L(p,u,t^u, v) = L_{\text{cls}}(p,u) + \lambda[u\ge 1]L_{\text{loc}}(t^u, v)
+$$
+
+where $$\lambda=1$$, $$L_{\text{cls}}(p,u)=-\log p_u$$ (simple log-loss for
+class $$u$$), The Iverson bracket indicator $$[u\ge 1]$$ is 1 if $$u\ge 1$$ and 0
+otherwise (i.e., no $$L_{\text{loc}}$$ for background class). The localization
+loss is defined as
+
+$$
+L_{\text{loc}}(t^u, v) = \sum_{\ast\in\{x,y,w,h\}} L_1(t_\ast^u - v_\ast)
+$$
+
+where $$L_1(x)$$ is the smooth L1 function, i.e.
+
+$$
+L_1(x) = \begin{cases}
+    0.5x^2 & \text{if }\vert x\vert < 1 \\
+    \vert x\vert-0.5 & \text{otherwise}
+\end{cases}
+$$
+
+L1 is preferred over L2 to prevent exploding gradients.
+
+The backpropagation at RoI pooling layer is done as follows. Assume the input to
+the RoI pooling is $$x_i$$ (the activation output $$i$$ from the preceding conv
+layer) and its output is $$y_{rj}$$ (the output $$j$$ of channel $$r$$ from RoI
+pooling), then we can model RoI pooling as
+
+$$
+y_{rj} = \max_{i\in R(r,j)} x_i
+$$
+
+where $$R(r,j)$$ is the set of indices of the corresponding sub-window. Let
+$$i^\ast = \argmax_{i\in R(r,j) x_i$$ (which $$i^\ast$$ is a function of
+$$r,j$$), we can have the partial derivative
+
+$$
+\frac{\partial L}{\partial x_i} = \sum_r\sum_j [i=i^\ast] \frac{\partial L}{\partial y_{rj}}
+$$
+
+i.e., partial derivative $$\partial L/\partial y_{rj}$$ is accumulated into
+$$\partial L/\partial x_i$$ in the backward process if $$x_i$$ is selected for
+$$y_{rj}$$ by max pooling.
+
+The SGD is run with global learning rate of 1e-3 for 30K mini-batches and then
+learning rate of 1e-4 for another 10K mini-batches. Per-layer learning rate of
+1 for weights and 2 for biases is applied. Momentum of 0.9 and decay of 5e-4 (on
+weights and biases) are used.
+
+## Inference
+
+At inference, the network takes one image and a list of proposals (around 2000)
+to score. The output will be a class posterior probability distribution $$p$$
+and a bounding box offset for each of the $$K$$ classes. RoI is assigned to a
+class with confidence based on the probability and the localization is selected
+using non-maximum suppression for each class, following the same algorithm as in
+R-CNN.
+
+Most of the computation is at the final fully-connected layers. They are
+essentially matrix multiplications. To make the inference faster, the technique
+of truncated SVD is applied: Consider the layer's weight as $$W$$, a
+$$u\times v$$ matrix, we can factorize using SVD as
+
+$$
+W \approx U\Sigma_t V^\top
+$$
+
+where $$\Sigma_t$$ is a $$t\times t$$ diagonal matrix of the top $$t$$ singular
+values of $$W$$. Matrix $$U$$ is $$u\times t$$ matrix of the first $$t$$
+left-singular vectors of $$W$$ and matrix $$V$$ is $$v\times t$$ matrix of the
+first $$t$$ right-singular vectors of $$W$$. This reduces the total parameters
+from $$uv$$ in matrix $$W$$ into $$t(u+v)$$. We can replace one
+fully-connected layer (of weight $$W$$) into two (of weight $$\Sigma_tV^\top$$
+without bias then of $$U$$ with the original bias), without non-linear
+activations in between.
+
+
+## What is spatial pyramid pooling?
+
+A fully convolutional network can work on the input image of any size but the
+output width and height depends on the input size. If the output of a ConvNet
+is the input to a fully connected network, a fixed size is required. Spatial
+pyramid pooling is to convert an arbitrary-sized output tensor of shape
+$$(H,W,C)$$ into fixed-size tensor. It is a pooling layer (e.g., average
+pooling or max pooling) but the receptive field is adaptive to the input size.
+A tensor of size $$(H, W)$$ can be pooled into output of size $$(N,N)$$ with
+the filter size $$(H/N, W/N)$$, where in the pyramid, $$N=1,2,3,\dots$$. The
+outputs of the pooling layers can be concatenated as a feature vector for the
+next step.

@@ -181,7 +181,7 @@ tf.keras.applications.MobileNet(
 
 And its model summary is:
 
-```
+```text
 Model: "mobilenet_1.00_224"
 ________________________________________________________________________________________________________________________
  Layer (type)                                         Output Shape                                    Param #
