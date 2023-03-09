@@ -106,7 +106,7 @@ y_{rj} = \max_{i\in R(r,j)} x_i
 $$
 
 where $$R(r,j)$$ is the set of indices of the corresponding sub-window. Let
-$$i^\ast = \argmax_{i\in R(r,j) x_i$$ (which $$i^\ast$$ is a function of
+$$i^\ast = \argmax_{i\in R(r,j)} x_i$$ (which $$i^\ast$$ is a function of
 $$r,j$$), we can have the partial derivative
 
 $$
