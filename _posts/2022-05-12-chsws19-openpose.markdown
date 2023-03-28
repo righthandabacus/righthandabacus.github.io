@@ -15,19 +15,21 @@ bibtex:
   arxiv: 1812.08008
 ---
 
-This is a library Goal of the paper: Human 2D pose estimation by identifying keypoints,
+Goal of the paper: Human 2D pose estimation by identifying keypoints,
 supporting multiple persons in the same image.
 
 Single-person pose estimation can be done using top-down approach, but suffer
 from the problem of early commitment (i.e., wrong bounding box fails the
 subsequent steps). Examples of the top-down approach includes Mask R-CNN (He et
 al, 2017) and Alpha-Pose (from "RMPE: Regional multi-person pose estimation",
-Fang et al, 2017). Deepcut (Pishchulin et al, 2016) and Deepercut (Insafutdinov
-et al, 2016) are previous work on the same topic using bottom-up approach, but
-the challenge is on association of body parts to the same person. The
-characteristics of this paper is to use *part affinity fields* (PAF) to encode
-the limbs in additional to key point detection. Part affinity fields encode the
-pairwise relationship between body parts of variable number of people. (Sec. 2)
+Fang et al, 2017). On the contrary, Deepcut (Pishchulin et al, 2016) and
+Deepercut (Insafutdinov et al, 2016) are previous work on the same topic using
+bottom-up approach, but the challenge is on association of body parts to the
+same person. The characteristics of this paper is to use *part affinity fields*
+(PAF) to encode the limbs in additional to key point detection. Part affinity
+fields encode the pairwise relationship between body parts of variable number
+of people. (Sec. 2)
+
 
 ## Model for PAF and confidence maps (Sec. 3.1 to 3.2)
 
@@ -39,11 +41,13 @@ $$
 L^1 = \phi^1(F)
 $$
 
-which $$\phi^k$$ is the stage $$k$$ CNN for PAF inference. Subsequently, this
-PAF inference process is repeated:
+which $$\phi^k$$ is the stage $$k$$ CNN for PAF inference (each has 5 conv
+blocks followed by 2 pointwise conv layers, each conv block is three 3×3 conv
+layers with skip connections, see Fig 3 in paper). Subsequently, this PAF
+inference process is repeated (where $$\oplus$$ denotes concatenation in channels):
 
 $$
-L^t = \phi^t(F, L^{t-1}) \quad t = 2,\dots,T_P
+L^t = \phi^t(F \oplus L^{t-1}) \quad t = 2,\dots,T_P
 $$
 
 There are $$T_P$$ stages of pose inferences with the final output $$L^{T_P}$$.
@@ -51,13 +55,13 @@ Then there is a confidence map (i.e., heatmap of confidence of the location of
 keypoints) detection:
 
 $$
-S^{T_P} = \rho^{T_P}(F, L^{T_P})
+S^{T_P} = \rho^{T_P}(F \oplus L^{T_P})
 $$
 
 and subsequently,
 
 $$
-S^t = \rho^t(F, L^{T_P}, S^{t-1}) \quad t = T_P+1, \dots, T_P+T_C
+S^t = \rho^t(F \oplus L^{T_P} \oplus S^{t-1}) \quad t = T_P+1, \dots, T_P+T_C
 $$
 
 so there will be $$T_P$$ of PAFs and $$T_C+1$$ of confidence maps. Each of the
@@ -66,17 +70,18 @@ vector is identified by a 2-tuple. Each $$S^t$$ will be J×w×h for confidence (
 to 1) of a pixel being each of the J keypoints.
 
 (**Note**: I believe the paper is inconsistent here with the loss evaluation. It
-should be $$S^{T_P+1} = \rho^{T_P+1}(F, L^{T_P})$$ and no $$S^{T_P}$$ ever
-defined. Other $$S^t$$ are defined for $$t=T_P+2,\dots,T_P+T_C$$.)
+should be $$S^{T_P+1} = \rho^{T_P+1}(F \oplus L^{T_P})$$ and no $$\rho^{T_P}$$ ever
+defined so no $$S^{T_P}$$. Other $$S^t$$ are defined for $$t=T_P+2,\dots,T_P+T_C$$.)
 
 The output of PAF is used for confidence map prediction because intuitively, we
 can guess the location from the PAF output.
 
 In Sec.3.1, the paper mentioned that in each of these $$T_P+T_C$$ stages, the
-original 7×7 convolutional layers are replaced with 3 consecutive 3×3 kernels.
-Each output pixel of a $$N\times N$$ kernel will do $$2N^2-1$$ operations
-(multiplication and addition). So each pixel from 7×7 kernel involves 97
-operations while three of 3×3 kernel will be 51 operations.
+conv block in the original paper was a 7×7 convolutional layer and here they
+are replaced with 3 consecutive 3×3 kernels. Each output pixel of a
+$$N\times N$$ kernel will do $$2N^2-1$$ operations (multiplication and
+addition). So each pixel from 7×7 kernel involves 97 operations while three of
+3×3 kernel will be 51 operations.
 
 
 ## Defining the PAF and confidence map (Sec. 3.3 to 3.4)
@@ -131,7 +136,7 @@ This is to mean that on $$L_{c,k}^\ast$$, each position is either the unit
 vector or zero. It is a unit vector if the position $$p$$ is within a rectangle
 region from $$x_{j_1,k}$$ to $$x_{j_2,k}$$ (this rectangle is not axis-aligned,
 but rotated to along the direction of $$v$$). The "width" of the rectangle is
-$$2\sigma_{\ell}$$ while the "length" is $$\ell_{c,k}$$.
+$$2\sigma_{\ell}$$ (a parameter in number of pixels) while the "length" is $$\ell_{c,k}$$.
 
 Then for an image of multiple persons, the groundtruth PAF is the average of
 non-zero vectors across all people:
@@ -172,9 +177,9 @@ $$
 This is the technique of intermediate supervision at each stage so we can
 replenish the vanishing gradient.
 
-At the time of using the output of the model, we evaluate the location of two
-candidate positions of a limb, $$d_1$$ and $$d_2$$, by a *line integral* along
-the line segment between the two points, namely, the confidence of $$d_1$$ to
+**Inference**: At the time of using the output of the model, we evaluate the location of two
+candidate positions of a limb, $$d_1$$ and $$d_2$$ (from output $$S^{T_P+T_C}$$), by a *line integral* along
+the line segment between the two points on $$L^{T_P}$$, namely, the confidence of $$d_1$$ to
 $$d_2$$ is a limb $$c$$ is defined to be
 
 $$
@@ -245,10 +250,10 @@ the neural network output.
 
 ## Links
 
-OpenPose: The model is in Caffe
+OpenPose: The model is in Caffe and Matlab
 - https://towardsdatascience.com/openpose-research-paper-summary-realtime-multi-person-2d-pose-estimation-3563a4d7e66
 - https://github.com/CMU-Perceptual-Computing-Lab/openpose
-- https://github.com/CMU-Perceptual-Computing-Lab/openpose_train
+- https://github.com/CMU-Perceptual-Computing-Lab/openpose_train (matlab)
 - https://github.com/CMU-Perceptual-Computing-Lab/openpose_caffe_train
 - https://cmu-perceptual-computing-lab.github.io/foot_keypoint_dataset/
 

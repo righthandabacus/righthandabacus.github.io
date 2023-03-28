@@ -1,0 +1,109 @@
+---
+layout: post
+title: "Wei et al (2016) Convolutional Pose Machine"
+date: 2023-03-27
+category: paper
+bibtex:
+  type: inproceedings
+  title: "Convolutional Pose Machine"
+  author: "Shih-En Wei and Varun Ramakrishna and Takeo Kanade and Yaser Sheikh"
+  booktitle: "Proc CVPR"
+  pages: "4724--4732"
+  year: 2016
+  note: "arXiv:1602.00134"
+---
+
+This paper proposes *Convolutional Pose Machines* (CPMs), which is a computer
+vision deep learning model to identify human poses in the form of keypoints.
+The output of the model are 2D belief maps, i.e., a heatmap of the predicted
+probability of the location of a keypoint. The architecture of the CPM is in
+multiple stages, each stage produces a belief map, which is feed into the next
+stage to predict a refined one. The multistage architecture can capture
+long-range interactions between parts (e.g., positions of hand and shoulder can
+help infer elbow), as at later stage, the receptive field would be larger.
+
+Description of the pose machine: Let there are $$P$$ anatomical landmark, pixel
+coordinates are $$Z\subset\mathbb{R}^2$$, and coordinate of landmark $$p$$ be
+$$Y_p\in Z$$. The CPM has $$T$$ stages, each stage is a classifier $$g_t()$$
+that assigns a belief for each part $$p$$ on each location $$z\in Z$$ based on
+features $$x_z\in\mathbb{R}^d$$ obtained from location $$z$$. In equation,
+
+$$
+g_t(x_z) = \{ b_t^p(Y_p=z) \} \quad p\in\{0,\dots,P\}
+$$
+
+for $$b_t^p()$$ the classification score on stage $$t$$ for part $$p$$. The
+input $$x_z$$ is the output from the convolutional layers at stage 1. At
+subsequent stages $$t$$, the classifier $$g_t()$$ depends on image data (which
+filtered by stack of convolutional layers) and the contextual information from
+the preceding classifier in the neighborhood around each location. See Figure
+2(c) and 2(d) in the paper.
+
+The receptive field is constrained in each stage. At stage 1, there are 5 conv
+layers (with interleaving pooling layers) followed by two 1×1 convolutional
+layers to produce the belief map. At subsequent stage $$t$$, the input image is
+processed by 4 conv layers with interleaving pooling layers then elementwise-add
+with the belief map output from stage $$t-1$$, and filtered with 3 more conv
+layers and 2 more 1×1 conv to produce the belief map.
+
+Input image is cropped to 368×368. The largest receptive field of the network is
+160×160.
+
+Detection accuracy is highest at head and shoulders but lower for keypoints at
+lower body due to large variation in configuration and appearance. Multistage
+detection can improve the accuracy by using detection output from previous stage
+as clues. The conv layers at later stages allows combination of most predictive
+features, effectively increased the receptive field. Hence classification
+accuracy increases with receptive field.
+
+(Note: Ways to increase receptive field in a conv network (1) pooling, at the
+expense of precision, (2) large kernel in conv layers, at the expense of
+computation, (3) more conv layers, at risk of vanishing gradients.)
+
+At each stage, the output belief map is evaluated with a loss function. Ideal
+belief map would be Gaussian $$b_\ast^p(z)$$ with peaks at ground truth
+locations of each body part $$p$$, i.e., loss function of stage $$t$$ defined as
+
+$$
+f_t = \sum_p \sum_{z\in Z} \Vert b_t^p(z) - b_\ast^p(z) \Vert_2^2
+$$
+
+and the overall objective function is the sum at each stage, $$F=\sum_{t=1}^T f_t$$
+
+Dataset used:
+
+- MPII Human Pose: http://human-pose.mpi-inf.mpg.de/
+- Leeds Sports Pose (LSP): http://sam.johnson.io/research/lspet.html (deadlink)
+- Frames Labeled in Cinema (FLIC): http://bensapp.github.io/flic-dataset.html
+
+Model architecture (stage 2 repeats until stage $$T$$):
+
+| Stage | Layer                | Effective receptive field |
+|-------|----------------------|---------------------------|
+| 1     | Input h×w×3          |                           |
+|       | Conv 9×9             | 9×9                       |
+|       | Pooling 2×           |                           |
+|       | Conv 9×9             | 26×26                     |
+|       | Pooling 2×           |                           |
+|       | Conv 9×9             | 60×60                     |
+|       | Pooling 2×           |                           |
+|       | Conv 5×5             | 96×96                     |
+|       | Conv 9×9             | 160×160                   |
+|       | Conv 1×1             |                           |
+|       | Conv 1×1             |                           |
+| 1     | Output b1, h×w×(P+1) |                           |
+| 2     | Image input h×w×3    |                           |
+|       | Conv 9×9             | 9×9                       |
+|       | Pooling 2×           |                           |
+|       | Conv 9×9             | 26×26                     |
+|       | Pooling 2×           |                           |
+|       | Conv 9×9             | 60×60                     |
+|       | Pooling 2×           |                           |
+|       | Conv 5×5             | 96×96                     |
+|       | Image feature x'     |                           |
+|       | Add(b1,x')           |                           |
+|       | Conv 11×11           | 240×240                   |
+|       | Conv 11×11           | 320×320                   |
+|       | Conv 11×11           |                           |
+|       | Conv 1×1             | 400×400                   |
+| 2     | Output b2, h×w×(P+1) |                           |
