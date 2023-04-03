@@ -1,0 +1,139 @@
+---
+layout: post
+title: "Redmon et al (2016) You Only Look Once: Unified, Real-time Object Detection"
+date: 2023-04-02
+category: paper
+bibtex:
+  type: inproceedings
+  title: "You Only Look Once: Unified, Real-time Object Detection"
+  author: "Joseph Redmon and Santosh Divvala and Ross Girshick and Ali Farhadi"
+  booktitle: "Proc. CVPR"
+  year: 2016
+  arxiv: 1506.02640
+---
+
+This is the paper to propose YOLOv1 network, which reframed object detection as a
+regression problem. It is a single convolutional network that simultaneously predicts
+multiple bounding boxes and class probabilities for those boxes. It is to compare against
+R-CNN but faster and can see the entire image at once.
+
+## Network Design
+
+The input image is divided into $S\times S$ grid, which the center of an object in a grid
+cell, that grid cell should detect it. Each grid cell detects $B$ bboxes with confidence
+score, which is defined as the probability of object times the IoU (i.e., score should be
+zero for no object). A bbox prediction is 5-tuple, $(x,y,w,h,o)$ which $(x,y)$ is the box
+center relative to the bounds of the grid cell, $w,h$ are relative to the whole image, and
+$o$ the IoU between predicted box and groundtruth (class-agnostic).
+
+Each grid cell predicts $C$ classes simultaneously, regardless of the number of bbox
+predicted. The class-specific confidence score for a box is therefore
+$P(C_i)\times \text{IoU}$.
+
+In summary, the $S\times S$ grid produces a tensor of $S\times S\times (5B+C)$. For PASCAL
+VOC, the paper suggested $S=7$, $B=2$ with $C=20$.
+
+The network architecture is depicted in Fig.3 in the paper, with 24 conv layers followed
+by 2 fully connected layers. A fast YOLO would use 9 conv layers and fewer filters in
+them. The 24-conv layer version for 20-class PASCAL VOC is as follows, all sequential:
+
+- Conv 7×7×64 stride 2, for input of 448×448
+- Max pooling 2×2 stride 2, outputs 112×112
+- Conv 3×3×192
+- Max pooling 2×2 stride 2, outputs 56×56
+- Conv 1×1×128
+- Conv 3×3×256
+- Conv 1×1×256
+- Conv 3×3×512
+- Max pooling 2×2 stride 2, outputs 28×28
+- Conv 1×1×256 (repetition 1 of 4)
+- Conv 3×3×512
+- Conv 1×1×256 (repetition 2 of 4)
+- Conv 3×3×512
+- Conv 1×1×256 (repetition 3 of 4)
+- Conv 3×3×512
+- Conv 1×1×256 (repetition 4 of 4)
+- Conv 3×3×512
+- Conv 1×1×512
+- Conv 3×3×1024
+- Max pooling 2×2 stride 2, outputs 14×14
+- Conv 1×1×512 (repetition 1 of 2)
+- Conv 3×3×1024
+- Conv 1×1×512 (repetition 2 of 2)
+- Conv 3×3×1024
+- Conv 3×3×1024
+- Conv 3×3×1024 stride 2, outputs 7×7
+- Conv 3×3×1024
+- Conv 3×3×1024
+- Fully connected layer, outputs 4096 units
+- Dropout at rate 0.5
+- Fully connected layer, outputs 7×7×30 units after reshape
+
+The final output of 7×7×30 is for 7×7 grids, each grid cell has 20 class probabilities and
+2 bounding boxes, each box represented by a 5-tuple of $(x,y,w,h,o)$.
+
+According to sec 2.2, the final layer uses linear activation, and the rest are using leaky
+ReLU,
+
+$$
+\phi(x) = \begin{cases}
+    x & \text{if }x>0 \\
+    0.1x & \text{otherwise}
+\end{cases}
+$$
+
+For PASCAL VOC, the network outputs 7×7×2=98 bounding boxes. At inference, they run
+through non-maximal suppression to produce 2-3% higher mAP output.
+
+
+## Training
+
+The YOLO network would pretrained with ImageNet dataset by taking the first 20 conv layers
+followed by an average pooling layer and a fully connected layer. The paper reported that
+this classification network can achieve 88% top-5 accuracy.
+
+After the pretraining, the remaining 4 conv layers and 2 FC layers are added, with random
+weight, and modified the input from 224×224 to 448×448 to provide more fine-grained visual
+information.
+
+The network output is interpreted as follows:
+
+- width and height on image are normalized by image dimension to between 0 and 1, and
+  network output is the square root of such
+- bounding box coordinates $(x,y)$ are offset to grid cell location, which are also
+  between 0 and 1
+
+The network is trained using sum-squared error as loss function, but weighted the loss
+between positive and negative boxes with $\lambda_\text{pos} = 5$ and
+$\lambda_\text{neg} = 0.5$ to mitigate the imbalanced sample sizes. The overall loss
+function:
+
+$$
+\begin{aligned}
+L &= \lambda_\text{pos} \sum_{i=0}^{S^2} \sum_{j=0}^B \mathbb{I}_{ij} [(x_i-\hat{x}_i)^2 +
+(y_i-\hat{y}_i)^2 + (\sqrt{w_i} - \sqrt{\hat{w}_i})^2 + (\sqrt{h_i} - \sqrt{\hat{h}_i})^2]
+\\
+& \quad + \sum_{i=0}^{S^2} \sum_{j=0}^B \mathbb{I}_{ij} (C_i - \hat{C}_i)^2 \\
+& \quad + \lambda_\text{neg} \sum_{i=0}^{S^2} \sum_{j=0}^B (1-\mathbb{I}_{ij}) (C_i - \hat{C}_i)^2 \\
+& \quad + \sum_{i=0}^{S^2} \mathbb{I}_i \sum_c (P_i(c) - \hat{P}_i(c))^2
+\end{aligned}
+$$
+
+where
+
+- Index $i$ iterates over all grid cells, index $j$ iterates over all bounding boxes in a grid cell
+- Index $c$ iterates over all classes
+- $\mathbb{I}_{i}$ is indicator function for cell $i$ contains an object
+- $\mathbb{I}_{ij}$ is indicator function for cell $i$ contains an object in bounding box $j$
+- $p_i(c)$ is the classification probability of class $c$ (groundtruth is either 0 or 1)
+
+At training only the predictor with the highest IoU with the groundtruth is considered
+positive. The paper claimed this can lead to better overall recall as the predictors are
+trained for certain size and aspect ratios.
+
+The training runs for 135 epochs on datasets of PASCAL VOC 2007 and 2012. Batch size is
+64, with momentum 0.9 and weight decay 5e-4. The learning rate started at 1e-3 and
+gradually increase to 1e-2 in the first epoch. Then trained at 1e-2 for 75 epochs,
+followed by 1e-3 for 30 epochs, and finally 1e-4 for 30 epochs. Images are augmented with
+random scaling and translation up to 20% of the original image size, then randomly adjust
+the exposure and saturation of the image by up to a factor of 1.5 on the HSV space.
