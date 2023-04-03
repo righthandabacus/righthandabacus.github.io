@@ -1,0 +1,141 @@
+---
+layout: post
+title: "Liu et al (2016) SSD: Single Shot MultiBox Detector"
+date: 2023-04-01
+category: paper
+bibtex:
+  type: inproceedings
+  title: "SSD: Single Shot MultiBox Detector"
+  author: "Wei Liu and Dragomir Anguelov and Dumitru Erhan and Christian Szegedy and Scott Reed and Cheng-Yang Fu and Alexander C. Berg"
+  booktitle: "Proc. European Conference on Computer Vision"
+  pages: 21--37
+  series: LNIP volume 9905
+  editor: "B. Leibe and J. Matas and N. Sebe and M. Welling"
+  series: "Lecture Notes in Computer Science vol 9905"
+  publisher: Springer
+  year: 2016
+  doi: 10.1007/978-3-319-46448-0_2
+  arxiv: 1512.02325
+---
+
+This paper distinct from previous work in the sense that the older approach of object
+detection first hypothesize bounding boxes, resample features for each box, then apply a
+classifier. This paper proposed a network that does not resample for bounding box
+hypotheses but equally accurate. It can do high speed detection, at 59 fps with mAP 74.3%
+on VOC2007 test set while Faster R-CNN can do only 7 fps with mAP 73.2%. The reasons for
+the speed up and accuracy improvement are (1) eliminated bbox proposal and feature
+resampling stage, (2) small conv filter to predict object categories and offsets, (3)
+separate predictors for different aspect ratio detection.
+
+
+## Model
+
+SSD is a feed-forward conv net that produces a fixed-size collection of bboxes and scores.
+Then non-maximum suppression can produce the final detection. The paper suggested an
+backbone network of VGG-16 truncated before the classifier, which takes an input of
+300×300 image and outputs a 38×38 feature map of channel depth 512 at its "conv5_3" layer.
+Then multiple conv layers are appended to it, with progressively decreased sizes to
+generate feature maps of different scales.
+
+A feature map of size $m\times n$ produces several detections at each position using a 3×3
+small kernel. The output of each convolution position is a $(c+4)k$ results, for $k$
+"default boxes" of different size and aspect ratios, each box has $c$ classification
+scores and 4 regressed bounding box parameters (the bounding box is agnostic to the
+classification result). Thus, there are $(c+4)kmn$ outputs from a feature map, regardless
+the channel depth $p$.
+
+The network proposed in the paper (Fig.2) is as follows:
+
+- Backbone: VGG-16, through "Conv5_3" layer, output feature map of 38×38×512 to a
+  classifier of 4×(c+4) output values (4 default boxes per location)
+- the previous feature map filtered with Conv 6 (3×3×1024 with 6×6 dilation) than Conv 7
+  (1×1×1024), producing a feature map of 19×19×1024 to a classifier of 6 default boxes,
+  output 6×(c+4) values
+- then filter with Conv 8 (1×1×256 then 3×3×512 stride 2) producing a feature map of
+  10×10×512 to a classifier of 6 default boxes (output 6×(c+4) values)
+- then filter with Conv 9 (1×1×128 then 3×3×256 stride 2) producing a feature map of
+  5×5×256 to a classifier of 6 default boxes (output 6×(c+4) values)
+- then filter with Conv 10 (1×1×128 then 3×3×256 stride 1) producing a feature map of
+  3×3×256 to a classifier of 4 default boxes (output 4×(c+4) values)
+- then filter with Conv 11 (1×1×128 then 3×3×256 stride 1) producing a feature map of
+  1×1×256 to a classifier of 4 default boxes (output 4×(c+4) values)
+
+The total number of output is $$38^2 \times 4 + 19^2 \times 6 + 10^2 \times 6 + 5^2 \times 6 + 3^2 \times 4 + 1^2 \times 4 = 8732$$
+boxes, each to classify to $$c$$ classes (PASCAL VOC 20 classes + 1 background).
+
+This is commonly called SSD300 model. Another model is SSD512 which takes 512×512 image as
+input.
+
+
+## Training: Loss function
+
+In training, SSD only needs an input image and groundtruth boxes for each object. As the
+output of various resolution and different default box are known, the groundtruth box is
+matched to the default box whenever >0.5 IoU (a.k.a. Jaccard overlap). Groundtruth is not
+associate with the single best default box so the network allows to predict high score for
+multiple boxes rather than requiring it to pick only one.
+
+The loss function at each location is the weighted sum of localization loss $L_\text{loc}$
+and confidence loss $L_\text{conf}$:
+
+$$
+L(x,c,l,g) = \frac{1}{N} (L_\text{conf}(x,c) + \alpha L_\text{loc}(x,l,g))
+$$
+
+where $N$ the number of matched default boxes, $L_\text{loc}$ is the smooth L1 loss
+between predicted box $l$ and the groundtruth box $g$, and $L_\text{conf}$ the softmax
+loss over multiple class confidences $c$, and $x\in\{0,1\}$ the indicator of whether the
+predicted box match with groundtruth box. Precisely,
+
+$$
+L_\text{loc}(x,l,g) = \sum_{i=1}^N \sum_{m\in\{cx,cy,w,h\}} x_{ij}^k L1(l_i^m - g_j^m)
+$$
+
+which $m$ is the 4 tuples of a bounding box, (cx, cy, w, h), and $i$ iterates over the $N$
+default boxes that matched with groundtruth $j$ (such that $x_{ij}=1$). The groundtruth
+bbox is in the form of that in R-CNN.
+
+The confidence loss is
+
+$$
+L_\text{conf}(x,c) = -\sum_i \log c_i^p
+$$
+
+where $c_i^p$ is the softmax output for the correct class $p$ (background class if not
+matched with any groundtruth bbox) and $i$ iterates over all default boxes.
+
+
+## Training: Default boxes
+
+The SSD network produced feature maps of different resolutions. The lower layer in higher
+resolution is believed to have better semantic segmentation quality, and pooling over a
+global context can also improve the result.
+
+For a SSD network with $m$ feature maps, the scale of the default boxes at feature map
+$k\in\{1,\dots,m\}$ is computed as
+
+$$
+s_k = s_{\min} + \frac{s_{\max} - s_{\min}}{m-1}(k-1)
+$$
+
+with $s_{\min}=0.2$ meaning the lowest layer has a scale of 0.2 and $s_{\max}=0.9$ meaning the
+highest layer has a scale of 0.9, and all layers in between are evenly scaled. The default
+boxes are with aspect ratios $a_r\in\{\frac13,\frac12,1,2,3\}$ which the width and height
+are $w_k=s_k\sqrt{a_r}, h_k=s_k/\sqrt{a_r}$. An additional square default box of scale
+$s_k' = \sqrt{s_k s_{k+1}}$ is added to make up 6 boxes per location.
+
+The center of each box is set to $(\frac{i+0.5}{f_k}, \frac{j+0.5}{f_k})$ (center of a
+pixel) where $f_k$ is the dimension of the square feature map $k$, and $i,j\in[0,f_k)$.
+
+This way, there are large amount of negative default boxes. In training, those negative
+boxes with highest confidence loss is picked such that the ratio between positive and
+negative boxes is maintained at 1:3 or less.
+
+
+## Training: Augmentation
+
+The input data is randomly augmented by extracting a patch of size 0.1 to 1 of the
+original image, with aspect ratio between 0.5 and 2. The sampled patch is then resized and
+randomly flipped horizontally before other photo-metric distortions. A patch is selected
+only if the IoU with the target object is high enough (e.g., 0.9) to provide enough
+positive samples.

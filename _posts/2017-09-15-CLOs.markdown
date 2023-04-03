@@ -9,7 +9,7 @@ Various thing about CLOs or other structured fixed income product.
 
 # Overview, terms
 
-Collateralised loan obligations: generally between $300M to $1B in size and own loans issued by 80--300 borrowers
+Collateralised loan obligations: generally between ＄300M to ＄1B in size and own loans issued by 80--300 borrowers
   - CLOs are companies with very limited purpose and no staff of their own
   - Special purpose vehicles (SPV, aka issuer or depositor) with a manager company
      - usually based in jurisdictions that pay no corporation tax
@@ -32,9 +32,9 @@ Collateralised loan obligations: generally between $300M to $1B in size and own 
 
 Tranche: French word for a slice
 - different tranche, different level of credit production or risk exposure
-- some tranche absorb early repayments (i.e., other has more predictable cash flow)
-- two waterfall may exists on loans and mortgages as it is easy to differentiate
-  the principal repayment and interest
+- some tranches absorb early repayments (i.e., other has more predictable cash flow)
+- two waterfall may exist on loans and mortgages as it is easy to differentiate
+  the principal repayment and interests
   - interest waterfall, principal waterfall
      - order to allocate payments: make some note more senior than others
   - corporate bonds: principal is paid in one lump sum at maturity
@@ -46,7 +46,7 @@ Tranche: French word for a slice
 
 Overcollateralisation (OC): pooling assets of principal amount greater than the security issued
 - usually by 10--20%
-- e.g. MBS with principal amount issued of $100MM while the underlying mortgage worth $120MM
+- e.g. MBS with principal amount issued of ＄100MM while the underlying mortgage worth ＄120MM
 
 Indenture: Legal document governing the CLO
 
@@ -416,23 +416,23 @@ $$\begin{aligned}
 where:
 
   * PP = CPR Principal Prepayment, as SMM for CPR
-  * $$P_0$$ = Starting principal balance
-  * $$P_t$$ = Principal portion of scheduled loan payment (unpaid principal)
+  * $P_0$ = Starting principal balance
+  * $P_t$ = Principal portion of scheduled loan payment (unpaid principal)
   * SMM = Single monthly mortality rate (principal loss in a month)
   * LS = Loss Severity
-  * $$S$$ = Loss Severity Percent
+  * $S$ = Loss Severity Percent
 
-Cashflow = Scheduled payment + Prepayment + Defaults $$-$$ Loss Severity $$-$$ Servicing Fee
+Cashflow = Scheduled payment + Prepayment + Defaults − Loss Severity − Servicing Fee
 
   * If the pool was original owned by the originator, there will be no servicing fee
   * Defaults added because they include loss severity and recovery. This assumes
     the recoverable part are prepayment and happen at the same time as loss.
-  * (Defaults $$-$$ Loss Severity) = Recoverable loans
+  * (Defaults − Loss Severity) = Recoverable loans
 
 Flat rate: Interest rate calculated without considering amortisation. For
-example, 12% annual flat rate of $1200 loan for 1 year repaid monthly, the
-monthly principal payment is $100 and the monthly interest is $1200 $$\times$$ 1% = $12,
-thus the monthly payment is $112. This yields a effective interest rate of 144%
+example, 12% annual flat rate of ＄1200 loan for 1 year repaid monthly, the
+monthly principal payment is ＄100 and the monthly interest is ＄1200 × 1% = ＄12,
+thus the monthly payment is ＄112. This yields a effective interest rate of 144%
 p.a. at the last payment. Or equivalently, a 23.68% APR compounded monthly for
 the overall payment (calculated using XIRR).
 
@@ -520,18 +520,20 @@ Alternatively, $$\textrm{moddur} = \frac{1}{P}\frac{dP}{dr}$$ for $$P$$ the pric
 
 Effective duration: a more accurate measurement of price volatility for loans and MBS
 
-$$\begin{aligned}
-\textrm{Effective duration %} &= \frac{1}{2}
-    (\textrm{change of price in % when yields fall} + \textrm{change of price in % when yields rise})
+$$
+\begin{aligned}
+\textrm{Effective duration \%} &= \frac{1}{2}
+    (\textrm{change of price in \% when yields fall} + \textrm{change of price in \% when yields rise})
 \\
-\textrm{Convexity adjustments} &= \frac{\textrm{change of price in % when yields fall}
-                                        + \textrm{change of price in % when yields rise}
+\textrm{Convexity adjustments} &= \frac{\textrm{change of price in \% when yields fall}
+                                        + \textrm{change of price in \% when yields rise}
                                         - 2 \times \textrm{init price}
                                       }{2 \times \textrm{init price}}
 \\
 \textrm{Convexity} &= \frac{2 \times \textrm{Convexity adjustments}}
                            {100 \times (\textrm{change in yield})^2}
-\end{aligned}$$
+\end{aligned}
+$$
 
 ## discount margin
 
@@ -560,7 +562,7 @@ $$ \textrm{PV} = c_0 = \sum_{i=1}^n \frac{c_i}{(1+\textrm{yield})^{t_i}} $$
 
 back-of-envelope calculation: price-yield-duration formula
 
-$$ \textrm{change in price in %} = \textrm{duration} \times -(\textrm{change in yield in %}) $$
+$$ \textrm{change in price in \%} = \textrm{duration} \times -(\textrm{change in yield in \%}) $$
 
 applied when impairment or write-down is a remote risk, which change in yield is same as change in DM in %
   - duration: the modified duration
@@ -611,12 +613,12 @@ Rule of 72: time it takes to double, e.g.
 - etc.
 
 Rule of 78, aka sum-of-the-digits method:
-assume total interest of whole period to be $($$N$$)
+assume total interest of whole period to be ＄($$N$$)
 and the total period to be $$n$$ months
 then the monthly payment $($$P$$) on month $$k$$ will include the interest portion of
 $$N \times k/S_n$$ where $$S_n = 1+2+...+n$$
-  
- - Using rule of 78 need to find the total financial cost $($$N$$) before hand
+
+ - Using rule of 78 need to find the total financial cost ＄($$N$$) before hand
  - The interest payment is front-loaded: interest payment is higher than simple interest
     - not beneficial to prepayment: there is more principal remain to be paid off
 
@@ -756,10 +758,10 @@ Law firms
      - offering memorandum/prospectus: terms of the notes for prospective buyers
      - interest rate hedge agreement: interest rate swap between issuer and swap counterparty
   - top CLO arranger counsels: Ashurst, Cadwalader, Allen & Overy, White & Case, Milbank
-  - advisor to the arranger can expect as much as $400k in a deal
+  - advisor to the arranger can expect as much as ＄400k in a deal
   - advisor to manager might get 1/3 of that amount
-  - advisor to trustee or individual investor might get $40k to $50k
-  - advisor to issuer (for setting up the SPV in Cayman Is) would typically get $50k
+  - advisor to trustee or individual investor might get ＄40k to ＄50k
+  - advisor to issuer (for setting up the SPV in Cayman Is) would typically get ＄50k
 
 Rating agencies
   - all tranches except equity are rated
@@ -929,7 +931,7 @@ Financial crisis of 2007 and 2008
      - keen to sell to lock in a gain
      - fuelled further secondary market
 
-Secondary market: >$20bn turnover a quarter since 2008
+Secondary market: >＄20bn turnover a quarter since 2008
 
 CLO trade: over the counter market
   - no exchange which CLO trading takes place
@@ -963,7 +965,7 @@ CLO trade: over the counter market
 
 Mid-market CLO: backed by loans to smaller companies
   - majority CLO is to buy large cap loans
-  - mid-market loans: companies with earning below $50M
+  - mid-market loans: companies with earning below ＄50M
   - bigger loans: broadly syndicated loan
   - loans originated:
       - larger company: arranged (syndicated) by investment bank, markets the debt to a large number of investor
@@ -1049,11 +1051,11 @@ securities available, the fraction is the % allocated, and applied to all
 bidders.
 
 Example: 100 units put up for sale. Bids are as follows:
-- $1.3 for 20 units
-- $1.2 for 30 units
-- $1.1 for 40 units
-- $1.0 for 60 units
+- ＄1.3 for 20 units
+- ＄1.2 for 30 units
+- ＄1.1 for 40 units
+- ＄1.0 for 60 units
 
-So the price is set at $1.0 (highest price $$x$$ such that bids $$\ge x$$ meet or exceed
+So the price is set at ＄1.0 (highest price $$x$$ such that bids $$\ge x$$ meet or exceed
 100 units); and total bids are 150 units thus each bidder allocates 2/3 of the
 bid.
