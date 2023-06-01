@@ -1,0 +1,157 @@
+---
+layout: post
+title: "Carion et al (2020) End-to-End Object Detection with Transformers"
+date: 2023-05-20
+category: paper
+bibtex:
+  type: inproceedings
+  title: "CatBoost: unbiased boosting with categorical features"
+  author: "Nicolas Carion and Alexander Kirillov and Francisco Massa and Gabriel Synnaeve and Nicolas Usunier and Sergey Zagoruyko"
+  booktitle: "Proc. ECCV"
+  year: 2020
+  arXiv: 2005.12872
+  github: https://github.com/facebookresearch/detr
+---
+
+Object detection is to predict the bounding boxes and category labels for each
+object of interest. This paper proposed DETR (Detection Transformer) to predict
+all objects at once, trained end-to-end with a set loss function to perform
+bipartite matching between the predicted and groundtruth. It is found to
+perform better on large objects due to the non-local computations of the
+transformer but sacrificed the performance on small objects.
+
+Object detection is challenging because predicting sets using deep learning model
+is challenging. The set of bounding boxes predicted has structural relationships
+(i.e., overlapping). It is not always an exact match to the ground truth.
+Therefore, postprocessing techniques such as non-maximal suppression are used. In
+DETR, set matching is to use Hungarian algorithm to find the best-fit bipartite
+matching, and avoided the non-maximal suppression.
+
+The existing object detectors are either two-stage (i.e., predict bounding box
+w.r.t. proposals) or single-stage (i.e., predict w.r.t. a grid of anchors as
+object centers). The accuracy depends on how exactly the initial guesses are
+set. DETR predicts the box w.r.t. image directly without anchors.
+
+## The DETR model
+
+The architecture is in Fig.10 in appendix A.3 of the paper. Its goal is to
+infer a set of $N$ object predictions from the input image.
+
+It uses CNN to generate a feature representation of the image. For an image of
+spatial size $(H_0,W_0)$ the feature is $(\frac{H_0}{32}, \frac{W_0}{32}, C)$
+with $C=2048$. Then this feature is input to the encoder of a transformer
+architecture. Firstly, a $1\times1$ convolution is applied to reduce the
+channel dimension of the activation map from $C$ to $d$. Then flatten the
+spatial dimension, as the transformer encoder expects sequence as input.
+
+The DETR architecture is an encoder-decoder transformer connected to a
+feedforward network for final detection prediction. In the encoder, input to
+each encoder layer is added with a fixed positional encoding (only the Q and K
+vectors, not V). The encoder layer is a multi-head self-attention module and an
+FNN. Precisely, each block is:
+self-attention → add & norm → feed-forward network → add & norm → output.
+
+In the decoder, $N$ objects are decoded in parallel, not using the
+autoregressive model of sequence prediction. The output from the encoder
+becomes the K and V vectors to the cross-attention layer in the decoder blocks.
+The decoder block receives queries, initially zero, and output positional
+encoding, which is served as queries to the subsequent decoder block.
+
+The feedforward network is using a 3-layer perceptron model, with hidden
+dimension $d$, and ReLU activation. It is to predict the normalized center
+coordinates and the width and height of the bounding box (all w.r.t. input
+image width and height). Parallel to it is a linear layer to predict the class
+label (of $N$ classes, some prediction can be $\varnothing$ for background
+class) using softmax function.
+
+The difficulties of training the DETR model is about scoring the predicted
+objects (class, position, and size) w.r.t. the ground truth. The loss function
+is set up to optimize object-specific bbox losses, as follows:
+
+Let $y=\{y_1,\dots,y_N\}$ be the groundtruth and
+$\hat{y}=\{\hat{y}_1,\dots,\hat{y}_N\}$ be a set of $N$ predictions, some
+groundtruth can be "no object" $\varnothing$. Each $y_i=(c_i,b_i)$ for target
+class label $c_i$ and bbox $b_i\in [0,1]^4$ of (cx,cy,h,w) relative to image
+size. First, we have an optimal bipartite matching $\hat{\sigma}$ (in the form
+of a permutation, obtained, e.g., from the Hungarian algorithm) between $y$ and
+$\hat{y}$ that minimized the matching cost:
+
+$$
+\hat{\sigma} = \arg\min_{\sigma} \sum_{i=1}^N L(y_i, \hat{y}_{\sigma(i)})
+$$
+
+where
+
+$$
+L(y_i,\hat{y}_{\sigma(i)})=\mathbb{I}[c_i\neq\varnothing](-\hat{p}_{\sigma(i)}(c_i)+L_{\text{box}}(b_i,\hat{b}_{\sigma(i)}))
+$$
+
+is the pairwise matching cost, with $\hat{p}_{\sigma(i)}(c_i)$ the predicted
+probability of class $c_i$ under the permutation $\sigma(i)$. The bbox loss is
+defined as
+
+$$
+L_{\text{box}}(b_i,\hat{b}_i) = \lambda_{\text{IoU}}L_{\text{IoU}}(b_i,\hat{b}_{\sigma(i)})+\lambda_{L1} \Vert b_i - \hat{b}_{\sigma(i)}\Vert_1
+$$
+
+where $L_{\text{IoU}}$ is a generalized IoU and it should be scale-invariant
+(see Rezatofighi et al. (2019) "Generalized intersection over union"):
+
+$$
+L_{\text{IoU}}(b_i,\hat{b}_{\sigma(i)}) =
+1-\Bigg(
+  \frac{\vert b_i \cap\hat{b}_{\sigma(i)}\vert}{\vert b_i \cup\hat{b}_{\sigma(i)}\vert}
+  -
+  -\frac{\vert B(b_i, \hat{b}_{\sigma(i)})\setminus b_i \cup\hat{b}_{\sigma(i)}\vert}{\vert B(b_i,\hat{b}_{\sigma(i)})\vert}
+\Bigg)
+$$
+
+where:
+
+- area is denoted with $\vert\cdot\vert$
+- union and intersection is on box geometry
+- $B(b_i,\hat{b}_{\sigma(i)})$ is the bounding box enclosing both
+  $b_i$ and $\hat{b}_{\sigma(i)}$
+- The formula of $L_{\text{IoU}}$ is from DICE/F-1 loss, which considered the
+  logit prediction $\hat{m}$ vs binary target $m$, defined as
+
+  $$L_{\text{DICE}}(m,\hat{m}) = 1-\frac{2m\sigma(\hat{m}+1)}{\sigma(\hat{m})+m+1}$$
+
+
+With the optimal matching $\hat{\sigma}$ is found between $y$ and $\hat{y}$,
+the training loss is defined as a linear combination of class prediction
+crossentropy and object-specific box loss:
+
+$$L_H(y,\hat{y}) = \sum_{i=1}^N \Big(-\log \hat{p}_{\hat{\sigma}(i)}(c_i)+\mathbb{I}[c_i\neq\varnothing]L_{\text{box}}(b_i,\hat{b}_{\hat{\sigma}(i)})\Big)$$
+
+which in practice, the log probability term for $c_i=\varnothing$ is
+down-weighted by a factor of 10 to correct class imbalance.
+
+## Details
+
+More implementation details are in the appendix of the paper. 
+
+The loss metrics are normalized by the number of objects in the batch. Care
+must be taken in distributed training since only a sub-batch is provided to
+each computing node.
+
+Hyperparameters for training:
+
+- Optimizer: AdamW with weight decay $10^{-4}$
+- Gradient clipped at maximal gradient norm of 0.1
+- Backbone (CNN) is ResNet-50 (from Torchvision) discarded the last
+  classification layer, with batch normalization weights and statistics frozen
+  during training, all else fine-tuned with a learning rate of $10^{-5}$
+    - the backbone learning rate is an order of magnitude smaller than the rest
+      of the network to stabilize the training
+- Transformer is trained with a learning rate $10^{-4}$, additive dropout of
+  0.1 at every multi-head attention and feed-forward layer before normalization
+- Transformer weights are initialized with Xavier initialization
+- Loss hyperparameter: $\lambda_{\text{IoU}}=2$, $\lambda_{L1}=5$
+- Decoder query slot $N=100$
+- Baseline compared with Faster-RCNN, trained for 109 epochs, using settings as
+  in Detectron2 model zoo Spatial positional encoding: Fixed absolute encoding
+    - both spatial coordinates of each embeddings use $d/2$ sine and cosine
+      functions with different frequencies, then concatenate them to get $d$
+      channel
+    - 2D positional encoding see Parmer et al (2018)

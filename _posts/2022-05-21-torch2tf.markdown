@@ -20,7 +20,7 @@ the FPU in CPU and in GPU may operate differently.
 
 
 Let's make a simple PyTorch model. LeNet-5 would be a good choice since there
-are convolutional layer and full-connected layers. We use the MNIST dataset and
+are convolutional layers and full-connected layers. We use the MNIST dataset and
 train one in PyTorch:
 
 ```python
@@ -277,7 +277,7 @@ The other way to do is to pick up each layer, find the kernel, and assign a
 matrix to it. But this way is specific to the layer. So we use `set_weights()`
 for its convenience.
 
-Now we need to transform the PyTorch weights to Keras weigths. This is how it is done:
+Now we need to transform the PyTorch weights to Keras weights. This is how it is done:
 
 ```python
 # Fetch weight from torch model
@@ -441,7 +441,7 @@ for k,t in zip(keras_weights.keys(), torch_weights.keys()):
 torch_model.load_state_dict(new_weights)
 ```
 
-Then we can verify that the two models are now behave exactly the same:
+Then we can verify that the two models are now behaved exactly the same:
 
 ```python
 from tensorflow.keras.datasets import mnist
