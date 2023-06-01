@@ -5,7 +5,7 @@ date: 2023-05-20
 category: paper
 bibtex:
   type: inproceedings
-  title: "CatBoost: unbiased boosting with categorical features"
+  title: "End-to-End Object Detection with Transformers"
   author: "Nicolas Carion and Alexander Kirillov and Francisco Massa and Gabriel Synnaeve and Nicolas Usunier and Sergey Zagoruyko"
   booktitle: "Proc. ECCV"
   year: 2020
@@ -110,8 +110,8 @@ where:
 
 - area is denoted with $\vert\cdot\vert$
 - union and intersection is on box geometry
-- $B(b_i,\hat{b}_{\sigma(i)})$ is the bounding box enclosing both
-  $b_i$ and $\hat{b}_{\sigma(i)}$
+- $$B(b_i,\hat{b}_{\sigma(i)})$$ is the bounding box enclosing both
+  $$b_i$$ and $$\hat{b}_{\sigma(i)}$$
 - The formula of $L_{\text{IoU}}$ is from DICE/F-1 loss, which considered the
   logit prediction $\hat{m}$ vs binary target $m$, defined as
 
