@@ -2,6 +2,7 @@
 layout: post
 title: "Ledig et al (2017) Photo-Realistic Single Image Super-Resolution Using a Generative Adversarial Network"
 date: 2023-05-30
+lastupdate: 2023-06-10
 category: paper
 bibtex:
   type: inproceedings
@@ -165,7 +166,7 @@ def upscale_block(input, name_prefix=""):
     """
     # k3n256s1
     y = Conv2D(256, (3, 3), padding="same", name=name_prefix+"_conv")(input)
-    y = UpSampling2D(size=2, interpolation="bilinear", name=name_prefix+"_up")(y)
+    y = tf.nn.depth_to_space(y, 2)  # 2x upsampling
     y = PReLU(shared_axes=[1, 2], name=name_prefix+"_prelu")(y)
     return y
 

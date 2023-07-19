@@ -158,7 +158,7 @@ Give remote host B access to host C by way of the local machine A:
 
 ## SOCKS proxy
 
-    $ ssh-D localport remote_host
+    $ ssh -D localport remote_host
 
 then a SOCKS5 proxy is created at localhost port `localport` and traffic will be tunneled to `remote_host`. In Firefox, DNS will not be tunneled through SOCKS proxy unless `network.proxy.socks_remote_dns=True`
 
@@ -185,6 +185,8 @@ Must be root at both hosts in order to create `tun0` virtual network devices. Al
     
     hostB# ifconfig tun0 192.168.1.102 netmask 255.255.255.0
 
+The option `-w X:Y` is to set up tunX local and tunY remote. The number can be replaced by `any` to let system pick the next available number.
+
 ## create a **layer-2** `tap` device between hosts A and B
 
 First we have to create the tap device on both hosts by either of the following two commands
@@ -206,10 +208,23 @@ we can check the tunnel working by ping on remote address, or the command `ethto
 
 To shutdown, send SIGTERM to the ssh process.
 
+## create a tunnel without using root
+
+(https://unix.stackexchange.com/questions/452433/ssh-tunnel-error-for-root-sys-tun-open-failed-to-configure-tunnel-mode-1-op)
+
+    # on both side create a tunnel device first
+    ip tuntap add name tun0 mode tun user myuser
+    ip address add 192.0.2.10/24 dev tun0
+    ip link set dev tun0 up
+    
+    # run command to create tunnel
+    ssh -NTCf -w 0:0 remoteuser@hostB
+
 ## other useful arguments to ssh in tunneling
 
 - `-f` to drop ssh to background
 - `-N` to run no command at remote server (`-f -N` = daemonized mode)
+- `-T` to allocate no pseudo terminal
 - `-o ServerAliveInterval=30` to send something over the TCP every 30 seconds to keep the tunnel alive. Similar options are `ClientAliveInterval` and `TCPKeepAlive`
 
 

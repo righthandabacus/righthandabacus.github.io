@@ -1,0 +1,46 @@
+---
+layout: post
+title: "Wang et al (2021) Real-ESRGAN"
+date: 2023-06-10
+category: paper
+bibtex:
+  type: inproceedings
+  title: "Real-ESRGAN: Training Real-World Blind Super-Resolution with Pure Synthetic Data"
+  author: "Xintao Wang and Liangbin Xie and Chao Dong and Ying Shen"
+  booktitle: "Proc. ICCV"
+  year: 2021
+  arXiv: 2107.10833
+---
+
+This is to extend the SR-GAN and ESR-GAN to do blind super-resolution. The
+problem statement is to reconstruct the high-resolution image from low
+resolution (a.k.a. super-resolution), but without knowing how the low
+resolution is derived from the original high-resolution image, i.e.,
+*blind super-resolution*.
+
+The contribution of this paper: (1) A process to create high-quality synthetic
+dataset for super-resolution, (2) a network for SR, especially using U-Net in
+the discriminator with spectral normalization to increase discriminator
+capability.
+
+The classical degradation model includes blur, downsampling, noise, and JPEG
+compression:
+
+$$
+\mathbf{x} = D(\mathbf{y}) = [(\mathbf{y} \oast \mathbf{k})
+$$
+
+----
+
+first-order vs high-order degradation modeling for real-world degradation
+sinc filter for ringing and overshoot artifacts
+discriminator of more powerful capability
+gradient feedback from discriminator needs to be more accurate for local detail nehancement
+U-net design with spectral normalization (SN) regularization
+
+
+
+## Further Reading
+
+- First SR network: SRCNN, 9, 10
+- Blind SR survey: 28

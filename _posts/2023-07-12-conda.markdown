@@ -1,0 +1,42 @@
+---
+layout: post
+title: Conda and CUDA
+date: 2023-07-12
+tags: system
+category: blog
+---
+
+If we want to run TensorFlow or PyTorch with CUDA on Linux, for example, we can
+install CUDA as a system library first and then install the Python package with
+pip (or via apt-get, in the rare case). This way, the package will find the
+CUDA library at system locations. The case of pyenv or virtualenv are similar.
+The Python packages are installed via pip and CUDA library are expected at the
+system path.
+
+The other way to run this would be using conda. It is special because conda is
+not a Python virtualenv. An environment in conda can come with other binaries,
+such as CUDA library. Hence you can conda install cudatoolkit and then conda
+install pytorch. These are conda-specific build that assumed libraries are
+installed in non-standard locations.
+
+At the time of writing, we have Python 3.11.4, PyTorch 2.0.1, and TensorFlow
+2.13.0. Luckily, PyTorch 2.0 and TensorFlow 2.13 both depends on CUDA 11.8
+(CUDA 12 is not supported yet). But, unfortunately, conda does not have
+TensorFlow 2.13 yet. In order to get everything in the same conda
+environment, seems it is what should be done:
+
+```sh
+sudo apt-get install cuda-11-8
+mamba create -n <name> python=3.11.4
+mamba activate <name>
+mamba install -c pytorch -c nvidia pytorch torchvision torchaudio pytorch-cuda=11.8
+pip install tensorflow  # 2.13.0 using system CUDA
+```
+
+If TensorFlow 2.12 is acceptable, we can indeed do (the build is necessary)
+
+    mamba install tensorflow=2.12.0=gpu_py311h65739b5_0
+
+But in the case above, we have TWO copies of CUDA installed: one at system
+level and another inside conda environment. The pip installed tensorflow uses
+the former, and conda installed pytorch uses the latter.

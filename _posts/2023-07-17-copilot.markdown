@@ -1,0 +1,44 @@
+---
+layout: post
+title: Self-hosted Copilot for Your VSCode
+date: 2023-07-17
+tags: system
+category: blog
+---
+
+GitHub has its Copilot service that we can pay a subscription for. It is a
+coding assistant in your IDE, which requires a plugin on your editor and performs
+*auto-complete* for the code you typed. There are off-the-shelf language models
+that can generate code like GitHub's Copilot. But the model can emit code like
+a function.
+
+To make it an assistant, you need to integrate it with your code editor.
+Neovim, unfortunately, has a smaller user base and [not much
+progress](https://github.com/fauxpilot/fauxpilot/issues/21) yet. But there is a
+VSCode plugin that can use
+[FauxPilot](https://github.com/fauxpilot/fauxpilot/). FauxPilot is a project
+try to let you self-host a server compatible to GitHub Copilot. Theoretically
+you can use the GitHub Copilot plugin in your editor (i.e., Neovim has it) but
+switch to the FauxPilot backend. But since GitHub hard-coded the server address
+in the plugin, you need to somehow hack the plugin to make it work. The
+dedicated FauxPilot plugin allows you to configure a different hostname/port
+number for the server, and that would be more convenient. Of course, how to
+communicate with the editor so that you can extract the context and provide
+suggestions seamlessly from the UX perspective would be another story. But the
+point is, there's a solution for the client (i.e., editor such as VSCode or
+neovim). And there's a model (e.g., CodeGen2). FauxPilot hard-coded to use
+Salesforce's CodeGen model.
+
+Indeed, I believe FauxPilot made things too complicated. Of course, its merit
+is to have a professional deployment of the self-hosted Copilot clone using
+Docker. But if the goal is to try out models *with your IDE*, that's too heavy.
+Therefore, I trimed down FauxPilot to take only the web interface part:
+Endpoints are implemented as REST API using FastAPI and uvicorn (hence server
+code can be asynchronous). From the web requests, we get the code that the user
+typed as a string (together with some parameters such as model temperature) and
+we can invoke the model to produce output. The interaction with the model
+should be a blackbox to the REST API. Hence it is designed as such.
+
+The code is at here: https://github.com/righthandabacus/fauxpilot_lite
+
+See the readme for more details.
