@@ -2,6 +2,7 @@
 layout: post
 title: "Explaining Attention Mechanism"
 date: 2023-05-21
+lastedit: 2023-07-22
 tags: math
 highlightjs:
   - python
@@ -39,14 +40,17 @@ e_{ij} &= q_i k_j^\top
 \end{aligned}
 $$
 
-The nonlinearity is moved to $f(\cdot)$ and $g(\cdot)$ and $e_{ij}$ can be
+The nonlinearity is moved to $f(\cdot)$ and $g(\cdot)$, and $e_{ij}$ can be
 computed all at once using matrix multiplication.
 
-In the Vaswani et al (2017) paper, "Attention is All You Need", single-head
+## Self-attention
+
+In the Vaswani et al (2017) paper "Attention is All You Need", single-head
 attention mechanism is an extension to the above to introduce the term, query,
-key, and value. At a high level, query sequence $Q$ and key sequence $K$ are
+key, and value. At a high level, query sequence $q$ and key sequence $k$ are
 used to compute attention score matrix $\alpha$, which is then
-matrix-multiplied with value sequence $V$ to produce the output $\alpha V$.
+matrix-multiplied with value sequence $v$ to produce the output $\alpha v$.
+The sequences $q,k,v$ are transformed sequences from the original $Q,K,V$.
 
 Precisely, $Q$ and $K$ are sequences of vectors stacked into matrix form. Then
 within the attention module, learnable matrices are multiplied with them, and
@@ -66,8 +70,38 @@ where softmax function is to compute
 $\sigma(z_i) = \exp(z_i) / \sum_j \exp(z_j)$, each row of keys share the same
 softmax and each query is independent. Note that usually $Q,K,V$ are in the same
 dimension size in each sequence step. Transformation matrices $W^Q,W^K$ should
-be of same shape to make $qk^\top$ possible. But $W^V$ can be of different
-dimension (the output dimension size).
+be of the same shape to make $qk^\top$ possible. But $W^V$ can be of different
+dimensions (the output dimension size).
+
+How should we understand this mechanism? In the book
+*Natural Language Processing with Transformers* (Tunstall et al, 2022), an
+example sentence "time flies like an arrow" is used to explain.
+Each word is first converted into a embedding vector. Hence we have a sequence
+of 5 vectors ($Q=K=V$). Then the vectors are transformed into $q,k,v$ by
+multiplying with matrices, usually resulted in a lower dimension. Afterwards,
+the attention score matrix $\alpha$ (in shape $5\times 5$) is derived, which
+each element $\alpha_{ij}$ is the similarity score of $q_i$ to $v_j$. Then the
+output $O$ (also a sequence of 5 vectors) is a matrix multiplication of $\alpha
+v$, which each element is therefore a weighted sum of elements of $v$ according
+to the attention score on the corresponding row of $\alpha$.
+
+The projection of $Q,K,V$ into $q,k,v$ is to transform the vector
+representation. Since the dot-product is used to calculate the attention score,
+this transformation adjusted what the score means, e.g., relating subject to
+verb for agreement.
+
+The sequence length of $q$ and $k$ can be different (since they are to find the
+attention score only) but sequence length of $k$ and $v$ have to agree so the
+multiplication $\alpha v$ is possible. Also, the dimension of embedding vector
+in $q$ and $k$ should agree to make the dot product possible, but $k$ and $v$
+can be different. The output of the self-attention mechanism would be of length
+same as $q$ but dimension of embedding same as that of $v$.
+
+In the case of self-attention, of course, $q,k,v$ are in the same length. And
+for easy stacking multiple attention layers, the transformed embedding vector
+space are also in the same dimension.
+
+# Multihead attention
 
 Multihead attention is a stack of $h$ single-head attention, each with
 independent weights $W^Q, W^K, W^V$. The $h$ outputs are concatenated, then
@@ -86,13 +120,23 @@ W_i^O &\in \mathbb{R}^{hd_v\times d_{\text{model}}}
 \end{aligned}
 $$
 
-In many cases, $K,V$ are the same. For example, in translation, $Q$ is the
-target sequence and $K,V$ are both the source sequence. In a recommendation
-system, $Q$ is the target items and $K,V$ is the user profile. In language
-models, self-attention is used and all $Q,K,V$ are the same. We often see $K=V$
-when we need to relate different positions of the same sequence to one another
-(e.g., what "it" refers to in the sentence).
+The reason multihead is used is to capture different kind of attention:
+Consider the case of a sentence, one head may be to find the gender agreement,
+another is to find the subject-verb relationship, for example. Each *head*
+responsible for one theme. The output is then concatenated. Of course, 
+concatenation means the output from each head is clustered. The output
+dimension is also a multiple of the number of heads. Therefore, there is a
+transformation matrix $W^O$ to realign the output to correct dimension.
+
+TensorFlow's implementation of `MultiHeadAttention` layer takes the call
+argument query, value, and key. The key is optional.
+In many cases, $K,V$ are the same (the same sequence). For example, in
+translation, $Q$ is the target sequence and $K,V$ are both the source sequence.
+In a recommendation system, $Q$ is the target items and $K,V$ is the user
+profile. In language models, self-attention is used and all $Q,K,V$ are the
+same. We often see $K=V$ when we need to relate different positions of the same
+sequence to one another (e.g., what "it" refers to in the sentence).
 
 Usually, feed-forward network is after the attention mechanism to introduce
 nonlinearity. This feed-forward network is to replace the *hidden state* of an
-RNN to extract hierarchical features.
+ RNN to extract hierarchical features.
