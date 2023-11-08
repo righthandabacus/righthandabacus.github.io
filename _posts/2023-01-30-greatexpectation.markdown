@@ -1,12 +1,12 @@
 ---
 layout: post
-title: Great Expectation
+title: Great Expectations
 date: 2023-01-30
 tags: code
 category: blog
 ---
 
-Great expectation is a Python library for data validation. It tries to profile
+Great expectations is a Python library for data validation. It tries to profile
 a sample dataset for what are the attributes, and the statistics of the
 attributes (e.g., if numeric, what are min, max, mean, variance, etc.). If you
 read the documentation, it would suggest you to create a data repository with
