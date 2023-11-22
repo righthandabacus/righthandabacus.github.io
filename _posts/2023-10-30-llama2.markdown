@@ -130,7 +130,7 @@ $$
 which means the dot product is *relative*. In the implementation, we can consider
 $x$ at position $m$ is encoded as $xe^{im\epsilon}$ for some
 $\epsilon\in(0,\frac{\pi}{2N}]$. So the features $1,\dots,d$ will have feature
-$i$ pair up with feature $i+d/2$, and using angle $\theta_i = 10000^{2(i-1)/d}$.
+$i$ pair up with feature $i+d/2$, and using angle $\theta_i = 10000^{-2(i-1)/d}$.
 The inner product above $\langle x, y\rangle = x\cdot \bar{y}$ is using complex
 inner product.
 

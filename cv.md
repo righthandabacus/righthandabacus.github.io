@@ -4,14 +4,25 @@ title: CV
 permalink: /cv/
 ---
 
-Thanks for your interest. My current CV is [here](https://drive.google.com/open?id=1KHga7JvykmeZ_LAUW0QVAgtSvSf4SpAG)
+Thanks for your interest. My current CV is ☞ [here](https://drive.google.com/open?id=1KHga7JvykmeZ_LAUW0QVAgtSvSf4SpAG).
+
+My posts in MachineLearningMastery.com:
+
+- <https://machinelearningmastery.com/author/adriantam/>
+
+and the ebooks published with MachineLearningMastery:
+
+- [Maximizing Productivity with ChatGPT](https://machinelearningmastery.com/productivity-with-chatgpt/), 2023
+- [Deep Learning with PyTorch](https://machinelearningmastery.com/deep-learning-with-pytorch), 2023
+- [Python for Machine Learning](https://machinelearningmastery.com/python-for-machine-learning/), 2022
+- [Deep Learning with Python](https://machinelearningmastery.com/deep-learning-with-python/), 2022
 
 In case you're interested:
 
 - my Ph.D dissertation, [Robustness in Data Center Networks](https://drive.google.com/open?id=1drer2itABK4lB8vjG5zpp8xub1jIVet0)
 - my M.Phil thesis, [A Study of the Coexistence of Heterogeneous Flows on Data Networks](https://drive.google.com/open?id=0B6DoI_vm0OLfNmVjeE9yMkNjeEU)
 
-Selected publications:
+Peer-reviewed publications:
 
 - [RAPID: Avoiding TCP Incast Throughput Collapse in Public Clouds with Intelligent Packet Discarding](https://ieeexplore.ieee.org/abstract/document/8766803), *IEEE J. Sel. Area of Comm.*, 37(8):1911--1923, with Yang Xu, Shikhar Shukla, Zehua Guo, Sen Liu, Kang Xi, H. Jonathan Chao (Aug 2019)
 - [TCP PLATO: Packet Labelling to Alleviate Time-Out](https://ieeexplore.ieee.org/document/6689484/), *IEEE J. Sel. Area of Comm.*, 32(1):65--76, with Shikhar Shukla, Shingau Chan, Abhishek Gupta, Yang Xu, and H. Jonathan Chao (Jan 2014)
