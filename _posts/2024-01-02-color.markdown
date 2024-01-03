@@ -1,0 +1,132 @@
+---
+layout: post
+title: "Photo Color Adjustment"
+date: 2024-01-02
+tags: code
+category: blog
+---
+
+
+Photos are matrices of pixels. Each pixel can be a tuple of RGB values (the most common) or other color spaces such as Lab or HSV. RGB is great for its additive nature. HSV, however, considered hue as an angle in some arbitrary order. It is better than RGB if you want to focus on the color saturation or value/brightness. CIE's Lab, however, has the lightness channel, which can be considered as the combination of the saturation and value channel in HSV color space. And the a-b channels are to lay out the color in a 2D space. Sometimes, it is easier to manipulate in this way.
+
+In a color photo, the color may be distorted. Some adjustments can be used for correction, such as:
+- color balance
+- brightness and contrast
+
+Let's first consider how to tune the brightness and contrast.
+
+If we consider a grayscale image of $I(x,y)$ over a 8-bit unsigned integer value of intensity, we can correct it into $I'(x,y)$ by linear transform, such as:
+$$
+I' = \alpha I+\beta = \frac{255}{I_\max - I_\min}I+\frac{255I_\min}{I_\max - I_\min}
+$$
+This is *stretching*, resulting in an image with a minimum pixel value of 0 and a maximum pixel value of 255. A variation is to consider the pixel intensities as a histogram or a probability distribution. Then, the minimum and maximum values in the formula above are defined not at the absolute minimum and maximum but at a low and high percentile, respectively. Similar stretching can be applied to separate channels in an RGB image and combined. In code, using numpy and OpenCV:
+
+```python
+def channel_stretch(img: np.ndarray, min_percentile=0.01, max_percentile=0.99) -> np.ndarray:
+    """Apply linear contrast stretch on an RGB image"""
+    # apply stretch per channel
+    channels = []
+    for ch in cv2.split(img):
+        # get histogram, then convert to CDF
+        hist, bins = np.histogram(ch.flatten(), 256, [0, 255])
+        cdf = hist.astype(float).cumsum()
+        cdf = cdf / cdf.max()
+        # linear contrast stretch
+        min_pixel = bins[np.searchsorted(cdf, min_percentile)]
+        max_pixel = bins[np.searchsorted(cdf, max_percentile)]
+        alpha = 255.0 / (max_pixel - min_pixel)
+        beta = -min_pixel * 255.0 / (max_pixel - min_pixel)
+        new_ch = cv2.convertScaleAbs(ch, alpha=alpha, beta=beta)
+        channels.append(new_ch)
+    return cv2.merge(channels)
+```
+
+If we consider pixels in a histogram, we can level it out. That is, first convert the histogram into a probability distribution $F(x)$ where $x$ is uint8 runs from 0 to 255. Then each pixel $x$ is replaced with $y=\lfloor 255\times F(x)\rfloor$. This is called *histogram equalization*. It is not a linear transform but depends on the intensity distribution. The code to do this on each channel of an image:
+
+```python
+def histogram_equalize(img: np.ndarray) -> np.ndarray:
+    """Apply histogram equalization on each channel"""
+    return cv2.merge([cv2.equalizeHist(ch) for ch in cv2.split(img)])
+```
+
+This equalization depends on one channel of the entire image. An alternative way is to perform equalization based on neighboring pixels only. This is *contrast limited adaptive histogram equalization* or CLAHE. To apply CLAHE to all channels in an RGB image,
+
+```python
+def clahe_channels(img: np.ndarray) -> np.ndarray:
+    clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
+    channels = [clahe.apply(ch) for ch in cv2.split(img)]
+    return cv2.merge(channels)
+```
+
+Instead of applying to all RGB channels, we can also apply this only to the L channel in the CIELAB color space, or only the V channel in HSB color space. This adjust only the brightness without touching the hue components.
+
+Another nonlinear transformation to pixel intensity is [gamma correction](https://en.wikipedia.org/wiki/Gamma_correction), which historically is how TV tries to correct the problem of nonlinear intensity response in cathode-ray tube. In essence, this is to update the pixel intensity with
+$$
+I' = I^{1/\gamma}
+$$
+which the intensity value should be between 0 and 1. For pixels of uint8 values, we can implement gamma correction as:
+
+```python
+def adjust_gamma(img: np.ndarray, gamma=1.0) -> np.ndarray:
+    """Gamma adjustment on RGB image, which gamma>1 brighten the image,
+    and gamma<1 darken the image
+    """
+    invgamma = 1.0 / gamma
+    table = (np.power(np.arange(256)/255.0, invgamma) * 255).astype(np.uint8)
+    new_img = cv2.LUT(img, table)
+    return new_img
+```
+
+Use of lookup table in OpenCV is faster than manipulating the matrix using NumPy. Compared to the previous algorithms, this requires the parameter $\gamma$ predefined. One way to figure out the value is to consider
+
+$$
+\gamma = \frac{\log I_\text{in}}{\log I_\text{out}}
+$$
+
+and if we assume the expected midtone is 127.5 (midpoint of 0 to 255) and the midtone of the original image is as computed by the average, we can find $\gamma$ using:
+
+```python
+def find_optimal_gamma(img: np.ndarray, mid=0.5) -> np.ndarray:
+    # with midtone set, best gamma is log(mean)/log(mid*255)
+    mean = np.mean(cv2.cvtColor(img, cv2.COLOR_RGB2GRAY))
+    gamma = np.log(mean)/np.log(mid*255)
+    return gamma
+```
+
+This code allows an adjustable midtone if 127.5 is not the best value.
+
+Let's consider the problem of color balance.
+
+An image with RGB channels with a different channel mean or range would make the picture look color-distorted. Without knowing what the actual color should be, it is difficult to correct. Of course, we can make assumptions, such as the range of each color should be the same or the means should be aligned. Applying histogram equalization across each channel, as in the code above, does just this.
+
+White balance is a special case of color balance, which usually describes the color of white as appears in the image in a spectrum from yellow to blue. One algorithm to adjust white balance automatically is the *gray world assumption*. This means the *average* of all colors in a picture should be gray, i.e., neutral to any color.
+
+Applying gray world assumption to white balance correction is as follows:
+
+```python
+def grayworld(img: np.ndarray) -> np.ndarray:
+    """White balance by gray world assumption"""
+    gray = img.mean()
+    ch_mean = img.mean(axis=(0, 1))
+    channels = [
+        cv2.convertScaleAbs(ch, alpha=gray/ch_mean[i])
+        for i, ch in enumerate(cv2.split(img))
+    ]
+    return cv2.merge(channels)
+```
+
+This assumes the target gray level as the simple mean of all channels in all pixels (in which the brightness is not adjusted). Then, the mean color intensity is computed per color channel. The quotient between the two is the scaling factor, in which the channel with higher intensity receives the lower scaling factor.
+
+Another way of white balance is to consider the CIELAB color space, in which the "a" and "b" channels are for the hue spectrum, and the center is white. Hence, we can correct the white balance by shifting these two channels:
+
+```python
+def lab_shift(img: np.ndarray) -> np.ndarray:
+    """Adjust white balance in Lab color space.
+    OpenCV's LAB color space run from 0 to 255 on all channels
+    """
+    l, a, b = cv2.split(cv2.cvtColor(img, cv2.COLOR_RGB2LAB))
+    delta_a, delta_b = 127.5-a.mean(), 127.5-b.mean()
+    a = cv2.convertScaleAbs(a, beta=delta_a)
+    b = cv2.convertScaleAbs(b, beta=delta_b)
+    return cv2.cvtColor(cv2.merge([l, a, b]), cv2.COLOR_LAB2RGB)
+```

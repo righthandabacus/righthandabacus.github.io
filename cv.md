@@ -17,6 +17,12 @@ and the ebooks published with MachineLearningMastery:
 - [Python for Machine Learning](https://machinelearningmastery.com/python-for-machine-learning/), 2022
 - [Deep Learning with Python](https://machinelearningmastery.com/deep-learning-with-python/), 2022
 
+Other writings published recently:
+
+- [Navigating the AI Journey: A Guide to Transitioning from Development to Production](https://webcache.googleusercontent.com/search?q=cache:bwE12bo_DyoJ:https://www.expresscomputer.in/artificial-intelligence-ai/navigating-the-ai-journey-a-guide-to-transitioning-from-development-to-production/105630/&hl=en&gl=us) on Express Computer
+- [ChatGPT is mythical but not magical](https://etinsights.et-edge.com/chatgpt-is-mythical-but-not-magical/) on ET Insights
+- [Never 'fix and forget', but 'learn and evolve'](https://www.dqindia.com/never-fix-forget-learn-evolve/) on DataQuest
+
 In case you're interested:
 
 - my Ph.D dissertation, [Robustness in Data Center Networks](https://drive.google.com/open?id=1drer2itABK4lB8vjG5zpp8xub1jIVet0)

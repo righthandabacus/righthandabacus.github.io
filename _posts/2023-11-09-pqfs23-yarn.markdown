@@ -1,0 +1,190 @@
+---
+layout: post
+title: "Peng et al (2023) YaRN: Efficient Context Window Extension of Large Language Models"
+date: 2023-11-09
+category: paper
+bibtex:
+  type: unpublished
+  title: "YaRN: Efficient Context Window Extension of Large"
+  author: Bowen Peng and Jeffrey Quesnelle and Honglu Fan and Enrico Shippole
+  year: 2023
+  arXiv: 2309.00071
+---
+
+This paper studies the positional encoding in large language models, since it
+is the factor that needs to change if we want to support a longer context
+length than it was pretrained. The original transformer model's position
+encoding scheme was called the *absolute sinusoidal position encoding*. Then,
+there are models (e.g., arXiv:1705.03122) that use a learnable absolute
+positional encoding and are found to improve the model. Another camp is the
+relative positional encodings, where the notable examples are RoPE
+(arXiv:2104.09864), XPos (arXiv:2212.10554), and ALiBi (Press et al, 2022).
+
+One way to let a model to handle context length significantly longer than it
+was pretrained is to do position interpolation, such as arXiv:2306.15595. And
+this paper used the NTK-aware interpolation and its improvements, *dynamic NTK*
+and *NTK-by-part* interpolations.
+
+## RoPE
+
+RoPE considers the feature vector of length $D$ as $x\in\mathbb{R}^D$ and it
+can also be represented in complex vector space $x\in\mathbb{C}^{D/2}$. The
+vector inner product in $\mathbb{R}^D$ should be Hermitian inner product in
+$\mathbb{C}^{D/2}$ to make them equal in real part. RoPE is to multiply
+$e^{im\theta}$ for some $\theta$ to the $m$-th token in the sequence
+$x_m\in\mathbb{C}^{D/2}$. This way, the inner product of two encoded tokens
+$x_m,x_n$ will depend only on the difference $m-n$ but not the exact positions
+$m$ or $n$.
+
+The paper denotes the position encoding as the function $f(x_m, m, \theta_d)$,
+which the $d$-th component of $x_m$ is $x_{m,d}\in\mathbb{C}$ and it is
+transformed into $x_{m,d}e^{im\theta_d}$. The original design of RoPE was to
+make $\theta_d = b^{-2d/D}$ for some large constant $b=10^4$.
+
+The position interpolation is not to extrapolate the position encoding because
+the model has not learned about the encoding beyond the range it was trained.
+If the model was pretrained with context length $L$, which $m=1,\dots,L$, then
+to extend the model to length $L'$ we make the encoding function
+
+$$
+f'(x_m,m,\theta_d) = f(x_m,\frac{mL}{L'}, \theta_d) = f(x_m, m/s, \theta_d)
+$$
+
+which we further denote $s=L'/L > 1$ as the *scale factor* from the pretrained model.
+
+We also defined the wavelength at the hidden dimension $d$ as
+
+$$
+\lambda_d = \frac{2\pi}{\theta_d} = 2\pi b^{2d/D}
+$$
+
+Tancik et al (2020) suggest to look at the encoding with Neural Tangent
+Kernel theory, which the network cannot learn high frequency information if the
+input dimension is low and the embedding lacks high frequency components. RoPE
+with PI for longer context length does not introduce any higher frequency,
+which the authors of this paper argue as the reason for the increase of
+perplexity if the model was fine-tuned on longer context length but used with
+shorter input afterward.
+
+## NTK-aware interpolation
+
+The solution would be NTK-aware interpolation on RoPE, which is
+
+$$
+\begin{aligned}
+f'(x_m,m,\theta_d) &= f(x_m,m,b'^{-2d/D}) & \text{where }b' &= b\cdot s^{D/(D-2)}
+\end{aligned}
+$$
+
+with the scale factor $s$ applied to $\theta_d$ part. This scheme is used by
+Code Llama (arXiv:2308.12950) with scaled base $b=10^6$. Note that this changes
+the frequency $\theta_d$ in the encoding.
+
+However, this treats all hidden dimension $d$ equally, while it is learned that
+the wavelengths $\lambda_d$ varies. For a given $L$ in pretraining, there are
+some $d$ that $\lambda_d > L$ and that means this dimension's encodings are not
+distributed evenly, and it works like absolute positional encoding. But if
+$\lambda_d \ll L$ then only relation positional information is provided.
+
+Scaling up the RoPE with factor $s$ or a larger base $b'$ essentially make the
+dot product of two vectors rotated by a lesser amount, hence impairing LLM's
+ability to understand local relationships. Therefore, the authors said the
+model would confuse on the positional order of close-by tokens. The proposal
+was to
+
+1. if $\lambda_d \ll L$, no interpolation
+2. if $\lambda_d \ge L$, interpolate but not extrapolate, hence not to use NTK-aware interpolation
+3. all other: a bit of both, e.g., NTK-aware interpolation
+
+The proposal first introduces the ratio $r_d=L/\lambda_d$ as the ratio between
+the original context size $L$ and wavelength $\lambda_d$. That is,
+
+$$
+r_d = \frac{L}{\lambda_d} = \frac{L}{2\pi b'^{2d/D}}
+$$
+
+Then two thresholds $\alpha,\beta$ are introduced, with the ramp function defined as
+
+$$
+\gamma(r) = \begin{cases}
+0 & \text{if }r<\alpha \\
+1 & \text{if }r>\beta \\
+\dfrac{r-\alpha}{\beta-\alpha} & \text{otherwise}
+\end{cases}
+$$
+
+and the *NTK-by-part* scheme is to use encoding function $f'(x_m, m, \theta_d)
+= f(x_m, m, h(\theta_d))$ where
+
+$$
+h(\theta_d) = \big(1-\gamma(r_d)\big)\frac{\theta_d}{s} + \gamma(r_d)\theta_d
+$$
+
+Such that for hidden dimensions $d$,
+
+- if $r_d<\alpha$, it is linearly interpolated by a scale $s$, exactly like PI, to avoid extrapolation
+- if $r_d>\beta$, no interpolation at all
+
+The paper suggested for LLaMA family of models set $\alpha=1,\beta=32$.
+
+## Dynamic Scaling
+
+In autoregressive generation, the sequence lengths are increasing in each step.
+There are two ways to run the inference. We can set a fixed $s=L'/L$ for the
+entire inference cycle, where $L'$ is an extended context size.  This will have
+a performance discount at a length shorter than $L$ and degradation when length
+goes beyond $L'$.
+
+The alternative is dynamically, use a different scale factor $s=\max(1, l'/L)$
+in each forward pass, with the current sequence length $l'$. This allows the
+model to degrade gracefully rather than breaking down all of a sudden. This is
+called *Dynamic NTK* interpolation. The downside is when the model has
+kv-caching to help autoregressive generation, we need to modify the code to
+cache the kv-embedding without RoPE and apply encoding to the entire cache in
+each iteration.
+
+## YaRN
+
+The author proposed to add a temperature $t$ to the softmax step, named as *attention scaling*:
+
+$$
+\text{softmax}_n\Big(\frac{q_m^\top k_n}{t\sqrt{D}}\Big)
+$$
+In implementation, this simply needs to scale both $q_m$ and $k_n$ by a factor
+$\sqrt{1/t}$ and the previous softmax implementation is left intact. This
+temperature parameter has a uniform impact on perplexity regardless of the
+token position. For LLaMA models, it is recommended to set
+$\sqrt{1/t}=0.1\ln(s)+1$
+
+The YaRN method is to combine *attention scaling* and *NTK-by-parts* interpolation method.
+
+## Experiments
+
+The authors took 400 training steps, with 0.1% of the original pretraining
+corpus, to extend the context window. The training and evaluation proceduce
+follows arXiv:2306.15595:
+
+- Modified LLaMA 2 7B and 13B models at only the calculation of embedding frequencies, using $s=16$ and $s=32$
+- Using learning rate 2e-5 with no weight decay and linear warmup of 20 steps, AdamW with $\beta_1=0.9,\beta_2=0.95$
+- Fine-tuned for $s=16$ with 400 steps on batch size 64 on PG19 dataset chunked at 64K segments (and bookended with BOS/EOS tokens); using PyTorch FSDP (arXiv:2304.11277) and FlashAttention 2 (arXiv:2307.08691)
+- Fine-tuned for $s=32$ with 200 additional steps further from the $s=16$ checkpoint, still using the dataset with 64K context.
+
+Code LLaMa with dataset on 16K context has shown that the network can
+extrapolate up to 100K content without ever saw such context sizes during
+training. The authors of this paper showed that $s=32$ model can extrapolate up
+to 128K context even with only 64K data in training. Therefore, YaRN is
+efficient at transfer learning with increasing scale $s$.
+
+The fine-tuned model is evaluated on the perplexity score, the passkey
+retrieval task, and other common LLM benchmark results. And found YaRN is able
+to train short and test long.
+
+- Perplexity: Using the sliding window perplexity method as in Press et al (2022) with the Proof-pile dataset and GovReport dataset
+	- pick 10 sample from Proof-pile with more than 128K tokens and evaluated the perplexity of each samples when truncated at 2K steps for a sequence length of 2K to 128K tokens
+- Passkey retrieval: as in arXiv:2305.16300, measures a model's ability to retrieve a 5-digit number from a large amount of meaningless text
+	- 10 iterations of passkey retrival task with passkey placed at random location uniformly distributed across the evaluation context window ranged 8K to 128K
+- Standardized benchmarks: see [Hugging Face Open LLM Leaderboard](https://huggingface.co/spaces/HuggingFaceH4/open_llm_leaderboard)
+	- 25-shot ARC challenge (arXiv:1803.05457)
+	- 10-shot HellaSwag (Zellers et al, 2019)
+	- 5-shot MMLU (Hendrycks et al, 2021)
+	- 0-shot TruthfulQA (Lin et al, 2022)
