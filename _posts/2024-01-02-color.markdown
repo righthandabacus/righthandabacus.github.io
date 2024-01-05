@@ -16,9 +16,11 @@ In a color photo, the color may be distorted. Some adjustments can be used for c
 Let's first consider how to tune the brightness and contrast.
 
 If we consider a grayscale image of $I(x,y)$ over a 8-bit unsigned integer value of intensity, we can correct it into $I'(x,y)$ by linear transform, such as:
+
 $$
-I' = \alpha I+\beta = \frac{255}{I_\max - I_\min}I+\frac{255I_\min}{I_\max - I_\min}
+I' = \alpha I+\beta = \frac{255}{I_{\max} - I_{\min}}I+\frac{255I_{\min}}{I_{\max} - I_{\min}}
 $$
+
 This is *stretching*, resulting in an image with a minimum pixel value of 0 and a maximum pixel value of 255. A variation is to consider the pixel intensities as a histogram or a probability distribution. Then, the minimum and maximum values in the formula above are defined not at the absolute minimum and maximum but at a low and high percentile, respectively. Similar stretching can be applied to separate channels in an RGB image and combined. In code, using numpy and OpenCV:
 
 ```python
