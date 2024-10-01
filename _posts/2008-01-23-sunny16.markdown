@@ -8,15 +8,16 @@ tags: work
 Sunny 16 rule says that in a sunny day, shooting shall set the shutter to the same ISO as the film and the aperture to f/16 to maintain the correct amount of light to come through. Setting shutter at the double of speed of ISO shall open the aperture to double in size as well, i.e. f/8.
 
 In case the lighting condition is different, the f-stops shall be changed:
-  * Beach or snow: minus one stop (f/22)
-  * Bright daylight: f/16
-  * Weak light, sun low in the sky: plus one stop (f/11)
-  * Cloudy: plus two stop (f/8)
-  * Dark clouds or in shadow: plus three stop (f/5.6)
-  * Sunset: plus four stop (f/4)
+
+- Beach or snow: minus one stop (f/22)
+- Bright daylight: f/16
+- Weak light, sun low in the sky: plus one stop (f/11)
+- Cloudy: plus two stop (f/8)
+- Dark clouds or in shadow: plus three stop (f/5.6)
+- Sunset: plus four stop (f/4)
 
 The above assumes you are shooting the ground, not the sky.
 
 Beach or snow condition means lights reflecting around, hence the lights is effectively stronger. The sunny 16 rule applies when the shadow has a sharp and hard edge.
 
-Cloudy means there is no shadow formed. In case of an shaded environment, that is "dark clouds".
+Cloudy means there is no shadow formed. In case of a shaded environment, that is "dark clouds".

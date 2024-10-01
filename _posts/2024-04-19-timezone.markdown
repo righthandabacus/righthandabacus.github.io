@@ -1,0 +1,127 @@
+---
+layout: post
+title: Timezone in Python
+date: 2024-04-19
+tags: code
+category: blog
+---
+
+The UNIX epoch is always in UTC. There's no such thing as local epoch. To get
+the epoch in command line, you do `date +%s`, or in Python, `time.time()`. It
+doesn't matter if `time.localtime()` and `time.gmtime()` are different, the
+epoch is universally consistent across timezone.
+
+When you get the time back from the epoch, the built-in `datetime` module in
+Python can do:
+
+```python
+import datetime
+
+epoch = 1713551000
+dt = datetime.datetime.fromtimestamp(epoch)
+```
+
+and this time is in your local timezone. You can explicitly add a timezone to
+the datetime created, such as
+
+```python
+import datetime, zoneinfo
+
+epoch = 1713551000
+dt = datetime.datetime.fromtimestamp(epoch, datetime.UTC)
+dt = datetime.datetime.fromtimestamp(epoch, zoneinfo.ZoneInfo("Asia/Hong_Kong"))
+dt = datetime.datetime.fromtimestamp(epoch, zoneinfo.ZoneInfo("US/Pacific"))
+```
+
+But this converts a time from local to the target timezone (tzinfo) since epoch
+is always in UTC. The datetime created above are numerically different. To
+convert any datetime object to a different timezone, you can do:
+
+```python
+import datetime, zoneinfo
+
+epoch = 1713551000
+dt_utc = datetime.datetime.fromtimestamp(epoch, datetime.UTC)
+dt_et = dt_utc.astimezone(zoneinfo.ZoneInfo("US/Eastern"))
+```
+
+Note that as a general rule in Python, a datetime object with no timezone means
+local timezone. This has a consequence: You have two ways to get the current time in Python:
+
+```
+dt = datetime.datetime.now()
+dt = datetime.datetime.utcnow()
+```
+
+And to get the epoch, you call `timestamp()` function on the datetime object
+only if that object reflects your local timezone. Hence this is wrong:
+
+```
+epoch = datetime.datetime.utcnow().timestamp()  # wrong!
+```
+
+If not to *convert* but to *change* the timezone while keeping the time
+numerically identical, you use `replace()`:
+
+```
+dt = dt_utc.replace(tzinfo=zoneinfo.ZoneInfo("US/Hawaii"))
+```
+
+The datetime object has implicit timezone. And the difference will take into
+account of the timezone as well. Hence `dt_utc - dt_et` will be
+`datetime.timedelta(0)`. To tell how many *seconds* the UTC is ahead of
+US/Eastern, you need to drop the timezone before the subtraction:
+
+```
+dt_utc.replace(tzinfo=None) - dt_et.replace(tzinfo=None)
+```
+
+This timezone property also affecting other routines silently. For example,
+getting the epoch with `dt.timestamp()` will always take into account of the
+timezone if you have one, or your local timezone, then convert to UTC and
+compute the epoch.
+
+The implicit timezone maybe confusion. Hence in pandas, it raise exceptions if
+you need a timezone but not providing one. For example, converting epoch to
+pandas datetime object:
+
+```
+import pandas as pd
+
+epoch = 1713551000
+ts = pd.to_datetime(epoch, unit="s")
+ts = ts.tz_convert("US/Eastern")  # fail
+```
+
+The conversion using `pd.to_datetime()` will assume local timezone while
+converting the epoch number to pandas Timestamp object. But the `tz_convert()`
+call will fail. To make it works, you need to start with a timezone aware
+Timestamp object:
+
+```
+import pandas as pd
+
+epoch = 1713551000
+ts = pd.to_datetime(epoch, unit="s", utc=True)
+ts = ts.tz_convert("US/Eastern")  # ok
+```
+
+The Timestamp object created with `to_datetime()` will carry UTC timestamp.
+Hence the next `tz_convert()` call works. Alternately, you can assign a
+timezone to a tz-unaware timestamp:
+
+```
+ts = ts.tz_localize("US/Eastern")
+```
+
+This assigns a timezone without adjusting the numbers. To remove the timezone,
+pass on `ts.tz_localize(None)`.
+
+Note that, NumPy avoids all these hassles by defining its `datetime64` type to
+be always UTC.
+
+
+In summary:
+
+1. UNIX epoch is always in UTC, since by definition it is the number of seconds since 1970 in UTC
+2. Python datetime always have a timezone. It uses local timezone if not explicitly set (not for pandas timestamp)
