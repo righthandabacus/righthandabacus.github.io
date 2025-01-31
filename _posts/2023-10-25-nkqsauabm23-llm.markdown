@@ -90,7 +90,11 @@ Transformers are designed as sequence transduction models for machine translatio
 - encoder output = context vector
 - context vector passed to the decoder to predict tokens
 
-Objective of an LLM is to predict the next token based on the input sequence. The *causal decoder* architecture restricts the flow of information backward, i.e., predicting token $\hat{t}_k$ using only the tokens $t_{1:k-1}$. This is the most widely used variant of LLMs.
+Objective of an LLM is to predict the next token based on the input sequence.
+The *causal decoder* architecture restricts the flow of information backward,
+i.e., predicting token $\hat{t}_k$
+using only the tokens $t_{1:k-1}$. This is the most widely used variant of
+LLMs.
 
 Another decoder-only architecture is *prefix decoder*, which the sequence is always fully visible on a portion of the input (usually the first few tokens of a sequence). The prefix decoder is non-causal.
 
