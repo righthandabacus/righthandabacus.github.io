@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Shazeer (2019) Fast Transformer Decoding. One Write-Head is All You Need
+title: "Shazeer (2019) Fast Transformer Decoding. One Write-Head is All You Need"
 date: 2025-01-31
 category: paper
 bibtex:
