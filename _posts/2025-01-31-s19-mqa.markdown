@@ -11,8 +11,9 @@ bibtex:
   arXiv: 1911.02150
 ---
 
-The author of this paper is from Google and the idea was explained in detail using TensorFlow code.
-Firstly, the traditional dot-product attention (single head):
+This is the paper that proposed the Multi-Query Attention (MQA). The author of
+is from Google and the idea was explained in detail using TensorFlow code.
+Firstly, the traditional dot-product attention (single head) is like this:
 
 ```python
 def DotProductAttention(q, K, V):
