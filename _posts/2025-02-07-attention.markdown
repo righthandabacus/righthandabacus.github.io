@@ -36,14 +36,14 @@ $$
 
 Each row in $K$ is a color. If you're curious, these are the colors:
 
-<span style="width:30px; background-color:#fef0d9;"> </span>
-<span style="width:30px; background-color:#fdcc8a;"> </span>
-<span style="width:30px; background-color:#fc8d59;"> </span>
-<span style="width:30px; background-color:#d7301f;"> </span>
-<span style="width:30px; background-color:#f6eff7;"> </span>
-<span style="width:30px; background-color:#bdc9e1;"> </span>
-<span style="width:30px; background-color:#67a9cf;"> </span>
-<span style="width:30px; background-color:#02818a;"> </span>
+<span style="width:1em; display:inline-block; background-color:#fef0d9;">&nbsp;</span>
+<span style="width:1em; display:inline-block; background-color:#fdcc8a;">&nbsp;</span>
+<span style="width:1em; display:inline-block; background-color:#fc8d59;">&nbsp;</span>
+<span style="width:1em; display:inline-block; background-color:#d7301f;">&nbsp;</span>
+<span style="width:1em; display:inline-block; background-color:#f6eff7;">&nbsp;</span>
+<span style="width:1em; display:inline-block; background-color:#bdc9e1;">&nbsp;</span>
+<span style="width:1em; display:inline-block; background-color:#67a9cf;">&nbsp;</span>
+<span style="width:1em; display:inline-block; background-color:#02818a;">&nbsp;</span>
 
 The first four are warm colors and the last four are cool colors. So we can define $V$ to indicate warm-cool:
 
@@ -76,7 +76,7 @@ $$
 
 This means the color as represented by $Q$ is 48.8% warm and 51.2% cool. The color is:
 
-<span style="width:30px; background-color:#8517dc;"> </span>
+<span style="width:1em; display:inline-block; background-color:#8517dc;">&nbsp;</span>
 
 Then it is intuitive what $Q,K,V$ means: $Q$ is the query because it is the
 input vector to the attention operation. $K$ is the key because it is the
