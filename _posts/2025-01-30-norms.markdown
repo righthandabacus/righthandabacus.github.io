@@ -57,7 +57,7 @@ expected to approximate $E[x]$ and $Var[x]$ over all training samples.
 The accuracy of batch norm (specifically, the calculation of mean and variance) depends on a large enough batch size. Also, computing them in a recurrent network is difficult.
 
 **Layer Normalization** performs across all channels and spatial dimensions. It
-is popularized only after the Transformer architecture use it. It simply compute the statistics over all units in the same layer, but the normalization term can be different in each training sample:
+is popularized only after the Transformer architecture use it. It simply computes the statistics over all units in the same layer, but the normalization term can be different in each training sample:
 
 $$
 \begin{aligned}
@@ -83,6 +83,32 @@ print(lnlayer.get_config()["axis"])  # ListWrapper([3])
 
 print(bnlayer.weights)   # gamma, beta, moving_mean, moving_variance: all of shape (11,)
 print(lnlayer.weights)   # gamma, beta: both of shape (11,)
+```
+
+An example implementation is found [here](https://github.com/facebookresearch/detectron2/blob/main/detectron2/layers/batch_norm.py):
+
+```python
+class LayerNorm(nn.Module):
+    """
+    A LayerNorm variant, popularized by Transformers, that performs point-wise mean and
+    variance normalization over the channel dimension for inputs that have shape
+    (batch_size, channels, height, width).
+    https://github.com/facebookresearch/ConvNeXt/blob/d1fa8f6fef0a165b27399986cc2bdacc92777e40/models/convnext.py#L119  # noqa B950
+    """
+
+    def __init__(self, normalized_shape, eps=1e-6):
+        super().__init__()
+        self.weight = nn.Parameter(torch.ones(normalized_shape))
+        self.bias = nn.Parameter(torch.zeros(normalized_shape))
+        self.eps = eps
+        self.normalized_shape = (normalized_shape,)
+
+    def forward(self, x):
+        u = x.mean(1, keepdim=True)
+        s = (x - u).pow(2).mean(1, keepdim=True)
+        x = (x - u) / torch.sqrt(s + self.eps)
+        x = self.weight[:, None, None] * x + self.bias[:, None, None]
+        return x
 ```
 
 Layer norm is useful in transformer (less common in image convolution) because input sequences are processed independently. A normalization that operate on individual sequence rather than across batch fits better.

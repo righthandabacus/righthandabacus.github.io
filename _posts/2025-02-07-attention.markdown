@@ -118,4 +118,12 @@ V = np.array(V, dtype=float)
 print(softmax @ V)
 ```
 
-In a transformer model, all of $Q,K,V$ are projected by a learnable projection matrix. Also, attention layer in a transformer model is usually multi-headed, meaning for the same input, it is projected differently to compute various attention outputs. In the example above, the attention output finds how warm or cool the RGB color is and the definition of warm-cool would be learned if the projection matrix is learnable, and a multitude of properties of a color will be found by the multiple outputs of multihead attention unit.
+In a transformer model, all of $Q,K,V$ are projected by a learnable projection
+matrix. Also, attention layer in a transformer model is usually multi-headed,
+meaning for the same input, it is projected differently to compute various
+attention outputs. In the example above, the attention output finds how warm or
+cool the RGB color is. The definition of warm-cool would be learned if the
+projection matrix is learnable. Moreover, color may be presented in HSV space
+instead of RGB and the learnable projection matrix should tell what would be
+the best way to represent a color. If multihead attention unit is used, not
+just warm-cool, but a multitude of properties of a color will be found.
