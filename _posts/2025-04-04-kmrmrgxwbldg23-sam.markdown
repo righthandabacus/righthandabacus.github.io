@@ -208,7 +208,7 @@ In each `SamTwoWayAttentionBlock`, self-attention is first applied on query+poin
 
 In graph, this is implemented as below:
 
-![](/img/sam-2way-attn-block.png)
+![](/img/sam-2way-transformer.png)
 
 ## References
 
