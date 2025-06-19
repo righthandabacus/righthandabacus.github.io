@@ -2,6 +2,7 @@
 layout: post
 title: "Normalization Zoo"
 date: 2025-01-30
+lastupdate: 2025-06-17
 tags: math
 highlightjs:
   - python
@@ -112,6 +113,17 @@ class LayerNorm(nn.Module):
 ```
 
 Layer norm is useful in transformer (less common in image convolution) because input sequences are processed independently. A normalization that operate on individual sequence rather than across batch fits better.
+
+**Adaptive LayerNorm** is a slight modification to LayerNorm by Xu et al. Instead of the learnable weight $\gamma$ and bias $\beta$ used above, it set:
+
+$$
+\begin{aligned}
+\gamma &= C(1-k\hat{x}_{nhwc}) = C(1-\frac{1}{10}\hat{x}_{nhwc}) \\
+\beta &= 0
+\end{aligned}
+$$
+
+where $C$ is a hyperparameter, to be the average of $\gamma$. No gradient are calculated for them as they are not learnable. The rationale is to make the scale and bias adaptively adjustable.
 
 **Instance normalization** limits the mean and variance calculation across the spatial dimension only. It originates from the style transfer of image in which the style can be characterized by $\gamma,\beta$ after the image is normalized. The formula from the paper are:
 
@@ -226,4 +238,4 @@ $$
 - Tim Salimans and Diederik P. Kingma (2016). Weight normalization: A simple reparameterization to accelerate training of deep neural networks. In Advances in neural information processing systems (pp. 901-909). [arXiv:1603.07868](https://arxiv.org/abs/1602.07868).
 - Takeru Miyato and Toshiki Kataoka and Masanori Koyama and Yuichi Yoshida (2018) Spectral normalization for generative adversarial networks. In Proc. ICLR [arXiv1802.05957](https://arxiv.org/abs/1802.05957).
 - Biao Zhang and Rico Sennrich (2019) Root Mean Square Layer Normalization. In Proc. NeurIPS. [arXiv:1910.07467](https://arxiv.org/abs/1910.07467).
-
+- Jingjing Xu, Xu Sun, Zhiyuan Zhang, Guangxiang Zhao, and Junyang Lin (2019) Understanding and Improving Layer Normalization. In Proc. NeurIPS [arXiv:1911.07013](https://arxiv.org/abs/1911.07013)
