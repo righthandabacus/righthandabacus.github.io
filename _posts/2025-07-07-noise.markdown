@@ -1,0 +1,52 @@
+---
+layout: post
+title: Digital Camera Noise
+date: 2025-07-07
+tags: math
+---
+
+How to understand noise in digital camera photos? A common believe is that it
+is related to ISO. The higher the ISO, the stronger the noise. However, some
+also said [ISO has nothing to do with noise](https://www.reddit.com/r/photography/comments/1ds56lo/about_the_relationship_between_iso_and_noise/).
+To be accurate, the only valid statement is that noise is a built-in property
+of the image sensor. It is complicated to tell how would that translate into
+the noise you see in the image.
+
+The digital image sensor is to be activated by photons and respond with voltage
+output. Reading the [dataset of a digital image sensor](https://www.onsemi.com/pdf/datasheet/noii4sm6600a-d.pdf),
+some parameters would be related to this function:
+
+- Sensitivity: In unit of volt per lux-second
+- Dark current: In unit of volt per second
+
+The sensitivity depends on multiple factors, including the wavelength of light,
+temperature, and light intensity. Usually the sensitivity is nonlinear to these
+parameters. The dark current may also depends on temperature. Ideally, the
+sensor should be a function that translate the light intensity into voltage. In
+reality, there is a non-zero noise added.
+
+Therefore, mathematically, we may represent the response of the image sensor with:
+
+$$
+I = \int_0^T g \big( L_A(t) + \epsilon(t)\big) dt
+$$
+
+where $\epsilon(t)$ represents the noise function and $L_A(t)$ the sensor
+function. In a simplified model, $\epsilon(t)$ is a small random quantity and
+$L_A(t)$ is a function depends on the aperture of the camera and light
+intensity of the subject. Both are a function of time. The constant $g$ is the
+gain, which is controlled by ISO. The time $T$ is the reciprocal of the shutter
+speed. $I$ is the pixel value as produced from the camera (before clipping due
+to overexposure).
+
+The image sensor gives you electrical signal representation of the light. ISO
+is implemented as the amplifier to the signal. The signal is produced by
+accumulating photons on the sensor in which will charge up the voltage output.
+This is a process that takes time.
+
+By looking at the integral above, the noise as perceived is determined by the
+signal-to-noise ratio $L_A(t)/\epsilon(t)$. Really, ISO plays no role here.
+Neither do the length of exposure $T$. To reduce noise, the stronger incident
+light is all you need. The reason for the misconception is at low-light situation,
+to make $I$ not underexposed, the natural operation is to increase $g$ or $T$
+while the aperture was limited by the lens so $L_A(t)$ is not adjustable.
