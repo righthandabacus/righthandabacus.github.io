@@ -1,0 +1,80 @@
+---
+layout: post
+title: "Gerber (2025) Attention Is Not All You Need"
+date: 2025-12-02
+category: paper
+bibtex:
+  type: unpublished
+  title: "Attention Is Not All You Need: The Importance of Feedforward Networks in Transformer Models"
+  author: "Isaac Gerber"
+  month: May
+  year: 2025
+  arXiv: 2505.06633
+  url: https://arxiv.org/abs/2505.06633v1
+---
+
+This is a paper to investigate the importance of the MLP sublayer in a
+decoder-only transformer model. In particular, the common design of a two-layer
+feed-forward network is challenged. Alternatives of 0 to 3 layers of
+feed-forward networks are compared for the standard error loss.
+
+Standard decoder-only architecture is popularized by OpenAI's GPT model. It is
+a stack of transformer blocks. Each block has an attention sub-layer and a
+feedforward sub-layer. It is known that a FFN with hidden layer is a universal
+function approximator (Hornik, Stinchcombe, & White, 1989). In transformer
+block, the ratio of the number of parameters between MLP and attention
+sub-layers is 8:3,
+
+- In MLP: the standard design is two linear layers, one for $4d\times d$ projection and one for $d\times 4d$. Total number of parameters is $8d^2$
+- In attention: there are three projection matrices for Q, K, and V, each has $d^2$ parameters.
+
+(Note: the ratio should be 2:1, since there should be a output projection
+matrix in the attention sub-layer as well)
+
+## Model architecture
+
+In the paper, only pre-norm architecture is studied. The architecture of the
+MLP sub-layer (with skip connection) is:
+
+- 0 linear layer: Act(Dropout(Norm(x)))+x
+- 1 linear layer: Act(Dropout(Linear(Norm(x))))+x
+- 2 linear layers: Dropout(Linear(Act(Linear(Norm(x)))))+x
+- 3 linear layers: Dropout(Linear(Act(Linear(Act(Linear(Norm(x)))))))+x
+
+The intermediate dimension in the MLP sub-layers are always 4x the model
+dimension, following the convention. The paper set the baseline model dimension
+to 1024 with 24 transformer blocks, use GELU activation, and dropout of 10%, to
+match the design of *GPT-3 medium*.
+
+The paper trains the models with:
+
+- a vocab size of 10K
+- sequence length 256
+- batch size 16
+- AdamW optimizer, cosine learning rate decay with 300 warm-up steps and max LR 1.5e-4
+- using Booksum Complete Cleaned dataset (<https://huggingface.co/datasets/ubaada/booksum-complete-cleaned>) and WikiText-103 dataset
+  - Booksum corpus has 145K sequences of training + 24K test data
+  - WikiText has 510K sequences of training + 1.2K test data
+- use mean cross-entropy loss on each sequence, and report mean and standard error of the accuracy of each batch
+
+## Result
+
+- 3 linear layers outperforms the standard 2 linear layers design
+- more linear layers outperform the models with fewer linear layers
+- higher dimension models outperform deeper network counterparts
+- Given the same number of parameters, a 3 layer model with fewer transformer blocks can train faster than 2 layer model with more blocks
+
+## Aspects not explored
+
+This is a short paper. The ideal set up has not been explored. For example, the
+paper explored that the intermediate dimension of MLP sub-layer as 4x the model
+dimension performs better than 2x, but haven't explored the other multiples.
+Also, the MLP is designed as a simple FFN. SwiGLU activation (which is to
+process the input tensor using a quadratic function) has not been explored.
+
+The paper also assumed only GELU activation. It has not prove whether the
+activation function affects the result, especially when the original attention
+paper uses ReLU.
+
+Also, the linear layer may or may not have bias term. It is unclear from the
+paper. The effect of the bias term is also not explored.
