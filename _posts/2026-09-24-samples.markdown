@@ -1,0 +1,193 @@
+---
+layout: post
+title: "Optimal number of trials"
+date: 2026-09-24
+category: math
+---
+
+Let $p = (p_1, \dots, p_V)^\top$ with $p_i \ge 0$ and $\sum_i p_i=1$ be a categorical probability distribution over a vocabulary of size $V$. We draw $N$ i.i.d. samples from $p$ to form the empirical probability vector $\hat p$, which should be close to $p$. If we draw again, the two empirical probability vectors should also be close. The closeness is defined using cosine similarity. What should be $N$?
+
+## Probability from one-hot vector
+
+Let $e_i$ be the $i$-th standard basis vector (one-hot), then the $t$-th sample we draw can be represented by $Y_t \in \{e_1, \ldots, e_V\}$, in which $\Pr[Y_t = e_i] = p_i$.
+
+Then we have $\mathbb{E}[Y_t] = \sum_{i=1}^{V} p_i e_i = p$. The (auto-)covariance matrix of random vector $Y_t$ is then
+
+$$
+  \mathrm{Cov}(Y_t)
+  = \mathbb{E}\big[
+      (Y_t-p)(Y_t-p)^\top
+    \big]
+  = \mathbb{E}[Y_tY_t^\top] - \mathbb{E}[2pY_t^\top] + pp^\top
+  = \mathbb{E}[Y_tY_t^\top] - pp^\top.
+$$
+
+Because $Y_t$ is one-hot, $Y_tY_t^\top$ is diagonal, consequently, $\mathbb{E}[Y_tY_t^\top] = \mathrm{diag}(p)$
+
+and hence
+
+$$
+\begin{aligned}
+  \mathrm{Cov}(Y_t) &= \mathrm{diag}(p) - pp^\top \\
+  \mathrm{Cov}(Y_{t,i},Y_{t,j}) &= \begin{cases}
+    p_i(1-p_i) & \text{if }i=j, \\
+    -p_ip_j & \text{if }i\ne j.
+  \end{cases}
+\end{aligned}
+$$
+
+The negative entries off-diagonal is because selecting one category excludes
+all other categories in the same trial.
+
+## Sampling noise
+
+The empirical distribution is
+
+$$
+  \hat p = \frac{1}{N}\sum_{t=1}^{N}Y_t.
+$$
+
+Since the sampling is i.i.d., we have $\mathbb{E}[\hat p] = p$ and $\mathrm{Cov}(\hat p) = \frac{1}{N} (\mathrm{diag}(p)-pp^\top)$.
+
+If $\hat p = p + \epsilon$ for $\epsilon$ the sampling error, and $\mathbb{E}[\epsilon]=0$, its expected that the squared Euclidean magnitude is the trace of its covariance:
+
+$$
+\begin{align}
+  \mathbb{E}[\lvert\epsilon\rvert_2^2]
+  &= \mathrm{tr}\big(\mathrm{Cov}(\hat p)\big) \\
+  &= \frac{1}{N}\big( \mathrm{tr}(\mathrm{diag}(p)) - \mathrm{tr}(pp^\top) \big) \\
+  &= \frac{1-\lvert p\rvert_2^2}{N}.
+\end{align}
+$$
+
+We can consider this as the noise power. The signal power is trivially $\lvert p \rvert_2^2$. Then the SNR is
+
+$$
+\text{SNR}
+= \frac{\lvert p\rvert_2^2}{\mathbb{E}[\lvert \epsilon \rvert_2^2]}
+= \frac{N\lvert p\rvert_2^2}{1-\lvert p\rvert_2^2}.
+$$
+
+Define the effective support of $p$ by $S_\text{eff} = 1/\sum_i p_i^2 = 1/\lvert p\rvert_2^2$, then we can write
+
+$$
+\text{SNR} = \frac{N}{S_\text{eff}-1}.
+$$
+
+If $p$ is concentrated like a one-hot, we have $S_\text{eff}=1$. If the distribution $p$ is very diffused, we have $S_\text{eff}\gg 1$. In particular when the distribution is uniform over $V'$ categories (in which case $V-V'$ categories are always with probability zero), $p_i=1/V'$ and $S_\text{eff}=V'$. In the diffuse scenarios, $\text{SNR}\approx N/S_\text{eff}$.
+
+
+## Estimating Distribution
+
+Let $s = \lvert p\rvert_2^2$. The cosine similarity between $\hat p=p+\epsilon$ and $p$ is exactly
+
+$$
+\begin{aligned}
+  \cos(\widehat p,p)
+  &= \frac{(p+\epsilon)^\top p}
+          {\lvert p+\epsilon\rvert_2\cdot \lvert p\rvert_2} \\
+  &= \frac{s+p^\top \epsilon}
+          {\sqrt{s+2p^\top \epsilon + \lvert\epsilon\rvert_2^2}\cdot\sqrt{s}} \\
+  &= \frac{1+a}{\sqrt{1+2a+b}},
+\end{aligned}
+$$
+
+where
+
+$$
+  a = \frac{p^\top\epsilon}{s},
+  \qquad
+  b = \frac{\lvert\epsilon\rvert_2^2}{s}.
+$$
+
+Since $\mathbb{E}[a]=0$, it can be ignored. And $\mathbb{E}[b]=1/\text{SNR}$ (see the formula above),
+
+$$
+  \cos(\hat p,p) = c
+  \approx \frac{1}{\sqrt{1+1/\text{SNR}}}
+  = \frac{1}{
+      \sqrt{1+(S_\text{eff}-1)/N}
+    }
+  \approx \frac{1}{
+      \sqrt{1+S_\text{eff}/N}
+    }.
+$$
+
+To meet a specified cosine similarity $c\in(0,1)$, solve
+
+$$
+\begin{aligned}
+  c & \le \frac{1}{\sqrt{1+S_\text{eff}/N}} \\
+  \frac{S_\text{eff}}{N} & \le \frac{1}{c^2} - 1 \\
+  N & \ge S_\text{eff}\frac{c^2}{1-c^2}
+\end{aligned}
+$$
+
+At $c=0.99$, that means $N$ is around $49.25 S_\text{eff}$.
+
+## Comparing Two Empirical Distributions
+
+Let $\hat p_1 = p+\epsilon_1$ and $\hat p_2=p+\epsilon_2$ are sampled from $p$ using the same i.i.d. process.
+
+With zero mean error $\mathbb{E}[\epsilon_1]=\mathbb{E}[\epsilon_2]=0$ and i.i.d., we have $\mathbb{E}[\hat p_1\hat p_2]=\vert p\vert_2^2 = s$.
+
+Also, we have
+
+$$
+\begin{align}
+  \mathbb{E}[\lvert\hat p_j\rvert_2^2]
+  &= s + \mathbb{E}[\lvert\epsilon_j\rvert_2^2] \\
+  &= s + s/\text{SNR} \\
+  &= s(1+1/\text{SNR}) \\
+  \therefore\; \cos(\hat p_1, \hat p_2)
+  & \approx \frac{s}{\sqrt{s(1+1/\text{SNR})}\sqrt{s(1+1/\text{SNR})}} \\
+  & = \frac{1}{1+1/\text{SNR}} \\
+  & \approx \frac{1}{1+S_\text{eff}/N}
+\end{align}
+$$
+
+with the threshold of $\cos(\hat p_1,\hat p_2)\ge c$, we get
+
+$$
+N \ge \frac{c}{1-c}S_\text{eff}.
+$$
+
+At $c=0.99$, that means $N$ is around $99 S_\text{eff}$. (More trials required because we do not have the clean probability vector $p$ to compare.)
+
+Note that the $N$ computed is the required minimum to achieve cosine similarity of $c$. Multiply it by a safe margin factor is always preferred.
+
+## Gaussian Distribution of $p$
+
+If $p$ is from a softmax of i.i.d. Gaussian vector, namely,
+
+$$
+  Z_i \overset{\text{iid}} \sim \mathcal{N}(0,\sigma^2),
+  \quad
+  p_i = \frac{e^{Z_i}}{\sum_j e^{Z_j}},
+$$
+
+with a large $V$ and no extreme logits to dominate the sum, the law of large numbers gives
+
+$$
+  \sum_j e^{Z_j} \approx V\,\mathbb{E}[e^Z],
+  \quad
+  \sum_j e^{2Z_j} \approx V\,\mathbb{E}[e^{2Z}].
+$$
+
+and with the moment generating function $\mathbb{E}[e^{tZ}] = e^{t^2\sigma^2/2}$, we have
+
+$$
+\begin{align}
+  \sum_i p_i^2
+  &\approx
+  \frac{
+    V\mathbb{E}[e^{2Z}]
+  }{
+    V^2\mathbb{E}[e^Z]^2
+  } \\
+  &= \frac{e^{\sigma^2}}{V} \\
+  \therefore\; S_\text{eff} & \approx Ve^{-\sigma^2}.
+\end{align}
+$$
+
+This formula can be substitued in the equations above to determine $N$.

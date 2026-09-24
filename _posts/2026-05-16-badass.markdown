@@ -1,0 +1,139 @@
+---
+layout: post
+title: "Badass: Making Users Awesome"
+subtitle: "Kathy Sierra / 2015"
+date: Wed, 17 Apr 2019 19:06:27 -0400
+category: book
+bibtex:
+  type: book
+  title: "Badass: Making Users Awesome"
+  author: Kathy Sierra
+  year: 2015
+  publisher: O'Reilly
+  isbn: 978-1-491-91901-9
+---
+
+This book is about empowering users. Not specific to any kind of product, but arguing that whether the users feel they
+have some achievements to talk about is the key to whether they are loyal to a product.
+
+## Tool vs Context
+
+The earlier pages explain that product quality is not the key to sustained success because some product with crappy
+quality still loved by users. If user desires for the product, defects can be tolerated. A successful product does not necessarily need to out-spend the competition on marketing. It needs to engage the users to recommend and talk about their *experiences* on *using* the product ("I am awesome", then the awesome product is just a side effect).
+
+It leads to the problem of how to create *badass users*. This is to answer the following questions:
+
+- What does having tool X enable you to do?
+- What can people do because of X that they couldn't do without it?
+- What can people do better because of X?
+
+These questions is not about the *tool*, but the *compelling context*. The context is the motivation for the users and the tool is the means to the goal. Just as "photography" is the context and "camera" is the tool. A user with deeper, richer experiences in photography will appreciate the benefits of higher-end cameras. Therefore, the users need to be upgraded, not the tool.
+
+## Learning Curve
+
+When users are on a product, what do they do in the next minute/hour/days/weeks? What doe they talk about? Who do they talk to? This is the post-UX experience. User need to do something in a short time.
+
+There are three possibilities of a user experience:
+1. Beginner drop out after first exposure
+2. Beginner grow slowly and never become a master
+3. Fast growth of ability to become mastery
+
+Suck threshold is below mediocre ability. If user cannot cross the suck threshold, they will drop out and never come back. You need to keep user survive by shorten their time in the suck zone. Some product has a long learning curve, then you need to think what the user can achieve in a short time.
+
+Most user just crossed suck threshold and stay plateau in the "stuck zone". They learn no new skill and not more powerful. Then their enthusiasm will fade away, not feeling awesome. They will not talk about the product even they are loyal users. Example is the "auto mode" in camera. Comfortable but cannot develop deeper interest.
+
+Badass threshold is where user become mastery. Not all users want to be badass, but all want to be *better*. The problem is how to turn the tiny spark at the beginning into a flame. You need just one "badass path", just some users can go further than others.
+
+## Deliberate Practice
+
+Badass performs a representative task in the domain in a superior way, more reliably. Not what they know, but what they do with what they know. They are consistent in their performance. They make better choices.
+
+The key to become badass is focused practice. This is the metaskill of building skills. That's the reason experts in one domain can build expertise in other domains. Users need support and encouragement to keep them going.
+
+Skills can be put into three categories:
+
+- A: Can't do
+- B: Can do with effort (not reliable)
+- C: Mastered (reliable/automatic) and can do consistently
+
+Normally the transition is A→B→C. Experts may have some A→C, but also C→B sometimes. This is because to deal with the *intermediate blues* which some automated skills must change to move forward. Only to bring back the unconscious competence at intermediate level to conscious inspection, user can change it and improve. Experts have a good balance of number of skills between B and C. Mediocre people have too many B skills.
+
+Experts practice more effectively with the same amount of time. That is *deliberate practice*. Practice locks-in the skill. Half-a-skill is better than half-assed skill. The right way of practice is to master one tiny sub-skill at a time even it is useless on its own.
+
+Each deliberate practice exercise is a take fine-grained task into 95% reliability within one to three 45-90 minute sessions. If you can't achieve that, either you need a finer-grained sub-task (narrower scope) or an easier sub-task (reduce complexity/reduce speed). It must be just beyond our current ability (comfort zone), but not too hard that we cannot do it. The 10,000-hour rule is about deliberate practice. If you practice hard but not making progress, you have too little deliberate practice.
+
+It is not deliberate practice if not to become significantly more reliable. For example, work on a project, listen to a lecture, do something you can already do reliably, or too long a gap between sessions are all not deliberate practice. But they might still useful: It might help you improve at a slower pace, help you figuring out what deliberate practice you need, or provide motivation.
+
+## Perceptual Exposure Experience
+
+To become experts, you need to be exposed to large quantity of high-quality examples in a compressed time. Your brain will learn perceptually by detecting the patterns from a *diverse* set of examples, without conscious awareness.
+
+Users will get better by being exposed to better. But you shouldn't show the bad examples because the brain will learn and try to imitate the bad examples too. The best way to learn the bad is to learn the pattern of good. If you must, make the user feel wrong/bad when they see wrong/bad examples (e.g., use harsh video filter).
+
+## Performance Path Map
+
+Users do not move forward because they stopped. There are two reasons for their stop. But they didn't lost the motivation:
+
+1. Gap of suck: They're in the suck zone. They feel pain and dropped out.
+2. Gap of disconnect: They got the tool but lost the connection between the compelling context and the tool.
+
+The problem is that we're not with the users when they're feeling the gap. They're struggling but don't know it is appropriate. We need to acknowledge it and let them know the struggle is typical and temporary. Make them willing to try again.
+
+The solution is to anticipate and compensate. Anticipate the most likely questions they might ask, and compensate for their inability to ask you for help. Just browse around the online discussion forums for 15 minutes you will uncover what are the pain and opportunities to compensate.
+
+The output is to create a performance path map. Show the clear steps for progression from beginner to master, with clear way to assess which step you are at. You can create a performance path map from a degree program curriculums, user groups, discussion forums, or the table of content from a bible of the domain: List all the key skills, then slice them into groups to make ranks and levels, in which lower ranks should be achievable in far less time than the higher ranks (e.g., double the time and effort for each level). This path map may not be agreed by all experts because there're more than one path possible. The path is not always optimal, but should be a robust path that does right things in the right ways.
+
+When users make progress, they should also benefit from getting better. You should lower the initial threshold for users do something. For example, convince them to try by creating a "wild experiment mode" or allow them to reset easily, so that they won't fear. The users should do meaningful things but not necessarily practical. It should surprise them with their new capabilities, delight them, or inspire them. This is to hint of the future potential.
+
+The progress should be high payoff: After first 30 minutes, recognize the progress with benefits, then motivate the next goal. It is a continuous loop of:
+
+1. Motivating next superpower (new goal)
+2. Practice + exposure (activities to build skills and knowledge)
+3. Payoff (ideas & activities to benefit from current superpower)
+
+Where the best payoff is an intrinsic reward. It can be *high resolution*, such as understanding the jargons used by experts (hence feel like a superpower), or a *flow* that fully absorbed the user in a stimulating and challenging activity that let you lose the sense of time (require to match the current skill level to meet the challenge).
+
+Create a page of tips & tricks to equip the user with some skillset to be able to do something rewarding. It is not to give shortcuts, but help them bypass the unnecessary hurdles, so that they can practice without even understanding why the shortcut works.
+
+## Cognitive Leaks
+
+The summary of helping user grow is the following:
+
+<pre class="mermaid">
+graph TD
+    A[Make our users\nbadass]
+    A --> B[Help them\nactually get better]
+    A --> C[Help them\nkeep wanting to]
+    B --> D[Help them\npractice right]
+    B --> E[Help them get exposure\nto the right things]
+    C --> F[Focus on\nwhat makes them stop]
+    C --> G[Motivation\npath & payoffs]
+</pre>
+
+But to make users move on needs to reduce the *congnitive leaks*.
+
+The 1999 experiment by Baba Shiv and Alex Fedorikhin showed that willpower and cognitive processing draw from the same pool of resources. If the product you use is poorly designed and hard to use, it drains your willpower. Therefore we should make sure users spend their scarce cognitive resources on the right things.
+
+Zeigarnik effect says the brain keeps a background process running for unfinished tasks. For example, unresolved plot elements keep you continue the novel. Your brain won't worry about unfinished cognitive tasks if it believes something has a trustworthy plan to handle it.
+
+Dan Saffer in his book "Microinteractions" says when a user did some small action but not sure the tool did exactly what it is intended, there is a *cognitive microleak*. Therefore, every new feature to a product should be reconsidered (1) whether the feature worth the drain of cognitive resources, (2) how the feature contribute to the bigger context, and (3) whether we can hide or minimize the feature until the user is ready to deal with it.
+
+The best way to reduce cognitive leaks is to move the cognitive work to something in the word so that it is not in the user's head. For example, use a labelled obvious control panel instead of a sleek elegant interface that user need to read the manual to understand. The skills in category B (can do with effort) is what will drain cognitive resources, but cateogry C (mastered) is cognitively cheap.
+
+There is a trade off between knowledge in the head vs in the world. Learning and memorizing drains cognitive resources, but using memorized knowledge and skill is fast and effortless. Find what is worth spending the effort to memorize and leave other to look up when needed. For example, we push a door when it labelled "pull" because it looked pullable. That is a design problem of the door. We should not let users choose because it is cognitively expensive. The users can have a choice, but they should not be forced to choose.
+
+This is the power of *perceived affordances* (from Donald Norman's book "The Design of Everyday Things"): To reduce the cognitive leaks, make the right things easy and wrong things hard.
+
+## Spam Filter
+
+Deliberate practice drains cognitive resources (because by definition, it requires cognitive effort). Therefore we should help users around to make practice easier, such as a practice notebook or tracking app. Reduce the need for willpower can help user gain intrinsic rewards and stay focus.
+
+Our brain has a spam filter to ignore the dull, lifeless content. To make the brain engage, you need to convince the brain that it is something to care about and remember. It can be a face showing strong emotions, young helpless things, something that cause a feeling (funny, suprising, or odd), or answers to unresolved questions (the Zeigarnik effect).
+
+You can put a gratuitous puppy pictures on boring pages to get attention until your brain get used to it. But to improve memorability, you should make it *visceral*, i.e., create feeling or convince the brain about the context. The best way is to reduce the amount of things that need to get past the brain's spam filter: Keep only the absolute essential. The brain prefer just-in-time knowledge over just-in-case. Hence you should validate to find what knowledge is directly related to the essential skills and remove all else.
+
+
+<script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true });
+</script>
